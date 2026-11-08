@@ -258,3 +258,45 @@ De test- en productieomgeving moeten daarbij beheersbaar blijven: wijzigingen wo
 ---
 
 **Documentstatus:** functionele doelstelling en globale beschrijving van de beoogde werking. Dit document beschrijft de richting van het project; het is geen bewijs dat alle genoemde functies al zijn gerealiseerd.
+
+## 17. Vaste standaard voor alle beheerlijsten en invoerschermen
+
+Iedere lijst in de beheeromgeving van DONDEBAILAR gebruikt dezelfde algemene opbouw en basisbediening. Dit geldt niet alleen voor gebruikers, evenementen en locaties, maar ook voor alle bestaande en toekomstige beheermodules, zoals regio's, organisatoren, categorieën, berichten en andere gegevens.
+
+### 17.1 Overzichtslijst
+
+Iedere beheerlijst bevat waar relevant:
+- Een zoekveld waarmee records op relevante gegevens kunnen worden gevonden.
+- Een knop **Toevoegen** die een afzonderlijk, leeg invoerscherm opent.
+- Een overzicht van de bestaande records met de belangrijkste herkenbare gegevens.
+- Per record een actie **Aanpassen** die een afzonderlijk invoerscherm opent met de bestaande gegevens ingevuld.
+- Per record een actie **Wissen** of, wanneer definitief verwijderen niet veilig of toegestaan is, **Archiveren/Deactiveren**.
+- Paginering wanneer de lijst te veel records bevat om overzichtelijk in één keer te tonen.
+- Duidelijke feedback wanneer geen resultaten gevonden zijn of wanneer een bewerking gelukt of mislukt is.
+
+### 17.2 Toevoegen en aanpassen
+
+Toevoegen en aanpassen gebeuren op een afzonderlijk invoerscherm, niet door de gegevens rechtstreeks in de overzichtslijst te wijzigen.
+
+- Het scherm voor toevoegen opent met lege velden en passende standaardwaarden.
+- Het scherm voor aanpassen toont de bestaande gegevens van het gekozen record.
+- Verplichte velden en invoerformaten worden duidelijk aangegeven en gecontroleerd.
+- Elk invoerscherm heeft duidelijke acties **Opslaan** en **Annuleren**.
+- Na succesvol opslaan keert de gebruiker terug naar de betreffende overzichtslijst, met waar mogelijk behoud van de zoekopdracht en de huidige pagina.
+- Bij validatiefouten blijven de ingevulde gegevens behouden en worden de fouten duidelijk getoond.
+
+### 17.3 Wissen en gegevensrelaties
+
+- Wissen vraagt altijd eerst een expliciete bevestiging.
+- Voor het verwijderen wordt gecontroleerd of het record gekoppeld is aan andere gegevens.
+- Gegevens die nog nodig zijn voor evenementen, gebruikers, financiële of historische gegevens, berichten of andere relaties mogen niet ongemerkt worden verwijderd.
+- Als definitief verwijderen niet veilig of functioneel toegestaan is, wordt archiveren of deactiveren gebruikt.
+- Verwijderen en archiveren zijn alleen beschikbaar voor gebruikers met de juiste rechten.
+
+### 17.4 Rechten en consistentie
+
+- De mogelijkheid om lijsten te bekijken, records toe te voegen, aan te passen, te wissen, te archiveren of te deactiveren wordt per gebruikersrol en bevoegdheid gecontroleerd.
+- Rechten worden zowel in de gebruikersinterface als op de server afgedwongen; het verbergen van een knop alleen is geen beveiliging.
+- Alle beheerlijsten gebruiken dezelfde herkenbare bediening, knopbenamingen, formulieropbouw, bevestigingen en meldingen.
+- De velden en inhoud verschillen per module, maar de werking en gebruikerservaring blijven consequent.
+- Nieuwe beheermodules moeten deze standaard hergebruiken. Waar mogelijk wordt hiervoor één gedeelde, herbruikbare technische basis voor lijsten en formulieren ontwikkeld.
