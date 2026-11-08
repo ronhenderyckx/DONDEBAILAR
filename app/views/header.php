@@ -51,4 +51,5 @@ $escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QU
         <?php endif; ?>
     </nav>
 </header>
+<link rel="stylesheet" href="/assets/css/site.css">
 <main class="site-main">
