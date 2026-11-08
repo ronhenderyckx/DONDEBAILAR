@@ -123,6 +123,7 @@ De sociale feed is de standaardweergave van de publieke kalender. De exacte werk
 De publieke feed krijgt bovenaan een bedieningsbalk met een gebruikservaring die aansluit bij Instagram. Vanuit deze balk kan de bezoeker de feed bedienen en evenementen filteren.
 
 - De bovenbalk bevat een duidelijke toegang tot de filtermogelijkheden.
+- **Vast zichtbare bovenbalk:** de bovenbalk blijft tijdens het scrollen permanent zichtbaar bovenaan het scherm (sticky/fixed gedrag). De evenementenfeed scrolt eronder door. Dit werkt op smartphone, tablet en desktop en houdt rekening met de beschikbare schermruimte.
 - **Filter op organisator:** de bezoeker kan een organisator selecteren en alleen de evenementen van die organisator bekijken.
 - **Filter op locatie:** de bezoeker kan filteren op stad of gemeente.
 - De actieve filter(s) zijn zichtbaar, zodat duidelijk is waarom bepaalde evenementen worden getoond.
