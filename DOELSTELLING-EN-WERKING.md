@@ -105,6 +105,7 @@ De publieke kalender is standaard een **sociale evenementenfeed**, geïnspireerd
 - De feed blijft één doorlopende stroom; alleen de presentatie en het aantal kolommen veranderen per schermformaat.
 - Een evenementkaart kan een affiche of foto, titel, datum en uur, locatie, organisator en korte beschrijving tonen.
 - Bezoekers kunnen evenementen openen voor alle details en, volgens de beschikbare rechten, liken, reageren, delen of bewaren.
+- **Like-knop:** de like-knop gebruikt een herkenbaar symbool van dansschoenen in plaats van een hartje. Na aanklikken krijgt het dansschoenen-symbool een duidelijke actieve kleur of vorm. Het aantal likes blijft zichtbaar. Dit symbool wordt consequent gebruikt op de evenementkaarten in de feed en in de evenementdetailweergave, op smartphone, tablet en desktop.
 - Organisatorprofielen en relevante zoek- en filtermogelijkheden maken deel uit van de publieke ontdekkingservaring.
 - De weergave moet snel, overzichtelijk en gebruiksvriendelijk blijven op smartphone, tablet en desktop.
 - **Extra informatie via swipe:** op een evenementkaart kan de bezoeker naar rechts swipen om meer informatie over dat evenement te tonen. Dit gebaar werkt zowel wanneer de beweging op de afbeelding/affiche begint als wanneer ze op de tekst van de kaart begint.
