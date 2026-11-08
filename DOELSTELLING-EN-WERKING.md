@@ -97,7 +97,6 @@ De vormgeving moet:
 - De agenda en evenementinformatie centraal stellen.
 - Rekening houden met de regionale huisstijl.
 
-
 ## 10. Chat en berichten
 
 DONDEBAILAR moet gebruikers de mogelijkheid bieden om met elkaar te communiceren via een ingebouwde chatfunctie.
@@ -162,7 +161,66 @@ Deze onderdelen worden gefaseerd ontwikkeld. Ze gelden niet als beschikbaar zola
 - Chatberichten en evenementreacties worden veilig opgeslagen en alleen getoond aan bevoegde gebruikers.
 - Bij communicatiefunctionaliteit wordt rekening gehouden met privacy, spambeperking, misbruikmeldingen en moderatie.
 
-## 14. Gefaseerde ontwikkeling
+## 14. Testomgeving op Raspberry Pi en productieomgeving
+
+De testomgeving van DONDEBAILAR wordt op een Raspberry Pi geplaatst. Deze Raspberry Pi dient als afzonderlijke ontwikkel- en testserver waarop nieuwe functies, updates en databasewijzigingen eerst kunnen worden uitgeprobeerd voordat ze naar de productieomgeving gaan.
+
+Een belangrijk uitgangspunt is dat de testomgeving **snel, gecontroleerd en herhaalbaar kan worden opgebouwd op de productieomgeving**. De productieomgeving mag dus niet afhankelijk zijn van handmatige instellingen of bestanden die alleen op de Raspberry Pi bestaan.
+
+Daarom gelden de volgende eisen:
+
+### 14.1 Dezelfde applicatiebasis
+
+- De test- en productieomgeving gebruiken dezelfde versie van de applicatiecode uit GitHub.
+- De PHP-versie, benodigde PHP-extensies en databaseversie worden vastgelegd en waar mogelijk op elkaar afgestemd.
+- Verschillen tussen de Raspberry Pi en de productiehosting worden vooraf gedocumenteerd.
+- De applicatie mag geen vaste paden, hostnamen of IP-adressen bevatten die uitsluitend op de Raspberry Pi werken.
+
+### 14.2 Configuratie gescheiden houden
+
+- Omgevingsspecifieke instellingen worden buiten de algemene applicatiecode bewaard.
+- Elke omgeving krijgt een eigen configuratie voor onder andere databaseverbinding, domeinnaam, e-mail, foutmeldingen en opslagpaden.
+- Wachtwoorden, API-sleutels en andere geheimen worden nooit in GitHub opgeslagen.
+- Er komt een voorbeeldconfiguratie zonder wachtwoorden, zodat een nieuwe omgeving eenvoudig kan worden ingesteld.
+
+### 14.3 Installatie en opnieuw opbouwen automatiseren
+
+- Er komen installatie- en configuratiestappen waarmee een lege omgeving zo veel mogelijk automatisch kan worden klaargemaakt.
+- Benodigde PHP-afhankelijkheden worden reproduceerbaar geïnstalleerd, bijvoorbeeld via Composer en een vastgelegde lockfile.
+- Databasewijzigingen worden uitgevoerd via genummerde of anderszins versieerbare migraties.
+- Mappen voor cache, logs, tijdelijke bestanden en uploads worden automatisch aangemaakt met de juiste rechten.
+- De installatieprocedure wordt gedocumenteerd en waar mogelijk voorzien van scripts voor Raspberry Pi/Linux en de productiehosting.
+- Een nieuwe installatie moet vanuit een schone omgeving kunnen worden uitgevoerd zonder afhankelijk te zijn van handmatige wijzigingen op de oude server.
+
+### 14.4 Overzetten naar productie
+
+De normale werkwijze wordt:
+
+1. Nieuwe of aangepaste code ontwikkelen en vastleggen in GitHub.
+2. De code op de Raspberry Pi bijwerken vanuit de afgesproken GitHub-branch.
+3. Installatie- en database-updates op de testomgeving uitvoeren.
+4. De volledige werking testen, inclusief gebruikersrechten, regio's, evenementen, uploads en communicatie.
+5. Een back-up maken van de productiegegevens en relevante bestanden.
+6. De geteste code naar de productieomgeving overzetten.
+7. De productieconfiguratie toepassen en alleen de nog niet uitgevoerde database-migraties uitvoeren.
+8. Een korte controle uitvoeren en bij problemen kunnen terugkeren naar de vorige werkende versie.
+
+De productiegegevens mogen bij een code-update niet onbedoeld worden overschreven door testgegevens. Test- en productiegegevens blijven gescheiden. Alleen wanneer dit bewust en veilig wordt aangevraagd, kan een gecontroleerde gegevensmigratie plaatsvinden.
+
+### 14.5 Back-up en herstel
+
+- Voor belangrijke updates wordt een databaseback-up gemaakt.
+- Gebruikersuploads, logo's en andere bestanden die niet in GitHub staan, krijgen een afzonderlijke back-upstrategie.
+- Er wordt een herstelprocedure beschreven en periodiek getest.
+- Een update moet bij ernstige problemen kunnen worden teruggedraaid, met aandacht voor eventuele databasewijzigingen.
+
+### 14.6 Doel van deze werkwijze
+
+De Raspberry Pi is de test- en proefomgeving; de productiehosting is de omgeving voor echte bezoekers en gegevens. De testomgeving moet daarom zo veel mogelijk de productieomgeving nabootsen, terwijl configuratie en gegevens strikt gescheiden blijven.
+
+**Doel:** een nieuwe of bijgewerkte productie-installatie moet vanuit de versiebeheerbron, de juiste productieconfiguratie en een gecontroleerde database- en bestandsmigratie snel en betrouwbaar kunnen worden opgebouwd.
+
+## 15. Gefaseerde ontwikkeling
 
 De ontwikkeling verloopt in stappen:
 
@@ -174,14 +232,17 @@ De ontwikkeling verloopt in stappen:
 6. **Meertaligheid:** vertalingen en taalkeuze uitwerken.
 7. **Interactie:** commentaar bij evenementen, reacties van organisatoren en moderatie.
 8. **Chat:** privéchat en afgeschermde communicatiekanalen met meldingen en toegangsrechten.
-9. **Verdere uitbreidingen:** pushmeldingen, deelnamefuncties en rapportage.
-10. **Productie:** testen, beveiligingscontrole, back-upstrategie en ingebruikname op de hostingomgeving.
+9. **Test- en productiebeheer:** Raspberry Pi-testomgeving, geautomatiseerde installatie, versiebeheer, database-migraties, back-up en gecontroleerde publicatie naar productie.
+10. **Verdere uitbreidingen:** pushmeldingen, deelnamefuncties en rapportage.
+11. **Productie:** testen, beveiligingscontrole, back-upstrategie en ingebruikname op de hostingomgeving.
 
-## 15. Uitgangspunt voor toekomstige uitbreidingen
+## 16. Uitgangspunt voor toekomstige uitbreidingen
 
 DONDEBAILAR moet kunnen groeien van een regionale dansagenda naar een platform voor meerdere regio's, zonder dat de basis opnieuw moet worden gebouwd.
 
 Nieuwe functies moeten passen binnen de bestaande regionale structuur, gebruikersrechten en meertalige opzet. Gebruiksgemak, betrouwbaarheid, veiligheid en eenvoudig beheer blijven daarbij de belangrijkste uitgangspunten.
+
+De test- en productieomgeving moeten daarbij beheersbaar blijven: wijzigingen worden eerst getest, versiebeheerd en daarna gecontroleerd uitgerold. Een productie-installatie moet reproduceerbaar zijn en mag niet afhankelijk zijn van verborgen instellingen op de testserver.
 
 ---
 
