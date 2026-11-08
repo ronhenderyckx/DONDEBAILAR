@@ -1,0 +1,28 @@
+# Secrets and local configuration
+.env
+.env.*
+!.env.example
+config/config.local.php
+config/secrets.php
+
+# Dependencies and local runtimes
+/vendor/
+/.tools/
+
+# User-generated and runtime data
+/uploads/*
+!/uploads/.gitkeep
+/storage/*
+!/storage/.gitkeep
+/logs/
+/*.log
+*.log
+*.sql
+*.sql.gz
+*.bak
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
