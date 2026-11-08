@@ -324,6 +324,35 @@ Een evenement kan de volgende gegevens bevatten:
 
 Evenementen worden gekoppeld aan de juiste regio, organisator en locatie.
 
+
+#### Afgelopen evenementen en terugblikken
+
+Afgelopen evenementen worden niet automatisch uit DONDEBAILAR verwijderd. Ze krijgen een afzonderlijke beheerweergave en kunnen door de organisator verder worden afgewerkt.
+
+- In het organisatormenu staat een afzonderlijk menu-item **Afgelopen evenementen**.
+- Dit overzicht toont de afgelopen evenementen van de ingelogde organisator.
+- De organisator kan de evenementinformatie verder beheren en achteraf foto's en video's toevoegen, verwijderen, vervangen en in de gewenste volgorde plaatsen.
+- De organisator kan een omslagbeeld kiezen en een reportage of terugblik samenstellen.
+- De organisator bepaalt zelf wanneer de terugblik klaar is en publiek wordt gemaakt.
+- Een gepubliceerde terugblik is zichtbaar voor bezoekers in een afzonderlijke publieke rubriek **Terugblikken**. Het evenement blijft herkenbaar als afgelopen en wordt niet opnieuw als toekomstig evenement in de actuele agenda getoond.
+- Bezoekers kunnen de gepubliceerde beelden, evenementinformatie, organisator en locatie bekijken en de terugblik delen.
+- De organisator behoudt toegang om de terugblik te beheren zolang die niet definitief verwijderd is.
+
+**Bewaartermijn voor terugblikken (voorgestelde standaard):**
+
+| Periode na publicatie van de terugblik | Werking |
+|---|---|
+| Eerste 12 maanden | Terugblik blijft publiek zichtbaar. |
+| Na 12 maanden | Terugblik wordt automatisch naar het archief verplaatst en verdwijnt uit de publieke rubriek Terugblikken. |
+| Na 24 maanden | Organisator ontvangt een melding dat de bewaartermijn nadert en kan de terugblik verlengen of verwijderen. |
+| Na 36 maanden | Verwijdering kan worden voorgesteld, maar gebeurt niet automatisch zonder voorafgaande melding en expliciete bevestiging. |
+
+- De organisator kan vóór de geplande archivering of verwijdering de bewaartermijn verlengen.
+- Archiveren betekent dat de terugblik niet meer publiek in de rubriek Terugblikken verschijnt, maar nog beschikbaar blijft voor de bevoegde organisator en beheerders.
+- Definitieve verwijdering vereist een duidelijke waarschuwing en bevestiging door een bevoegde gebruiker.
+- Bij verwijdering verdwijnen de bijbehorende media ook uit de publieke weergave. Eventuele wettelijke, privacy- of beveiligingsverplichtingen kunnen een afzonderlijke verwijdering of beperking vereisen.
+- De bewaartermijnen en meldingen moeten configureerbaar zijn door platformbeheer, met bovenstaande termijnen als standaardvoorstel.
+
 ### 6.2 Locaties
 
 Locaties worden centraal beheerd en kunnen aan meerdere evenementen gekoppeld worden. Beschikbare gegevens kunnen zijn:
@@ -392,34 +421,40 @@ Google Places levert niet voor iedere locatie een officieel logo als afzonderlij
 
 ### 8.1 Reacties bij evenementen
 
+De communicatie tussen bezoekers en organisatoren verloopt via reacties die rechtstreeks aan een evenement gekoppeld zijn. Er is geen algemene privéchat tussen gebruikers.
+
 Beoogde mogelijkheden:
-- Reacties plaatsen bij evenementen.
-- Eventueel reageren op bestaande reacties.
-- Auteur, datum en tijd tonen.
-- Reacties aanpassen of verwijderen volgens rechten.
-- Ongepaste reacties melden.
-- Moderatie door bevoegde beheerders.
-- Reacties per evenement in- of uitschakelen.
+- Bezoekers kunnen vragen en opmerkingen plaatsen bij een evenement.
+- Bezoekers kunnen antwoorden op bestaande reacties, zodat een gesprek binnen het evenement ontstaat.
+- Auteur, avatar, datum en tijd worden bij iedere reactie getoond.
+- Gebruikers kunnen hun eigen reacties aanpassen of verwijderen.
+- Organisatoren kunnen reageren op vragen en opmerkingen bij hun eigen evenementen.
+- Reacties kunnen likes krijgen, indien deze functie wordt ingeschakeld.
+- Ongepaste reacties kunnen gemeld worden.
+- Bevoegde beheerders en moderatoren kunnen reacties beheren en modereren.
+- Reacties kunnen per evenement worden in- of uitgeschakeld.
+- Er gelden maatregelen tegen spam en misbruik.
 
-Organisatoren kunnen reageren op vragen bij hun eigen evenementen. Zij mogen reacties van anderen niet zomaar aanpassen of verwijderen. Er komen maatregelen tegen misbruik en spam, met respect voor de privacy van gebruikers.
+Reacties blijven gekoppeld aan het evenement, ook nadat het evenement afgelopen is. Bij afgelopen evenementen blijven bestaande reacties leesbaar. De organisator kan de reacties beheren volgens zijn rechten. De periode waarin bezoekers nog nieuwe reacties kunnen plaatsen na afloop wordt configureerbaar; de standaardtermijn moet nog worden vastgelegd.
 
-### 8.2 Chat en berichten
+### 8.2 Geen privéchat tussen gebruikers
 
-De ingebouwde chat wordt voorbereid voor:
-- **Privéchat:** berichten tussen gebruikers volgens de ingestelde rechten.
-- **Organisatorcommunicatie:** bezoekers nemen contact op met een organisator over diens profiel of evenementen.
-- **Regionale communicatie:** bevoegde beheerders communiceren met gebruikers of organisatoren binnen hun regio.
-- **Beheerderskanaal:** afgeschermde communicatie voor platformbeheerders en bevoegde regionale beheerders.
+DONDEBAILAR krijgt **geen WhatsApp-achtige privéchat tussen gebruikers** en geen algemene gebruikersgroepen of persoonlijke gesprekken.
 
-De chat krijgt waar mogelijk:
-- Een overzicht van gesprekken en nieuwe berichten.
-- Datum en tijd bij berichten.
-- Meldingen bij nieuwe berichten.
-- Mogelijkheid om ongewenste berichten te melden.
-- Mogelijkheid om gebruikers te blokkeren.
-- Moderatie door bevoegde beheerders.
+- Gebruikers kunnen elkaar niet via een privébericht contacteren.
+- Er komt geen algemene inbox met persoonlijke gesprekken.
+- Er komen geen gebruikersgroepen of groepsgesprekken.
+- Vragen aan een organisator verlopen via de reacties bij het betreffende evenement.
+- De organisator kan daar openbaar antwoorden, zodat alle bezoekers met dezelfde vraag het antwoord kunnen lezen.
 
-Gebruikers zien alleen gesprekken waarvoor ze bevoegd zijn. Privégesprekken blijven afgeschermd. Eventuele inzage door beheerders volgt vooraf vastgelegde regels en respecteert de privacy.
+### 8.3 Meldingen bij reacties
+
+Het platform kan meldingen versturen wanneer:
+- Iemand reageert op een evenement van een organisator.
+- Een bezoeker een antwoord krijgt op zijn/haar reactie.
+- Een organisator antwoordt op een vraag bij een evenement.
+
+Meldingen kunnen via de website, e-mail of pushmelding worden aangeboden, afhankelijk van de gebruikersinstellingen. De melding bevat alleen de informatie die nodig is om de betreffende reactie of het evenement te openen.
 
 ### 8.3 E-mail en accountmeldingen
 
@@ -471,7 +506,7 @@ Het logo is waar passend aanklikbaar en verwijst naar de startpagina van de betr
 - Regio's, gebruikers, rollen en rechten worden centraal beheerd.
 - Wachtwoorden worden veilig gehasht.
 - Invoer wordt gevalideerd en databasebewerkingen worden veilig uitgevoerd.
-- Chatberichten en reacties zijn alleen toegankelijk voor bevoegde gebruikers.
+- Evenementreacties zijn alleen toegankelijk volgens de publicatie- en regiorechten; er bestaat geen privéchat tussen gebruikers.
 - Er wordt rekening gehouden met privacy, spambeperking, meldingen en moderatie.
 - Databasewijzigingen verlopen via versieerbare migraties.
 - Geheimen, lokale configuratie, databaseback-ups, logs, sessies en gebruikersuploads worden niet in GitHub opgenomen.
@@ -578,8 +613,8 @@ De ontwikkeling verloopt in stappen. De volgorde kan worden verfijnd. Een functi
 4. **Kerngegevens:** locaties, organisatoren, categorieën en evenementen; Google Maps voor locaties.
 5. **Publieke feed:** responsieve sociale evenementenfeed, media, likes, swipe-interactie, vaste boven- en onderbalk, filters en zoeken.
 6. **Meertaligheid:** taalkeuze en vertalingen.
-7. **Reacties:** evenementreacties, antwoorden van organisatoren en moderatie.
-8. **Chat:** privéchat en afgeschermde communicatiekanalen.
+7. **Evenementreacties:** reacties, antwoorden van organisatoren, meldingen en moderatie.
+8. **Afgelopen evenementen:** organisatorenoverzicht, mediabeheer, publicatie van terugblikken en archivering volgens de bewaartermijnen.
 9. **Test- en productiebeheer:** Raspberry Pi, reproduceerbare installatie, migraties, back-ups en gecontroleerde publicatie.
 10. **Uitbreidingen:** pushmeldingen, deelnamefuncties en rapportage.
 11. **Productie-ingebruikname:** volledige test, beveiligingscontrole, back-upstrategie en gecontroleerde lancering.
