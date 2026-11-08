@@ -107,6 +107,10 @@ De publieke kalender is standaard een **sociale evenementenfeed**, geïnspireerd
 - Bezoekers kunnen evenementen openen voor alle details en, volgens de beschikbare rechten, liken, reageren, delen of bewaren.
 - Organisatorprofielen en relevante zoek- en filtermogelijkheden maken deel uit van de publieke ontdekkingservaring.
 - De weergave moet snel, overzichtelijk en gebruiksvriendelijk blijven op smartphone, tablet en desktop.
+- **Extra informatie via swipe:** op een evenementkaart kan de bezoeker naar rechts swipen om meer informatie over dat evenement te tonen. Dit gebaar werkt zowel wanneer de beweging op de afbeelding/affiche begint als wanneer ze op de tekst van de kaart begint.
+- De extra informatie wordt binnen de feed getoond, zodat de bezoeker de overzichtsfeed niet onbedoeld verlaat. De bezoeker kan de uitgebreide weergave weer sluiten en verder scrollen.
+- Op apparaten zonder aanraakscherm, zoals een desktopcomputer, is dezelfde extra informatie bereikbaar via een duidelijke klikactie of knop op de evenementkaart.
+- De horizontale swipebediening mag het normale verticale scrollen door de feed niet hinderen. De interactie moet ook toegankelijk zijn via toetsenbord en duidelijke bedieningselementen.
 
 De sociale feed is de standaardweergave van de publieke kalender. De exacte werking van de regiokeuze en het tonen van evenementen uit andere regio's wordt nog afzonderlijk vastgelegd.
 
