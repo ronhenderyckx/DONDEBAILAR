@@ -133,9 +133,25 @@ De publieke kalender opent standaard als een **sociale evenementenfeed**, geïns
 De feed past zich aan het scherm aan:
 - **Smartphone:** één evenementkaart per rij.
 - **Tablet:** meerdere kolommen, afhankelijk van de beschikbare breedte.
-- **Desktop:** standaard drie of vier kaarten naast elkaar, met volgende kaarten op de volgende rij.
+- **Desktop:** een aangepaste, ruimere weergave met meerdere evenementkaarten naast elkaar. De desktopindeling mag duidelijk afwijken van de mobiele presentatie, zonder de herkenbare feedbediening te verliezen.
 
-De feed blijft één doorlopende stroom; alleen de rasterindeling verandert.
+De feed blijft één doorlopende stroom; de presentatie en rasterindeling passen zich aan de beschikbare schermruimte aan.
+
+### 4.1.1 Navigatie en organisatoroverzicht
+
+- De publieke bovenkant bevat de centrale merknaam of het logo, een taalkeuze en een hoofdmenu dat op kleine schermen compact kan worden weergegeven.
+- Organisatoren kunnen boven de evenementenfeed in een horizontale rij met ronde profielafbeeldingen of logo's worden getoond.
+- De organisatorrij kan worden omgeschakeld naar een meer compacte lijstweergave.
+- Selectie van een organisator opent het profiel of filtert de feed op die organisator.
+- Als een organisator geen geschikte afbeelding heeft, wordt een neutrale standaardafbeelding gebruikt.
+- De navigatie blijft bruikbaar op smartphone, tablet en desktop.
+
+### 4.1.2 Snelle locatiekeuze
+
+- Veelgebruikte steden en gemeenten kunnen als duidelijke, snel selecteerbare locatieknoppen of tegels worden getoond.
+- Selectie van een stad/gemeente activeert het overeenkomstige locatie-filter.
+- De actieve locatie is herkenbaar en kan eenvoudig worden gewist of vervangen.
+- Deze snelle keuze werkt samen met de algemene filters uit hoofdstuk 4.5.
 
 ### 4.2 Inhoud van een evenementkaart
 
@@ -159,6 +175,8 @@ Een bezoeker kan een evenement openen om de volledige informatie te bekijken. Af
 - Foto's en video's mogen gecombineerd worden.
 - Video's zijn herkenbaar en starten niet onverwacht met geluid.
 - Horizontale mediabediening mag het verticale scrollen niet hinderen.
+- Afbeeldingen kunnen in een grotere weergave (lightbox) worden geopend en weer gesloten zonder de feedpositie onnodig te verliezen.
+- Video's ondersteunen waar passend een afzonderlijke grotere weergave. Afspelen gebeurt inline en op een manier die geschikt is voor mobiele browsers.
 
 ### 4.4 Interactie op evenementkaarten
 
@@ -172,7 +190,7 @@ Een bezoeker kan een evenement openen om de volledige informatie te bekijken. Af
 - De bezoeker kan op een evenementkaart naar rechts swipen om extra informatie te tonen.
 - Dit werkt wanneer de beweging begint op de afbeelding/affiche of op de tekst.
 - De extra informatie verschijnt binnen de feed; de bezoeker verlaat het overzicht niet.
-- De uitgebreide weergave kan eenvoudig gesloten worden.
+- De uitgebreide weergave kan eenvoudig gesloten worden, onder meer door terug te swipen.
 - Op desktop is dezelfde informatie beschikbaar via een duidelijke klikactie of knop.
 - De bediening mag verticaal scrollen niet hinderen en moet ook met toetsenbord bruikbaar zijn.
 
@@ -181,6 +199,7 @@ Een bezoeker kan een evenement openen om de volledige informatie te bekijken. Af
 - Gebruik bij voorkeur de opgeslagen Google Maps-link; anders de opgeslagen coördinaten.
 - Dit werkt op smartphone, tablet en desktop.
 - Zonder geldige locatiegegevens is het icoon niet actief.
+- In de evenementdetails kunnen, indien beschikbaar, ook de naam van de locatie, het adres, een locatieafbeelding of logo en praktische contactgegevens worden getoond.
 
 ### 4.5 Vaste bovenbalk: filters
 
@@ -219,6 +238,9 @@ De onderbalk werkt op smartphone, tablet en desktop. Hij houdt rekening met de b
 ### 4.7 Algemene gebruikservaring
 
 - De feed moet snel, overzichtelijk en gebruiksvriendelijk zijn.
+- De interface kan een installatievoorstel tonen waarmee bezoekers DONDEBAILAR als webapp op hun toestel kunnen plaatsen (PWA), voor zover de browser dit ondersteunt.
+- De installatieprompt verschijnt niet voortdurend en respecteert de keuze van de bezoeker.
+- Contactacties bij een organisator of evenement kunnen, indien door de organisator ingevuld, directe telefoon- of WhatsApp-contactmogelijkheden aanbieden.
 - Boven- en onderbalk blijven beschikbaar terwijl de inhoud ertussen scrolt.
 - Horizontale gebaren mogen verticaal scrollen niet blokkeren.
 - Bediening moet bruikbaar zijn met aanraking, muis en toetsenbord.
@@ -390,7 +412,7 @@ E-mail wordt gebruikt voor onder meer:
 
 SMTP-instellingen zijn per omgeving configureerbaar. Wachtwoorden en SMTP-geheimen worden buiten GitHub opgeslagen. E-mails bevatten geen wachtwoorden of andere gevoelige gegevens.
 
-### 8.3 Overige meldingen
+### 8.4 Overige meldingen
 
 Het platform wordt voorbereid op:
 - E-mailmeldingen.
