@@ -87,15 +87,25 @@ De vertaalstructuur wordt nu voorzien. De volledige vertalingen worden in een la
 
 Evenementen kunnen later vertaalde titels en beschrijvingen ondersteunen, zodat informatie begrijpelijk is voor bezoekers in verschillende talen.
 
-## 9. Vormgeving en herkenbaarheid
+## 9. Vormgeving, DONDEBAILAR-logo en regionale herkenbaarheid
 
-Elke regio kan een eigen visuele identiteit krijgen via een logo en kleurenpalet. De algemene structuur en bediening blijven herkenbaar en gelijk voor alle regio's.
+DONDEBAILAR krijgt een eigen, centraal merklogo. **Het officiële DONDEBAILAR-logo moet zichtbaar aanwezig zijn op de publieke website**, zodat bezoekers op iedere pagina kunnen herkennen welk platform ze gebruiken.
+
+Voor het DONDEBAILAR-logo gelden de volgende uitgangspunten:
+- Het logo wordt duidelijk weergegeven in de algemene websiteheader, op desktop en mobiel.
+- Het logo is op een gebruiksvriendelijke manier aanklikbaar en brengt de bezoeker terug naar de startpagina van de betreffende website of regio.
+- Het logo wordt waar passend ook gebruikt op de inlogpagina, in de beheeromgeving en als favicon/app-icoon.
+- Het logo moet scherp en goed leesbaar blijven op verschillende schermformaten en achtergronden.
+- Het logo wordt centraal beheerd en niet afzonderlijk in elke pagina vast ingebouwd.
+
+Naast het centrale DONDEBAILAR-merk kan iedere regio een eigen regionaal logo en kleurenpalet krijgen. Het regionale logo is aanvullend op de DONDEBAILAR-identiteit en vervangt het centrale platformlogo niet. De vormgeving moet beide herkenningselementen op een evenwichtige manier tonen.
 
 De vormgeving moet:
 - Duidelijk en gebruiksvriendelijk zijn.
 - Goed werken op computer, tablet en smartphone.
 - De agenda en evenementinformatie centraal stellen.
-- Rekening houden met de regionale huisstijl.
+- Het DONDEBAILAR-merk herkenbaar tonen op alle publieke pagina's.
+- Rekening houden met de regionale huisstijl zonder de centrale merkidentiteit te verliezen.
 
 ## 10. Chat en berichten
 
@@ -157,6 +167,7 @@ Deze onderdelen worden gefaseerd ontwikkeld. Ze gelden niet als beschikbaar zola
 - Wachtwoorden worden veilig gehasht.
 - Invoer wordt gevalideerd en databasebewerkingen worden veilig uitgevoerd.
 - Geheimen, lokale configuratie, databaseback-ups, logs, sessies en gebruikersuploads worden niet in de Git-repository opgenomen.
+- Het centrale DONDEBAILAR-logo wordt als gedeeld merkmiddel beheerd en op consistente wijze in de publieke websiteheader en relevante schermen gebruikt; regionale logo's blijven afzonderlijke instellingen.
 - Wijzigingen aan de database worden waar mogelijk als versieerbare migraties bijgehouden.
 - Chatberichten en evenementreacties worden veilig opgeslagen en alleen getoond aan bevoegde gebruikers.
 - Bij communicatiefunctionaliteit wordt rekening gehouden met privacy, spambeperking, misbruikmeldingen en moderatie.
