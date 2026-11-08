@@ -97,6 +97,33 @@ De taalstructuur wordt vanaf het begin voorzien. De volledige vertalingen worden
 
 De precieze rechten per handeling worden tijdens de ontwikkeling verder uitgewerkt.
 
+
+### 3.3 Nieuwe gebruikers registreren en e-mailadres bevestigen
+
+Nieuwe gebruikers kunnen zich zelf registreren. Een account wordt pas actief nadat het opgegeven e-mailadres is bevestigd.
+
+De registratie verloopt als volgt:
+
+1. De gebruiker vult de gevraagde gegevens in, waaronder naam, e-mailadres en wachtwoord.
+2. DONDEBAILAR controleert de invoer en controleert of het e-mailadres al in gebruik is.
+3. Het systeem maakt het account aan met de status **in afwachting van e-mailbevestiging**.
+4. DONDEBAILAR stuurt een e-mail met een persoonlijke bevestigingslink.
+5. De gebruiker klikt op de link. Na een geldige bevestiging wordt het account geactiveerd.
+6. Pas daarna kan de gebruiker aanmelden en functies gebruiken die een actief account vereisen.
+
+Beveiliging en gebruiksgemak:
+
+- De bevestigingslink bevat een unieke, moeilijk te raden token en kan slechts één keer worden gebruikt.
+- Tokens worden veilig opgeslagen (bij voorkeur als hash) en hebben een beperkte geldigheidsduur.
+- Een verlopen link kan opnieuw worden aangevraagd; daarbij wordt de oude link ongeldig gemaakt.
+- De gebruiker krijgt duidelijke meldingen over de status en kan de bevestigingsmail opnieuw laten versturen.
+- Het systeem geeft bij registratie geen onnodige informatie prijs over bestaande accounts.
+- Er gelden maatregelen tegen misbruik, geautomatiseerde registraties en het veelvuldig aanvragen van bevestigingsmails.
+- E-mailadressen moeten uniek zijn.
+- Beheerders kunnen de accountstatus en bevestiging beheren volgens hun rechten.
+- De verzendinstellingen (SMTP) worden per omgeving veilig ingesteld en zijn niet opgenomen in GitHub.
+
+
 ## 4. Publieke website en evenementenfeed
 
 ### 4.1 Standaardweergave
@@ -353,6 +380,16 @@ De chat krijgt waar mogelijk:
 
 Gebruikers zien alleen gesprekken waarvoor ze bevoegd zijn. Privégesprekken blijven afgeschermd. Eventuele inzage door beheerders volgt vooraf vastgelegde regels en respecteert de privacy.
 
+### 8.3 E-mail en accountmeldingen
+
+E-mail wordt gebruikt voor onder meer:
+- Bevestiging van nieuwe gebruikersregistraties.
+- Opnieuw versturen van een bevestigingslink.
+- Wachtwoordherstel via een beveiligde link.
+- Relevante account- en evenementmeldingen.
+
+SMTP-instellingen zijn per omgeving configureerbaar. Wachtwoorden en SMTP-geheimen worden buiten GitHub opgeslagen. E-mails bevatten geen wachtwoorden of andere gevoelige gegevens.
+
 ### 8.3 Overige meldingen
 
 Het platform wordt voorbereid op:
@@ -458,7 +495,7 @@ Testgegevens mogen nooit onbedoeld productiegegevens overschrijven.
 
 De ontwikkeling verloopt in stappen. De volgorde kan worden verfijnd. Een functie geldt pas als beschikbaar wanneer ze gebouwd en getest is.
 
-1. **Basisplatform:** projectstructuur, configuratie, database en veilige authenticatie.
+1. **Basisplatform:** projectstructuur, configuratie, database, veilige authenticatie en registratie met e-mailbevestiging.
 2. **Beheerbasis:** dashboard, gebruikers, rollen, rechten en uniforme lijsten/formulieren.
 3. **Regiobeheer:** regio's, regionale kleuren en logo's.
 4. **Kerngegevens:** locaties, organisatoren, categorieën en evenementen; Google Maps voor locaties.
