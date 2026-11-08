@@ -73,7 +73,7 @@ De technische structuur wordt voorbereid op:
 - Spaans (ES).
 - Frans (FR).
 
-De taalstructuur wordt vanaf het begin voorzien. De volledige vertalingen worden later ingevuld. Evenementen moeten waar nodig vertaalde titels en beschrijvingen kunnen ondersteunen.
+De taalstructuur wordt vanaf het begin voorzien. De volledige vertalingen van de interface worden later ingevuld. Elk evenement wordt in precies één taal aangemaakt en beheerd. Bij het evenement wordt vastgelegd in welke taal de titel, beschrijving en overige evenementinformatie zijn opgesteld. Er worden geen afzonderlijke vertaalde versies van hetzelfde evenement bijgehouden en evenementteksten worden niet automatisch vertaald. De taalvoorkeur van de gebruiker bepaalt de taal van de interface en systeemberichten, niet de inhoudstaal van een evenement.
 
 ## 3. Gebruikers, rollen en rechten
 
