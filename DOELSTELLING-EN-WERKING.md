@@ -128,6 +128,7 @@ De publieke feed krijgt bovenaan een bedieningsbalk met een gebruikservaring die
 - **Filter op locatie:** de bezoeker kan filteren op stad of gemeente.
 - De actieve filter(s) zijn zichtbaar, zodat duidelijk is waarom bepaalde evenementen worden getoond.
 - Een filter kan eenvoudig worden gewijzigd of verwijderd; er moet ook een duidelijke mogelijkheid zijn om alle filters te wissen en terug te keren naar de volledige feed.
+- **Na filteren automatisch naar boven:** zodra de bezoeker een filter instelt, wijzigt of verwijdert, wordt de feed automatisch naar de bovenkant van de resultaten gescrold. De eerste gefilterde evenementen zijn dan meteen zichtbaar, direct onder de vast zichtbare bovenbalk.
 - De filterbediening moet goed werken op smartphone, tablet en desktop en mag het bekijken en verticaal scrollen van de feed niet hinderen.
 
 ## 5. Vaste standaard voor alle beheerlijsten
