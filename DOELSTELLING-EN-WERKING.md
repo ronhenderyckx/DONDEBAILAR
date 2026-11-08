@@ -1,367 +1,481 @@
 # DONDEBAILAR
-## Projectdoelstelling, functionele werking en technische uitgangspunten
+## Projectdoelstelling en functionele specificaties
 
-*Centraal werkdocument voor de ontwikkeling van het DONDEBAILAR-platform.*
+*Centraal referentiedocument voor ontwerp, ontwikkeling, testen en beheer.*
+
+> **Leeswijzer**
+> - Dit document beschrijft wat DONDEBAILAR moet kunnen en hoe het platform moet werken.
+> - Een beschreven functie is niet automatisch al gebouwd of getest.
+> - Nieuwe beslissingen worden op de passende plaats toegevoegd; dubbele of tegenstrijdige beschrijvingen worden vermeden.
 
 ## Inhoud
-1. Project in het kort
-2. Gebruikers en rollen
-3. Regio's en talen
-4. Belangrijkste onderdelen
-5. Vaste standaard voor alle beheerlijsten
-6. Locaties zoeken via Google Maps
-7. Reacties, chat en meldingen
-8. Huisstijl en logo's
-9. Technische uitgangspunten en beveiliging
-10. Raspberry Pi-testomgeving en productie
-11. Ontwikkelfasen
-12. Documentstatus
+
+1. [Projectvisie en uitgangspunten](#1-projectvisie-en-uitgangspunten)
+2. [Regio's en talen](#2-regios-en-talen)
+3. [Gebruikers, rollen en rechten](#3-gebruikers-rollen-en-rechten)
+4. [Publieke website en evenementenfeed](#4-publieke-website-en-evenementenfeed)
+5. [Beheeromgeving en vaste lijststandaard](#5-beheeromgeving-en-vaste-lijststandaard)
+6. [Gegevens en modules](#6-gegevens-en-modules)
+7. [Locaties en Google Maps](#7-locaties-en-google-maps)
+8. [Reacties, chat en meldingen](#8-reacties-chat-en-meldingen)
+9. [Huisstijl en logo's](#9-huisstijl-en-logos)
+10. [Techniek, privacy en beveiliging](#10-techniek-privacy-en-beveiliging)
+11. [Testomgeving, productie en back-ups](#11-testomgeving-productie-en-back-ups)
+12. [Ontwikkelvolgorde](#12-ontwikkelvolgorde)
+13. [Status en besluitvorming](#13-status-en-besluitvorming)
 
 ---
 
-## 1. Project in het kort
+## 1. Projectvisie en uitgangspunten
 
-DONDEBAILAR wordt een meertalig, regionaal platform voor dansactiviteiten en dansevenementen. Het helpt dansliefhebbers om activiteiten in hun omgeving te vinden. Organisatoren kunnen hun evenementen bekendmaken en beheren.
+DONDEBAILAR wordt een meertalig, regionaal platform waarop dansliefhebbers dansevenementen en activiteiten kunnen vinden. Organisatoren kunnen hun activiteiten publiceren en beheren.
 
-De eerste regionale uitwerking is **Marina Alta (Spanje)**. De technische opzet moet uitbreiding naar andere regio's mogelijk maken zonder de basis opnieuw te moeten bouwen.
+De eerste regio is **Marina Alta in Spanje**. De opbouw moet uitbreiding naar andere regio's mogelijk maken zonder de applicatie opnieuw te moeten ontwikkelen.
 
-### 1.1 Activiteiten
+### 1.1 Soorten activiteiten
 
-De agenda richt zich in eerste instantie op:
 - Salsa, bachata en kizomba.
 - Danslessen en workshops.
 - Dansavonden en socials.
 - Festivals en congressen.
 - Andere activiteiten die passen binnen een regionale dansagenda.
 
-Bevoegde beheerders moeten categorieën later kunnen uitbreiden en aanpassen.
+Bevoegde beheerders kunnen categorieën later uitbreiden en aanpassen.
 
-## 2. Gebruikers en rollen
+### 1.2 Centrale uitgangspunten
 
-| Rol | Hoofdtaak |
+- Eén centraal platform met meerdere regionale agenda's.
+- Een herkenbare DONDEBAILAR-huisstijl, aangevuld met regionale kleuren en logo's.
+- Een sociale evenementenfeed als standaardweergave van de publieke kalender.
+- Een uniforme beheeromgeving voor alle gegevenslijsten.
+- Meertaligheid vanaf de technische basis.
+- Rechten en gegevensscheiding op platform- en regioniveau.
+- Eerst ontwikkelen en testen, daarna gecontroleerd publiceren.
+
+## 2. Regio's en talen
+
+### 2.1 Regionale structuur
+
+Iedere regio kan beschikken over:
+- Een eigen naam en URL of subdomein.
+- Een eigen landinstelling en tijdzone.
+- Een eigen logo en kleurenpalet.
+- Eigen evenementen, locaties en organisatoren.
+- Eigen regionale beheerders.
+
+Gegevens van verschillende regio's blijven logisch van elkaar gescheiden. Een platformbeheerder kan alle regio's beheren.
+
+### 2.2 Talen
+
+De technische structuur wordt voorbereid op:
+- Nederlands (NL).
+- Engels (EN).
+- Spaans (ES).
+- Frans (FR).
+
+De taalstructuur wordt vanaf het begin voorzien. De volledige vertalingen worden later ingevuld. Evenementen moeten waar nodig vertaalde titels en beschrijvingen kunnen ondersteunen.
+
+## 3. Gebruikers, rollen en rechten
+
+### 3.1 Gebruikerstypen
+
+| Rol | Bevoegdheid |
 |---|---|
 | **admin** | Volledig platformbeheer |
 | **region_admin** | Beheer van toegewezen regio's |
 | **editor** | Redactioneel beheer volgens toegekende rechten |
-| **organizer** | Beheer van eigen organisator- en evenementgegevens |
-| **viewer/bezoeker** | Raadplegen van publiek beschikbare informatie |
+| **organizer** | Beheer van eigen organisatorprofiel en evenementen |
+| **viewer/bezoeker** | Publieke informatie bekijken; extra functies volgens account en rechten |
 
-Bezoekers zoeken activiteiten en bekijken evenementen, organisatoren en locaties. Organisatoren krijgen een profiel en kunnen na toekenning van rechten hun eigen evenementen beheren. Regionale beheerders beheren hun regio; platformbeheerders beheren het volledige platform.
+### 3.2 Rechtenbeheer
 
-Rechten worden centraal gecontroleerd. Een gebruiker mag nooit meer gegevens of functies aanpassen dan zijn of haar rechten toelaten. De precieze rechten en eventuele goedkeuringsstappen worden tijdens de ontwikkeling verder uitgewerkt.
+- Rechten worden centraal gecontroleerd.
+- Een gebruiker kan alleen gegevens bekijken of wijzigen waarvoor die gebruiker bevoegd is.
+- Regionale beheerders zijn beperkt tot hun toegewezen regio's.
+- Organisatoren beheren alleen hun eigen gegevens en evenementen, voor zover toegestaan.
+- Rechten worden zowel in de gebruikersinterface als op de server afgedwongen. Een knop verbergen is op zichzelf geen beveiliging.
 
-## 3. Regio's en talen
+De precieze rechten per handeling worden tijdens de ontwikkeling verder uitgewerkt.
 
-### 3.1 Regionale structuur
+## 4. Publieke website en evenementenfeed
 
-DONDEBAILAR is één centraal platform met meerdere regio's. Iedere regio kan beschikken over:
-- Een eigen naam en herkenbare URL of subdomein.
-- Een eigen tijdzone en landinstelling.
-- Een eigen logo en kleurenpalet.
-- Eigen evenementen, locaties en regionale organisatoren.
-- Beheerders die alleen toegang hebben tot de regio's waarvoor ze bevoegd zijn.
+### 4.1 Standaardweergave
 
-Gegevens van verschillende regio's blijven logisch van elkaar gescheiden. Een platformbeheerder kan het geheel beheren.
+De publieke kalender opent standaard als een **sociale evenementenfeed**, geïnspireerd op de gebruikservaring van Instagram. Evenementen verschijnen als visuele kaarten in één doorlopende stroom.
 
-### 3.2 Meertaligheid
+De feed past zich aan het scherm aan:
+- **Smartphone:** één evenementkaart per rij.
+- **Tablet:** meerdere kolommen, afhankelijk van de beschikbare breedte.
+- **Desktop:** standaard drie of vier kaarten naast elkaar, met volgende kaarten op de volgende rij.
 
-De technische structuur wordt vanaf het begin voorbereid op Nederlands (NL), Engels (EN), Spaans (ES) en Frans (FR). De taalstructuur wordt nu voorzien; de volledige vertalingen volgen later. Evenementen moeten waar nodig vertaalde titels en beschrijvingen kunnen ondersteunen.
+De feed blijft één doorlopende stroom; alleen de rasterindeling verandert.
 
-## 4. Belangrijkste onderdelen
+### 4.2 Inhoud van een evenementkaart
 
-### 4.1 Evenementen
+Een kaart kan tonen:
+- Affiche, foto of ander evenementbeeld.
+- Titel, datum en uur.
+- Locatie en organisator.
+- Korte beschrijving.
+- Like-aantal en beschikbare interacties.
 
-Een evenement kan bevatten:
+Een bezoeker kan een evenement openen om de volledige informatie te bekijken. Afhankelijk van de rechten kan de bezoeker liken, reageren, delen of een evenement bewaren.
+
+### 4.3 Media op evenementen
+
+- Eén evenement kan meerdere foto's, afbeeldingen en video's bevatten.
+- In de kaart wordt één media-item tegelijk getoond.
+- Bij meerdere items kan horizontaal tussen de media worden geswipet.
+- De bediening en positie-indicator passen zich aan het aantal media-items aan.
+- Bij één item worden geen overbodige swipebediening of indicatoren getoond.
+- De organisator bepaalt de volgorde.
+- Foto's en video's mogen gecombineerd worden.
+- Video's zijn herkenbaar en starten niet onverwacht met geluid.
+- Horizontale mediabediening mag het verticale scrollen niet hinderen.
+
+### 4.4 Interactie op evenementkaarten
+
+**Dansschoenen als like-knop**
+- Gebruik een herkenbaar symbool van dansschoenen in plaats van een hartje.
+- Na aanklikken toont een actieve kleur of vorm dat de gebruiker het evenement leuk vindt.
+- Het aantal likes blijft zichtbaar.
+- Gebruik hetzelfde symbool op de kaart en op de detailpagina, op alle schermformaten.
+
+**Extra informatie door naar rechts te swipen**
+- De bezoeker kan op een evenementkaart naar rechts swipen om extra informatie te tonen.
+- Dit werkt wanneer de beweging begint op de afbeelding/affiche of op de tekst.
+- De extra informatie verschijnt binnen de feed; de bezoeker verlaat het overzicht niet.
+- De uitgebreide weergave kan eenvoudig gesloten worden.
+- Op desktop is dezelfde informatie beschikbaar via een duidelijke klikactie of knop.
+- De bediening mag verticaal scrollen niet hinderen en moet ook met toetsenbord bruikbaar zijn.
+
+**Locatie openen**
+- Het locatie-icoon op de kaart en detailpagina opent de juiste locatie in Google Maps.
+- Gebruik bij voorkeur de opgeslagen Google Maps-link; anders de opgeslagen coördinaten.
+- Dit werkt op smartphone, tablet en desktop.
+- Zonder geldige locatiegegevens is het icoon niet actief.
+
+### 4.5 Vaste bovenbalk: filters
+
+De publieke feed krijgt een bovenbalk die **altijd zichtbaar blijft tijdens het scrollen**. De feed beweegt onder deze balk door.
+
+De bovenbalk biedt:
+- Toegang tot de filtermogelijkheden.
+- Filter op **organisator**: toon alleen evenementen van de gekozen organisator.
+- Filter op **stad of gemeente**.
+- Een duidelijke weergave van de actieve filters.
+- Mogelijkheid om een filter te wijzigen of afzonderlijk te verwijderen.
+- Een actie om alle filters te wissen en de volledige feed terug te tonen.
+
+**Na iedere filterwijziging** — instellen, aanpassen of verwijderen — scrolt de feed automatisch terug naar de bovenkant. De eerste resultaten verschijnen direct onder de vaste bovenbalk.
+
+De bovenbalk werkt op smartphone, tablet en desktop.
+
+### 4.6 Vaste onderbalk: zoeken en geluid
+
+Naast de bovenbalk krijgt de publieke feed een **onderbalk die altijd zichtbaar blijft tijdens het scrollen**. De feed beweegt tussen de boven- en onderbalk.
+
+De onderbalk bevat:
+
+1. **Manueel zoekveld**
+   - De bezoeker voert zelf een zoekterm in.
+   - De zoekopdracht wordt uitgevoerd met Enter of een duidelijke zoekactie.
+   - Zoeken werkt samen met de actieve filters.
+
+2. **Geluid aan/uit**
+   - Een duidelijke knop schakelt het geluid in of uit.
+   - Het icoon toont de actuele status, bijvoorbeeld een luidspreker met of zonder geluidsgolven.
+   - De geluidskeuze wordt consequent toegepast op media in de feed.
+
+De onderbalk werkt op smartphone, tablet en desktop. Hij houdt rekening met de beschikbare schermhoogte en veilige schermranden en bedekt geen belangrijke inhoud of bediening.
+
+### 4.7 Algemene gebruikservaring
+
+- De feed moet snel, overzichtelijk en gebruiksvriendelijk zijn.
+- Boven- en onderbalk blijven beschikbaar terwijl de inhoud ertussen scrolt.
+- Horizontale gebaren mogen verticaal scrollen niet blokkeren.
+- Bediening moet bruikbaar zijn met aanraking, muis en toetsenbord.
+- De precieze werking van regiokeuze en het tonen van evenementen uit andere regio's wordt nog vastgelegd.
+
+## 5. Beheeromgeving en vaste lijststandaard
+
+**Alle beheerlijsten gebruiken dezelfde opbouw en bediening.** Dit geldt onder andere voor gebruikers, evenementen, locaties, organisatoren, regio's, categorieën en berichten.
+
+### 5.1 Overzichtsscherm
+
+Iedere lijst bevat waar relevant:
+1. Een zoekveld.
+2. Een knop **Toevoegen**.
+3. Een overzicht met de belangrijkste gegevens.
+4. Een actie **Aanpassen** per record.
+5. Een actie **Wissen**, of **Archiveren/Deactiveren** als verwijderen niet veilig of toegestaan is.
+6. Paginering bij lange lijsten.
+7. Duidelijke meldingen bij lege resultaten en geslaagde of mislukte acties.
+
+### 5.2 Toevoegen en aanpassen
+
+Toevoegen en aanpassen gebeuren op een **afzonderlijk invoerscherm**, niet rechtstreeks in de lijst.
+
+- **Toevoegen:** een leeg formulier met passende standaardwaarden.
+- **Aanpassen:** hetzelfde type formulier, vooraf ingevuld met de bestaande gegevens.
+- Verplichte velden en formaten zijn duidelijk aangegeven en worden gecontroleerd.
+- Elk formulier heeft **Opslaan** en **Annuleren**.
+- Na opslaan keert de gebruiker terug naar de lijst.
+- Waar mogelijk blijven de zoekopdracht en huidige pagina behouden.
+- Bij validatiefouten blijven de ingevulde waarden behouden en worden de fouten duidelijk getoond.
+
+### 5.3 Wissen en archiveren
+
+- Wissen vraagt altijd een bevestiging.
+- Voor verwijderen worden gekoppelde gegevens gecontroleerd.
+- Gegevens die nodig zijn voor evenementen, gebruikers, berichten of historiek worden niet ongemerkt verwijderd.
+- Als definitief verwijderen niet veilig of toegestaan is, wordt archiveren of deactiveren gebruikt.
+
+### 5.4 Uniforme techniek en rechten
+
+- Alle lijsten gebruiken dezelfde herkenbare knoppen, formulieren, meldingen en bevestigingen.
+- Velden verschillen per module; de bediening blijft gelijk.
+- Er komt één gedeelde, herbruikbare technische basis voor lijsten en formulieren.
+- Nieuwe beheermodules gebruiken diezelfde basis.
+- Alle handelingen worden zowel in de interface als op de server op rechten gecontroleerd.
+
+## 6. Gegevens en modules
+
+### 6.1 Evenementen
+
+Een evenement kan de volgende gegevens bevatten:
 - Titel en beschrijving.
 - Datum, beginuur en einduur.
 - Dansstijl of categorie.
 - Organisator.
 - Locatie en adres.
 - Toegangsprijs en praktische informatie.
-- Afbeelding of affiche.
+- Eén of meerdere afbeeldingen en video's.
 - Publicatiestatus.
+- Regio.
 
-Evenementen worden gekoppeld aan de juiste regio, organisator en locatie. Bezoekers moeten activiteiten eenvoudig kunnen terugvinden.
+Evenementen worden gekoppeld aan de juiste regio, organisator en locatie.
 
-### 4.2 Locaties
+### 6.2 Locaties
 
-Locaties worden centraal beheerd en kunnen aan meerdere evenementen gekoppeld worden. Een locatie bevat waar beschikbaar de naam, het adres, postcode, gemeente/stad, land, geografische coördinaten, Google Maps-verwijzing, telefoonnummer, website en eventueel een logo of afbeelding. De Google Maps-invoer staat beschreven in hoofdstuk 6.
+Locaties worden centraal beheerd en kunnen aan meerdere evenementen gekoppeld worden. Beschikbare gegevens kunnen zijn:
+- Naam.
+- Straat, huisnummer, postcode en stad/gemeente.
+- Land.
+- Geografische coördinaten.
+- Google Maps-link of plaatsreferentie.
+- Telefoonnummer en website.
+- Logo of afbeelding, indien beschikbaar.
 
-### 4.3 Organisatoren
+De automatische invoer via Google Maps staat beschreven in hoofdstuk 7.
 
-Organisatoren krijgen een eigen profiel. Na toekenning van de juiste rechten kunnen ze hun eigen evenementen beheren en reageren op vragen over hun evenementen.
+### 6.3 Organisatoren
 
-### 4.4 Gebruikersbeheer
+- Organisatoren krijgen een eigen profiel.
+- Ze kunnen hun eigen profiel en evenementen beheren volgens hun rechten.
+- Ze kunnen reageren op vragen en opmerkingen bij hun eigen evenementen.
+- Bezoekers kunnen organisatorprofielen bekijken en evenementen van een organisator filteren.
 
-Gebruikers kunnen een account en profiel hebben. Beheer, wijzigingen en toegang tot functies zijn afhankelijk van de toegekende rol en bevoegdheden.
+### 6.4 Gebruikers
 
-### 4.5 Publieke kalender als sociale feed
+Gebruikers kunnen een account en profiel hebben. Het profiel kan onder meer een avatar bevatten. Beheer en toegang tot functies zijn afhankelijk van de rol en rechten.
 
-De publieke kalender is standaard een **sociale evenementenfeed**, geïnspireerd op de gebruikservaring van Instagram. Bezoekers krijgen evenementen als visuele kaarten te zien in één doorlopende stroom. De indeling past zich automatisch aan het schermformaat aan.
+## 7. Locaties en Google Maps
 
-- **Smartphone:** één evenementkaart per rij, onder elkaar, zodat de feed prettig verticaal te bekijken en te scrollen is.
-- **Tablet:** een aangepaste rasterindeling met meerdere kolommen, afhankelijk van de beschikbare schermbreedte.
-- **Desktop:** drie of vier evenementkaarten naast elkaar. Zodra een rij vol is, verschijnen de volgende evenementen op de rij eronder. De kolommen passen zich aan de beschikbare breedte aan.
-- De feed blijft één doorlopende stroom; alleen de presentatie en het aantal kolommen veranderen per schermformaat.
-- Een evenementkaart kan een affiche of foto, titel, datum en uur, locatie, organisator en korte beschrijving tonen.
-- **Meerdere media per evenement:** een evenement kan meerdere foto's/afbeeldingen en video's bevatten. In de feed wordt telkens één media-item tegelijk getoond. Als er meerdere media-items zijn, kan de bezoeker horizontaal door de afbeeldingen en video's swipen; de bediening en eventuele positie-indicator passen zich automatisch aan het aantal items aan. Bij één media-item is er geen onnodige swipebediening of navigatie-indicator. De volgorde van de media wordt door de organisator bepaald.
-- De mediacarrousel ondersteunt zowel foto's als video's. Video's worden duidelijk herkenbaar weergegeven en starten niet onverwacht met geluid. De bediening moet het gewone verticale scrollen van de feed niet hinderen.
-- **Locatie-icoon:** het locatie-icoon op een evenementkaart en in de evenementinformatie is aanklikbaar en opent de bijbehorende locatie in Google Maps. Hiervoor wordt bij voorkeur de opgeslagen Google Maps-link gebruikt; als die ontbreekt, worden de opgeslagen geografische coördinaten gebruikt om de kaartlocatie te openen. Dit werkt op smartphone, tablet en desktop. De gebruiker kan vanuit Google Maps indien gewenst de routebeschrijving starten. Zonder geldige locatiegegevens wordt het icoon niet als actieve link getoond.
-- Bezoekers kunnen evenementen openen voor alle details en, volgens de beschikbare rechten, liken, reageren, delen of bewaren.
-- **Like-knop:** de like-knop gebruikt een herkenbaar symbool van dansschoenen in plaats van een hartje. Na aanklikken krijgt het dansschoenen-symbool een duidelijke actieve kleur of vorm. Het aantal likes blijft zichtbaar. Dit symbool wordt consequent gebruikt op de evenementkaarten in de feed en in de evenementdetailweergave, op smartphone, tablet en desktop.
-- Organisatorprofielen en relevante zoek- en filtermogelijkheden maken deel uit van de publieke ontdekkingservaring.
-- De weergave moet snel, overzichtelijk en gebruiksvriendelijk blijven op smartphone, tablet en desktop.
-- **Extra informatie via swipe:** op een evenementkaart kan de bezoeker naar rechts swipen om meer informatie over dat evenement te tonen. Dit gebaar werkt zowel wanneer de beweging op de afbeelding/affiche begint als wanneer ze op de tekst van de kaart begint.
-- De extra informatie wordt binnen de feed getoond, zodat de bezoeker de overzichtsfeed niet onbedoeld verlaat. De bezoeker kan de uitgebreide weergave weer sluiten en verder scrollen.
-- Op apparaten zonder aanraakscherm, zoals een desktopcomputer, is dezelfde extra informatie bereikbaar via een duidelijke klikactie of knop op de evenementkaart.
-- De horizontale swipebediening mag het normale verticale scrollen door de feed niet hinderen. De interactie moet ook toegankelijk zijn via toetsenbord en duidelijke bedieningselementen.
+Bij het toevoegen of aanpassen van een locatie kan de beheerder zoeken via een geïntegreerde Google Maps- of Google Places-functie. Na selectie worden de beschikbare gegevens automatisch ingevuld.
 
-De sociale feed is de standaardweergave van de publieke kalender. De exacte werking van de regiokeuze en het tonen van evenementen uit andere regio's wordt nog afzonderlijk vastgelegd.
+### 7.1 Automatisch ingevulde gegevens
 
-### 4.6 Bovenbalk en filters van de publieke feed
-
-De publieke feed krijgt bovenaan een bedieningsbalk met een gebruikservaring die aansluit bij Instagram. Vanuit deze balk kan de bezoeker de feed bedienen en evenementen filteren.
-
-- De bovenbalk bevat een duidelijke toegang tot de filtermogelijkheden.
-- **Vast zichtbare bovenbalk:** de bovenbalk blijft tijdens het scrollen permanent zichtbaar bovenaan het scherm (sticky/fixed gedrag). De evenementenfeed scrolt eronder door. Dit werkt op smartphone, tablet en desktop en houdt rekening met de beschikbare schermruimte.
-- **Filter op organisator:** de bezoeker kan een organisator selecteren en alleen de evenementen van die organisator bekijken.
-- **Filter op locatie:** de bezoeker kan filteren op stad of gemeente.
-- De actieve filter(s) zijn zichtbaar, zodat duidelijk is waarom bepaalde evenementen worden getoond.
-- Een filter kan eenvoudig worden gewijzigd of verwijderd; er moet ook een duidelijke mogelijkheid zijn om alle filters te wissen en terug te keren naar de volledige feed.
-- **Na filteren automatisch naar boven:** zodra de bezoeker een filter instelt, wijzigt of verwijdert, wordt de feed automatisch naar de bovenkant van de resultaten gescrold. De eerste gefilterde evenementen zijn dan meteen zichtbaar, direct onder de vast zichtbare bovenbalk.
-- De filterbediening moet goed werken op smartphone, tablet en desktop en mag het bekijken en verticaal scrollen van de feed niet hinderen.
-
-### 4.7 Vast zichtbare onderbalk
-
-Naast de vast zichtbare bovenbalk krijgt de publieke feed een **onderbalk die tijdens het scrollen permanent zichtbaar blijft onderaan het scherm**. De feed beweegt tussen de boven- en onderbalk.
-
-- De onderbalk blijft zichtbaar op smartphone, tablet en desktop.
-- De onderbalk bevat een **manueel zoekveld** waarin de bezoeker zelf een zoekterm kan invoeren om evenementen terug te vinden.
-- De bezoeker kan de zoekopdracht uitvoeren met een duidelijke zoekactie (bijvoorbeeld een zoekknop of Enter-toets). De zoekfunctie werkt samen met de ingestelde filters.
-- De onderbalk bevat daarnaast een duidelijke knop **Geluid aan/uit**. De bezoeker kan hiermee het geluid in de feed in- of uitschakelen.
-- De knop toont steeds de actuele geluidsstatus, bijvoorbeeld met een luidsprekericoon met of zonder geluidsgolven.
-- De vaste onderbalk houdt rekening met de schermhoogte en bedekt geen belangrijke inhoud of bediening van de feed. Op mobiele apparaten wordt ook rekening gehouden met de veilige schermrand.
-- De bediening blijft toegankelijk via aanraking, muis en toetsenbord.
-
-## 5. Vaste standaard voor alle beheerlijsten
-
-**Iedere lijst in de beheeromgeving gebruikt dezelfde opbouw en basisbediening.** Dit geldt voor gebruikers, evenementen, locaties, organisatoren, regio's, categorieën, berichten en alle toekomstige beheermodules.
-
-### 5.1 Overzichtsscherm
-
-Iedere beheerlijst bevat waar relevant:
-1. Een zoekveld om records op relevante gegevens te vinden.
-2. Een knop **Toevoegen** die een afzonderlijk, leeg invoerscherm opent.
-3. Een overzicht van bestaande records met de belangrijkste gegevens.
-4. Per record een actie **Aanpassen** die een afzonderlijk invoerscherm opent met de bestaande gegevens ingevuld.
-5. Per record een actie **Wissen**, of **Archiveren/Deactiveren** als definitief verwijderen niet veilig of toegestaan is.
-6. Paginering bij lange lijsten.
-7. Duidelijke meldingen bij geen zoekresultaten en na geslaagde of mislukte acties.
-
-### 5.2 Invoerscherm voor toevoegen en aanpassen
-
-Toevoegen en aanpassen gebeuren op een afzonderlijk scherm; gegevens worden niet rechtstreeks in de overzichtslijst gewijzigd.
-
-- **Toevoegen:** lege velden met passende standaardwaarden.
-- **Aanpassen:** bestaande gegevens worden vooraf ingevuld.
-- Verplichte velden en invoerformaten worden duidelijk aangegeven en gecontroleerd.
-- Elk formulier heeft de acties **Opslaan** en **Annuleren**.
-- Na succesvol opslaan keert de gebruiker terug naar de overzichtslijst. Waar mogelijk blijven zoekopdracht en huidige pagina behouden.
-- Bij validatiefouten blijven ingevulde gegevens behouden en worden de fouten duidelijk getoond.
-
-### 5.3 Wissen, archiveren en relaties
-
-- Wissen vraagt altijd eerst een expliciete bevestiging.
-- Voor verwijderen wordt gecontroleerd of het record aan andere gegevens gekoppeld is.
-- Gegevens die nodig zijn voor evenementen, gebruikers, berichten of historische informatie mogen niet ongemerkt worden verwijderd.
-- Als definitief verwijderen niet veilig of functioneel toegestaan is, wordt archiveren of deactiveren gebruikt.
-
-### 5.4 Rechten en uniforme werking
-
-- Bekijken, toevoegen, aanpassen, wissen, archiveren en deactiveren zijn afhankelijk van gebruikersrechten.
-- Rechten worden zowel in de gebruikersinterface als op de server afgedwongen. Alleen een knop verbergen is geen beveiliging.
-- Alle lijsten gebruiken dezelfde herkenbare bediening, knopbenamingen, formulieropbouw, bevestigingen en meldingen.
-- De velden verschillen per module, maar de werking blijft hetzelfde.
-- Er wordt één gedeelde, herbruikbare technische basis voor lijsten en formulieren ontwikkeld. Nieuwe beheermodules gebruiken die basis.
-
-## 6. Locaties zoeken via Google Maps
-
-Bij het toevoegen of aanpassen van een locatie kan de beheerder de locatie opzoeken en selecteren via een geïntegreerde Google Maps- of Google Places-zoekfunctie. Na selectie vult DONDEBAILAR de beschikbare gegevens automatisch in.
-
-### 6.1 Automatisch invullen
-
-Voor zover Google Places deze informatie beschikbaar stelt, worden onder andere ingevuld:
+Voor zover beschikbaar en toegestaan:
 - Naam van de locatie of zaak.
 - Straatnaam en huisnummer.
-- Postcode en gemeente/stad.
+- Postcode en stad/gemeente.
 - Land.
-- Geografische coördinaten (breedte- en lengtegraad).
+- Geografische coördinaten.
 - Google Maps-link of plaatsreferentie.
 - Telefoonnummer en website.
 - Andere toegestane praktische locatiegegevens.
 
-De beheerder kan alle ingevulde gegevens controleren en handmatig corrigeren voordat de locatie wordt opgeslagen.
+De beheerder kan alle gegevens controleren en corrigeren vóór het opslaan.
 
-### 6.2 Logo's en afbeeldingen van locaties
+### 7.2 Logo en afbeelding
 
-Google Maps/Places levert niet voor iedere locatie een officieel logo als afzonderlijk gegeven. DONDEBAILAR mag daarom niet aannemen dat elk logo automatisch beschikbaar is.
+Google Places levert niet voor iedere locatie een officieel logo als afzonderlijk gegeven.
 
-- Als een betrouwbaar officieel logo via een toegestane bron beschikbaar is, kan dit als voorstel worden getoond.
-- Als geen officieel logo beschikbaar is, kan de beheerder zelf een logo of afbeelding uploaden of de locatie zonder logo opslaan.
-- Een categorie-icoon of gewone foto mag niet als officieel bedrijfslogo worden voorgesteld.
-- Afbeeldingen en logo's worden alleen gebruikt met inachtneming van de toepasselijke gebruiksvoorwaarden en rechten.
+- Als een betrouwbaar officieel logo via een toegestane bron beschikbaar is, kan het als voorstel worden getoond.
+- Anders kan de beheerder zelf een logo of afbeelding uploaden.
+- Een categorie-icoon of gewone foto wordt nooit voorgesteld als officieel bedrijfslogo.
+- Een locatie kan ook zonder logo worden opgeslagen.
+- Gebruik van afbeeldingen respecteert de toepasselijke rechten en voorwaarden.
 
-### 6.3 Controle en technische voorwaarden
+### 7.3 Bevestiging en technische voorwaarden
 
-- De beheerder selecteert en bevestigt de juiste locatie; een zoekterm alleen maakt geen record aan.
-- De gegevens kunnen vóór opslaan worden aangevuld of gecorrigeerd.
+- De beheerder selecteert en bevestigt de juiste locatie.
+- Een zoekterm alleen maakt geen locatie aan.
+- De gegevens blijven aanpasbaar vóór het opslaan.
 - De koppeling gebruikt de officiële Google Maps Platform/Places-functionaliteit.
-- API-sleutels worden veilig per omgeving ingesteld, beperkt tot de nodige API's en toegestane toepassingen, en nooit in publieke broncode of GitHub opgeslagen.
-- Er wordt rekening gehouden met gebruiksvoorwaarden, privacy, kosten en quota.
-- Als Google Maps niet beschikbaar is of geen resultaat oplevert, blijft handmatige invoer mogelijk.
-- De locatie wordt pas definitief opgeslagen nadat de beheerder op **Opslaan** klikt.
+- API-sleutels worden per omgeving veilig ingesteld en beperkt tot noodzakelijke toepassingen.
+- API-sleutels komen nooit in publieke broncode of GitHub.
+- Er wordt rekening gehouden met voorwaarden, privacy, kosten en quota.
+- Handmatige invoer blijft mogelijk als Google Maps niet beschikbaar is of geen resultaat geeft.
+- De locatie wordt pas opgeslagen na een expliciete klik op **Opslaan**.
 
-## 7. Reacties, chat en meldingen
+## 8. Reacties, chat en meldingen
 
-### 7.1 Reacties bij evenementen
-
-Bezoekers en ingelogde gebruikers moeten vragen kunnen stellen, praktische informatie delen en reageren op evenementen.
+### 8.1 Reacties bij evenementen
 
 Beoogde mogelijkheden:
-- Een reactie plaatsen bij een evenement en eventueel reageren op bestaande reacties.
+- Reacties plaatsen bij evenementen.
+- Eventueel reageren op bestaande reacties.
 - Auteur, datum en tijd tonen.
-- Reacties aanpassen of verwijderen volgens de ingestelde rechten.
+- Reacties aanpassen of verwijderen volgens rechten.
 - Ongepaste reacties melden.
-- Reacties modereren of verwijderen door bevoegde beheerders.
+- Moderatie door bevoegde beheerders.
 - Reacties per evenement in- of uitschakelen.
 
-Organisatoren kunnen reageren op vragen en opmerkingen bij hun eigen evenementen. Zij mogen reacties van andere gebruikers niet zomaar aanpassen of verwijderen. Er komen passende maatregelen tegen misbruik en spam; de privacy van gebruikers wordt gerespecteerd.
+Organisatoren kunnen reageren op vragen bij hun eigen evenementen. Zij mogen reacties van anderen niet zomaar aanpassen of verwijderen. Er komen maatregelen tegen misbruik en spam, met respect voor de privacy van gebruikers.
 
-### 7.2 Chat en berichten
+### 8.2 Chat en berichten
 
-De ingebouwde chat wordt voorbereid in verschillende vormen:
-- **Privéchat:** rechtstreeks berichten sturen tussen gebruikers, volgens de ingestelde rechten.
-- **Organisatorcommunicatie:** bezoekers kunnen contact opnemen met een organisator over diens profiel of evenementen.
-- **Regionale communicatie:** bevoegde beheerders kunnen berichten sturen aan gebruikers of organisatoren binnen hun regio.
-- **Beheerderskanaal:** een afzonderlijk afgeschermd kanaal voor platformbeheerders en bevoegde regionale beheerders.
+De ingebouwde chat wordt voorbereid voor:
+- **Privéchat:** berichten tussen gebruikers volgens de ingestelde rechten.
+- **Organisatorcommunicatie:** bezoekers nemen contact op met een organisator over diens profiel of evenementen.
+- **Regionale communicatie:** bevoegde beheerders communiceren met gebruikers of organisatoren binnen hun regio.
+- **Beheerderskanaal:** afgeschermde communicatie voor platformbeheerders en bevoegde regionale beheerders.
 
-De chat ondersteunt waar mogelijk een overzicht van gesprekken en nieuwe berichten, datum en tijd, meldingen, het melden van ongewenste berichten, blokkeren van gebruikers en moderatie door bevoegde beheerders.
+De chat krijgt waar mogelijk:
+- Een overzicht van gesprekken en nieuwe berichten.
+- Datum en tijd bij berichten.
+- Meldingen bij nieuwe berichten.
+- Mogelijkheid om ongewenste berichten te melden.
+- Mogelijkheid om gebruikers te blokkeren.
+- Moderatie door bevoegde beheerders.
 
-Gebruikers zien alleen gesprekken en berichten waarvoor ze bevoegd zijn. Privégesprekken blijven afgeschermd. Beheerders krijgen niet automatisch toegang tot privégesprekken; eventuele inzage of moderatie volgt vooraf vastgelegde regels en respecteert de privacy.
+Gebruikers zien alleen gesprekken waarvoor ze bevoegd zijn. Privégesprekken blijven afgeschermd. Eventuele inzage door beheerders volgt vooraf vastgelegde regels en respecteert de privacy.
 
-### 7.3 Overige meldingen en communicatie
+### 8.3 Overige meldingen
 
 Het platform wordt voorbereid op:
-- E-mailmeldingen en wachtwoordherstel.
+- E-mailmeldingen.
+- Wachtwoordherstel via e-mail.
 - Aanpasbare e-mailinstellingen.
 - Pushmeldingen voor relevante evenementen of wijzigingen.
 - Meldingen bij nieuwe chatberichten en reacties.
-- Berichtenkanalen voor gebruikers, organisatoren en beheerders.
 - Rapportage en geplande onderhoudstaken.
 
-Deze functies worden gefaseerd ontwikkeld en gelden niet als beschikbaar zolang ze niet gebouwd en getest zijn.
+Deze functies zijn pas beschikbaar nadat ze gebouwd en getest zijn.
 
-## 8. Huisstijl en logo's
+## 9. Huisstijl en logo's
 
-DONDEBAILAR krijgt een eigen centraal merklogo. Het officiële DONDEBAILAR-logo moet zichtbaar zijn op de publieke website, zodat bezoekers op iedere pagina het platform herkennen.
+### 9.1 Centraal DONDEBAILAR-merk
 
-### 8.1 Centraal DONDEBAILAR-logo
+Het centrale DONDEBAILAR-logo blijft herkenbaar op:
+- De publieke websiteheader, op desktop en mobiel.
+- De inlogpagina.
+- De beheeromgeving waar passend.
+- Favicon en app-icoon.
 
-- Duidelijk zichtbaar in de algemene websiteheader op desktop en mobiel.
-- Aanklikbaar en verwijzend naar de startpagina van de betreffende website of regio.
-- Waar passend ook op de inlogpagina, in de beheeromgeving en als favicon/app-icoon.
-- Scherp en leesbaar op verschillende schermformaten en achtergronden.
-- Centraal beheerd als gedeeld merkmiddel, niet afzonderlijk vast ingebouwd op iedere pagina.
+Het logo is waar passend aanklikbaar en verwijst naar de startpagina van de betreffende website of regio. Het wordt centraal als gedeeld merkmiddel beheerd.
 
-### 8.2 Regionale herkenbaarheid
+### 9.2 Regionale huisstijl
 
-Iedere regio kan een eigen regionaal logo en kleurenpalet krijgen. Het regionale logo is aanvullend op de DONDEBAILAR-identiteit en vervangt het centrale platformlogo niet. Beide herkenningselementen worden evenwichtig getoond.
+- Iedere regio kan een eigen logo en kleurenpalet instellen.
+- Het regionale logo vult de centrale DONDEBAILAR-identiteit aan en vervangt die niet.
+- Beide logo's worden evenwichtig weergegeven.
+- Vormgeving blijft duidelijk en bruikbaar op computer, tablet en smartphone.
+- De agenda en evenementinformatie blijven centraal staan.
 
-De vormgeving moet duidelijk en gebruiksvriendelijk zijn, goed werken op computer, tablet en smartphone, en de agenda en evenementinformatie centraal stellen.
+## 10. Techniek, privacy en beveiliging
 
-## 9. Technische uitgangspunten en beveiliging
-
-- De applicatie wordt ontwikkeld in **PHP** en gebruikt **MySQL** voor gegevensopslag.
-- De applicatie wordt modulair opgebouwd, zodat onderdelen afzonderlijk kunnen worden uitgebreid.
-- De lokale ontwikkelomgeving moet zo goed mogelijk overeenkomen met de uiteindelijke hostingomgeving.
-- Regio's, gebruikers, rollen en rechten worden centraal en consequent beheerd.
+- De applicatie wordt ontwikkeld in **PHP** met **MySQL** als database.
+- De applicatie wordt modulair opgebouwd.
+- De lokale ontwikkelomgeving sluit zo goed mogelijk aan op de hostingomgeving.
+- Regio's, gebruikers, rollen en rechten worden centraal beheerd.
 - Wachtwoorden worden veilig gehasht.
 - Invoer wordt gevalideerd en databasebewerkingen worden veilig uitgevoerd.
-- Chatberichten en evenementreacties worden veilig opgeslagen en alleen getoond aan bevoegde gebruikers.
-- Bij communicatie wordt rekening gehouden met privacy, spambeperking, meldingen en moderatie.
-- Databasewijzigingen worden via versieerbare migraties bijgehouden.
-- Geheimen, lokale configuratie, databaseback-ups, logs, sessies en gebruikersuploads worden niet in de Git-repository opgenomen.
+- Chatberichten en reacties zijn alleen toegankelijk voor bevoegde gebruikers.
+- Er wordt rekening gehouden met privacy, spambeperking, meldingen en moderatie.
+- Databasewijzigingen verlopen via versieerbare migraties.
+- Geheimen, lokale configuratie, databaseback-ups, logs, sessies en gebruikersuploads worden niet in GitHub opgenomen.
 - API-sleutels en wachtwoorden worden per omgeving veilig geconfigureerd.
-- Het centrale DONDEBAILAR-logo wordt als gedeeld merkmiddel beheerd; regionale logo's blijven afzonderlijke instellingen.
+- Het centrale logo wordt gedeeld beheerd; regionale logo's zijn afzonderlijke instellingen.
 
-## 10. Raspberry Pi-testomgeving en productie
+## 11. Testomgeving, productie en back-ups
 
-De Raspberry Pi dient als afzonderlijke ontwikkel- en testserver. Nieuwe functies, updates en databasewijzigingen worden daar eerst uitgeprobeerd voordat ze naar de productieomgeving gaan.
+De Raspberry Pi is de afzonderlijke ontwikkel- en testserver. Productie is bestemd voor echte bezoekers en gegevens.
 
-**Hoofduitgangspunt:** de testomgeving moet snel, gecontroleerd en herhaalbaar kunnen worden opgebouwd. Test- en productiegegevens en configuraties blijven strikt gescheiden.
+**Test- en productiegegevens en configuraties blijven strikt gescheiden.**
 
-### 10.1 Dezelfde applicatiebasis
+### 11.1 Gelijke applicatiebasis
 
 - Test en productie gebruiken dezelfde applicatiecode uit GitHub.
-- PHP-versie, benodigde extensies en databaseversie worden vastgelegd en waar mogelijk op elkaar afgestemd.
+- PHP-versie, extensies en databaseversie worden vastgelegd en waar mogelijk afgestemd.
 - Verschillen tussen Raspberry Pi en productiehosting worden gedocumenteerd.
-- De applicatie bevat geen vaste paden, hostnamen of IP-adressen die alleen op de Raspberry Pi werken.
+- De applicatie bevat geen vaste paden, hostnamen of IP-adressen die alleen op de testserver werken.
 
-### 10.2 Configuratie per omgeving
+### 11.2 Configuratie per omgeving
 
-Iedere omgeving krijgt een eigen configuratie voor databaseverbinding, domeinnaam, e-mailinstellingen, foutmeldingen, opslagpaden, API-sleutels en andere geheimen. Omgevingsinstellingen staan buiten de algemene applicatiecode. Er komt een voorbeeldconfiguratie zonder wachtwoorden of geheimen.
+Iedere omgeving krijgt een eigen configuratie voor:
+- Databaseverbinding.
+- Domeinnaam en URL.
+- E-mailinstellingen.
+- Foutmeldingen.
+- Opslagpaden.
+- API-sleutels en andere geheimen.
 
-### 10.3 Installatie en opnieuw opbouwen
+Omgevingsinstellingen staan buiten de algemene applicatiecode. Er komt een voorbeeldconfiguratie zonder wachtwoorden of geheimen.
+
+### 11.3 Herhaalbare installatie
 
 - Installatie- en configuratiestappen maken een lege omgeving zo veel mogelijk automatisch klaar.
-- PHP-afhankelijkheden worden reproduceerbaar geïnstalleerd, bijvoorbeeld met Composer en een vastgelegde lockfile.
-- Databasewijzigingen verlopen via versieerbare migraties.
-- Mappen voor cache, logs, tijdelijke bestanden en uploads worden met de juiste rechten aangemaakt.
-- De installatie wordt gedocumenteerd en waar mogelijk voorzien van scripts voor Raspberry Pi/Linux en productiehosting.
-- Een nieuwe installatie mag niet afhankelijk zijn van verborgen of handmatige wijzigingen op een oude server.
+- PHP-afhankelijkheden worden reproduceerbaar geïnstalleerd met Composer en een vastgelegde lockfile.
+- Databasewijzigingen verlopen via migraties.
+- Mappen voor cache, logs, tijdelijke bestanden en uploads krijgen de juiste rechten.
+- Installatie wordt gedocumenteerd en waar mogelijk voorzien van scripts voor Raspberry Pi/Linux en productiehosting.
+- Een nieuwe installatie mag niet afhangen van verborgen handmatige wijzigingen op een oude server.
 
-### 10.4 Werkwijze voor een productie-update
+### 11.4 Publicatie van een update
 
-1. Nieuwe of aangepaste code ontwikkelen en vastleggen in GitHub.
+1. Code ontwikkelen en vastleggen in GitHub.
 2. De afgesproken versie op de Raspberry Pi ophalen.
-3. Installatie- en database-updates op de testomgeving uitvoeren.
-4. De werking testen, waaronder rechten, regio's, evenementen, uploads en communicatie.
+3. Installatie- en database-updates uitvoeren.
+4. Rechten, regio's, evenementen, uploads en communicatie testen.
 5. Een back-up maken van productiegegevens en relevante bestanden.
 6. De geteste code naar productie overzetten.
 7. De productieconfiguratie toepassen en alleen nog niet uitgevoerde migraties uitvoeren.
 8. De productie-installatie controleren en bij problemen kunnen terugkeren naar de vorige werkende versie.
 
-Productiegegevens worden nooit onbedoeld overschreven door testgegevens. Een gegevensmigratie gebeurt alleen bewust en gecontroleerd.
+Testgegevens mogen nooit onbedoeld productiegegevens overschrijven.
 
-### 10.5 Back-up en herstel
+### 11.5 Back-up en herstel
 
 - Voor belangrijke updates wordt een databaseback-up gemaakt.
-- Gebruikersuploads, logo's en andere bestanden buiten GitHub krijgen een afzonderlijke back-upstrategie.
+- Gebruikersuploads, logo's en andere bestanden buiten GitHub krijgen een afzonderlijke back-up.
 - De herstelprocedure wordt beschreven en periodiek getest.
 - Terugdraaien houdt rekening met eventuele databasewijzigingen.
 
-**Rolverdeling:** de Raspberry Pi is de test- en proefomgeving; de productiehosting is bestemd voor echte bezoekers en gegevens. De testomgeving bootst productie zo goed mogelijk na, maar gebruikt eigen configuratie en gegevens.
+## 12. Ontwikkelvolgorde
 
-## 11. Ontwikkelfasen
+De ontwikkeling verloopt in stappen. De volgorde kan worden verfijnd. Een functie geldt pas als beschikbaar wanneer ze gebouwd en getest is.
 
-De ontwikkeling verloopt gefaseerd. De volgorde kan tijdens het project worden verfijnd, maar nieuwe functies worden eerst gebouwd en getest voordat ze als beschikbaar worden beschouwd.
+1. **Basisplatform:** projectstructuur, configuratie, database en veilige authenticatie.
+2. **Beheerbasis:** dashboard, gebruikers, rollen, rechten en uniforme lijsten/formulieren.
+3. **Regiobeheer:** regio's, regionale kleuren en logo's.
+4. **Kerngegevens:** locaties, organisatoren, categorieën en evenementen; Google Maps voor locaties.
+5. **Publieke feed:** responsieve sociale evenementenfeed, media, likes, swipe-interactie, vaste boven- en onderbalk, filters en zoeken.
+6. **Meertaligheid:** taalkeuze en vertalingen.
+7. **Reacties:** evenementreacties, antwoorden van organisatoren en moderatie.
+8. **Chat:** privéchat en afgeschermde communicatiekanalen.
+9. **Test- en productiebeheer:** Raspberry Pi, reproduceerbare installatie, migraties, back-ups en gecontroleerde publicatie.
+10. **Uitbreidingen:** pushmeldingen, deelnamefuncties en rapportage.
+11. **Productie-ingebruikname:** volledige test, beveiligingscontrole, back-upstrategie en gecontroleerde lancering.
 
-1. **Basisplatform:** projectstructuur, configuratie, database en veilige gebruikersauthenticatie.
-2. **Beheerbasis:** dashboard, gebruikers, rollen en rechten, met de vaste standaard voor alle beheerlijsten.
-3. **Regiobeheer:** regio's aanmaken en beheren, inclusief regionale kleuren en logo's.
-4. **Kerngegevens:** locaties, organisatoren, categorieën en evenementen beheren; Google Maps-koppeling voor locaties.
-5. **Publieke agenda en sociale feed:** de Instagram-geïnspireerde evenementenfeed bouwen, met een responsieve weergave: één kolom op smartphone, een aangepaste rasterindeling op tablet en drie of vier kolommen op desktop.
-6. **Meertaligheid:** taalkeuze en vertalingen uitwerken.
-7. **Interactie:** evenementreacties, antwoorden van organisatoren en moderatie.
-8. **Chat:** privéchat en afgeschermde communicatiekanalen met rechten en meldingen.
-9. **Test- en productiebeheer:** Raspberry Pi-testomgeving, reproduceerbare installatie, migraties, back-ups en gecontroleerde publicatie.
-10. **Verdere uitbreidingen:** pushmeldingen, deelnamefuncties en rapportage.
-11. **Productie-ingebruikname:** testen, beveiligingscontrole, back-upstrategie en gecontroleerde ingebruikname op de hostingomgeving.
+## 13. Status en besluitvorming
 
-## 12. Documentstatus
+Dit document is het centrale functionele en technische referentiepunt voor DONDEBAILAR.
 
-Dit document beschrijft de functionele doelstelling, de beoogde werking en de technische uitgangspunten van DONDEBAILAR. Het is het centrale projectreferentiedocument voor verdere ontwikkeling.
-
-**Belangrijk onderscheid:** een beschreven functie is een gewenste of geplande functionaliteit. Dit document is geen bewijs dat die functie al gebouwd, beschikbaar of getest is. De voortgang wordt tijdens de ontwikkeling afzonderlijk bijgehouden.
-
-Nieuwe eisen en beslissingen worden in dit document verwerkt, zodat het project één actueel en overzichtelijk uitgangspunt behoudt.
+- Nieuwe wensen worden bij het juiste hoofdstuk toegevoegd.
+- Dubbele beschrijvingen worden vermeden.
+- Beslissingen die nog niet genomen zijn, worden als open punt aangeduid.
+- Een beschreven wens betekent niet dat de functie al gebouwd of getest is.
+- De werkelijke ontwikkelstatus wordt afzonderlijk bijgehouden.
