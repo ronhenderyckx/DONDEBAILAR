@@ -95,6 +95,21 @@ Organisatoren krijgen een eigen profiel. Na toekenning van de juiste rechten kun
 
 Gebruikers kunnen een account en profiel hebben. Beheer, wijzigingen en toegang tot functies zijn afhankelijk van de toegekende rol en bevoegdheden.
 
+### 4.5 Publieke kalender als sociale feed
+
+De publieke kalender is standaard een **sociale evenementenfeed**, geïnspireerd op de gebruikservaring van Instagram. Bezoekers krijgen evenementen als visuele kaarten te zien in één doorlopende stroom. De indeling past zich automatisch aan het schermformaat aan.
+
+- **Smartphone:** één evenementkaart per rij, onder elkaar, zodat de feed prettig verticaal te bekijken en te scrollen is.
+- **Tablet:** een aangepaste rasterindeling met meerdere kolommen, afhankelijk van de beschikbare schermbreedte.
+- **Desktop:** drie of vier evenementkaarten naast elkaar. Zodra een rij vol is, verschijnen de volgende evenementen op de rij eronder. De kolommen passen zich aan de beschikbare breedte aan.
+- De feed blijft één doorlopende stroom; alleen de presentatie en het aantal kolommen veranderen per schermformaat.
+- Een evenementkaart kan een affiche of foto, titel, datum en uur, locatie, organisator en korte beschrijving tonen.
+- Bezoekers kunnen evenementen openen voor alle details en, volgens de beschikbare rechten, liken, reageren, delen of bewaren.
+- Organisatorprofielen en relevante zoek- en filtermogelijkheden maken deel uit van de publieke ontdekkingservaring.
+- De weergave moet snel, overzichtelijk en gebruiksvriendelijk blijven op smartphone, tablet en desktop.
+
+De sociale feed is de standaardweergave van de publieke kalender. De exacte werking van de regiokeuze en het tonen van evenementen uit andere regio's wordt nog afzonderlijk vastgelegd.
+
 ## 5. Vaste standaard voor alle beheerlijsten
 
 **Iedere lijst in de beheeromgeving gebruikt dezelfde opbouw en basisbediening.** Dit geldt voor gebruikers, evenementen, locaties, organisatoren, regio's, categorieën, berichten en alle toekomstige beheermodules.
@@ -302,7 +317,7 @@ De ontwikkeling verloopt gefaseerd. De volgorde kan tijdens het project worden v
 2. **Beheerbasis:** dashboard, gebruikers, rollen en rechten, met de vaste standaard voor alle beheerlijsten.
 3. **Regiobeheer:** regio's aanmaken en beheren, inclusief regionale kleuren en logo's.
 4. **Kerngegevens:** locaties, organisatoren, categorieën en evenementen beheren; Google Maps-koppeling voor locaties.
-5. **Publieke agenda:** agenda en evenementinformatie toegankelijk maken voor bezoekers.
+5. **Publieke agenda en sociale feed:** de Instagram-geïnspireerde evenementenfeed bouwen, met een responsieve weergave: één kolom op smartphone, een aangepaste rasterindeling op tablet en drie of vier kolommen op desktop.
 6. **Meertaligheid:** taalkeuze en vertalingen uitwerken.
 7. **Interactie:** evenementreacties, antwoorden van organisatoren en moderatie.
 8. **Chat:** privéchat en afgeschermde communicatiekanalen met rechten en meldingen.
