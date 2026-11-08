@@ -491,6 +491,42 @@ Testgegevens mogen nooit onbedoeld productiegegevens overschrijven.
 - De herstelprocedure wordt beschreven en periodiek getest.
 - Terugdraaien houdt rekening met eventuele databasewijzigingen.
 
+
+### 11.6 Updates op de Raspberry Pi via een knop
+
+Updates op de Raspberry Pi worden **handmatig gestart door een bevoegde platformbeheerder** vanuit de beheeromgeving. De Pi haalt dus niet automatisch op de achtergrond nieuwe code op.
+
+De updatepagina bevat:
+
+- De huidige geïnstalleerde versie (Git-commit of versienummer).
+- Een knop **Controleer op updates**.
+- De beschikbare versie en een overzicht van de wijzigingen.
+- Een knop **Update installeren**, die pas beschikbaar is nadat een update is gevonden en de beheerder de installatie bevestigt.
+- De status en voortgang van de update, met een duidelijk resultaat en eventuele foutmelding.
+
+De installatie verloopt gecontroleerd:
+
+1. Controleer de identiteit en platformbeheerdersrechten van de gebruiker en vraag een expliciete bevestiging.
+2. Controleer de herkomst en integriteit van de gekozen versie uit de private GitHub-repository.
+3. Maak een back-up van database en uploads/bestanden die niet in GitHub staan.
+4. Controleer of de omgeving geschikt is en of er voldoende schijfruimte is.
+5. Haal de goedgekeurde codeversie op zonder lokale configuratie, geheimen, gebruikersbestanden of testgegevens te overschrijven.
+6. Voer alleen nog niet uitgevoerde database-migraties uit.
+7. Voer controles uit en toon of de update geslaagd is.
+8. Bij een fout wordt de applicatie veilig teruggezet naar de vorige codeversie. Als een databasewijziging niet veilig terug te draaien is, wordt herstel uitgevoerd volgens een vooraf ontworpen back-upprocedure.
+
+Beveiliging en betrouwbaarheid:
+
+- De webknop mag nooit rechtstreeks willekeurige shellcommando's uitvoeren.
+- De update wordt uitgevoerd door een afzonderlijk, beperkt updateproces met alleen de noodzakelijke rechten.
+- GitHub-toegang gebeurt via een beveiligd token of een deploy key; geheimen staan niet in de repository of in browsercode.
+- Updates worden niet uitgevoerd vanuit een willekeurige branch of niet-goedgekeurde code.
+- Tijdens de installatie wordt voorkomen dat gelijktijdige updates worden gestart.
+- Alle updatepogingen, uitvoerder, versies, tijdstippen en resultaten worden gelogd.
+- De updatefunctie is alleen beschikbaar voor de platformbeheerder.
+- De productieomgeving op WebReus wordt niet automatisch mee bijgewerkt wanneer de test-Pi wordt bijgewerkt.
+
+
 ## 12. Ontwikkelvolgorde
 
 De ontwikkeling verloopt in stappen. De volgorde kan worden verfijnd. Een functie geldt pas als beschikbaar wanneer ze gebouwd en getest is.
