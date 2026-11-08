@@ -156,12 +156,15 @@ In de vaste bovenbalk komt een duidelijke **schakelknop** waarmee de bezoeker wi
 Werking:
 - De knop wisselt tussen de weergave **Organisatoren** en **Locaties** zonder de bezoeker naar een andere pagina te sturen.
 - De actieve keuze is duidelijk herkenbaar.
-- In de organisatorweergave kan een organisator worden geselecteerd om het profiel te openen of de feed op die organisator te filteren.
-- In de locatieweergave worden veelgebruikte steden en gemeenten als duidelijke, snel selecteerbare knoppen of tegels getoond.
-- Selectie van een stad/gemeente activeert het overeenkomstige locatie-filter.
+- **Dynamische inhoud:** de organisatorweergave wordt automatisch gevuld met organisatoren die minstens één gepubliceerd en zichtbaar evenement in de geselecteerde regio hebben.
+- **Dynamische inhoud:** de locatieweergave wordt automatisch gevuld met steden en gemeenten waar minstens één gepubliceerd en zichtbaar evenement plaatsvindt.
+- Organisatoren of locaties zonder relevant gepubliceerd evenement worden niet in deze snelle keuzebalk getoond.
+- De inhoud wordt automatisch bijgewerkt wanneer evenementen worden gepubliceerd, gewijzigd, geannuleerd, verborgen of verwijderd.
+- Bij selectie van een organisator wordt de feed gefilterd op die organisator; bij selectie van een stad/gemeente wordt de feed gefilterd op die locatie.
 - De actieve selectie is herkenbaar en kan eenvoudig worden gewist of vervangen.
 - De schakelknop en beide overzichten werken op smartphone, tablet en desktop.
 - De keuze tussen organisatoren en locaties verandert alleen het getoonde snelkeuze-overzicht; andere actieve filters blijven behouden.
+- De telling en inhoud worden bepaald op basis van de regio die de bezoeker bekijkt.
 
 ### 4.2 Inhoud van een evenementkaart
 
