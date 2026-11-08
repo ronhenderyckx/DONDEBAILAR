@@ -282,6 +282,30 @@ De onderbalk werkt op smartphone, tablet en desktop. Hij houdt rekening met de b
 
 ## 5. Beheeromgeving en vaste lijststandaard
 
+### 5.0 Eén gemeenschappelijke header en beveiligde navigatie
+
+De volledige website gebruikt één gemeenschappelijke header en een centraal opgebouwde navigatiestructuur. Pagina's krijgen dus niet elk een eigen, afwijkende header of een los menu.
+
+- Dezelfde headercomponent wordt op alle pagina's hergebruikt, zowel in de publieke omgeving als in de aangemelde omgeving en beheerpagina's.
+- De header behoudt een vaste, herkenbare opbouw. Logo/naam, navigatie, taalkeuze en accountbediening staan op consistente plaatsen.
+- De inhoud en beschikbare menu-items passen zich aan de context aan: publieke bezoeker, aangemelde gebruiker, organisator, regionale beheerder of platformbeheerder.
+- De regionale website toont in de header het logo en de huisstijl van de actieve regio, met behoud van de herkenbare DONDEBAILAR-identiteit.
+- Het menu toont alleen onderdelen waarvoor de gebruiker op dat moment bevoegd is.
+- Menu-items en submenu's worden centraal gedefinieerd; dezelfde rechtenlogica wordt overal toegepast.
+- De navigatie blijft bruikbaar op smartphone, tablet en desktop. Op kleine schermen mag het menu inklappen, maar de bediening en volgorde blijven herkenbaar.
+- De actieve pagina of menukeuze is duidelijk zichtbaar.
+- Na aanmelden toont de header de beschikbare accountacties; na afmelden worden uitsluitend de publieke menu-items getoond.
+
+**Beveiliging van menu en pagina's:**
+
+- Het verbergen van een menu-item is alleen een gebruiksgemak en vormt nooit de eigenlijke beveiliging.
+- Iedere beschermde pagina, actie en API-endpoint controleert op de server opnieuw of de gebruiker is aangemeld en de vereiste rol en rechten heeft.
+- Regionale beheerrechten worden gecontroleerd voor de regio die bij de aanvraag hoort. Een beheerder mag nooit via een aangepaste URL of request gegevens van een andere regio bereiken.
+- Platformbeheerfuncties zijn uitsluitend toegankelijk voor de platformbeheerder.
+- Onbevoegde toegang wordt geweigerd, ook wanneer iemand rechtstreeks een URL opent.
+- Dezelfde centrale autorisatiefuncties worden gebruikt door menuopbouw, pagina's en API-acties om afwijkende rechtencontroles te voorkomen.
+
+
 **Alle beheerlijsten gebruiken dezelfde opbouw en bediening.** Dit geldt onder andere voor gebruikers, evenementen, locaties, organisatoren, regio's, categorieën en berichten.
 
 ### 5.1 Overzichtsscherm
