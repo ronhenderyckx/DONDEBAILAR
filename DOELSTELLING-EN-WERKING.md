@@ -118,6 +118,17 @@ De publieke kalender is standaard een **sociale evenementenfeed**, geïnspireerd
 
 De sociale feed is de standaardweergave van de publieke kalender. De exacte werking van de regiokeuze en het tonen van evenementen uit andere regio's wordt nog afzonderlijk vastgelegd.
 
+### 4.6 Bovenbalk en filters van de publieke feed
+
+De publieke feed krijgt bovenaan een bedieningsbalk met een gebruikservaring die aansluit bij Instagram. Vanuit deze balk kan de bezoeker de feed bedienen en evenementen filteren.
+
+- De bovenbalk bevat een duidelijke toegang tot de filtermogelijkheden.
+- **Filter op organisator:** de bezoeker kan een organisator selecteren en alleen de evenementen van die organisator bekijken.
+- **Filter op locatie:** de bezoeker kan filteren op stad of gemeente.
+- De actieve filter(s) zijn zichtbaar, zodat duidelijk is waarom bepaalde evenementen worden getoond.
+- Een filter kan eenvoudig worden gewijzigd of verwijderd; er moet ook een duidelijke mogelijkheid zijn om alle filters te wissen en terug te keren naar de volledige feed.
+- De filterbediening moet goed werken op smartphone, tablet en desktop en mag het bekijken en verticaal scrollen van de feed niet hinderen.
+
 ## 5. Vaste standaard voor alle beheerlijsten
 
 **Iedere lijst in de beheeromgeving gebruikt dezelfde opbouw en basisbediening.** Dit geldt voor gebruikers, evenementen, locaties, organisatoren, regio's, categorieën, berichten en alle toekomstige beheermodules.
