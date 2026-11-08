@@ -338,6 +338,10 @@ Afgelopen evenementen worden niet automatisch uit DONDEBAILAR verwijderd. Ze kri
 - Een evenement komt uitsluitend in aanmerking voor de publieke rubriek **Terugblikken** wanneer de organisator het expliciet heeft aangeduid én er na afloop extra foto's en/of video's aan het evenement zijn toegevoegd. De gewone affiche of media die al vóór of tijdens het evenement bij de oorspronkelijke aankondiging stonden, tellen op zichzelf niet als extra terugblikbeelden.
 - De organisator bepaalt zelf wanneer de terugblik klaar is en publiek wordt gemaakt. Het aanduiden van een evenement of het toevoegen van beelden publiceert de terugblik dus niet automatisch.
 - Een gepubliceerde terugblik is zichtbaar voor bezoekers in een afzonderlijke publieke rubriek **Terugblikken**. Het evenement blijft herkenbaar als afgelopen en wordt niet opnieuw als toekomstig evenement in de actuele agenda getoond.
+- De foto's en video's van een gepubliceerde terugblik kunnen ook in de gewone sociale feed worden getoond, op dezelfde manier als evenementberichten. Ze vormen een terugblikbericht en worden niet als een nieuw of toekomstig evenement behandeld.
+- Bij één beeld wordt de afbeelding getoond. Bij meerdere foto's en/of video's worden de media in één swipebare carrousel weergegeven, volgens dezelfde weergaveregels als bij evenementen.
+- Het terugblikbericht verwijst duidelijk naar het oorspronkelijke afgelopen evenement. Bezoekers kunnen het bericht openen om de volledige terugblik en alle toegevoegde media te bekijken.
+- De organisator kan de volgorde en presentatie van de toegevoegde beelden beheren. Alleen media van een gepubliceerde terugblik zijn publiek zichtbaar.
 - Als de organisator het evenement niet aanduidt of geen extra foto's/video's toevoegt, blijft het uitsluitend beschikbaar onder **Afgelopen evenementen** in het beheer en verschijnt het niet in de publieke rubriek **Terugblikken**.
 - Bezoekers kunnen de gepubliceerde beelden, evenementinformatie, organisator en locatie bekijken en de terugblik delen.
 - De organisator behoudt toegang om de terugblik te beheren zolang die niet definitief verwijderd is.
