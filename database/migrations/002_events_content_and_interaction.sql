@@ -110,6 +110,17 @@ CREATE TABLE IF NOT EXISTS categories (
     CONSTRAINT fk_categories_region FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+CREATE TABLE IF NOT EXISTS category_translations (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+    category_id BIGINT UNSIGNED NOT NULL,
+    language CHAR(2) NOT NULL,
+    name VARCHAR(120) NOT NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uq_category_translation_language (category_id, language),
+    CONSTRAINT chk_category_translation_language CHECK (language IN ('nl', 'en', 'es', 'fr')),
+    CONSTRAINT fk_category_translations_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 CREATE TABLE IF NOT EXISTS events (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
     region_id BIGINT UNSIGNED NOT NULL,
