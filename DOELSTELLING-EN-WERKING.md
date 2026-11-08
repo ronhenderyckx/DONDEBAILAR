@@ -105,11 +105,14 @@ Nieuwe gebruikers kunnen zich zelf registreren. Een account wordt pas actief nad
 De registratie verloopt als volgt:
 
 1. De gebruiker vult de gevraagde gegevens in, waaronder naam, e-mailadres en wachtwoord.
-2. DONDEBAILAR controleert de invoer en controleert of het e-mailadres al in gebruik is.
-3. Het systeem maakt het account aan met de status **in afwachting van e-mailbevestiging**.
-4. DONDEBAILAR stuurt een e-mail met een persoonlijke bevestigingslink.
-5. De gebruiker klikt op de link. Na een geldige bevestiging wordt het account geactiveerd.
-6. Pas daarna kan de gebruiker aanmelden en functies gebruiken die een actief account vereisen.
+2. Tijdens de registratie kiest de gebruiker ook de gewenste taal voor DONDEBAILAR: Nederlands, Engels, Spaans of Frans. De browsertaal mag als voorstel vooraf worden geselecteerd, maar de gebruiker kan zelf een andere taal kiezen.
+3. DONDEBAILAR controleert de invoer en controleert of het e-mailadres al in gebruik is.
+4. Het systeem maakt het account aan met de status **in afwachting van e-mailbevestiging** en bewaart de gekozen taal als voorkeur van de gebruiker.
+5. DONDEBAILAR stuurt een e-mail met een persoonlijke bevestigingslink, in de gekozen taal wanneer die vertaling beschikbaar is.
+6. De gebruiker klikt op de link. Na een geldige bevestiging wordt het account geactiveerd.
+7. Pas daarna kan de gebruiker aanmelden en functies gebruiken die een actief account vereisen.
+
+De gekozen taal wordt gebruikt voor de interface en systeemberichten, waaronder e-mails en meldingen, voor zover de vertalingen beschikbaar zijn. De gebruiker kan de taal later altijd wijzigen in de profiel- of accountinstellingen. De taalvoorkeur van een gebruiker staat los van de taal waarin een evenement wordt ingevoerd of weergegeven.
 
 Beveiliging en gebruiksgemak:
 
