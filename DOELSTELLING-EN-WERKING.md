@@ -146,12 +146,22 @@ De feed blijft één doorlopende stroom; de presentatie en rasterindeling passen
 - Als een organisator geen geschikte afbeelding heeft, wordt een neutrale standaardafbeelding gebruikt.
 - De navigatie blijft bruikbaar op smartphone, tablet en desktop.
 
-### 4.1.2 Snelle locatiekeuze
+### 4.1.2 Schakelen tussen organisatoren en locaties
 
-- Veelgebruikte steden en gemeenten kunnen als duidelijke, snel selecteerbare locatieknoppen of tegels worden getoond.
+In de vaste bovenbalk komt een duidelijke **schakelknop** waarmee de bezoeker wisselt tussen twee overzichten:
+
+- **Organisatoren:** toont de horizontale rij met organisatorprofielen of logo's.
+- **Locaties:** toont de snelkeuze voor steden en gemeenten.
+
+Werking:
+- De knop wisselt tussen de weergave **Organisatoren** en **Locaties** zonder de bezoeker naar een andere pagina te sturen.
+- De actieve keuze is duidelijk herkenbaar.
+- In de organisatorweergave kan een organisator worden geselecteerd om het profiel te openen of de feed op die organisator te filteren.
+- In de locatieweergave worden veelgebruikte steden en gemeenten als duidelijke, snel selecteerbare knoppen of tegels getoond.
 - Selectie van een stad/gemeente activeert het overeenkomstige locatie-filter.
-- De actieve locatie is herkenbaar en kan eenvoudig worden gewist of vervangen.
-- Deze snelle keuze werkt samen met de algemene filters uit hoofdstuk 4.5.
+- De actieve selectie is herkenbaar en kan eenvoudig worden gewist of vervangen.
+- De schakelknop en beide overzichten werken op smartphone, tablet en desktop.
+- De keuze tussen organisatoren en locaties verandert alleen het getoonde snelkeuze-overzicht; andere actieve filters blijven behouden.
 
 ### 4.2 Inhoud van een evenementkaart
 
