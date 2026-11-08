@@ -97,18 +97,59 @@ De vormgeving moet:
 - De agenda en evenementinformatie centraal stellen.
 - Rekening houden met de regionale huisstijl.
 
-## 10. Beheer en communicatie
+
+## 10. Chat en berichten
+
+DONDEBAILAR moet gebruikers de mogelijkheid bieden om met elkaar te communiceren via een ingebouwde chatfunctie.
+
+De chat wordt in verschillende vormen voorbereid:
+
+- **Privéchat:** gebruikers kunnen rechtstreeks een bericht sturen naar een andere gebruiker, voor zover hun accountrechten dit toelaten.
+- **Organisatorcommunicatie:** bezoekers kunnen contact opnemen met een organisator over diens profiel of evenementen.
+- **Regionale communicatie:** bevoegde beheerders kunnen een communicatiekanaal gebruiken voor berichten aan gebruikers of organisatoren binnen hun regio.
+- **Beheerderskanaal:** er kan een afzonderlijk, afgeschermd kanaal zijn voor platformbeheerders en bevoegde regionale beheerders.
+
+De toegang tot elk kanaal wordt bepaald door gebruikersrollen en rechten. Een gebruiker mag alleen gesprekken en berichten zien waarvoor die gebruiker bevoegd is.
+
+De chat moet waar mogelijk ondersteuning bieden voor:
+- Een overzicht van gesprekken en nieuwe berichten.
+- Datum en tijd van berichten.
+- Meldingen bij nieuwe berichten.
+- Mogelijkheid om ongewenste berichten te melden of gebruikers te blokkeren.
+- Beheer- en moderatiemogelijkheden voor bevoegde beheerders.
+
+Privégesprekken blijven afgeschermd. Beheerders krijgen niet automatisch toegang tot de inhoud van privégesprekken; eventuele inzage of moderatie moet volgens vooraf vastgelegde regels en met respect voor privacy gebeuren.
+
+## 11. Reacties en commentaar bij evenementen
+
+Bij evenementen moet een commentaarfunctie beschikbaar kunnen zijn. Bezoekers en ingelogde gebruikers kunnen zo vragen stellen, praktische informatie delen of reageren op een evenement.
+
+De beoogde mogelijkheden zijn:
+- Een reactie plaatsen bij een evenement.
+- Reageren op bestaande commentaren, indien deze functie wordt uitgewerkt.
+- De datum, tijd en auteur van een reactie tonen.
+- Een reactie aanpassen of verwijderen volgens de ingestelde rechten.
+- Ongepaste reacties melden.
+- Commentaren modereren of verwijderen door bevoegde beheerders.
+- Commentaren per evenement in- of uitschakelen.
+
+Organisatoren moeten kunnen reageren op vragen en opmerkingen bij hun eigen evenementen, zonder dat zij reacties van andere gebruikers zomaar kunnen wijzigen of verwijderen.
+
+Om misbruik en spam te beperken, worden passende beveiliging, moderatie en eventueel beperkingen op het plaatsen van reacties voorzien. De privacy van gebruikers moet worden gerespecteerd.
+
+## 12. Beheer en communicatie
 
 Het platform wordt voorbereid op uitbreidingen zoals:
 - E-mailmeldingen en wachtwoordherstel.
 - Pushmeldingen voor relevante evenementen of wijzigingen.
-- Berichten of communicatiekanalen voor gebruikers en organisatoren.
+- Meldingen bij nieuwe chatberichten en reacties op evenementen.
+- Berichten- en communicatiekanalen voor gebruikers, organisatoren en beheerders.
 - Beheer van e-mailinstellingen.
 - Rapportage en geplande onderhoudstaken.
 
 Deze onderdelen worden gefaseerd ontwikkeld. Ze gelden niet als beschikbaar zolang ze niet daadwerkelijk zijn gebouwd en getest.
 
-## 11. Technische uitgangspunten
+## 13. Technische uitgangspunten
 
 - De applicatie wordt ontwikkeld in PHP en gebruikt MySQL voor gegevensopslag.
 - De lokale ontwikkelomgeving moet zo goed mogelijk overeenkomen met de uiteindelijke hostingomgeving.
@@ -118,8 +159,10 @@ Deze onderdelen worden gefaseerd ontwikkeld. Ze gelden niet als beschikbaar zola
 - Invoer wordt gevalideerd en databasebewerkingen worden veilig uitgevoerd.
 - Geheimen, lokale configuratie, databaseback-ups, logs, sessies en gebruikersuploads worden niet in de Git-repository opgenomen.
 - Wijzigingen aan de database worden waar mogelijk als versieerbare migraties bijgehouden.
+- Chatberichten en evenementreacties worden veilig opgeslagen en alleen getoond aan bevoegde gebruikers.
+- Bij communicatiefunctionaliteit wordt rekening gehouden met privacy, spambeperking, misbruikmeldingen en moderatie.
 
-## 12. Gefaseerde ontwikkeling
+## 14. Gefaseerde ontwikkeling
 
 De ontwikkeling verloopt in stappen:
 
@@ -129,10 +172,12 @@ De ontwikkeling verloopt in stappen:
 4. **Agenda:** evenementen, categorieën, locaties en organisatoren beheren.
 5. **Publieke website:** agenda en evenementinformatie toegankelijk maken voor bezoekers.
 6. **Meertaligheid:** vertalingen en taalkeuze uitwerken.
-7. **Uitbreidingen:** meldingen, communicatie, deelnamefuncties en verdere verbeteringen.
-8. **Productie:** testen, beveiligingscontrole, back-upstrategie en ingebruikname op de hostingomgeving.
+7. **Interactie:** commentaar bij evenementen, reacties van organisatoren en moderatie.
+8. **Chat:** privéchat en afgeschermde communicatiekanalen met meldingen en toegangsrechten.
+9. **Verdere uitbreidingen:** pushmeldingen, deelnamefuncties en rapportage.
+10. **Productie:** testen, beveiligingscontrole, back-upstrategie en ingebruikname op de hostingomgeving.
 
-## 13. Uitgangspunt voor toekomstige uitbreidingen
+## 15. Uitgangspunt voor toekomstige uitbreidingen
 
 DONDEBAILAR moet kunnen groeien van een regionale dansagenda naar een platform voor meerdere regio's, zonder dat de basis opnieuw moet worden gebouwd.
 
