@@ -300,3 +300,40 @@ Toevoegen en aanpassen gebeuren op een afzonderlijk invoerscherm, niet door de g
 - Alle beheerlijsten gebruiken dezelfde herkenbare bediening, knopbenamingen, formulieropbouw, bevestigingen en meldingen.
 - De velden en inhoud verschillen per module, maar de werking en gebruikerservaring blijven consequent.
 - Nieuwe beheermodules moeten deze standaard hergebruiken. Waar mogelijk wordt hiervoor één gedeelde, herbruikbare technische basis voor lijsten en formulieren ontwikkeld.
+
+## 18. Locaties automatisch invullen via Google Maps
+
+Bij het toevoegen of aanpassen van een locatie moet de beheerder de locatie kunnen opzoeken en selecteren via een geïntegreerde Google Maps- of Google Places-zoekfunctie. Na selectie vult DONDEBAILAR de beschikbare locatiegegevens automatisch in.
+
+### 18.1 Automatisch in te vullen gegevens
+
+Voor zover Google Places deze gegevens voor de geselecteerde locatie beschikbaar stelt, worden onder andere ingevuld:
+- Naam van de locatie of zaak.
+- Straatnaam en huisnummer.
+- Postcode en gemeente/stad.
+- Land.
+- Geografische coördinaten (breedte- en lengtegraad).
+- Google Maps-link of plaatsreferentie.
+- Telefoonnummer en website, indien beschikbaar.
+- Andere praktische locatiegegevens die via de toegestane Places-velden beschikbaar zijn.
+
+De beheerder kan alle automatisch ingevulde gegevens vóór het opslaan controleren en handmatig corrigeren.
+
+### 18.2 Logo en afbeeldingen
+
+Een officieel bedrijfs- of locatielogo is niet standaard als afzonderlijk gegeven beschikbaar via Google Maps/Places. DONDEBAILAR mag daarom niet veronderstellen dat iedere locatie automatisch een echt logo kan krijgen.
+
+- Als een betrouwbaar officieel logo via een toegestane bron beschikbaar is, kan dit als voorstel worden getoond.
+- Als geen officieel logo beschikbaar is, kan de beheerder zelf een logo of afbeelding uploaden of de locatie zonder logo opslaan.
+- Een algemene Google Maps-categorie-icoon of foto mag niet zonder duidelijke aanduiding als officieel bedrijfslogo worden voorgesteld.
+- Afbeeldingen en logo's worden alleen opgeslagen en gebruikt met inachtneming van de toepasselijke gebruiksvoorwaarden en rechten.
+
+### 18.3 Controle en technische voorwaarden
+
+- De beheerder bevestigt de gekozen locatie; alleen een zoekterm invoeren mag niet automatisch een locatie-record aanmaken.
+- De beheerder kan de gegevens aanvullen of corrigeren voordat deze worden opgeslagen.
+- De koppeling gebruikt de officiële Google Maps Platform/Places-functionaliteit en de daarvoor vereiste API-configuratie.
+- API-sleutels worden veilig per omgeving ingesteld, beperkt tot de nodige API's en toegestane toepassingen, en nooit in de publieke broncode of GitHub opgeslagen.
+- Er wordt rekening gehouden met gebruiksvoorwaarden, privacy, eventuele kosten en quota van Google Maps Platform.
+- Als Google Maps tijdelijk niet beschikbaar is of geen resultaat oplevert, moet de beheerder de locatie nog steeds handmatig kunnen invoeren.
+- De locatie wordt pas definitief opgeslagen nadat de beheerder op **Opslaan** klikt.
