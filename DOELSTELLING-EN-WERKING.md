@@ -572,7 +572,7 @@ Het logo is waar passend aanklikbaar en verwijst naar de startpagina van de betr
 
 ## 11. Testomgeving, productie en back-ups
 
-De **nieuwe Raspberry Pi in België** host zowel de testomgeving als de latere publieke productieomgeving. Dit is één fysiek toestel met twee logisch en technisch gescheiden installaties. De bestaande Raspberry Pi in Spanje voor VPN/Guifi valt buiten dit project en wordt niet aangepast.
+De **nieuwe Raspberry Pi in België** host zowel de testomgeving als de latere publieke productieomgeving. Dit is één fysiek toestel met twee logisch en technisch gescheiden installaties.
 
 De testomgeving wordt gebruikt voor nieuwe functies en controles. De productieomgeving is bestemd voor echte bezoekers en gegevens. Beide omgevingen gebruiken dezelfde applicatiebasis, maar hebben eigen configuraties, databases, uploads, logs en back-ups.
 
