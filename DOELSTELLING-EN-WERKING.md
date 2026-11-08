@@ -89,7 +89,7 @@ De taalstructuur wordt vanaf het begin voorzien. De volledige vertalingen van de
 | **admin** | Volledig platformbeheer |
 | **region_admin** | Beheer van toegewezen regio's |
 | **editor** | Redactioneel beheer volgens toegekende rechten |
-| **organizer** | Beheer van eigen organisatorprofiel en evenementen |
+| **organizer** | Beheer van het eigen organisatorprofiel en de eigen evenementen, inclusief publicatie en media |
 | **viewer/bezoeker** | Publieke informatie bekijken; extra functies volgens account en rechten |
 
 ### 3.2 Rechtenbeheer
@@ -97,7 +97,10 @@ De taalstructuur wordt vanaf het begin voorzien. De volledige vertalingen van de
 - Rechten worden centraal gecontroleerd.
 - Een gebruiker kan alleen gegevens bekijken of wijzigen waarvoor die gebruiker bevoegd is.
 - Regionale beheerders zijn beperkt tot hun toegewezen regio's.
-- Organisatoren beheren alleen hun eigen gegevens en evenementen, voor zover toegestaan.
+- Organisatoren kunnen hun eigen evenementen aanmaken, bekijken, wijzigen, publiceren, tijdelijk offline halen en annuleren volgens de beschikbare evenementstatussen en regionale regels.
+- Organisatoren kunnen bij hun eigen evenementen de foto's en video's beheren, de volgorde en het omslagbeeld bepalen en reacties beheren volgens de moderatieregels.
+- Organisatoren kunnen geen evenementen van andere organisatoren wijzigen, tenzij zij daarvoor afzonderlijk expliciete rechten hebben gekregen.
+- Organisatoren beheren alleen hun eigen organisatorprofiel en evenementen.
 - Rechten worden zowel in de gebruikersinterface als op de server afgedwongen. Een knop verbergen is op zichzelf geen beveiliging.
 
 De precieze rechten per handeling worden tijdens de ontwikkeling verder uitgewerkt.
@@ -331,6 +334,8 @@ Een evenement kan de volgende gegevens bevatten:
 - Regio.
 
 Evenementen worden gekoppeld aan de juiste regio, organisator en locatie.
+
+De organisator beheert de eigen evenementen via een afzonderlijke beheeromgeving. Vanuit die omgeving kan de organisator evenementen aanmaken en bestaande eigen evenementen aanpassen, publiceren, offline halen of annuleren. Ook de bijbehorende afbeeldingen, video's, praktische informatie en evenementreacties kunnen daar worden beheerd binnen de toegekende rechten. Een organisator krijgt hierdoor geen toegang tot evenementen of beheerinstellingen van andere organisatoren.
 
 
 #### Afgelopen evenementen en terugblikken
