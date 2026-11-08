@@ -510,6 +510,10 @@ Het logo is waar passend aanklikbaar en verwijst naar de startpagina van de betr
 
 - Iedere regio heeft een eigen subdomein, bijvoorbeeld **marinaalta.dondebailar.eu**.
 - Iedere regio kan een eigen logo uploaden en een eigen kleurenpalet instellen. Deze instellingen gelden uitsluitend voor het subdomein van die regio.
+- Iedere regio kan daarnaast voor elke weekdag een vaste eigen kleur instellen: maandag, dinsdag, woensdag, donderdag, vrijdag, zaterdag en zondag.
+- De ingestelde dagkleur is elke week opnieuw dezelfde en wordt bepaald door de datum van het evenement. De kleuren veranderen dus niet automatisch van dag tot dag.
+- De dagkleur wordt consequent gebruikt in de agenda en bij de datum-/dagweergave van evenementen, zodat bezoekers snel de weekdag herkennen. De kleur moet voldoende contrast bieden voor leesbare tekst en pictogrammen.
+- De regionale beheerder kan de zeven dagkleuren afzonderlijk aanpassen. Als er geen eigen kleur is ingesteld, gebruikt het systeem een duidelijke standaardkleur.
 - Per regio kunnen ook de naam, omschrijving, welkomsttekst, contactgegevens, website en sociale-media-links worden beheerd.
 - De regionale naam, het logo en de kleuren worden consequent gebruikt in de regionale header, startpagina en andere passende onderdelen.
 - Het regionale logo en de regionale huisstijl geven de regio een eigen herkenbare uitstraling. De centrale DONDEBAILAR-identiteit blijft als overkoepelend platform herkenbaar.
