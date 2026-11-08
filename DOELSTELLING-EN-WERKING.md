@@ -140,8 +140,11 @@ De feed blijft één doorlopende stroom; de presentatie en rasterindeling passen
 ### 4.1.1 Navigatie en organisatoroverzicht
 
 - De publieke bovenkant bevat de centrale merknaam of het logo, een taalkeuze en een hoofdmenu dat op kleine schermen compact kan worden weergegeven.
-- Organisatoren kunnen boven de evenementenfeed in een horizontale rij met ronde profielafbeeldingen of logo's worden getoond.
-- De organisatorrij kan worden omgeschakeld naar een meer compacte lijstweergave.
+- Organisatoren worden boven de evenementenfeed getoond als horizontale rij met **afgeronde, rechthoekige knoppen**. De knoppen kunnen de naam en, indien beschikbaar, een kleine profielafbeelding of logo bevatten.
+- Gebruik geen ronde profielknoppen of de typische Instagram-stijl. De vormgeving krijgt een eigen DONDEBAILAR-uitstraling.
+- De knoppen hebben eigen DONDEBAILAR-kleuren en volgen niet de kleurstelling of vormgeving van Instagram. Gebruik de centrale huisstijlkleuren, met voldoende contrast tussen actieve en niet-actieve knoppen. Waar regionale themakleuren zijn ingesteld, mogen die consequent worden toegepast.
+- De rij kan horizontaal scrollen op kleine schermen; knoppen blijven goed leesbaar en makkelijk aan te raken.
+- Het organisatoroverzicht kan ook als compacte lijst worden weergegeven.
 - Selectie van een organisator opent het profiel of filtert de feed op die organisator.
 - Als een organisator geen geschikte afbeelding heeft, wordt een neutrale standaardafbeelding gebruikt.
 - De navigatie blijft bruikbaar op smartphone, tablet en desktop.
@@ -150,8 +153,11 @@ De feed blijft één doorlopende stroom; de presentatie en rasterindeling passen
 
 In de vaste bovenbalk komt een duidelijke **schakelknop** waarmee de bezoeker wisselt tussen twee overzichten:
 
-- **Organisatoren:** toont de horizontale rij met organisatorprofielen of logo's.
-- **Locaties:** toont de snelkeuze voor steden en gemeenten.
+- **Organisatoren:** toont de horizontale rij met afgeronde, rechthoekige knoppen voor organisatoren.
+- **Locaties:** toont dezelfde soort afgeronde, rechthoekige knoppen voor steden en gemeenten.
+- De knoppen gebruiken een eigen DONDEBAILAR-kleurstijl en wijken duidelijk af van de ronde Instagram-profielknoppen en Instagram-kleuren.
+- De actieve knop krijgt een duidelijk onderscheidende achtergrond- en/of tekstkleur; niet-actieve knoppen blijven herkenbaar maar visueel rustiger.
+- De knoppen zijn consistent vormgegeven in beide standen, met passende labels en eventueel een klein pictogram of logo.
 
 Werking:
 - De knop wisselt tussen de weergave **Organisatoren** en **Locaties** zonder de bezoeker naar een andere pagina te sturen.
