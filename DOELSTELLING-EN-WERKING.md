@@ -131,6 +131,18 @@ De publieke feed krijgt bovenaan een bedieningsbalk met een gebruikservaring die
 - **Na filteren automatisch naar boven:** zodra de bezoeker een filter instelt, wijzigt of verwijdert, wordt de feed automatisch naar de bovenkant van de resultaten gescrold. De eerste gefilterde evenementen zijn dan meteen zichtbaar, direct onder de vast zichtbare bovenbalk.
 - De filterbediening moet goed werken op smartphone, tablet en desktop en mag het bekijken en verticaal scrollen van de feed niet hinderen.
 
+### 4.7 Vast zichtbare onderbalk
+
+Naast de vast zichtbare bovenbalk krijgt de publieke feed een **onderbalk die tijdens het scrollen permanent zichtbaar blijft onderaan het scherm**. De feed beweegt tussen de boven- en onderbalk.
+
+- De onderbalk blijft zichtbaar op smartphone, tablet en desktop.
+- De onderbalk bevat een **manueel zoekveld** waarin de bezoeker zelf een zoekterm kan invoeren om evenementen terug te vinden.
+- De bezoeker kan de zoekopdracht uitvoeren met een duidelijke zoekactie (bijvoorbeeld een zoekknop of Enter-toets). De zoekfunctie werkt samen met de ingestelde filters.
+- De onderbalk bevat daarnaast een duidelijke knop **Geluid aan/uit**. De bezoeker kan hiermee het geluid in de feed in- of uitschakelen.
+- De knop toont steeds de actuele geluidsstatus, bijvoorbeeld met een luidsprekericoon met of zonder geluidsgolven.
+- De vaste onderbalk houdt rekening met de schermhoogte en bedekt geen belangrijke inhoud of bediening van de feed. Op mobiele apparaten wordt ook rekening gehouden met de veilige schermrand.
+- De bediening blijft toegankelijk via aanraking, muis en toetsenbord.
+
 ## 5. Vaste standaard voor alle beheerlijsten
 
 **Iedere lijst in de beheeromgeving gebruikt dezelfde opbouw en basisbediening.** Dit geldt voor gebruikers, evenementen, locaties, organisatoren, regio's, categorieën, berichten en alle toekomstige beheermodules.
