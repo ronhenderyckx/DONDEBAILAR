@@ -56,14 +56,19 @@ Bevoegde beheerders kunnen categorieën later uitbreiden en aanpassen.
 
 ### 2.1 Regionale structuur
 
-Iedere regio kan beschikken over:
-- Een eigen naam en URL of subdomein.
-- Een eigen landinstelling en tijdzone.
-- Een eigen logo en kleurenpalet.
+Iedere regio krijgt een eigen subdomein onder het centrale DONDEBAILAR-domein. Bijvoorbeeld: **marinaalta.dondebailar.eu**. Het subdomein opent rechtstreeks de publieke omgeving van die regio.
+
+Iedere regio heeft daarnaast eigen, afzonderlijk instelbare gegevens:
+- Regionale naam, korte omschrijving en welkomst-/infotekst.
+- Eigen logo en kleurenpalet, onafhankelijk van andere regio's.
+- Eigen contactgegevens en regionale informatie, zoals website en sociale-media-links.
+- Eigen landinstelling, taalinstellingen en tijdzone.
 - Eigen evenementen, locaties en organisatoren.
 - Eigen regionale beheerders.
 
-Gegevens van verschillende regio's blijven logisch van elkaar gescheiden. Een platformbeheerder kan alle regio's beheren.
+De regionale website gebruikt de eigen naam, het eigen logo, de ingestelde kleuren en de regionale informatie op de juiste plaatsen, zoals de header, startpagina en contact-/infopagina. De centrale DONDEBAILAR-identiteit blijft herkenbaar als overkoepelend platform.
+
+Gegevens en vormgevingsinstellingen van verschillende regio's blijven logisch van elkaar gescheiden. Een platformbeheerder kan alle regio's beheren. Een regionale beheerder kan alleen de instellingen en inhoud van de toegewezen regio beheren.
 
 ### 2.2 Talen
 
@@ -501,11 +506,14 @@ Het centrale DONDEBAILAR-logo blijft herkenbaar op:
 
 Het logo is waar passend aanklikbaar en verwijst naar de startpagina van de betreffende website of regio. Het wordt centraal als gedeeld merkmiddel beheerd.
 
-### 9.2 Regionale huisstijl
+### 9.2 Eigen regionale website, logo en kleuren
 
-- Iedere regio kan een eigen logo en kleurenpalet instellen.
-- Het regionale logo vult de centrale DONDEBAILAR-identiteit aan en vervangt die niet.
-- Beide logo's worden evenwichtig weergegeven.
+- Iedere regio heeft een eigen subdomein, bijvoorbeeld **marinaalta.dondebailar.eu**.
+- Iedere regio kan een eigen logo uploaden en een eigen kleurenpalet instellen. Deze instellingen gelden uitsluitend voor het subdomein van die regio.
+- Per regio kunnen ook de naam, omschrijving, welkomsttekst, contactgegevens, website en sociale-media-links worden beheerd.
+- De regionale naam, het logo en de kleuren worden consequent gebruikt in de regionale header, startpagina en andere passende onderdelen.
+- Het regionale logo en de regionale huisstijl geven de regio een eigen herkenbare uitstraling. De centrale DONDEBAILAR-identiteit blijft als overkoepelend platform herkenbaar.
+- De regionale beheerder kan deze regionale gegevens en vormgeving aanpassen binnen de eigen bevoegdheden.
 - Vormgeving blijft duidelijk en bruikbaar op computer, tablet en smartphone.
 - De agenda en evenementinformatie blijven centraal staan.
 
