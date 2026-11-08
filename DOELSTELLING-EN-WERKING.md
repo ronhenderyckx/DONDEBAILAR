@@ -68,7 +68,7 @@ Iedere regio heeft daarnaast eigen, afzonderlijk instelbare gegevens:
 
 De regionale website gebruikt de eigen naam, het eigen logo, de ingestelde kleuren en de regionale informatie op de juiste plaatsen, zoals de header, startpagina en contact-/infopagina. De centrale DONDEBAILAR-identiteit blijft herkenbaar als overkoepelend platform.
 
-Gegevens en vormgevingsinstellingen van verschillende regio's blijven logisch van elkaar gescheiden. Een platformbeheerder kan alle regio's beheren. Een regionale beheerder kan alleen de instellingen en inhoud van de toegewezen regio beheren.
+Gegevens en vormgevingsinstellingen van verschillende regio's blijven logisch van elkaar gescheiden. Alleen de platformbeheerder (`admin`) bepaalt wie welke regio's mag beheren. De platformbeheerder wijst per regio één of meerdere regionale beheerders (`region_admin`) toe en kan die toewijzingen wijzigen of intrekken. Eén regionale beheerder kan aan meerdere regio's toegewezen worden. Een regionale beheerder kan uitsluitend de instellingen en inhoud beheren van de regio's die de platformbeheerder aan die gebruiker heeft toegewezen.
 
 ### 2.2 Talen
 
@@ -96,7 +96,11 @@ De taalstructuur wordt vanaf het begin voorzien. De volledige vertalingen van de
 
 - Rechten worden centraal gecontroleerd.
 - Een gebruiker kan alleen gegevens bekijken of wijzigen waarvoor die gebruiker bevoegd is.
-- Regionale beheerders zijn beperkt tot hun toegewezen regio's.
+- Alleen de platformbeheerder (`admin`) kan regionale beheerders aan regio's toewijzen, hun toewijzingen wijzigen of intrekken.
+- De platformbeheerder bepaalt per regio welke gebruikers regionale beheerder (`region_admin`) zijn; een regio kan meerdere beheerders hebben.
+- Eén regionale beheerder kan meerdere regio's beheren als de platformbeheerder die regio's aan die gebruiker heeft toegewezen.
+- Regionale beheerders kunnen zichzelf geen regio's toekennen en kunnen geen andere regionale beheerders aanstellen of hun toegang wijzigen.
+- Een regionale beheerder is beperkt tot de regio's die expliciet door de platformbeheerder zijn toegewezen.
 - Organisatoren kunnen hun eigen evenementen aanmaken, bekijken, wijzigen, publiceren, tijdelijk offline halen en annuleren volgens de beschikbare evenementstatussen en regionale regels.
 - Organisatoren kunnen bij hun eigen evenementen de foto's en video's beheren, de volgorde en het omslagbeeld bepalen en reacties beheren volgens de moderatieregels.
 - Organisatoren kunnen geen evenementen van andere organisatoren wijzigen, tenzij zij daarvoor afzonderlijk expliciete rechten hebben gekregen.
