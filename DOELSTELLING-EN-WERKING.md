@@ -558,7 +558,8 @@ Het logo is waar passend aanklikbaar en verwijst naar de startpagina van de betr
 
 - De applicatie wordt ontwikkeld in **PHP** met **MySQL** als database.
 - De applicatie wordt modulair opgebouwd.
-- De lokale ontwikkelomgeving sluit zo goed mogelijk aan op de hostingomgeving.
+- De ontwikkeling verloopt via GitHub; een lokale Windows-PHP/MySQL-server is geen onderdeel van de afgesproken werkwijze.
+- De Belgische Raspberry Pi biedt een afzonderlijke testomgeving en de latere productieomgeving.
 - Regio's, gebruikers, rollen en rechten worden centraal beheerd.
 - Wachtwoorden worden veilig gehasht.
 - Invoer wordt gevalideerd en databasebewerkingen worden veilig uitgevoerd.
@@ -571,18 +572,42 @@ Het logo is waar passend aanklikbaar en verwijst naar de startpagina van de betr
 
 ## 11. Testomgeving, productie en back-ups
 
-De Raspberry Pi is de afzonderlijke ontwikkel- en testserver. Productie is bestemd voor echte bezoekers en gegevens.
+De **nieuwe Raspberry Pi in België** host zowel de testomgeving als de latere publieke productieomgeving. Dit is één fysiek toestel met twee logisch en technisch gescheiden installaties. De bestaande Raspberry Pi in Spanje voor VPN/Guifi valt buiten dit project en wordt niet aangepast.
+
+De testomgeving wordt gebruikt voor nieuwe functies en controles. De productieomgeving is bestemd voor echte bezoekers en gegevens. Beide omgevingen gebruiken dezelfde applicatiebasis, maar hebben eigen configuraties, databases, uploads, logs en back-ups.
 
 **Test- en productiegegevens en configuraties blijven strikt gescheiden.**
 
-### 11.1 Gelijke applicatiebasis
+### 11.1 Domein- en subdomeinstructuur
+
+De test- en productieomgeving krijgen elk een eigen domeinstructuur. Iedere regio blijft in beide omgevingen herkenbaar via haar eigen subdomein.
+
+**Productie:**
+- Hoofddomein: `dondebailar.eu`.
+- Regionale subdomeinen, bijvoorbeeld `marinaalta.dondebailar.eu`, `valencia.dondebailar.eu` en `alicante.dondebailar.eu`.
+
+**Test:**
+- Testbasisdomein: `test.dondebailar.eu`.
+- Dezelfde regio's onder het testdomein, bijvoorbeeld `marinaalta.test.dondebailar.eu`, `valencia.test.dondebailar.eu` en `alicante.test.dondebailar.eu`.
+
+Technische uitgangspunten:
+- DNS verwijst de productie- en testdomeinen naar de Belgische Raspberry Pi.
+- Er worden passende wildcard-DNS-records voorzien voor `*.dondebailar.eu` en `*.test.dondebailar.eu`, naast de expliciete records die voor de basisdomeinen nodig zijn.
+- De webserver gebruikt afzonderlijke virtuele hosts of een gelijkwaardige hostconfiguratie voor test en productie.
+- De applicatie bepaalt op basis van de aangevraagde hostnaam de omgeving en de actieve regio. De hostnaam wordt gevalideerd tegen bekende regio's; een willekeurige hostnaam mag niet zomaar een regio activeren.
+- Een regionale subdomeinnaam verwijst naar de regionale publieke website; de testvariant toont dezelfde regio met testgegevens en testinstellingen.
+- Test en productie krijgen afzonderlijke HTTPS-certificaten of correct afgedekte wildcardcertificaten. HTTPS is verplicht voordat een omgeving publiek toegankelijk wordt.
+- Testomgevingen worden afgeschermd tegen indexering en onbevoegde toegang. Testgegevens en testaccounts worden nooit als echte productiegegevens beschouwd.
+- Nieuwe regio's moeten via regiobeheer kunnen worden toegevoegd zonder een aparte applicatie-installatie per regio. DNS- en certificaatdekking moet nieuwe regionale subdomeinen ondersteunen.
+
+### 11.2 Gelijke applicatiebasis
 
 - Test en productie gebruiken dezelfde applicatiecode uit GitHub.
 - PHP-versie, extensies en databaseversie worden vastgelegd en waar mogelijk afgestemd.
 - Verschillen tussen Raspberry Pi en productiehosting worden gedocumenteerd.
 - De applicatie bevat geen vaste paden, hostnamen of IP-adressen die alleen op de testserver werken.
 
-### 11.2 Configuratie per omgeving
+### 11.3 Configuratie per omgeving
 
 Iedere omgeving krijgt een eigen configuratie voor:
 - Databaseverbinding.
@@ -594,7 +619,7 @@ Iedere omgeving krijgt een eigen configuratie voor:
 
 Omgevingsinstellingen staan buiten de algemene applicatiecode. Er komt een voorbeeldconfiguratie zonder wachtwoorden of geheimen.
 
-### 11.3 Herhaalbare installatie
+### 11.4 Herhaalbare installatie
 
 - Installatie- en configuratiestappen maken een lege omgeving zo veel mogelijk automatisch klaar.
 - PHP-afhankelijkheden worden reproduceerbaar geïnstalleerd met Composer en een vastgelegde lockfile.
@@ -603,7 +628,7 @@ Omgevingsinstellingen staan buiten de algemene applicatiecode. Er komt een voorb
 - Installatie wordt gedocumenteerd en waar mogelijk voorzien van scripts voor Raspberry Pi/Linux en productiehosting.
 - Een nieuwe installatie mag niet afhangen van verborgen handmatige wijzigingen op een oude server.
 
-### 11.4 Publicatie van een update
+### 11.5 Publicatie van een update
 
 1. Code ontwikkelen en vastleggen in GitHub.
 2. De afgesproken versie op de Raspberry Pi ophalen.
@@ -616,7 +641,7 @@ Omgevingsinstellingen staan buiten de algemene applicatiecode. Er komt een voorb
 
 Testgegevens mogen nooit onbedoeld productiegegevens overschrijven.
 
-### 11.5 Back-up en herstel
+### 11.6 Back-up en herstel
 
 - Voor belangrijke updates wordt een databaseback-up gemaakt.
 - Gebruikersuploads, logo's en andere bestanden buiten GitHub krijgen een afzonderlijke back-up.
@@ -624,7 +649,7 @@ Testgegevens mogen nooit onbedoeld productiegegevens overschrijven.
 - Terugdraaien houdt rekening met eventuele databasewijzigingen.
 
 
-### 11.6 Updates op de Raspberry Pi via een knop
+### 11.7 Updates op de Raspberry Pi via een knop
 
 Updates op de Raspberry Pi worden **handmatig gestart door een bevoegde platformbeheerder** vanuit de beheeromgeving. De Pi haalt dus niet automatisch op de achtergrond nieuwe code op.
 
