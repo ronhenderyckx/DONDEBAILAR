@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="DONDEBAILAR locatiepin met dansend koppel">
+  <defs>
+    <linearGradient id="pinGradient" x1="70" y1="55" x2="430" y2="455" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0A4D9F"/>
+      <stop offset=".52" stop-color="#00B8D4"/>
+      <stop offset="1" stop-color="#4DDFFF"/>
+    </linearGradient>
+  </defs>
+  <path fill="url(#pinGradient)" d="M256 28c-111.6 0-202 90.4-202 202 0 151.5 178.4 243.1 193.6 250.6a18 18 0 0 0 16.8 0C279.6 473.1 458 381.5 458 230 458 118.4 367.6 28 256 28Z"/>
+  <g fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="205" cy="166" r="23" fill="#fff" stroke="none"/>
+    <circle cx="310" cy="151" r="22" fill="#fff" stroke="none"/>
+    <path stroke-width="20" d="M205 198c-20 22-28 48-24 75l10 52m19-127c20 9 39 25 52 47l26 45"/>
+    <path stroke-width="20" d="M310 181c-18 13-31 33-35 57l-7 49m42-106c25 5 45 22 55 47l17 42"/>
+    <path stroke-width="18" d="M191 322l-37 66m47-67 31 66m-18-123 54 22 34-28m-27 75 7 55m-7-55 48 55m-81-105-28 38"/>
+    <path stroke-width="16" d="M245 220c18-17 39-23 63-18 19 4 34 14 44 29"/>
+  </g>
+</svg>
