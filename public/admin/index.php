@@ -62,6 +62,16 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     <section class="admin-section">
         <div class="section-heading">
             <div>
+                <h2>Organisatoren</h2>
+                <p>Beheer centrale organisatieprofielen die in meerdere regio's evenementen kunnen organiseren.</p>
+            </div>
+            <a class="button button--primary" href="/admin/organizers.php">Organisatoren beheren</a>
+        </div>
+    </section>
+
+    <section class="admin-section">
+        <div class="section-heading">
+            <div>
                 <h2>Gebruikers</h2>
                 <p>Beheer platformgebruikers en hun regionale toegangsrechten.</p>
             </div>
