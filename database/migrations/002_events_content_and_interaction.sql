@@ -19,7 +19,7 @@ CREATE TABLE IF NOT EXISTS region_appearance (
     PRIMARY KEY (region_id),
     CONSTRAINT fk_region_appearance_region FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE CASCADE,
     CONSTRAINT fk_region_appearance_user FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS region_social_links (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -31,7 +31,7 @@ CREATE TABLE IF NOT EXISTS region_social_links (
     PRIMARY KEY (id),
     KEY idx_region_social_links_region (region_id, sort_order),
     CONSTRAINT fk_region_social_links_region FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS locations (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -60,7 +60,7 @@ CREATE TABLE IF NOT EXISTS locations (
     KEY idx_locations_active (region_id, is_active),
     CONSTRAINT fk_locations_region FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE RESTRICT,
     CONSTRAINT fk_locations_creator FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS organizers (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -80,7 +80,7 @@ CREATE TABLE IF NOT EXISTS organizers (
     UNIQUE KEY uq_organizers_region_slug (region_id, slug),
     KEY idx_organizers_region_active (region_id, is_active),
     CONSTRAINT fk_organizers_region FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS organizer_users (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS organizer_users (
     CONSTRAINT fk_organizer_users_organizer FOREIGN KEY (organizer_id) REFERENCES organizers(id) ON DELETE CASCADE,
     CONSTRAINT fk_organizer_users_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_organizer_users_assigner FOREIGN KEY (assigned_by) REFERENCES users(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS categories (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -108,7 +108,7 @@ CREATE TABLE IF NOT EXISTS categories (
     UNIQUE KEY uq_categories_region_slug (region_id, slug),
     KEY idx_categories_active (region_id, is_active, sort_order),
     CONSTRAINT fk_categories_region FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS category_translations (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS category_translations (
     UNIQUE KEY uq_category_translation_language (category_id, language),
     CONSTRAINT chk_category_translation_language CHECK (language IN ('nl', 'en', 'es', 'fr')),
     CONSTRAINT fk_category_translations_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS events (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS events (
     CONSTRAINT fk_events_category FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL,
     CONSTRAINT fk_events_creator FOREIGN KEY (created_by) REFERENCES users(id) ON DELETE SET NULL,
     CONSTRAINT fk_events_updater FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS event_media (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -175,7 +175,7 @@ CREATE TABLE IF NOT EXISTS event_media (
     KEY idx_event_media_order (event_id, media_context, sort_order),
     CONSTRAINT fk_event_media_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
     CONSTRAINT fk_event_media_uploader FOREIGN KEY (uploaded_by) REFERENCES users(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 ALTER TABLE events
     ADD CONSTRAINT fk_events_cover_media
@@ -191,7 +191,7 @@ CREATE TABLE IF NOT EXISTS event_likes (
     KEY idx_event_likes_user (user_id),
     CONSTRAINT fk_event_likes_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
     CONSTRAINT fk_event_likes_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS event_comments (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -211,7 +211,7 @@ CREATE TABLE IF NOT EXISTS event_comments (
     CONSTRAINT fk_event_comments_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
     CONSTRAINT fk_event_comments_parent FOREIGN KEY (parent_comment_id) REFERENCES event_comments(id) ON DELETE CASCADE,
     CONSTRAINT fk_event_comments_moderator FOREIGN KEY (moderated_by) REFERENCES users(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS event_attendances (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -224,7 +224,7 @@ CREATE TABLE IF NOT EXISTS event_attendances (
     UNIQUE KEY uq_event_attendance_user (event_id, user_id),
     CONSTRAINT fk_event_attendances_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
     CONSTRAINT fk_event_attendances_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS email_action_tokens (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -238,7 +238,7 @@ CREATE TABLE IF NOT EXISTS email_action_tokens (
     UNIQUE KEY uq_email_action_token_hash (token_hash),
     KEY idx_email_action_user_purpose (user_id, purpose, expires_at),
     CONSTRAINT fk_email_action_tokens_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS notifications (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -255,7 +255,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     CONSTRAINT fk_notifications_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_notifications_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE SET NULL,
     CONSTRAINT fk_notifications_comment FOREIGN KEY (comment_id) REFERENCES event_comments(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- NOTE: Application logic must enforce that an event's organizer, location and category
 -- belong to the same region as the event. It must also authorize every read/write by region

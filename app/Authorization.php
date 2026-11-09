@@ -70,7 +70,7 @@ function userHasRegionRole(int $regionId, array $allowedRoles, ?array $user = nu
 
     $allowedRoles = array_values(array_intersect(
         $allowedRoles,
-        ['region_admin', 'editor']
+        ['user', 'editor', 'region_admin']
     ));
     if ($allowedRoles === []) {
         return false;

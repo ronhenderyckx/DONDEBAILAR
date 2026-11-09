@@ -18,6 +18,7 @@ config/secrets.php
 /*.log
 *.log
 *.sql
+!database/migrations/*.sql
 *.sql.gz
 *.bak
 

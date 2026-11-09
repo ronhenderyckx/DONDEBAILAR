@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS users (
     UNIQUE KEY uq_users_email (email),
     KEY idx_users_status (status),
     CONSTRAINT chk_users_language CHECK (preferred_language IN ('nl', 'en', 'es', 'fr'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS regions (
     id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS regions (
     UNIQUE KEY uq_regions_subdomain (subdomain),
     KEY idx_regions_active (is_active),
     CONSTRAINT chk_regions_language CHECK (default_language IN ('nl', 'en', 'es', 'fr'))
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Assignment is controlled exclusively by platform admins in application logic.
 -- One user may administer several regions; each region may have several admins.
@@ -58,4 +58,4 @@ CREATE TABLE IF NOT EXISTS user_region_roles (
     CONSTRAINT fk_user_region_roles_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     CONSTRAINT fk_user_region_roles_region FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE CASCADE,
     CONSTRAINT fk_user_region_roles_assigner FOREIGN KEY (assigned_by) REFERENCES users(id) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

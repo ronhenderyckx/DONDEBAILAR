@@ -1,11 +1,28 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const toggle = document.querySelector('.site-menu-toggle');
-    const navigation = document.querySelector('#site-navigation');
-    if (!toggle || !navigation) return;
+    const menu = document.querySelector('.site-menu');
 
-    toggle.addEventListener('click', () => {
-        const isOpen = toggle.getAttribute('aria-expanded') === 'true';
-        toggle.setAttribute('aria-expanded', String(!isOpen));
-        navigation.classList.toggle('is-open', !isOpen);
+    if (!menu) {
+        return;
+    }
+
+    // Sluit het menu met Escape.
+    document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+            menu.open = false;
+        }
+    });
+
+    // Sluit het menu wanneer buiten het menu wordt geklikt.
+    document.addEventListener('click', (event) => {
+        if (!menu.contains(event.target)) {
+            menu.open = false;
+        }
+    });
+
+    // Sluit het menu na het kiezen van een navigatielink.
+    menu.querySelectorAll('.site-menu__panel a').forEach((link) => {
+        link.addEventListener('click', () => {
+            menu.open = false;
+        });
     });
 });
