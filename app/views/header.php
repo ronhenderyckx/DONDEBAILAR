@@ -84,6 +84,7 @@ $escape = static fn ($value): string =>
                 <?php endif; ?>
 
                 <?php if ($isAdmin): ?>
+                    <a href="/admin/organizers.php">Organisatoren beheren</a>
                     <a href="/admin/regions.php">Regio's beheren</a>
                 <?php endif; ?>
 
