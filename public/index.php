@@ -332,6 +332,47 @@ require dirname(__DIR__) . '/app/views/header.php';
     }
 }
 
+/* Locatieknoppen en organisator-fallbacks krijgen dezelfde afgeronde vierkante vorm. */
+.agenda-organizer-item .agenda-organizer-fallback{
+    width:62px;
+    height:62px;
+    flex:0 0 62px;
+    box-sizing:border-box;
+    border:1px solid #d8dee8;
+    border-radius:15px;
+    background:linear-gradient(145deg,#ffffff 0%,#f4f6fa 52%,#e7edf4 100%);
+    box-shadow:0 3px 9px #1720331c, inset 0 1px 0 #ffffff;
+    color:var(--db-primary);
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+.agenda-organizer-item:hover .agenda-organizer-fallback{
+    transform:translateY(-2px);
+    border-color:var(--db-primary);
+    box-shadow:0 5px 13px #17203329, inset 0 1px 0 #ffffff;
+}
+
+/* De wisselknop gebruikt exact dezelfde maat, vorm en achtergrondstijl. */
+.agenda-selector-button{
+    border:1px solid #d8dee8;
+    border-radius:15px;
+    background:linear-gradient(145deg,#ffffff 0%,#f4f6fa 52%,#e7edf4 100%);
+    box-shadow:0 3px 9px #1720331c, inset 0 1px 0 #ffffff;
+    color:var(--db-primary);
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+}
+.agenda-selector-button:hover{
+    transform:translateY(-2px);
+    border-color:var(--db-primary);
+    box-shadow:0 5px 13px #17203329, inset 0 1px 0 #ffffff;
+}
+@media(max-width:700px){
+    .agenda-organizer-item .agenda-organizer-fallback{
+        width:58px;
+        height:58px;
+        flex-basis:58px;
+    }
+}
+
 </style>
 <?php
 $hasInstagramReels = false;
