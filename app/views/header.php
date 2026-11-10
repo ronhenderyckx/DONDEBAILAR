@@ -43,8 +43,10 @@ if (is_file($platformLogoSetting)) {
 
 $regionLogoPath = '';
 if ($region !== null) {
-    $candidateRegionLogo = trim((string) ($region['logo_path'] ?? ''));
-    if ($candidateRegionLogo !== '' && preg_match('#^/uploads/regions/[a-zA-Z0-9._/-]+$#', $candidateRegionLogo)) {
+    $candidateRegionLogo = '/' . ltrim(trim((string) ($region['logo_path'] ?? '')), '/');
+    if (preg_match('#^/uploads/regions/[a-zA-Z0-9._/-]+$#', $candidateRegionLogo)
+        && !str_contains($candidateRegionLogo, '/../')
+        && !str_contains($candidateRegionLogo, '/./')) {
         $regionLogoPath = $candidateRegionLogo;
     }
 }
