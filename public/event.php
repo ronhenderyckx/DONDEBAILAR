@@ -63,7 +63,7 @@ $escape = static fn($value): string => escapeHtml((string) $value);
                             $path = (string) (parse_url((string) $item['external_url'], PHP_URL_PATH) ?: '');
                             $segments = array_values(array_filter(explode('/', $path)));
                             $shortcode = $segments[1] ?? '';
-                            $embedPath = $item['media_type'] === 'reel' ? 'reel' : 'p';
+                            $embedPath = in_array(($segments[0] ?? ''), ['p', 'reel', 'tv'], true) ? $segments[0] : ($item['media_type'] === 'reel' ? 'reel' : 'p');
                             ?>
                             <?php if (preg_match('/\A[A-Za-z0-9_-]+\z/', $shortcode)): ?>
                                 <iframe src="https://www.instagram.com/<?= $embedPath ?>/<?= rawurlencode($shortcode) ?>/embed" title="Instagram <?= $escape($item['media_type']) ?>" loading="lazy" allowtransparency="true" allowfullscreen></iframe>

@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $removedMediaPaths[] = (string) $item['file_path'];
             }
 
-            storeEventMedia($db, (int) $id, (int) $user['id'], $_FILES);\n            storeEventSocialMedia($db, (int) $id, (int) $user['id'], $_POST);
+            storeEventSocialMedia($db, (int) $id, (int) $user['id'], $_POST);\n            storeEventMedia($db, (int) $id, (int) $user['id'], $_FILES);
             $db->commit();
 
             // Verwijder bestanden pas nadat de databasewijzigingen definitief zijn.

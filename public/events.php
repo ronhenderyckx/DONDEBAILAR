@@ -61,7 +61,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                     <?php foreach ($events as $event): ?>
                         <tr>
                             <td><?= escapeHtml(date('d-m-Y H:i', strtotime($event['starts_at']))) ?></td>
-                            <td><strong><?= escapeHtml($event['title']) ?></strong></td>
+                            <td><strong><?php if ($event['status'] === 'published'): ?><a href="/event.php?id=<?= (int) $event['id'] ?>" target="_blank" rel="noopener noreferrer"><?= escapeHtml($event['title']) ?></a><?php else: ?><?= escapeHtml($event['title']) ?><?php endif; ?></strong></td>
                             <td><?= escapeHtml($event['region_name']) ?></td>
                             <td><?= escapeHtml($event['organizer_name']) ?></td>
                             <td><?= escapeHtml($event['status']) ?></td>
