@@ -105,6 +105,7 @@ $escape = static fn ($value): string =>
                         <a href="/admin/organizers.php">Organisatoren</a>
                         <a href="/admin/locations.php">Locaties</a>
                         <a href="/admin/users.php">Gebruikers</a>
+                        <a href="/admin/mail-settings.php">E-mailinstellingen</a>
                         <a href="/admin/regions.php">Regio's</a>
                     </details>
                 <?php elseif ($canManageRegion || $canManageLocations): ?>
