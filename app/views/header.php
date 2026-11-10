@@ -108,7 +108,23 @@ $escape = static fn ($value): string =>
                         <a href="/admin/regions.php">Regio's</a>
                     </details>
                 <?php elseif ($canManageRegion || $canManageLocations): ?>
-                    <a href="/admin/locations.php">Beheer</a>
+                    <details class="site-menu__admin">
+                        <summary>Regiobeheer</summary>
+                        <?php if ($canManageLocations): ?>
+                            <a href="/admin/locations.php">Locaties</a>
+                        <?php endif; ?>
+                        <?php
+                        $organizerAccess = Database::connection()->prepare(
+                            "SELECT 1 FROM user_region_roles
+                             WHERE user_id = :user_id AND role = 'region_admin'
+                             LIMIT 1"
+                        );
+                        $organizerAccess->execute(['user_id' => (int) $headerUser['id']]);
+                        if ($organizerAccess->fetchColumn()):
+                        ?>
+                            <a href="/admin/organizers.php">Organisatoren</a>
+                        <?php endif; ?>
+                    </details>
                 <?php endif; ?>
 
                 <div class="site-menu__divider"></div>
