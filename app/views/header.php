@@ -97,8 +97,18 @@ $escape = static fn ($value): string =>
                     <a href="/events.php">Mijn evenementen</a>
                 <?php endif; ?>
 
-                <?php if ($canManageRegion || $canManageLocations || $isAdmin): ?>
-                    <a href="<?= $isAdmin ? '/admin/' : '/admin/locations.php' ?>">Beheer</a>
+                <?php if ($isAdmin): ?>
+                    <details class="site-menu__admin">
+                        <summary>Platformbeheer</summary>
+                        <a href="/admin/">Dashboard</a>
+                        <a href="/events.php">Evenementen</a>
+                        <a href="/admin/organizers.php">Organisatoren</a>
+                        <a href="/admin/locations.php">Locaties</a>
+                        <a href="/admin/users.php">Gebruikers</a>
+                        <a href="/admin/regions.php">Regio's</a>
+                    </details>
+                <?php elseif ($canManageRegion || $canManageLocations): ?>
+                    <a href="/admin/locations.php">Beheer</a>
                 <?php endif; ?>
 
                 <div class="site-menu__divider"></div>
