@@ -18,8 +18,11 @@ if ($regionIds === [] && !isPlatformAdmin($user)) {
 $pageTitle = 'Organisatoren beheren - DONDEBAILAR';
 
 $search = trim((string) ($_GET['q'] ?? ''));
-$sql = "SELECT id, region_id, name, phone, website, logo_path, is_active
-        FROM organizers";
+$sql = "SELECT organizers.id, organizers.region_id, organizers.name, organizers.phone,
+               organizers.website, organizers.logo_path, organizers.is_active,
+               regions.name AS region_name
+        FROM organizers
+        LEFT JOIN regions ON regions.id = organizers.region_id";
 $params = [];
 $where = [];
 if (!isPlatformAdmin($user)) {
@@ -105,6 +108,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                     <tr>
                         <th>Logo</th>
                         <th>Naam</th>
+                        <th>Regio</th>
                         <th>Telefoon</th>
                         <th>Website</th>
                         <th>Status</th>
@@ -124,6 +128,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                                 <?php endif; ?>
                             </td>
                             <td><strong><?= escapeHtml($organizer['name']) ?></strong></td>
+                            <td><?= escapeHtml($organizer['region_name'] ?? 'Nog niet toegewezen') ?></td>
                             <td><?= escapeHtml($organizer['phone'] ?: '—') ?></td>
                             <td>
                                 <?php if (!empty($organizer['website'])): ?>
