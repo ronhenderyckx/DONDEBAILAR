@@ -113,9 +113,9 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     <section class="admin-section location-form-section">
         <form method="post" enctype="multipart/form-data" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+            <label for="google_maps_url">Google Maps-link</label>
+            <input id="google_maps_url" name="google_maps_url" type="url" maxlength="700" value="<?= escapeHtml($mapsUrl) ?>" placeholder="https://maps.google.com/?cid=...">
             <label for="name">Naam locatie *</label><input id="name" name="name" maxlength="190" required value="<?= escapeHtml($name) ?>">
-            <label for="google_maps_url">Google Maps-link</label><input id="google_maps_url" name="google_maps_url" type="url" maxlength="700" value="<?= escapeHtml($mapsUrl) ?>" placeholder="https://maps.google.com/?cid=...">
-            <div class="location-form-note">Plak de Google Maps-deellink en klik op ‘Gegevens ophalen’. Controleer de ingevulde gegevens altijd even.<br><button class="button" type="button" id="resolve-maps-link">Gegevens ophalen</button> <span id="maps-resolve-status" role="status" aria-live="polite"></span></div>
             <div class="location-form-grid">
                 <div><label for="street">Straat</label><input id="street" name="street" maxlength="190" value="<?= escapeHtml($street) ?>"></div>
                 <div><label for="house_number">Huisnummer</label><input id="house_number" name="house_number" maxlength="40" value="<?= escapeHtml($houseNumber) ?>"></div>
@@ -133,7 +133,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <label for="logo_file">Logo uploaden (PNG, JPG of WebP – maximaal 5 MB)</label>
             <input id="logo_file" name="logo_file" type="file" accept="image/png,image/jpeg,image/webp">
             <input type="hidden" id="discovered_logo_url" name="discovered_logo_url" value="<?= escapeHtml($logoUrl) ?>">
-            <div class="location-brand-search"><button class="button" type="button" id="search-location-brand">Website en logo zoeken</button><span id="brand-search-status" role="status" aria-live="polite"></span><div id="brand-logo-preview"></div></div>
+            <div class="location-brand-search"><div id="brand-logo-preview"></div></div>
             <label for="notes">Opmerkingen</label><textarea id="notes" name="notes" rows="5"><?= escapeHtml($notes) ?></textarea>
             <label class="checkbox-label"><input type="checkbox" name="is_active" value="1" <?= $isActive ? 'checked' : '' ?>> Actieve locatie</label>
             <div class="form-actions"><button class="button button--primary" type="submit">Wijzigingen opslaan</button><a class="button" href="/admin/locations.php">Annuleren</a></div>
@@ -145,49 +145,52 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 </style>
 <script>
 (() => {
- const input=document.getElementById('google_maps_url'), button=document.getElementById('resolve-maps-link'), status=document.getElementById('maps-resolve-status');
- if(!input||!button||!status)return;
+ const mapsInput=document.getElementById('google_maps_url');
+ const csrf=document.querySelector('input[name="csrf_token"]')?.value||'';
  const fields=['name','street','house_number','postal_code','city','country_code','latitude','longitude','phone','website_url'];
- button.addEventListener('click',async()=>{
-  if(!input.value.trim()){status.textContent='Plak eerst een Google Maps-link.';return;}
-  button.disabled=true;status.textContent='Locatiegegevens ophalen…';
-  try{
-   const response=await fetch('/admin/location-resolve.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="csrf_token"]').value},body:JSON.stringify({url:input.value.trim()})});
-   const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Locatie kon niet worden herkend.');
-   for(const key of fields){const el=document.getElementById(key);if(el&&data.location[key]!==undefined&&data.location[key]!==null&&data.location[key]!=='')el.value=data.location[key];}
-   status.textContent=data.message||'Gegevens ingevuld. Controleer ze voor je opslaat.';
-  }catch(error){status.textContent=error.message||'Ophalen mislukt.';}finally{button.disabled=false;}
- });
-})();
-</script>
-
-<script>
-(() => {
- const button=document.getElementById('search-location-brand');
- const status=document.getElementById('brand-search-status');
  const logoField=document.getElementById('discovered_logo_url');
  const preview=document.getElementById('brand-logo-preview');
- if(!button||!status||!logoField||!preview)return;
- button.addEventListener('click',async()=>{
-  const name=document.getElementById('name')?.value.trim()||'';
-  const city=document.getElementById('city')?.value.trim()||'';
-  if(!name){status.textContent='Vul eerst de locatienaam in.';return;}
-  button.disabled=true;status.textContent='Gratis zoeken naar website en logo…';preview.replaceChildren();logoField.value='';
+ if(!mapsInput||!csrf||!logoField||!preview)return;
+ let timer=null, lastUrl='';
+ async function resolveAndSearch(){
+  const url=mapsInput.value.trim();
+  if(!url||url===lastUrl)return;
+  lastUrl=url;
   try{
-   const response=await fetch('/admin/location-search.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="csrf_token"]').value},body:JSON.stringify({name,city,country_code:document.getElementById('country_code')?.value.trim()||''})});
+   const response=await fetch('/admin/location-resolve.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({url})});
    const data=await response.json();
-   if(!response.ok||!data.success)throw new Error(data.message||'Zoeken is mislukt.');
-   document.getElementById('website_url').value=data.website_url||'';
-   if(data.logo_url){
-    logoField.value=data.logo_url;
-    const img=document.createElement('img');img.src=data.logo_url;img.alt='Voorbeeld gevonden locatielogo';img.referrerPolicy='no-referrer';img.style='max-width:180px;max-height:100px;object-fit:contain;display:block;margin-top:8px';
-    img.onerror=()=>{preview.textContent='Website gevonden, maar het logo kon niet worden getoond.';logoField.value='';};
-    preview.appendChild(img);
-    const note=document.createElement('small');note.textContent='Logo gevonden. Het wordt bij opslaan lokaal bewaard.';preview.appendChild(note);
-   }else{preview.textContent='Website gevonden, maar er werd geen logo-afbeelding gevonden.';}
-   status.textContent=data.message||'Website gevonden.';
-  }catch(error){status.textContent=error.message||'Zoeken is mislukt.';}
-  finally{button.disabled=false;}
+   if(!response.ok||!data.success)return;
+   for(const key of fields){
+    const el=document.getElementById(key);
+    if(el&&data.location[key]!==undefined&&data.location[key]!==null&&data.location[key]!=='')el.value=data.location[key];
+   }
+   const name=document.getElementById('name')?.value.trim()||'';
+   const city=document.getElementById('city')?.value.trim()||'';
+   if(!name)return;
+   const search=await fetch('/admin/location-search.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({name,city,country_code:document.getElementById('country_code')?.value.trim()||''})});
+   const result=await search.json();
+   if(!search.ok||!result.success)return;
+   const website=document.getElementById('website_url');
+   if(website&&result.website_url)website.value=result.website_url;
+   if(result.logo_url){
+    logoField.value=result.logo_url;
+    const img=document.createElement('img');
+    img.src=result.logo_url;img.alt='Locatielogo';img.referrerPolicy='no-referrer';
+    img.style='max-width:180px;max-height:100px;object-fit:contain;display:block;margin-top:8px';
+    img.onerror=()=>{logoField.value='';img.remove();};
+    preview.replaceChildren(img);
+   }
+  }catch(error){
+   // Automatisch ophalen blijft stil; handmatige invoer blijft mogelijk.
+  }
+ }
+ mapsInput.addEventListener('input',()=>{
+  clearTimeout(timer);
+  timer=setTimeout(resolveAndSearch,700);
+ });
+ mapsInput.addEventListener('paste',()=>{
+  clearTimeout(timer);
+  timer=setTimeout(resolveAndSearch,900);
  });
 })();
 </script>
