@@ -98,7 +98,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <form method="post" enctype="multipart/form-data" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="google_maps_url">Google Maps-link</label>
-            <div class="maps-url-row"><input id="google_maps_url" name="google_maps_url" type="url" maxlength="700" placeholder="https://maps.google.com/?cid=..." value="<?= escapeHtml($mapsUrl) ?>"><button class="button" type="button" id="maps-lookup-button">Haal gegevens</button></div>
+            <div class="maps-url-row"><input id="google_maps_url" name="google_maps_url" type="url" maxlength="700" placeholder="https://maps.google.com/?cid=..." value="<?= escapeHtml($mapsUrl) ?>"><button type="button" id="maps-lookup-button" aria-label="Haal adresgegevens op uit Google Maps" style="display:inline-flex!important;visibility:visible!important;opacity:1!important;align-items:center;justify-content:center;flex:0 0 auto;min-height:42px;padding:9px 16px;border:1px solid #1769aa;border-radius:7px;background:#1769aa;color:#fff;font-weight:700;white-space:nowrap;cursor:pointer;position:relative;z-index:2">Haal gegevens</button></div>
             <p id="maps-lookup-status" class="location-form-note" role="status" aria-live="polite">Plak een Google Maps-link om het adres automatisch op te halen.</p>
             <label for="region_id">Regio *</label>
             <select id="region_id" name="region_id" required>
@@ -129,7 +129,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     <?php endif; ?>
 </section>
 <style>
-.location-form-section{max-width:900px}.location-form-section .auth-form{max-width:760px}.location-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.location-form-grid>div{min-width:0}.location-brand-search{margin:12px 0 18px}.location-brand-search span{display:block;font-size:13px;color:var(--db-muted);margin-top:6px}.location-brand-search img{background:#fff;padding:8px;border:1px solid #ddd;border-radius:6px}.location-form-note,.location-form-section small{font-size:13px;color:var(--db-muted)}.maps-url-row{display:flex;gap:10px;align-items:stretch}.maps-url-row input{flex:1;min-width:0}.maps-url-row button{white-space:nowrap;align-self:flex-start}@media(max-width:600px){.location-form-grid{grid-template-columns:1fr}}
+.location-form-section{max-width:900px}.location-form-section .auth-form{max-width:760px}.location-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.location-form-grid>div{min-width:0}.location-brand-search{margin:12px 0 18px}.location-brand-search span{display:block;font-size:13px;color:var(--db-muted);margin-top:6px}.location-brand-search img{background:#fff;padding:8px;border:1px solid #ddd;border-radius:6px}.location-form-note,.location-form-section small{font-size:13px;color:var(--db-muted)}.maps-url-row{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;gap:10px;align-items:center;width:100%;max-width:100%;overflow:visible}.maps-url-row input{display:block;flex:1 1 auto;min-width:0;width:100%}.maps-url-row #maps-lookup-button{display:inline-flex!important;visibility:visible!important;opacity:1!important;flex:0 0 auto!important;white-space:nowrap!important;align-self:center!important}@media(max-width:480px){.maps-url-row{flex-wrap:wrap!important}.maps-url-row input{flex-basis:100%}.maps-url-row #maps-lookup-button{width:auto!important}}@media(max-width:600px){.location-form-grid{grid-template-columns:1fr}}
 </style>
 <script>
 (() => {
@@ -138,7 +138,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
  const fields=['name','street','house_number','postal_code','city','country_code','latitude','longitude','phone','website_url'];
  const logoField=document.getElementById('discovered_logo_url');
  const preview=document.getElementById('brand-logo-preview');
- if(!mapsInput||!csrf||!logoField||!preview)return;
+ if(!mapsInput||!csrf)return;
  let timer=null, lastUrl='', requestNumber=0;
  const mapsStatus=document.getElementById('maps-lookup-status');
  function showMapsStatus(message,isError=false){if(mapsStatus){mapsStatus.textContent=message;mapsStatus.style.color=isError?'#b42318':'';}}
@@ -157,7 +157,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
    if(!search.ok||!result.success){lastBrandSearch='';return;}
    const website=document.getElementById('website_url');
    if(website&&result.website_url)website.value=result.website_url;
-   if(result.logo_url){
+   if(result.logo_url&&logoField&&preview){
     logoField.value=result.logo_url;
     const img=document.createElement('img');
     img.src=result.logo_url;img.alt='Locatielogo';img.referrerPolicy='no-referrer';
