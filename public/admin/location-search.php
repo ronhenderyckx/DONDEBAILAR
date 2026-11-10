@@ -170,9 +170,8 @@ try {
         $website = $findResult($instagramHtml, 'instagram');
         if ($website !== '') $socialType = 'Instagram';
     }
-    if ($website === '') {
-        throw new RuntimeException('Geen betrouwbare website, Facebook- of Instagrampagina gevonden voor ' . $name . ' in ' . $city . ', ' . $countryName . '. Controleer de gegevens of vul de link handmatig in.');
-    }
+    // Ook zonder gevonden website gaan we door: het telefoonnummer kan
+    // wel rechtstreeks in de Google-resultaten staan.
     $siteHtml = '';
     try { $siteHtml = locationSearchFetch($website); } catch (Throwable $ignored) {}
     // Haal het telefoonnummer op uit gestructureerde gegevens of een tel:-link.
@@ -218,6 +217,10 @@ try {
             // Telefoon zoeken mag de website- en logovondst niet blokkeren.
         }
     }
+    if ($website === '' && $phone === '') {
+        throw new RuntimeException('Google vond geen telefoonnummer of betrouwbare website voor ' . $name . ' in ' . $city . ', ' . $countryName . '. Controleer de naam en gemeente.');
+    }
+
     // Verzamel logo-kandidaten in volgorde van betrouwbaarheid.
     $logoCandidates = [];
     if ($siteHtml !== '') {
@@ -246,8 +249,10 @@ try {
             }
         }
     }
-    $base = parse_url($website);
-    $origin = ($base['scheme'] ?? 'https') . '://' . ($base['host'] ?? '');
+    $base = $website !== '' ? parse_url($website) : false;
+    $origin = is_array($base) && !empty($base['host'])
+        ? (($base['scheme'] ?? 'https') . '://' . $base['host'])
+        : '';
     $logo = '';
     foreach ($logoCandidates as $candidate) {
         $candidate = html_entity_decode(trim((string) $candidate), ENT_QUOTES | ENT_HTML5, 'UTF-8');
@@ -264,10 +269,13 @@ try {
         }
     }
     // Zelfs als de website geen logo-tag heeft, probeer het standaard site-icoon.
-    if ($logo === '') $logo = $origin . '/favicon.ico';
+    if ($logo === '' && $origin !== '') $logo = $origin . '/favicon.ico';
+    $message = $socialType !== ''
+        ? 'Geen eigen website gevonden. Mogelijke ' . $socialType . '-pagina gevonden; controleer of dit de juiste locatie is.'
+        : ($website !== '' ? 'Website gevonden. Controleer of dit de officiële website is en bekijk het logo.' : 'Telefoonnummer gevonden via Google. Er is geen betrouwbare website gevonden.');
     echo json_encode([
         'success' => true,
-        'message' => $socialType !== '' ? 'Geen eigen website gevonden. Mogelijke ' . $socialType . '-pagina gevonden; controleer of dit de juiste locatie is.' : 'Website gevonden. Controleer of dit de officiële website is en bekijk het logo.',
+        'message' => $message,
         'website_url' => $website,
         'phone' => $phone,
         'logo_url' => $logo,
