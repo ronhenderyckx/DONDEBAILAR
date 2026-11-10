@@ -30,6 +30,9 @@ if (str_contains($url, 'Qzt8cyYZ4m7SX3ke6')) {
    'postal_code' => '03792',
    'city' => 'Parcent',
    'country_code' => 'ES',
+   // Exact, user-verified pin for this shared Maps link.
+   'latitude' => 38.7449645,
+   'longitude' => -0.0675329,
   ],
  ], JSON_UNESCAPED_UNICODE);
  exit;
