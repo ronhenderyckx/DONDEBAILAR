@@ -127,15 +127,16 @@ try {
         runRequiredGit(['merge-base', '--is-ancestor', 'HEAD', 'FETCH_HEAD'], $projectRoot);
         runRequiredGit(['pull', '--ff-only', 'origin', 'develop'], $projectRoot);
 
-        // Database-aanpassing voor meerdere accounts met hetzelfde e-mailadres.
-        migrateDuplicateUserEmails(Database::connection());
-
         $success = true;
         $messages[] = 'DONDEBAILAR is bijgewerkt naar de nieuwste versie van develop.';
     } else {
         $messages[] = 'DONDEBAILAR is al up-to-date. Er was geen nieuwe versie beschikbaar.';
         $success = true;
     }
+
+    // Ook uitvoeren wanneer de code al up-to-date is, bijvoorbeeld na een
+    // eerdere update waarbij de database-aanpassing nog niet kon worden afgerond.
+    migrateDuplicateUserEmails(Database::connection());
 
     $shortCommit = runRequiredGit(['rev-parse', '--short', 'HEAD'], $projectRoot);
     $messages[] = 'Geïnstalleerde versie: ' . $shortCommit;
