@@ -138,10 +138,13 @@ try {
     // Extract the exact place pin first; only use the map viewport as fallback.
     $pair = '(-?\d{1,3}(?:\.\d+)?)';
     $coords = null;
+    $viewportCoords = null;
     $match = [];
-    if (preg_match('/!3d' . $pair . '!4d' . $pair . '/', $finalUrl, $match)
-        || preg_match('/@' . $pair . ',' . $pair . '/', $finalUrl, $match)) {
+    if (preg_match('/!3d' . $pair . '!4d' . $pair . '/', $finalUrl, $match)) {
         $coords = [(float) $match[1], (float) $match[2]];
+    } elseif (preg_match('/@' . $pair . ',' . $pair . '/', $finalUrl, $match)) {
+        // @ coordinates are the visible map centre, not necessarily the selected venue.
+        $viewportCoords = [(float) $match[1], (float) $match[2]];
     }
 
     $parts = parse_url($finalUrl);
@@ -162,9 +165,8 @@ try {
         }
     }
 
-    if ($coords !== null && (abs($coords[0]) > 90 || abs($coords[1]) > 180)) {
-        $coords = null;
-    }
+    if ($coords !== null && (abs($coords[0]) > 90 || abs($coords[1]) > 180)) $coords = null;
+    if ($viewportCoords !== null && (abs($viewportCoords[0]) > 90 || abs($viewportCoords[1]) > 180)) $viewportCoords = null;
 
     $placeText = '';
     if (preg_match('#/maps/(?:place|search)/([^/@]+)#', $path, $match)) {
@@ -191,8 +193,47 @@ try {
         'country_code' => '',
     ];
 
+    // If Maps gives an address/place but no exact pin coordinates, geocode that place text.
+    // Do not reverse-geocode the @ viewport centre: it can belong to another municipality.
+    if ($coords === null && $placeText !== '') {
+        $params = [
+            'format' => 'jsonv2', 'addressdetails' => 1, 'extratags' => 1,
+            'accept-language' => 'nl', 'q' => $placeText, 'limit' => 1,
+        ];
+        $geoUrl = 'https://nominatim.openstreetmap.org/search?' . http_build_query($params);
+        $geo = curl_init($geoUrl);
+        curl_setopt_array($geo, [
+            CURLOPT_RETURNTRANSFER => true, CURLOPT_CONNECTTIMEOUT => 5, CURLOPT_TIMEOUT => 10,
+            CURLOPT_USERAGENT => $userAgent,
+            CURLOPT_HTTPHEADER => ['Accept: application/json', 'Accept-Language: nl'],
+        ]);
+        $geoBody = curl_exec($geo);
+        $geoStatus = (int) curl_getinfo($geo, CURLINFO_RESPONSE_CODE);
+        curl_close($geo);
+        if ($geoBody !== false && $geoStatus === 200) {
+            $rows = json_decode((string) $geoBody, true);
+            if (is_array($rows) && isset($rows[0]) && is_array($rows[0])) {
+                $row = $rows[0];
+                if (isset($row['lat'], $row['lon'])) $coords = [(float) $row['lat'], (float) $row['lon']];
+                $a = is_array($row['address'] ?? null) ? $row['address'] : [];
+                $pick = static function (array $source, array $keys): string {
+                    foreach ($keys as $key) if (!empty($source[$key]) && is_string($source[$key])) return $source[$key];
+                    return '';
+                };
+                $address = [
+                    'street' => $pick($a, ['road', 'pedestrian', 'footway', 'path', 'square', 'residential']),
+                    'house_number' => $pick($a, ['house_number']),
+                    'postal_code' => $pick($a, ['postcode']),
+                    'city' => $pick($a, ['city', 'town', 'village', 'municipality', 'hamlet', 'suburb']),
+                    'country_code' => strtoupper($pick($a, ['country_code'])),
+                ];
+            }
+        }
+    }
+    if ($coords === null && $viewportCoords !== null) $coords = $viewportCoords;
+
     // Same Nominatim reverse lookup and address-field priority as the supplied working code.
-    if ($coords !== null) {
+    if ($coords !== null && ($address['street'] === '' || $address['city'] === '')) {
         $params = [
             'format' => 'jsonv2',
             'addressdetails' => 1,
