@@ -149,6 +149,85 @@ function migrateOrganizerRegions(PDO $db): void
     }
 }
 
+
+/**
+ * Universele registratie van aanmaak en laatste wijziging.
+ * Alle applicatietabellen krijgen dezelfde vier auditvelden. Database-triggers
+ * vullen ze automatisch, zodat ook bestaande formulieren en API-acties gevolgd worden.
+ */
+function migrateAuditTracking(PDO $db): void
+{
+    $tables = $db->query(
+        "SELECT TABLE_NAME
+         FROM information_schema.TABLES
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_TYPE = 'BASE TABLE'
+         ORDER BY TABLE_NAME"
+    )->fetchAll(PDO::FETCH_COLUMN);
+
+    foreach ($tables as $tableName) {
+        $tableName = (string) $tableName;
+        if (!preg_match('/^[A-Za-z0-9_]+$/', $tableName)) {
+            continue;
+        }
+
+        $columns = $db->prepare(
+            "SELECT COLUMN_NAME
+             FROM information_schema.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table_name"
+        );
+        $columns->execute(['table_name' => $tableName]);
+        $existing = array_fill_keys($columns->fetchAll(PDO::FETCH_COLUMN), true);
+
+        $quotedTable = '`' . $tableName . '`';
+        $definitions = [
+            'created_at' => 'DATETIME NULL',
+            'created_by' => 'INT UNSIGNED NULL',
+            'updated_at' => 'DATETIME NULL',
+            'updated_by' => 'INT UNSIGNED NULL',
+        ];
+
+        foreach ($definitions as $columnName => $definition) {
+            if (!isset($existing[$columnName])) {
+                $db->exec(
+                    'ALTER TABLE ' . $quotedTable .
+                    ' ADD COLUMN `' . $columnName . '` ' . $definition
+                );
+            }
+        }
+
+        // Vult oude records die nog geen aanmaakdatum hebben eenmalig aan.
+        $db->exec(
+            'UPDATE ' . $quotedTable .
+            ' SET `created_at` = COALESCE(`created_at`, NOW()),' .
+            ' `updated_at` = COALESCE(`updated_at`, `created_at`, NOW())'
+        );
+
+        $suffix = substr(hash('sha256', $tableName), 0, 12);
+        $insertTrigger = 'db_audit_bi_' . $suffix;
+        $updateTrigger = 'db_audit_bu_' . $suffix;
+
+        $db->exec('DROP TRIGGER IF EXISTS `' . $insertTrigger . '`');
+        $db->exec('DROP TRIGGER IF EXISTS `' . $updateTrigger . '`');
+
+        $db->exec(
+            'CREATE TRIGGER `' . $insertTrigger . '` BEFORE INSERT ON ' . $quotedTable .
+            ' FOR EACH ROW SET' .
+            ' NEW.created_at = COALESCE(NEW.created_at, NOW()),' .
+            ' NEW.created_by = COALESCE(NEW.created_by, @dondebailar_user_id),' .
+            ' NEW.updated_at = COALESCE(NEW.updated_at, NOW()),' .
+            ' NEW.updated_by = COALESCE(NEW.updated_by, @dondebailar_user_id)'
+        );
+
+        $db->exec(
+            'CREATE TRIGGER `' . $updateTrigger . '` BEFORE UPDATE ON ' . $quotedTable .
+            ' FOR EACH ROW SET' .
+            ' NEW.updated_at = NOW(),' .
+            ' NEW.updated_by = COALESCE(@dondebailar_user_id, NEW.updated_by)'
+        );
+    }
+}
+
 try {
     set_time_limit(180);
 
@@ -193,6 +272,7 @@ try {
     // eerdere update waarbij de database-aanpassing nog niet kon worden afgerond.
     migrateDuplicateUserEmails(Database::connection());
     migrateOrganizerRegions(Database::connection());
+    migrateAuditTracking(Database::connection());
 
     $shortCommit = runRequiredGit(['rev-parse', '--short', 'HEAD'], $projectRoot);
     $messages[] = 'Geïnstalleerde versie: ' . $shortCommit;
