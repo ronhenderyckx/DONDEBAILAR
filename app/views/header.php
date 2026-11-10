@@ -93,11 +93,7 @@ $escape = static fn ($value): string =>
 
             <nav class="site-menu__panel" aria-label="Hoofdnavigatie">
                 <a href="/">Agenda</a>
-                <a href="/organizers.php">Organisatoren</a>
-                <a href="/locations.php">Locaties</a>
-
                 <?php if ($headerUser !== null): ?>
-                    <a href="/account.php">Mijn account</a>
                     <a href="/events.php">Mijn evenementen</a>
                 <?php endif; ?>
 
