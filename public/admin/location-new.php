@@ -99,6 +99,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="google_maps_url">Google Maps-link</label>
             <input id="google_maps_url" name="google_maps_url" type="url" maxlength="700" placeholder="https://maps.google.com/?cid=..." value="<?= escapeHtml($mapsUrl) ?>">
+            <p id="maps-lookup-status" class="location-form-note" role="status" aria-live="polite">Plak een Google Maps-link om het adres automatisch op te halen.</p>
             <label for="region_id">Regio *</label>
             <select id="region_id" name="region_id" required>
                 <?php foreach ($regions as $item): ?><option value="<?= (int) $item['id'] ?>" <?= $regionId === (int) $item['id'] ? 'selected' : '' ?>><?= escapeHtml($item['name']) ?></option><?php endforeach; ?>
@@ -138,7 +139,9 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
  const logoField=document.getElementById('discovered_logo_url');
  const preview=document.getElementById('brand-logo-preview');
  if(!mapsInput||!csrf||!logoField||!preview)return;
- let timer=null, lastUrl='';
+ let timer=null, lastUrl='', requestNumber=0;
+ const mapsStatus=document.getElementById('maps-lookup-status');
+ function showMapsStatus(message,isError=false){if(mapsStatus){mapsStatus.textContent=message;mapsStatus.style.color=isError?'#b42318':'';}}
  let lastBrandSearch='';
  async function searchLocationBranding(){
   const name=document.getElementById('name')?.value.trim()||'';
@@ -166,8 +169,11 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
  }
  async function resolveAndSearch(){
   const url=mapsInput.value.trim();
-  if(!url||url===lastUrl)return;
+  if(!url)return;
+  if(url===lastUrl)return;
   lastUrl=url;
+  const thisRequest=++requestNumber;
+  showMapsStatus('Google Maps-link wordt opgehaald…');
   const isParcentLink=url.includes('Qzt8cyYZ4m7SX3ke6');
   const parcentAddress={street:'Av. de Benidorm',house_number:'5, bajo',postal_code:'03792',city:'Parcent',country_code:'ES'};
   if(isParcentLink){
@@ -179,7 +185,8 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
   try{
    const response=await fetch('/admin/location-resolve.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({url})});
    const data=await response.json();
-   if(!response.ok||!data.success)return;
+   if(thisRequest!==requestNumber)return;
+   if(!response.ok||!data.success){lastUrl='';showMapsStatus(data.message||'De kaartgegevens konden niet worden opgehaald.',true);return;}
    for(const key of fields){
     const el=document.getElementById(key);
     if(el&&data.location[key]!==undefined&&data.location[key]!==null&&data.location[key]!=='')el.value=data.location[key];
@@ -190,9 +197,10 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
      if(el)el.value=value;
     }
    }
+   showMapsStatus(data.message||'Adresgegevens ingevuld. Controleer het resultaat.');
    await searchLocationBranding();
   }catch(error){
-   // Automatisch ophalen blijft stil; handmatige invoer blijft mogelijk.
+   lastUrl='';showMapsStatus('Kaartopzoeking mislukt. Controleer de link en probeer opnieuw.',true);
   }
  }
  ['name','city','country_code'].forEach(id=>{
@@ -203,13 +211,15 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
   }
  });
  mapsInput.addEventListener('input',()=>{
-  clearTimeout(timer);
+  clearTimeout(timer);lastUrl='';
   timer=setTimeout(resolveAndSearch,700);
  });
+ mapsInput.addEventListener('change',()=>{clearTimeout(timer);lastUrl='';resolveAndSearch();});
  mapsInput.addEventListener('paste',()=>{
-  clearTimeout(timer);
+  clearTimeout(timer);lastUrl='';
   timer=setTimeout(resolveAndSearch,900);
  });
+ if(mapsInput.value.trim())setTimeout(resolveAndSearch,200);
 })();
 </script>
 
