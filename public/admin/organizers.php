@@ -4,40 +4,53 @@ declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
 require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
+require_once dirname(__DIR__, 2) . '/app/Organizers.php';
 
-requirePlatformAdmin();
+$user = requireLogin();
+$db = Database::connection();
+$regions = organizerManageableRegions($db, $user);
+$regionIds = array_map(static fn(array $item): int => (int) $item['id'], $regions);
+if ($regionIds === [] && !isPlatformAdmin($user)) {
+    http_response_code(403);
+    exit('Je hebt geen rechten om organisatoren te beheren.');
+}
 
 $pageTitle = 'Organisatoren beheren - DONDEBAILAR';
-$db = Database::connection();
 
 $search = trim((string) ($_GET['q'] ?? ''));
-$sql = "SELECT id, name, phone, website, logo_path, is_active
+$sql = "SELECT id, region_id, name, phone, website, logo_path, is_active
         FROM organizers";
 $params = [];
+$where = [];
+if (!isPlatformAdmin($user)) {
+    $keys = [];
+    foreach ($regionIds as $index => $regionId) {
+        $key = 'region_' . $index;
+        $keys[] = ':' . $key;
+        $params[$key] = $regionId;
+    }
+    $where[] = 'region_id IN (' . implode(',', $keys) . ')';
+}
 
 if ($search !== '') {
-    $sql .= " WHERE name LIKE :search_name
+    $where[] = "(name LIKE :search_name
               OR phone LIKE :search_phone
               OR website LIKE :search_website
-              OR notes LIKE :search_notes";
+              OR notes LIKE :search_notes)";
     $searchValue = '%' . $search . '%';
-    $params = [
+    $params += [
         'search_name' => $searchValue,
         'search_phone' => $searchValue,
         'search_website' => $searchValue,
         'search_notes' => $searchValue,
     ];
 }
-$sql .= " ORDER BY name";
+$sql .= ($where !== [] ? ' WHERE ' . implode(' AND ', $where) : '') . ' ORDER BY name';
 
 $statement = $db->prepare($sql);
 $statement->execute($params);
 $organizers = $statement->fetchAll();
 
-$totalCount = (int) $db->query("SELECT COUNT(*) FROM organizers")->fetchColumn();
-$activeCount = (int) $db->query(
-    "SELECT COUNT(*) FROM organizers WHERE is_active = 1"
-)->fetchColumn();
 
 require dirname(__DIR__, 2) . '/app/views/header.php';
 ?>
@@ -45,9 +58,9 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 <section class="admin-page">
     <div class="admin-heading">
         <div>
-            <p class="eyebrow">PLATFORMBEHEER</p>
+            <p class="eyebrow">REGIOBEHEER</p>
             <h1>Organisatoren</h1>
-            <p>Beheer organisaties die evenementen organiseren in één of meerdere regio's.</p>
+            <p>Beheer organisatoren binnen de regio's waartoe je toegang hebt.</p>
         </div>
         <a class="button" href="/admin/">Terug naar dashboard</a>
     </div>
@@ -81,7 +94,9 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             </div>
         </form>
 
-        <?php if ($organizers === []): ?>
+        <?php if ($regions === []): ?>
+            <p>Je hebt geen rechten om organisatoren te beheren.</p>
+        <?php elseif ($organizers === []): ?>
             <p><?= $search !== '' ? 'Geen organisatoren gevonden.' : 'Er zijn nog geen organisatoren aangemaakt.' ?></p>
         <?php else: ?>
             <div class="table-wrapper">
