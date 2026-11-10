@@ -69,6 +69,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($errors === []) {
         try {
+            $uploadedLogo = storeUploadedLocationLogo($_FILES['logo_file'] ?? []);
+            $logoPath = $uploadedLogo ?? storeDiscoveredLocationLogo($logoUrl);
             $update = $db->prepare(
                 "UPDATE locations SET name = :name, street = :street, house_number = :house_number,
                     postal_code = :postal_code, city = :city, country_code = :country_code,
