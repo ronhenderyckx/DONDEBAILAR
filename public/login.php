@@ -39,16 +39,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             "SELECT id, password_hash, status
              FROM users
              WHERE email = :email
-             LIMIT 1"
+             ORDER BY id DESC"
         );
-        $statement->execute(['email' => $email]);
-        $user = $statement->fetch();
+        $statement->execute(['email' => strtolower($email)]);
+        $matchingUsers = $statement->fetchAll();
+        $user = null;
 
-        if (
-            !$user
-            || $user['status'] !== 'active'
-            || !password_verify($password, $user['password_hash'])
-        ) {
+        // Meerdere testaccounts mogen hetzelfde e-mailadres delen.
+        // Het wachtwoord bepaalt bij welk account de gebruiker inlogt.
+        foreach ($matchingUsers as $candidate) {
+            if (
+                $candidate['status'] === 'active'
+                && password_verify($password, $candidate['password_hash'])
+            ) {
+                $user = $candidate;
+                break;
+            }
+        }
+
+        if ($user === null) {
             $errorMessage = 'E-mailadres of wachtwoord is niet correct.';
         } else {
             session_regenerate_id(true);
