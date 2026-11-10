@@ -121,36 +121,44 @@ try {
     // Search official sites first, then use a Facebook page as a fallback.
     $cityNeedle = mb_strtolower($city);
     $findResult = static function (string $searchHtml, bool $facebookOnly) use ($cityNeedle): string {
-        if (!preg_match_all('~<a\\b[^>]*>.*?</a>~is', $searchHtml, $anchors, PREG_OFFSET_CAPTURE)) return '';
+        if (!preg_match_all('~<a\b[^>]*>.*?</a>~is', $searchHtml, $anchors, PREG_OFFSET_CAPTURE)) return '';
+        $seen = [];
         foreach ($anchors[0] as [$anchor, $offset]) {
-            if (!preg_match('~class=["\'][^"\']*result__a[^"\']*["\']~i', $anchor)
+            if (!preg_match('~<h3\b~i', $anchor)
                 || !preg_match('~href=["\']([^"\']+)["\']~i', $anchor, $hrefMatch)) continue;
-            $context = substr($searchHtml, max(0, $offset - 900), 2600);
+            $context = substr($searchHtml, max(0, $offset - 1400), 3600);
             $resultText = mb_strtolower(html_entity_decode(strip_tags($context), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-            if (!str_contains($resultText, $cityNeedle)) continue;
+            if ($cityNeedle !== '' && !str_contains($resultText, $cityNeedle)) continue;
             $candidate = html_entity_decode($hrefMatch[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
             if (str_starts_with($candidate, '//')) $candidate = 'https:' . $candidate;
             $parts = parse_url($candidate);
             if (isset($parts['query'])) {
                 parse_str($parts['query'], $params);
-                if (!empty($params['uddg'])) $candidate = (string) $params['uddg'];
+                if (!empty($params['q']) && preg_match('~^https?://~i', (string) $params['q'])) $candidate = (string) $params['q'];
+                elseif (!empty($params['url']) && preg_match('~^https?://~i', (string) $params['url'])) $candidate = (string) $params['url'];
+                elseif (!empty($params['uddg'])) $candidate = (string) $params['uddg'];
             }
             $candidateParts = parse_url($candidate);
             $host = strtolower((string) ($candidateParts['host'] ?? ''));
-            $isFacebook = preg_match('/(^|\\.)facebook\\.com$/i', $host) === 1;
+            $isFacebook = preg_match('/(^|\.)facebook\.com$/i', $host) === 1;
             if (!in_array(strtolower((string) ($candidateParts['scheme'] ?? '')), ['http', 'https'], true) || $host === '') continue;
-            if ($facebookOnly ? $isFacebook : (!$isFacebook && !preg_match('/(^|\\.)(duckduckgo\\.com|instagram\\.com|tripadvisor\\.[a-z.]+)$/i', $host))) return $candidate;
+            if (preg_match('/(^|\.)(google\.[a-z.]+|gstatic\.com|googleusercontent\.com|youtube\.com|instagram\.com|tripadvisor\.[a-z.]+)$/i', $host)) continue;
+            if ($facebookOnly ? !$isFacebook : $isFacebook) continue;
+            if (isset($seen[$candidate])) continue;
+            $seen[$candidate] = true;
+            return $candidate;
         }
         return '';
     };
 
     $searchTerms = '"' . $name . '" "' . $city . '" "' . $countryName . '" official website';
-    $html = locationSearchFetch('https://html.duckduckgo.com/html/?q=' . rawurlencode($searchTerms));
+    // Google is bereikbaar vanaf de server; DuckDuckGo gaf op de Pi een verbindingstime-out.
+    $html = locationSearchFetch('https://www.google.com/search?hl=es&num=10&q=' . rawurlencode($searchTerms));
     $website = $findResult($html, false);
     $isFacebook = false;
     if ($website === '') {
         $facebookTerms = 'site:facebook.com "' . $name . '" "' . $city . '" "' . $countryName . '"';
-        $facebookHtml = locationSearchFetch('https://html.duckduckgo.com/html/?q=' . rawurlencode($facebookTerms));
+        $facebookHtml = locationSearchFetch('https://www.google.com/search?hl=es&num=10&q=' . rawurlencode($facebookTerms));
         $website = $findResult($facebookHtml, true);
         $isFacebook = $website !== '';
     }
