@@ -174,6 +174,8 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
    }
    const website=document.getElementById('website_url');
    if(website&&result.website_url)website.value=result.website_url;
+   const phone=document.getElementById('phone');
+   if(phone&&result.phone&&!phone.value.trim())phone.value=result.phone;
    if(result.logo_url&&logoField&&preview){
     logoField.value=result.logo_url;
     const img=document.createElement('img');
