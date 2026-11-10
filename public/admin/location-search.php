@@ -120,7 +120,7 @@ try {
     $countryName = $countryNames[$countryCode] ?? $countryCode;
     // Search official sites first, then use a Facebook page as a fallback.
     $cityNeedle = mb_strtolower($city);
-    $findResult = static function (string $searchHtml, bool $facebookOnly) use ($cityNeedle): string {
+    $findResult = static function (string $searchHtml, string $socialOnly = '') use ($cityNeedle): string {
         if (!preg_match_all('~<a\b[^>]*>.*?</a>~is', $searchHtml, $anchors, PREG_OFFSET_CAPTURE)) return '';
         $seen = [];
         foreach ($anchors[0] as [$anchor, $offset]) {
@@ -136,14 +136,16 @@ try {
                 parse_str($parts['query'], $params);
                 if (!empty($params['q']) && preg_match('~^https?://~i', (string) $params['q'])) $candidate = (string) $params['q'];
                 elseif (!empty($params['url']) && preg_match('~^https?://~i', (string) $params['url'])) $candidate = (string) $params['url'];
-                elseif (!empty($params['uddg'])) $candidate = (string) $params['uddg'];
             }
             $candidateParts = parse_url($candidate);
             $host = strtolower((string) ($candidateParts['host'] ?? ''));
             $isFacebook = preg_match('/(^|\.)facebook\.com$/i', $host) === 1;
+            $isInstagram = preg_match('/(^|\.)instagram\.com$/i', $host) === 1;
             if (!in_array(strtolower((string) ($candidateParts['scheme'] ?? '')), ['http', 'https'], true) || $host === '') continue;
-            if (preg_match('/(^|\.)(google\.[a-z.]+|gstatic\.com|googleusercontent\.com|youtube\.com|instagram\.com|tripadvisor\.[a-z.]+)$/i', $host)) continue;
-            if ($facebookOnly ? !$isFacebook : $isFacebook) continue;
+            if (preg_match('/(^|\.)(google\.[a-z.]+|gstatic\.com|googleusercontent\.com|youtube\.com|tripadvisor\.[a-z.]+)$/i', $host)) continue;
+            if ($socialOnly === 'facebook' && !$isFacebook) continue;
+            if ($socialOnly === 'instagram' && !$isInstagram) continue;
+            if ($socialOnly === '' && ($isFacebook || $isInstagram)) continue;
             if (isset($seen[$candidate])) continue;
             $seen[$candidate] = true;
             return $candidate;
@@ -152,21 +154,46 @@ try {
     };
 
     $searchTerms = '"' . $name . '" "' . $city . '" "' . $countryName . '" official website';
-    // Google is bereikbaar vanaf de server; DuckDuckGo gaf op de Pi een verbindingstime-out.
+    // Eerst een eigen website, daarna Facebook en Instagram als alternatief.
     $html = locationSearchFetch('https://www.google.com/search?hl=es&num=10&q=' . rawurlencode($searchTerms));
-    $website = $findResult($html, false);
-    $isFacebook = false;
+    $website = $findResult($html);
+    $socialType = '';
     if ($website === '') {
+        $facebookTerms = 'site:facebook.com "' . $name . '" "' . $city . '" "' . $countryName . '"';
+        $facebookHtml = locationSearchFetch('https://www.google.com/search?hl=es&num=10&q=' . rawurlencode($facebookTerms));
+        $website = $findResult($facebookHtml, 'facebook');
+        if ($website !== '') $socialType = 'Facebook';
+    }
+    if ($website === '') {
+        $instagramTerms = 'site:instagram.com "' . $name . '" "' . $city . '" "' . $countryName . '"';
+        $instagramHtml = locationSearchFetch('https://www.google.com/search?hl=es&num=10&q=' . rawurlencode($instagramTerms));
+        $website = $findResult($instagramHtml, 'instagram');
+        if ($website !== '') $socialType = 'Instagram';
+    }    if ($website === '') {
         $facebookTerms = 'site:facebook.com "' . $name . '" "' . $city . '" "' . $countryName . '"';
         $facebookHtml = locationSearchFetch('https://www.google.com/search?hl=es&num=10&q=' . rawurlencode($facebookTerms));
         $website = $findResult($facebookHtml, true);
         $isFacebook = $website !== '';
     }
     if ($website === '') {
-        throw new RuntimeException('Geen betrouwbare website of Facebookpagina gevonden voor ' . $name . ' in ' . $city . ', ' . $countryName . '. Controleer de gegevens of vul de link handmatig in.');
+        throw new RuntimeException('Geen betrouwbare website, Facebook- of Instagrampagina gevonden voor ' . $name . ' in ' . $city . ', ' . $countryName . '. Controleer de gegevens of vul de link handmatig in.');
     }
     $siteHtml = '';
     try { $siteHtml = locationSearchFetch($website); } catch (Throwable $ignored) {}
+    // Haal het telefoonnummer op uit gestructureerde gegevens of een tel:-link.
+    $phone = '';
+    if ($siteHtml !== '') {
+        if (preg_match('~"telephone"\s*:\s*"([^"]+)"~i', $siteHtml, $phoneMatch)) {
+            $phone = trim(html_entity_decode($phoneMatch[1], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        }
+        if ($phone === '' && preg_match('~href=["\']tel:([^"\']+)["\']~i', $siteHtml, $phoneMatch)) {
+            $phone = trim(rawurldecode(html_entity_decode($phoneMatch[1], ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+        }
+        if ($phone === '' && preg_match('~(?:telephone|phone|tel)\s*["\']?\s*[:=]\s*["\']?(\+?[0-9][0-9\s()./-]{6,25})~i', $siteHtml, $phoneMatch)) {
+            $phone = trim($phoneMatch[1]);
+        }
+        if (mb_strlen($phone) > 50 || !preg_match('/^[+0-9][0-9\s().\/-]{5,49}$/', $phone)) $phone = '';
+    }
     // Verzamel logo-kandidaten in volgorde van betrouwbaarheid.
     $logoCandidates = [];
     if ($siteHtml !== '') {
@@ -216,8 +243,9 @@ try {
     if ($logo === '') $logo = $origin . '/favicon.ico';
     echo json_encode([
         'success' => true,
-        'message' => $isFacebook ? 'Geen eigen website gevonden. Mogelijke Facebookpagina gevonden; controleer of dit de juiste locatie is.' : 'Website gevonden. Controleer of dit de officiële website is en bekijk het logo.',
+        'message' => $socialType !== '' ? 'Geen eigen website gevonden. Mogelijke ' . $socialType . '-pagina gevonden; controleer of dit de juiste locatie is.' : 'Website gevonden. Controleer of dit de officiële website is en bekijk het logo.',
         'website_url' => $website,
+        'phone' => $phone,
         'logo_url' => $logo,
     ], JSON_UNESCAPED_UNICODE);
 } catch (Throwable $e) {
