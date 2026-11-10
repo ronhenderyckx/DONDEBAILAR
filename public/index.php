@@ -118,18 +118,11 @@ require dirname(__DIR__) . '/app/views/header.php';
         <section class="agenda-empty"><h2>De agenda wordt voorbereid</h2><p>Er zijn nog geen actieve regio's beschikbaar.</p></section>
     <?php else: ?>
         <form class="agenda-selectors" method="get" action="/">
-            <input type="hidden" name="region_id" id="agenda-region-value" value="<?= $regionId ?>">
+            <input type="hidden" name="region_id" value="<?= $regionId ?>">
             <div class="agenda-selector-line">
-                <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" aria-label="Wissel filter" title="Wissel filter"><span class="agenda-filter-icon" aria-hidden="true">📍</span></button>
-                <div class="agenda-selector-panel is-open" data-panel="region">
-                    <select id="agenda-region" name="region_choice" aria-label="Kies regio">
-                        <?php foreach ($regions as $regionOption): ?>
-                            <option value="<?= (int) $regionOption['id'] ?>" <?= $regionId === (int) $regionOption['id'] ? 'selected' : '' ?>><?= $escape($regionOption['name']) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
-                <div class="agenda-selector-panel" data-panel="organizer" hidden>
-                    <select id="agenda-organizer" name="organizer_id" disabled aria-label="Kies organisator">
+                <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" aria-label="Wissel filter" title="Wissel filter"><span class="agenda-filter-icon" aria-hidden="true">👥</span></button>
+                <div class="agenda-selector-panel is-open" data-panel="organizer">
+                    <select id="agenda-organizer" name="organizer_id" aria-label="Kies organisator">
                         <option value="">Alle organisatoren</option>
                         <?php foreach ($organizers as $organizerOption): ?>
                             <option value="<?= (int) $organizerOption['id'] ?>" <?= $organizerId === (int) $organizerOption['id'] ? 'selected' : '' ?>><?= $escape($organizerOption['name']) ?></option>
@@ -202,8 +195,8 @@ require dirname(__DIR__) . '/app/views/header.php';
 @media(max-width:420px){.agenda-month-nav{width:100%;gap:6px}.agenda-month-nav h2{flex:1;min-width:0;font-size:17px}.agenda-month-nav .button{min-width:34px}.agenda-calendar__day{min-height:82px}.agenda-calendar__event time{display:none}}
 </style>
 <script>
-const agendaFilterIcons = ['📍', '👥', '🗺️'];
-const agendaFilterLabels = ['Regio', 'Organisator', 'Stad'];
+const agendaFilterIcons = ['👥', '🗺️'];
+const agendaFilterLabels = ['Organisator', 'Stad'];
 let agendaFilterIndex = 0;
 const agendaFilterSwitch = document.getElementById('agenda-filter-switch');
 function showAgendaFilter(index) {
@@ -213,7 +206,7 @@ function showAgendaFilter(index) {
     agendaFilterSwitch.setAttribute('aria-label', 'Filter: ' + agendaFilterLabels[agendaFilterIndex] + '. Klik om te wisselen');
     agendaFilterSwitch.setAttribute('title', 'Filter: ' + agendaFilterLabels[agendaFilterIndex] + ' — klik om te wisselen');
     document.querySelectorAll('[data-panel]').forEach(function (panel) {
-        const active = panel.dataset.panel === ['region', 'organizer', 'city'][agendaFilterIndex];
+        const active = panel.dataset.panel === ['organizer', 'city'][agendaFilterIndex];
         panel.hidden = !active;
         panel.classList.toggle('is-open', active);
         const select = panel.querySelector('select');
@@ -226,15 +219,7 @@ if (agendaFilterSwitch) {
     });
     showAgendaFilter(0);
 }
-const agendaRegionSelect = document.getElementById('agenda-region');
-const agendaRegionValue = document.getElementById('agenda-region-value');
 const agendaFilterForm = document.querySelector('.agenda-selectors');
-if (agendaRegionSelect && agendaRegionValue) {
-    agendaRegionSelect.addEventListener('change', function () {
-        agendaRegionValue.value = agendaRegionSelect.value;
-        if (agendaFilterForm) agendaFilterForm.requestSubmit();
-    });
-}
 ['agenda-organizer', 'agenda-city'].forEach(function (id) {
     const select = document.getElementById(id);
     if (select) {
