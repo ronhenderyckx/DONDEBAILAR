@@ -36,7 +36,7 @@ try {
   if($body!==false&&$status===200){$g=json_decode($body,true);$a=is_array($g['address']??null)?$g['address']:[];
    $location['street']=(string)($a['road']??$a['pedestrian']??$a['footway']??'');
    $location['house_number']=(string)($a['house_number']??'');$location['postal_code']=(string)($a['postcode']??'');
-   $location['city']=(string)($a['municipality']??$a['city']??$a['town']??$a['village']??$a['county']??'');
+   $location['city']=(string)($a['city']??$a['town']??$a['village']??$a['municipality']??'');
    $location['country_code']=strtoupper((string)($a['country_code']??''));
    if($location['name']==='')$location['name']=(string)($g['name']??'');
   }
