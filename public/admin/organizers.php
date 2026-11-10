@@ -6,34 +6,16 @@ require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
 require_once dirname(__DIR__, 2) . '/app/Organizers.php';
 
-$user = requireLogin();
+$user = requireOrganizerManagement();
 $db = Database::connection();
-$regions = organizerManageableRegions($db, $user);
-$regionIds = array_map(static fn(array $item): int => (int) $item['id'], $regions);
-if ($regionIds === [] && !isPlatformAdmin($user)) {
-    http_response_code(403);
-    exit('Je hebt geen rechten om organisatoren te beheren.');
-}
 
 $pageTitle = 'Organisatoren beheren - DONDEBAILAR';
 
 $search = trim((string) ($_GET['q'] ?? ''));
-$sql = "SELECT organizers.id, organizers.region_id, organizers.name, organizers.phone,
-               organizers.website, organizers.logo_path, organizers.is_active,
-               regions.name AS region_name
-        FROM organizers
-        LEFT JOIN regions ON regions.id = organizers.region_id";
+$sql = "SELECT id, name, phone, website, logo_path, is_active
+        FROM organizers";
 $params = [];
 $where = [];
-if (!isPlatformAdmin($user)) {
-    $keys = [];
-    foreach ($regionIds as $index => $regionId) {
-        $key = 'region_' . $index;
-        $keys[] = ':' . $key;
-        $params[$key] = $regionId;
-    }
-    $where[] = 'region_id IN (' . implode(',', $keys) . ')';
-}
 
 if ($search !== '') {
     $where[] = "(name LIKE :search_name
@@ -61,9 +43,9 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 <section class="admin-page">
     <div class="admin-heading">
         <div>
-            <p class="eyebrow">REGIOBEHEER</p>
+            <p class="eyebrow">BEHEER</p>
             <h1>Organisatoren</h1>
-            <p>Beheer organisatoren binnen de regio's waartoe je toegang hebt.</p>
+            <p>Alle beheerders met beheerdersrechten kunnen alle organisatoren beheren.</p>
         </div>
         <a class="button" href="/admin/">Terug naar dashboard</a>
     </div>
@@ -97,9 +79,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             </div>
         </form>
 
-        <?php if ($regions === []): ?>
-            <p>Je hebt geen rechten om organisatoren te beheren.</p>
-        <?php elseif ($organizers === []): ?>
+        <?php if ($organizers === []): ?>
             <p><?= $search !== '' ? 'Geen organisatoren gevonden.' : 'Er zijn nog geen organisatoren aangemaakt.' ?></p>
         <?php else: ?>
             <div class="table-wrapper">
@@ -108,7 +88,6 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                     <tr>
                         <th>Logo</th>
                         <th>Naam</th>
-                        <th>Regio</th>
                         <th>Telefoon</th>
                         <th>Website</th>
                         <th>Status</th>
@@ -128,7 +107,6 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                                 <?php endif; ?>
                             </td>
                             <td><strong><?= escapeHtml($organizer['name']) ?></strong></td>
-                            <td><?= escapeHtml($organizer['region_name'] ?? 'Nog niet toegewezen') ?></td>
                             <td><?= escapeHtml($organizer['phone'] ?: '—') ?></td>
                             <td>
                                 <?php if (!empty($organizer['website'])): ?>
