@@ -28,20 +28,7 @@ try {
 }
 date_default_timezone_set($timezone->getName());
 
-$monthInput = (string) ($_GET['month'] ?? (new DateTimeImmutable('now', $timezone))->format('Y-m'));
-if (!preg_match('/^\d{4}-\d{2}$/', $monthInput)
-    || !($monthStart = DateTimeImmutable::createFromFormat('!Y-m-d', $monthInput . '-01', $timezone))) {
-    $monthStart = new DateTimeImmutable('first day of this month', $timezone);
-    $monthInput = $monthStart->format('Y-m');
-}
-$monthEnd = $monthStart->modify('first day of next month');
-$calendarStart = $monthStart->modify('monday this week');
-$calendarEnd = $calendarStart->modify('+41 days');
-
-$view = (string) ($_GET['view'] ?? 'feed');
-if (!in_array($view, ['feed', 'calendar'], true)) {
-    $view = 'feed';
-}
+$now = new DateTimeImmutable('now', $timezone);
 $categoryId = filter_input(INPUT_GET, 'category_id', FILTER_VALIDATE_INT) ?: 0;
 $city = trim((string) ($_GET['city'] ?? ''));
 $search = trim((string) ($_GET['q'] ?? ''));
@@ -96,12 +83,10 @@ if ($regionId > 0) {
             )
             WHERE e.region_id = :region_id
               AND e.status = 'published'
-              AND e.starts_at >= :month_start
-              AND e.starts_at < :month_end";
+              AND e.starts_at >= :now";
     $params = [
         'region_id' => $regionId,
-        'month_start' => $monthStart->format('Y-m-d H:i:s'),
-        'month_end' => $monthEnd->format('Y-m-d H:i:s'),
+        'now' => $now->format('Y-m-d H:i:s'),
     ];
     if ($categoryId > 0 && in_array($categoryId, array_map(static fn($item) => (int) $item['id'], $categories), true)) {
         $sql .= " AND e.category_id = :category_id";
@@ -126,25 +111,7 @@ if ($regionId > 0) {
     $events = $eventQuery->fetchAll();
 }
 
-$eventsByDay = [];
-foreach ($events as $event) {
-    $day = (new DateTimeImmutable((string) $event['starts_at'], $timezone))->format('Y-m-d');
-    $eventsByDay[$day][] = $event;
-}
 $escape = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-$monthNames = [1 => 'januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
-$weekdayShort = [1 => 'ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'];
-$monthLabel = $monthNames[(int) $monthStart->format('n')] . ' ' . $monthStart->format('Y');
-$previousMonth = $monthStart->modify('-1 month')->format('Y-m');
-$nextMonth = $monthStart->modify('+1 month')->format('Y-m');
-$queryBase = [
-    'region_id' => $regionId,
-    'month' => $monthInput,
-    'category_id' => $categoryId ?: null,
-    'city' => $city !== '' ? $city : null,
-    'q' => $search !== '' ? $search : null,
-];
-$queryBase = array_filter($queryBase, static fn($value) => $value !== null);
 $pageTitle = 'Agenda' . ($region ? ' — ' . $region['name'] : '') . ' — DONDEBAILAR';
 $pageRobots = 'index, follow';
 require dirname(__DIR__) . '/app/views/header.php';
@@ -154,12 +121,12 @@ require dirname(__DIR__) . '/app/views/header.php';
         <section class="agenda-empty"><h2>De agenda wordt voorbereid</h2><p>Er zijn nog geen actieve regio's beschikbaar.</p></section>
     <?php else: ?>
         <section class="agenda-region-strip" aria-label="Kies een stad">
-            <a class="agenda-city <?= $city === '' ? 'is-active' : '' ?>" href="/?<?= $escape(http_build_query(['region_id' => $regionId, 'month' => $monthInput])) ?>">
+            <a class="agenda-city <?= $city === '' ? 'is-active' : '' ?>" href="/?<?= $escape(http_build_query(['region_id' => $regionId])) ?>">
                 <span class="agenda-city__round agenda-city__all"><span>✦</span></span>
                 <span>Alle plaatsen</span>
             </a>
             <?php foreach ($cities as $cityItem): ?>
-                <a class="agenda-city <?= $city === $cityItem['city'] ? 'is-active' : '' ?>" href="/?<?= $escape(http_build_query(array_merge($queryBase, ['city' => $cityItem['city'], 'view' => 'feed']))) ?>">
+                <a class="agenda-city <?= $city === $cityItem['city'] ? 'is-active' : '' ?>" href="/?<?= $escape(http_build_query(['region_id' => $regionId, 'city' => $cityItem['city']])) ?>">
                     <span class="agenda-city__round">
                         <?php if (!empty($cityItem['logo_path'])): ?>
                             <img src="<?= $escape($cityItem['logo_path']) ?>" alt="">
@@ -178,17 +145,10 @@ require dirname(__DIR__) . '/app/views/header.php';
                 <h1><?= $escape($region['name'] ?? 'Dansagenda') ?></h1>
                 <p>Dansavonden, socials, workshops en festivals in jouw buurt.</p>
             </div>
-            <form class="agenda-month-select" method="get">
-                <input type="hidden" name="region_id" value="<?= $regionId ?>">
-                <?php if ($city !== ''): ?><input type="hidden" name="city" value="<?= $escape($city) ?>"><?php endif; ?>
-                <label for="agenda-month">Maand</label>
-                <input id="agenda-month" type="month" name="month" value="<?= $escape($monthInput) ?>" onchange="this.form.submit()">
-            </form>
         </div>
 
         <form class="agenda-filters" method="get" action="/">
             <input type="hidden" name="region_id" value="<?= $regionId ?>">
-            <input type="hidden" name="month" value="<?= $escape($monthInput) ?>">
             <?php if ($city !== ''): ?><input type="hidden" name="city" value="<?= $escape($city) ?>"><?php endif; ?>
             <label>Dansstijl
                 <select name="category_id">
@@ -202,40 +162,11 @@ require dirname(__DIR__) . '/app/views/header.php';
                 <input type="search" name="q" value="<?= $escape($search) ?>" placeholder="Evenement of organisator">
             </label>
             <button class="button button--primary" type="submit">Zoeken</button>
-            <a class="agenda-reset" href="/?region_id=<?= $regionId ?>&month=<?= $escape($monthInput) ?>">Wis filters</a>
+            <a class="agenda-reset" href="/?region_id=<?= $regionId ?>">Wis filters</a>
         </form>
 
-        <div class="agenda-toolbar">
-            <div class="agenda-month-nav">
-                <a class="button" href="/?<?= $escape(http_build_query(array_merge($queryBase, ['month' => $previousMonth, 'view' => $view]))) ?>" aria-label="Vorige maand">‹</a>
-                <h2><?= $escape($monthLabel) ?></h2>
-                <a class="button" href="/?<?= $escape(http_build_query(array_merge($queryBase, ['month' => $nextMonth, 'view' => $view]))) ?>" aria-label="Volgende maand">›</a>
-                <a class="agenda-today" href="/?region_id=<?= $regionId ?>&month=<?= (new DateTimeImmutable('now', $timezone))->format('Y-m') ?>">Vandaag</a>
-            </div>
-            <div class="agenda-view-switch" aria-label="Agendaweergave">
-                <a class="<?= $view === 'feed' ? 'is-active' : '' ?>" href="/?<?= $escape(http_build_query(array_merge($queryBase, ['view' => 'feed']))) ?>">Feed</a>
-                <a class="<?= $view === 'calendar' ? 'is-active' : '' ?>" href="/?<?= $escape(http_build_query(array_merge($queryBase, ['view' => 'calendar']))) ?>">Kalender</a>
-            </div>
-        </div>
-
         <?php if ($events === []): ?>
-            <section class="agenda-empty"><h2>Geen evenementen gevonden</h2><p>Er zijn in deze maand geen gepubliceerde evenementen met deze filters.</p></section>
-        <?php elseif ($view === 'calendar'): ?>
-            <div class="agenda-calendar">
-                <?php foreach (['Ma','Di','Wo','Do','Vr','Za','Zo'] as $weekday): ?><div class="agenda-calendar__weekday"><?= $weekday ?></div><?php endforeach; ?>
-                <?php for ($day = $calendarStart; $day <= $calendarEnd; $day = $day->modify('+1 day')): ?>
-                    <?php $key = $day->format('Y-m-d'); $outside = $day->format('Y-m') !== $monthInput; ?>
-                    <div class="agenda-calendar__day <?= $outside ? 'is-outside' : '' ?> <?= $day->format('Y-m-d') === (new DateTimeImmutable('today', $timezone))->format('Y-m-d') ? 'is-today' : '' ?>">
-                        <span class="agenda-calendar__number"><?= $day->format('j') ?></span>
-                        <?php foreach (($eventsByDay[$key] ?? []) as $event): ?>
-                            <a class="agenda-calendar__event" href="/event.php?id=<?= (int) $event['id'] ?>">
-                                <time><?= $escape((new DateTimeImmutable((string) $event['starts_at'], $timezone))->format('H:i')) ?></time>
-                                <?= $escape($event['title']) ?>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                <?php endfor; ?>
-            </div>
+            <section class="agenda-empty"><h2>Geen evenementen gevonden</h2><p>Er zijn momenteel geen toekomstige gepubliceerde evenementen met deze filters.</p></section>
         <?php else: ?>
             <div class="agenda-feed">
                 <?php foreach ($events as $event): ?>
