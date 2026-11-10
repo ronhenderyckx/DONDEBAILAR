@@ -75,13 +75,15 @@ try {
     $html = locationSearchFetch('https://html.duckduckgo.com/html/?q=' . $query);
     $website = '';
     $cityNeedle = mb_strtolower($city);
-    if (preg_match_all('~<div[^>]+class="[^"]*result[^"]*"[^>]*>.*?</div>\\s*</div>~is', $html, $blocks)) {
-        foreach ($blocks[0] as $block) {
-            if (!preg_match('~class="result__a"[^>]*href="([^"]+)"~i', $block, $linkMatch)) continue;
-            $resultText = html_entity_decode(strip_tags($block), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            // Require the exact municipality to appear in the search result title/snippet.
-            if (!str_contains(mb_strtolower($resultText), $cityNeedle)) continue;
-            $candidate = html_entity_decode($linkMatch[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    if (preg_match_all('~<a\\b[^>]*>.*?</a>~is', $html, $anchors, PREG_OFFSET_CAPTURE)) {
+        foreach ($anchors[0] as [$anchor, $offset]) {
+            if (!preg_match('~class=["\\'][^"\\']*result__a[^"\\']*["\\']~i', $anchor)
+                || !preg_match('~href=["\\']([^"\\']+)["\\']~i', $anchor, $hrefMatch)) continue;
+            $context = substr($html, max(0, $offset - 900), 2600);
+            $resultText = mb_strtolower(html_entity_decode(strip_tags($context), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+            // Require the municipality to appear near this result, not merely elsewhere on the search page.
+            if (!str_contains($resultText, $cityNeedle)) continue;
+            $candidate = html_entity_decode($hrefMatch[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
             if (str_starts_with($candidate, '//')) $candidate = 'https:' . $candidate;
             $parts = parse_url($candidate);
             if (isset($parts['query'])) {
