@@ -72,8 +72,8 @@ try {
     if (preg_match_all('~class="result__a"[^>]*href="([^"]+)"~i', $html, $matches)) {
         foreach ($matches[1] as $href) {
             $href = html_entity_decode($href, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            $candidate = $href;
-            $parts = parse_url($href);
+            $candidate = str_starts_with($href, '//') ? 'https:' . $href : $href;
+            $parts = parse_url($candidate);
             if (isset($parts['query'])) {
                 parse_str($parts['query'], $params);
                 if (!empty($params['uddg'])) $candidate = (string) $params['uddg'];
@@ -95,7 +95,9 @@ try {
     try { $siteHtml = locationSearchFetch($website); } catch (Throwable $ignored) {}
     $logo = '';
     if ($siteHtml !== '') {
-        if (preg_match('~<meta[^>]+(?:property|name)=["\'](?:og:image|twitter:image)["\'][^>]+content=["\']([^"\']+)~i', $siteHtml, $m)
+        if (preg_match('~(?:"|\\\')logo(?:"|\\\')\\s*:\\s*(?:"|\\\')([^"\\\']+)~i', $siteHtml, $m)) {
+            $logo = html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        } elseif (preg_match('~<meta[^>]+(?:property|name)=["\'](?:og:image|twitter:image)["\'][^>]+content=["\']([^"\']+)~i', $siteHtml, $m)
             || preg_match('~<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\'](?:og:image|twitter:image)["\']~i', $siteHtml, $m)) {
             $logo = html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
         } elseif (preg_match('~<link[^>]+rel=["\'][^"\']*icon[^"\']*["\'][^>]+href=["\']([^"\']+)~i', $siteHtml, $m)) {
