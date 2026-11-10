@@ -164,3 +164,60 @@ function deleteEventMediaFile(string $relativePath, int $eventId): void
         @unlink($path);
     }
 }
+
+
+/**
+ * Koppel een openbaar Facebook- of Instagram-bericht/reel aan een evenement.
+ * De inhoud blijft op het oorspronkelijke platform; DONDEBAILAR bewaart de URL.
+ */
+function storeEventSocialMedia(PDO $db, int $eventId, int $userId, array $input): ?int
+{
+    $url = trim((string) ($input['social_url'] ?? ''));
+    if ($url === '') return null;
+
+    $platform = (string) ($input['social_platform'] ?? '');
+    $kind = (string) ($input['social_kind'] ?? 'social_post');
+    if (!in_array($platform, ['facebook', 'instagram'], true)) {
+        throw new RuntimeException('Kies Facebook of Instagram voor de gekoppelde link.');
+    }
+    if (!in_array($kind, ['reel', 'social_post'], true)) {
+        throw new RuntimeException('Kies een geldige soort social media.');
+    }
+    if (strlen($url) > 1000 || filter_var($url, FILTER_VALIDATE_URL) === false) {
+        throw new RuntimeException('Vul een geldige openbare Facebook- of Instagram-link in.');
+    }
+
+    $parts = parse_url($url);
+    $scheme = strtolower((string) ($parts['scheme'] ?? ''));
+    $host = strtolower((string) ($parts['host'] ?? ''));
+    $path = (string) ($parts['path'] ?? '');
+    if ($scheme !== 'https') {
+        throw new RuntimeException('Gebruik de volledige HTTPS-link van het bericht.');
+    }
+
+    if ($platform === 'instagram') {
+        if (!in_array($host, ['instagram.com', 'www.instagram.com'], true)
+            || !preg_match('~^/(?:p|reel|tv)/[A-Za-z0-9_-]+/?$~', $path)) {
+            throw new RuntimeException('Gebruik een openbare Instagram-post- of reel-link.');
+        }
+    } else {
+        if (!in_array($host, ['facebook.com', 'www.facebook.com', 'm.facebook.com', 'fb.watch'], true)
+            || trim($path, '/') === '') {
+            throw new RuntimeException('Gebruik een openbare Facebook-bericht-, video- of reel-link.');
+        }
+    }
+
+    $insert = $db->prepare(
+        "INSERT INTO event_media
+            (event_id, media_context, media_type, file_path, media_source, external_url, uploaded_by)
+         VALUES (:event_id, 'event', :media_type, NULL, :media_source, :external_url, :uploaded_by)"
+    );
+    $insert->execute([
+        'event_id' => $eventId,
+        'media_type' => $kind,
+        'media_source' => $platform,
+        'external_url' => $url,
+        'uploaded_by' => $userId,
+    ]);
+    return (int) $db->lastInsertId();
+}

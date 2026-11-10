@@ -40,7 +40,7 @@ $locations = $statement->fetchAll();
 $statement = $db->prepare("SELECT id, name FROM categories WHERE (region_id IS NULL OR region_id = :region_id) AND (is_active = 1 OR id = :category_id) ORDER BY sort_order, name");
 $statement->execute(['region_id' => (int) $event['region_id'], 'category_id' => (int) ($event['category_id'] ?? 0)]);
 $categories = $statement->fetchAll();
-$statement = $db->prepare("SELECT id, media_type, file_path, caption, created_at FROM event_media WHERE event_id = :event_id AND media_context = 'event' ORDER BY sort_order, id");
+$statement = $db->prepare("SELECT id, media_type, file_path, media_source, external_url, caption, created_at FROM event_media WHERE event_id = :event_id AND media_context = 'event' ORDER BY sort_order, id");
 $statement->execute(['event_id' => $id]);
 $media = $statement->fetchAll();
 
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $removedMediaPaths[] = (string) $item['file_path'];
             }
 
-            storeEventMedia($db, (int) $id, (int) $user['id'], $_FILES);
+            storeEventMedia($db, (int) $id, (int) $user['id'], $_FILES);\n            storeEventSocialMedia($db, (int) $id, (int) $user['id'], $_POST);
             $db->commit();
 
             // Verwijder bestanden pas nadat de databasewijzigingen definitief zijn.
@@ -178,17 +178,37 @@ require dirname(__DIR__) . '/app/views/header.php';
                 <div class="event-media-grid">
                 <?php foreach ($media as $item): ?>
                     <label class="event-media-item">
-                        <?php if ($item['media_type'] === 'image'): ?>
+                        <?php if (($item['media_source'] ?? 'upload') !== 'upload'): ?>
+                            <div class="event-social-placeholder">
+                                <strong><?= escapeHtml(ucfirst((string) $item['media_source'])) ?> · <?= escapeHtml($item['media_type'] === 'reel' ? 'Reel' : 'Bericht') ?></strong>
+                                <a href="<?= escapeHtml((string) $item['external_url']) ?>" target="_blank" rel="noopener noreferrer">Open oorspronkelijk bericht</a>
+                            </div>
+                        <?php elseif ($item['media_type'] === 'image'): ?>
                             <img src="/event-media.php?id=<?= (int) $item['id'] ?>" alt="Evenementfoto">
                         <?php else: ?>
                             <video src="/event-media.php?id=<?= (int) $item['id'] ?>" controls preload="metadata"></video>
                         <?php endif; ?>
-                        <span><?= escapeHtml($item['media_type'] === 'reel' ? 'Reel' : ($item['media_type'] === 'video' ? 'Video' : 'Foto')) ?></span>
+                        <span><?= escapeHtml($item['media_type'] === 'reel' ? 'Reel' : ($item['media_type'] === 'video' ? 'Video' : ($item['media_type'] === 'social_post' ? 'Social bericht' : 'Foto'))) ?></span>
                         <span><input type="checkbox" name="delete_media[]" value="<?= (int) $item['id'] ?>"> Verwijderen</span>
                     </label>
                 <?php endforeach; ?>
                 </div>
             <?php else: ?><p>Er zijn nog geen foto's, video's of reels toegevoegd.</p><?php endif; ?>
+            <h3>Facebook- of Instagram-bericht koppelen</h3>
+            <p>Plak de openbare link van een Facebook- of Instagram-bericht of reel. De inhoud blijft op het oorspronkelijke platform staan.</p>
+            <label for="social_platform">Platform</label>
+            <select id="social_platform" name="social_platform">
+                <option value="instagram">Instagram</option>
+                <option value="facebook">Facebook</option>
+            </select>
+            <label for="social_kind">Soort</label>
+            <select id="social_kind" name="social_kind">
+                <option value="reel">Reel</option>
+                <option value="social_post">Bericht / post</option>
+            </select>
+            <label for="social_url">Link naar het openbare bericht</label>
+            <input id="social_url" type="url" name="social_url" maxlength="1000" placeholder="https://www.instagram.com/reel/...">
+            <p class="event-form-note">Je kunt per keer één link toevoegen. Sla de wijzigingen op om deze aan het evenement te koppelen.</p>
             <label for="photos">Foto's toevoegen (JPG/PNG/WebP, max. 15 MB per foto)</label><input id="photos" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple>
             <label for="videos">Video's toevoegen (MP4/WebM/MOV, max. 80 MB per video)</label><input id="videos" type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime" multiple>
             <label for="reels">Reels toevoegen (MP4/WebM/MOV, max. 80 MB per reel)</label><input id="reels" type="file" name="reels[]" accept="video/mp4,video/webm,video/quicktime" multiple>
@@ -198,6 +218,6 @@ require dirname(__DIR__) . '/app/views/header.php';
     </section>
 </section>
 <style>
-.event-form-section{max-width:900px}.event-form-section .auth-form{max-width:760px}.event-form-section input[type=file]{padding:8px}.event-form-section h2{margin:24px 0 0;padding-top:20px;border-top:1px solid #E7EAF0}.event-media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}.event-media-item{padding:10px;border:1px solid #E7EAF0;border-radius:9px;background:#fff}.event-media-item img,.event-media-item video{width:100%;height:120px;object-fit:cover;border-radius:6px;background:#111}.event-media-item span{display:block;margin-top:7px;font-size:12px}.event-form-note{color:var(--db-muted);font-size:13px}
+.event-form-section{max-width:900px}.event-form-section .auth-form{max-width:760px}.event-form-section input[type=file]{padding:8px}.event-form-section h2{margin:24px 0 0;padding-top:20px;border-top:1px solid #E7EAF0}.event-media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}.event-media-item{padding:10px;border:1px solid #E7EAF0;border-radius:9px;background:#fff}.event-media-item img,.event-media-item video{width:100%;height:120px;object-fit:cover;border-radius:6px;background:#111}.event-social-placeholder{min-height:120px;display:flex;flex-direction:column;justify-content:center;gap:12px;overflow-wrap:anywhere}.event-social-placeholder a{font-size:13px}.event-media-item span{display:block;margin-top:7px;font-size:12px}.event-form-note{color:var(--db-muted);font-size:13px}
 </style>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
