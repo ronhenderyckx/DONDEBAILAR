@@ -110,25 +110,53 @@ try {
     }
     $siteHtml = '';
     try { $siteHtml = locationSearchFetch($website); } catch (Throwable $ignored) {}
-    $logo = '';
+    // Verzamel logo-kandidaten in volgorde van betrouwbaarheid.
+    $logoCandidates = [];
     if ($siteHtml !== '') {
-        $jsonLogoPattern = '~"logo"\s*:\s*"([^"]+)"~i';
-        if (preg_match($jsonLogoPattern, $siteHtml, $m)) {
-            $logo = html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        } elseif (preg_match('~<meta[^>]+(?:property|name)=["\'](?:og:image|twitter:image)["\'][^>]+content=["\']([^"\']+)~i', $siteHtml, $m)
-            || preg_match('~<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\'](?:og:image|twitter:image)["\']~i', $siteHtml, $m)) {
-            $logo = html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        } elseif (preg_match('~<link[^>]+rel=["\'][^"\']*icon[^"\']*["\'][^>]+href=["\']([^"\']+)~i', $siteHtml, $m)) {
-            $logo = html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        // Gestructureerde gegevens (Schema.org / JSON-LD).
+        if (preg_match_all('~"logo"\\s*:\\s*(?:"([^"]+)"|\\{[^}]*"url"\\s*:\\s*"([^"]+)"[^}]*\\})~i', $siteHtml, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) $logoCandidates[] = $match[1] !== '' ? $match[1] : ($match[2] ?? '');
+        }
+        // Afbeeldingen waarvan class of id expliciet "logo" vermeldt.
+        if (preg_match_all('~<img\\b[^>]*>~i', $siteHtml, $images)) {
+            foreach ($images[0] as $imageTag) {
+                if (!preg_match('~(?:class|id)=["\\'][^"\\']*logo[^"\\']*["\\']~i', $imageTag)) continue;
+                if (preg_match('~\\bsrc=["\\']([^"\\']+)["\\']~i', $imageTag, $src)) $logoCandidates[] = $src[1];
+                elseif (preg_match('~\\bdata-src=["\\']([^"\\']+)["\\']~i', $imageTag, $src)) $logoCandidates[] = $src[1];
+            }
+        }
+        // Open Graph / Twitter-afbeelding als bruikbare terugval.
+        if (preg_match_all('~<meta\\b[^>]*(?:property|name)=["\\'](?:og:image|twitter:image)["\\'][^>]*>~i', $siteHtml, $metas)) {
+            foreach ($metas[0] as $meta) {
+                if (preg_match('~content=["\\']([^"\\']+)["\\']~i', $meta, $src)) $logoCandidates[] = $src[1];
+            }
+        }
+        // Apple touch icon en gewone favicon als laatste website-opties.
+        if (preg_match_all('~<link\\b[^>]*rel=["\\'][^"\\']*(?:apple-touch-icon|icon)[^"\\']*["\\'][^>]*>~i', $siteHtml, $links)) {
+            foreach ($links[0] as $link) {
+                if (preg_match('~href=["\\']([^"\\']+)["\\']~i', $link, $href)) $logoCandidates[] = $href[1];
+            }
         }
     }
-    if (str_starts_with($logo, '//')) {
-        $logo = 'https:' . $logo;
-    } elseif ($logo !== '' && !preg_match('~^https?://~i', $logo)) {
-        $base = parse_url($website);
-        $origin = ($base['scheme'] ?? 'https') . '://' . ($base['host'] ?? '');
-        $logo = str_starts_with($logo, '/') ? $origin . $logo : $origin . '/' . $logo;
+    $base = parse_url($website);
+    $origin = ($base['scheme'] ?? 'https') . '://' . ($base['host'] ?? '');
+    $logo = '';
+    foreach ($logoCandidates as $candidate) {
+        $candidate = html_entity_decode(trim((string) $candidate), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        if ($candidate === '' || str_starts_with($candidate, 'data:')) continue;
+        if (str_starts_with($candidate, '//')) $candidate = 'https:' . $candidate;
+        elseif (!preg_match('~^https?://~i', $candidate)) {
+            $candidate = str_starts_with($candidate, '/') ? $origin . $candidate : $origin . '/' . $candidate;
+        }
+        $candidateParts = parse_url($candidate);
+        if (in_array(strtolower((string) ($candidateParts['scheme'] ?? '')), ['http', 'https'], true)
+            && !empty($candidateParts['host'])) {
+            $logo = $candidate;
+            break;
+        }
     }
+    // Zelfs als de website geen logo-tag heeft, probeer het standaard site-icoon.
+    if ($logo === '') $logo = $origin . '/favicon.ico';
     echo json_encode([
         'success' => true,
         'message' => $isFacebook ? 'Geen eigen website gevonden. Mogelijke Facebookpagina gevonden; controleer of dit de juiste locatie is.' : 'Website gevonden. Controleer of dit de officiële website is en bekijk het logo.',
