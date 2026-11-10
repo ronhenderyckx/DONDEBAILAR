@@ -100,7 +100,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <input id="name" name="name" maxlength="190" required value="<?= escapeHtml($name) ?>">
             <label for="google_maps_url">Google Maps-link</label>
             <input id="google_maps_url" name="google_maps_url" type="url" maxlength="700" placeholder="https://maps.google.com/?cid=..." value="<?= escapeHtml($mapsUrl) ?>">
-            <p class="location-form-note">Plak hier de deellink uit Google Maps. De link wordt opgeslagen; automatisch adresgegevens ophalen voegen we later toe.</p>
+            <div class="location-form-note">Plak de Google Maps-deellink en klik op ‘Gegevens ophalen’. Controleer de ingevulde gegevens altijd even.<br><button class="button" type="button" id="resolve-maps-link">Gegevens ophalen</button> <span id="maps-resolve-status" role="status" aria-live="polite"></span></div>
             <div class="location-form-grid">
                 <div><label for="street">Straat</label><input id="street" name="street" maxlength="190" value="<?= escapeHtml($street) ?>"></div>
                 <div><label for="house_number">Huisnummer</label><input id="house_number" name="house_number" maxlength="40" value="<?= escapeHtml($houseNumber) ?>"></div>
@@ -122,4 +122,21 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 <style>
 .location-form-section{max-width:900px}.location-form-section .auth-form{max-width:760px}.location-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.location-form-grid>div{min-width:0}.location-form-note,.location-form-section small{font-size:13px;color:var(--db-muted)}@media(max-width:600px){.location-form-grid{grid-template-columns:1fr}}
 </style>
+<script>
+(() => {
+ const input=document.getElementById('google_maps_url'), button=document.getElementById('resolve-maps-link'), status=document.getElementById('maps-resolve-status');
+ if(!input||!button||!status)return;
+ const fields=['name','street','house_number','postal_code','city','country_code','latitude','longitude','phone','website_url'];
+ button.addEventListener('click',async()=>{
+  if(!input.value.trim()){status.textContent='Plak eerst een Google Maps-link.';return;}
+  button.disabled=true;status.textContent='Locatiegegevens ophalen…';
+  try{
+   const response=await fetch('/admin/location-resolve.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="csrf_token"]').value},body:JSON.stringify({url:input.value.trim()})});
+   const data=await response.json();if(!response.ok||!data.success)throw new Error(data.message||'Locatie kon niet worden herkend.');
+   for(const key of fields){const el=document.getElementById(key);if(el&&data.location[key]!==undefined&&data.location[key]!==null&&data.location[key]!=='')el.value=data.location[key];}
+   status.textContent=data.message||'Gegevens ingevuld. Controleer ze voor je opslaat.';
+  }catch(error){status.textContent=error.message||'Ophalen mislukt.';}finally{button.disabled=false;}
+ });
+})();
+</script>
 <?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
