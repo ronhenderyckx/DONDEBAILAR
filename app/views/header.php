@@ -77,6 +77,7 @@ $escape = static fn ($value): string =>
 
                 <?php if ($headerUser !== null): ?>
                     <a href="/account.php">Mijn account</a>
+                    <a href="/events.php">Mijn evenementen</a>
                 <?php endif; ?>
 
                 <?php if ($canManageRegion || $isAdmin): ?>
