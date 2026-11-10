@@ -53,3 +53,37 @@ function storeDiscoveredLocationLogo(string $url): ?string
     }
     return 'uploads/locations/' . $filename;
 }
+
+
+/** Store a logo uploaded through the location form. */
+function storeUploadedLocationLogo(array $file): ?string
+{
+    $error = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($error === UPLOAD_ERR_NO_FILE) return null;
+    if ($error !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('Het logo kon niet worden geüpload. Controleer de maximale uploadgrootte.');
+    }
+    $tmp = (string) ($file['tmp_name'] ?? '');
+    $size = (int) ($file['size'] ?? 0);
+    if ($tmp === '' || !is_uploaded_file($tmp) || $size < 1 || $size > 5 * 1024 * 1024) {
+        throw new RuntimeException('Kies een logo van maximaal 5 MB.');
+    }
+    $image = @getimagesize($tmp);
+    $types = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+    $mime = is_array($image) ? (string) ($image['mime'] ?? '') : '';
+    if (!isset($types[$mime])) {
+        throw new RuntimeException('Gebruik een geldig PNG-, JPG- of WebP-bestand.');
+    }
+    if (($image[0] ?? 0) > 6000 || ($image[1] ?? 0) > 6000) {
+        throw new RuntimeException('Het logo mag maximaal 6000 × 6000 pixels zijn.');
+    }
+    $directory = dirname(__DIR__) . '/uploads/locations';
+    if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) {
+        throw new RuntimeException('De uploadmap voor locatielogo’s kon niet worden aangemaakt.');
+    }
+    $filename = bin2hex(random_bytes(16)) . '.' . $types[$mime];
+    if (!move_uploaded_file($tmp, $directory . '/' . $filename)) {
+        throw new RuntimeException('Het locatielogo kon niet worden opgeslagen.');
+    }
+    return 'uploads/locations/' . $filename;
+}
