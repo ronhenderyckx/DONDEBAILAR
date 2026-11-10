@@ -147,7 +147,6 @@ require dirname(__DIR__) . '/app/views/header.php';
                         <option value="<?= (int) $organizerOption['id'] ?>" <?= $organizerId === (int) $organizerOption['id'] ? 'selected' : '' ?>><?= $escape($organizerOption['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
-                <input type="hidden" name="region_id" value="<?= $regionId ?>">
             </div>
             <div class="agenda-selector-panel" data-panel="city" hidden>
                 <label for="agenda-city">Welke stad?</label>
@@ -157,7 +156,6 @@ require dirname(__DIR__) . '/app/views/header.php';
                         <option value="<?= $escape($cityOption['city']) ?>" <?= $city === $cityOption['city'] ? 'selected' : '' ?>><?= $escape($cityOption['city']) ?></option>
                     <?php endforeach; ?>
                 </select>
-                <input type="hidden" name="region_id" value="<?= $regionId ?>">
             </div>
             <div class="agenda-selector-actions">
                 <button class="button button--primary" type="submit">Toon evenementen</button>
