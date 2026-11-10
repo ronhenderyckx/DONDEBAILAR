@@ -105,6 +105,36 @@ function migrateDuplicateUserEmails(PDO $db): void
     }
 }
 
+
+/**
+ * Koppel organisatoren aan een regio. Bestaande records blijven NULL totdat
+ * een platformbeheerder ze bewust aan een regio toewijst.
+ */
+function migrateOrganizerRegions(PDO $db): void
+{
+    $column = $db->query(
+        "SELECT COUNT(*) FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'organizers'
+           AND COLUMN_NAME = 'region_id'"
+    )->fetchColumn();
+
+    if ((int) $column === 0) {
+        $db->exec("ALTER TABLE organizers ADD COLUMN region_id INT UNSIGNED NULL AFTER id");
+    }
+
+    $index = $db->query(
+        "SELECT COUNT(*) FROM information_schema.STATISTICS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'organizers'
+           AND INDEX_NAME = 'idx_organizers_region_id'"
+    )->fetchColumn();
+
+    if ((int) $index === 0) {
+        $db->exec("CREATE INDEX idx_organizers_region_id ON organizers (region_id)");
+    }
+}
+
 try {
     set_time_limit(180);
 
@@ -148,6 +178,7 @@ try {
     // Ook uitvoeren wanneer de code al up-to-date is, bijvoorbeeld na een
     // eerdere update waarbij de database-aanpassing nog niet kon worden afgerond.
     migrateDuplicateUserEmails(Database::connection());
+    migrateOrganizerRegions(Database::connection());
 
     $shortCommit = runRequiredGit(['rev-parse', '--short', 'HEAD'], $projectRoot);
     $messages[] = 'Geïnstalleerde versie: ' . $shortCommit;
