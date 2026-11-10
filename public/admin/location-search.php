@@ -188,35 +188,61 @@ try {
         }
         if (mb_strlen($phone) > 50 || !preg_match('/^[+0-9][0-9\s().\/-]{5,49}$/', $phone)) $phone = '';
     }
-    // Als de website zelf geen telefoonnummer toont, zoek gericht in Google-resultaten.
+    // Als de website zelf geen telefoonnummer toont, zoek in meerdere gerichte
+    // Google-opdrachten. De Maps-pagina bevat het nummer niet altijd in de HTML,
+    // terwijl Google Search het telefoonnummer soms wel als bedrijfsgegeven toont.
     if ($phone === '') {
-        $phoneTerms = '"' . $name . '" "' . $city . '" "' . $countryName . '" (telefono OR teléfono OR phone OR contacto)';
-        try {
-            $phoneHtml = locationSearchFetch('https://www.google.com/search?hl=es&num=10&q=' . rawurlencode($phoneTerms));
-            $phoneText = html_entity_decode(strip_tags($phoneHtml), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            // Google-result snippets can show the phone before its label,
-            // or show a Spanish 9-digit number without any label.
-            $phonePatterns = [
-                '~(?:tel(?:éfono|efono)?|phone|contacto|call|llamar)\\D{0,45}(\\+?[0-9][0-9\\s()./-]{6,24}[0-9])~iu',
-                '~(\\+?[0-9][0-9\\s()./-]{6,24}[0-9])\\D{0,45}(?:tel(?:éfono|efono)?|phone|contacto|call|llamar)~iu',
-                '~(?:\\+34[\\s.-]?)?[6789](?:[\\s.-]?[0-9]){8}~u',
-            ];
-            foreach ($phonePatterns as $phonePattern) {
-                if (!preg_match_all($phonePattern, $phoneText, $phoneMatches)) continue;
-                $candidates = $phoneMatches[1] ?? $phoneMatches[0];
-                foreach ($candidates as $rawPhone) {
-                    $candidatePhone = trim((string) $rawPhone);
-                    $digits = preg_replace('/\\D+/', '', $candidatePhone);
-                    if (strlen((string) $digits) >= 9 && strlen((string) $digits) <= 15) {
+        $phoneQueries = [
+            '"' . $name . '" "' . $city . '" "' . $countryName . '" teléfono',
+            '"' . $name . '" "' . $city . '" teléfono contacto',
+            '"' . $name . '" "' . $city . '" phone',
+        ];
+        foreach ($phoneQueries as $phoneTerms) {
+            try {
+                $phoneHtml = locationSearchFetch('https://www.google.com/search?hl=es&num=10&q=' . rawurlencode($phoneTerms));
+                $phoneDecoded = html_entity_decode(
+                    str_replace(['\\u003a', '\\u002b', '\\u002d', '\\u002f'], [':', '+', '-', '/'], rawurldecode($phoneHtml)),
+                    ENT_QUOTES | ENT_HTML5,
+                    'UTF-8'
+                );
+
+                $phoneCandidates = [];
+                if (preg_match_all('~"(?:telephone|phoneNumber|phone)"\s*:\s*"([^"]{7,40})"~i', $phoneDecoded, $jsonPhones)) {
+                    $phoneCandidates = array_merge($phoneCandidates, $jsonPhones[1]);
+                }
+                if (preg_match_all('~href=["\']tel:([^"\']+)["\']~i', $phoneDecoded, $telPhones)) {
+                    $phoneCandidates = array_merge($phoneCandidates, $telPhones[1]);
+                }
+
+                $phoneText = html_entity_decode(strip_tags($phoneDecoded), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                $phonePatterns = [
+                    '~(?:tel(?:éfono|efono)?|phone|contacto|call|llamar)\D{0,55}(\+?[0-9][0-9\s()./-]{6,24}[0-9])~iu',
+                    '~(\+?[0-9][0-9\s()./-]{6,24}[0-9])\D{0,55}(?:tel(?:éfono|efono)?|phone|contacto|call|llamar)~iu',
+                    '~\+?34[\s.-]?[6789](?:[\s.-]?[0-9]){8}~u',
+                    '~(?<![0-9])[6789](?:[\s.-]?[0-9]){8}(?![0-9])~u',
+                ];
+                foreach ($phonePatterns as $phonePattern) {
+                    if (preg_match_all($phonePattern, $phoneText, $phoneMatches)) {
+                        $phoneCandidates = array_merge($phoneCandidates, $phoneMatches[1] ?? $phoneMatches[0]);
+                    }
+                }
+
+                foreach ($phoneCandidates as $rawPhone) {
+                    $candidatePhone = trim(rawurldecode(strip_tags((string) $rawPhone)));
+                    $candidatePhone = preg_replace('/[^0-9+().\s\/-]/u', '', $candidatePhone) ?? '';
+                    $digits = preg_replace('/\D+/', '', $candidatePhone);
+                    if (strlen((string) $digits) === 9
+                        || (strlen((string) $digits) === 11 && str_starts_with((string) $digits, '34'))) {
                         $phone = $candidatePhone;
                         break 2;
                     }
                 }
+            } catch (Throwable $ignored) {
+                // Een mislukte zoekopdracht mag de andere Google-varianten niet blokkeren.
             }
-        } catch (Throwable $ignored) {
-            // Telefoon zoeken mag de website- en logovondst niet blokkeren.
         }
     }
+
     if ($website === '' && $phone === '') {
         throw new RuntimeException('Google vond geen telefoonnummer of betrouwbare website voor ' . $name . ' in ' . $city . ', ' . $countryName . '. Controleer de naam en gemeente.');
     }
