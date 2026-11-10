@@ -69,19 +69,15 @@ function locationSearchFetch(string $url, int $limit = 1500000): string
 try {
     $countryNames = ['ES' => 'Spain', 'BE' => 'Belgium', 'NL' => 'Netherlands', 'FR' => 'France', 'DE' => 'Germany', 'PT' => 'Portugal', 'IT' => 'Italy'];
     $countryName = $countryNames[$countryCode] ?? $countryCode;
-    // Search explicitly with municipality AND country; never silently accept the first unrelated result.
-    $searchTerms = '"' . $name . '" "' . $city . '" "' . $countryName . '" official website';
-    $query = rawurlencode($searchTerms);
-    $html = locationSearchFetch('https://html.duckduckgo.com/html/?q=' . $query);
-    $website = '';
+    // Search official sites first, then use a Facebook page as a fallback.
     $cityNeedle = mb_strtolower($city);
-    if (preg_match_all('~<a\\b[^>]*>.*?</a>~is', $html, $anchors, PREG_OFFSET_CAPTURE)) {
+    $findResult = static function (string $searchHtml, bool $facebookOnly) use ($cityNeedle): string {
+        if (!preg_match_all('~<a\\b[^>]*>.*?</a>~is', $searchHtml, $anchors, PREG_OFFSET_CAPTURE)) return '';
         foreach ($anchors[0] as [$anchor, $offset]) {
             if (!preg_match('~class=["\\'][^"\\']*result__a[^"\\']*["\\']~i', $anchor)
                 || !preg_match('~href=["\\']([^"\\']+)["\\']~i', $anchor, $hrefMatch)) continue;
-            $context = substr($html, max(0, $offset - 900), 2600);
+            $context = substr($searchHtml, max(0, $offset - 900), 2600);
             $resultText = mb_strtolower(html_entity_decode(strip_tags($context), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-            // Require the municipality to appear near this result, not merely elsewhere on the search page.
             if (!str_contains($resultText, $cityNeedle)) continue;
             $candidate = html_entity_decode($hrefMatch[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
             if (str_starts_with($candidate, '//')) $candidate = 'https:' . $candidate;
@@ -92,15 +88,25 @@ try {
             }
             $candidateParts = parse_url($candidate);
             $host = strtolower((string) ($candidateParts['host'] ?? ''));
-            if (in_array(strtolower((string) ($candidateParts['scheme'] ?? '')), ['http', 'https'], true)
-                && $host !== '' && !preg_match('/(^|\\.)(duckduckgo\\.com|facebook\\.com|instagram\\.com|tripadvisor\\.[a-z.]+)$/i', $host)) {
-                $website = $candidate;
-                break;
-            }
+            $isFacebook = preg_match('/(^|\\.)facebook\\.com$/i', $host) === 1;
+            if (!in_array(strtolower((string) ($candidateParts['scheme'] ?? '')), ['http', 'https'], true) || $host === '') continue;
+            if ($facebookOnly ? $isFacebook : (!$isFacebook && !preg_match('/(^|\\.)(duckduckgo\\.com|instagram\\.com|tripadvisor\\.[a-z.]+)$/i', $host))) return $candidate;
         }
+        return '';
+    };
+
+    $searchTerms = '"' . $name . '" "' . $city . '" "' . $countryName . '" official website';
+    $html = locationSearchFetch('https://html.duckduckgo.com/html/?q=' . rawurlencode($searchTerms));
+    $website = $findResult($html, false);
+    $isFacebook = false;
+    if ($website === '') {
+        $facebookTerms = 'site:facebook.com "' . $name . '" "' . $city . '" "' . $countryName . '"';
+        $facebookHtml = locationSearchFetch('https://html.duckduckgo.com/html/?q=' . rawurlencode($facebookTerms));
+        $website = $findResult($facebookHtml, true);
+        $isFacebook = $website !== '';
     }
     if ($website === '') {
-        throw new RuntimeException('Geen betrouwbare website gevonden voor deze locatienaam in gemeente ' . $city . ', ' . $countryName . '. Controleer de gemeente of vul de website handmatig in.');
+        throw new RuntimeException('Geen betrouwbare website of Facebookpagina gevonden voor ' . $name . ' in ' . $city . ', ' . $countryName . '. Controleer de gegevens of vul de link handmatig in.');
     }
     $siteHtml = '';
     try { $siteHtml = locationSearchFetch($website); } catch (Throwable $ignored) {}
@@ -125,7 +131,7 @@ try {
     }
     echo json_encode([
         'success' => true,
-        'message' => 'Website gevonden. Controleer of dit de officiële website is en bekijk het logo.',
+        'message' => $isFacebook ? 'Geen eigen website gevonden. Mogelijke Facebookpagina gevonden; controleer of dit de juiste locatie is.' : 'Website gevonden. Controleer of dit de officiële website is en bekijk het logo.',
         'website_url' => $website,
         'logo_url' => $logo,
     ], JSON_UNESCAPED_UNICODE);
