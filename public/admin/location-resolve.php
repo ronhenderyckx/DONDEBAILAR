@@ -442,6 +442,85 @@ try {
         $name = '';
     }
 
+    /*
+     * Zoek aanvullend in OpenStreetMap op de naam van de locatie,
+     * beperkt tot een kleine omgeving rond de exacte Google Maps-pin.
+     * Dit is dezelfde Nominatim-methode als in de werkende oude website.
+     */
+    $nominatimWebsite = '';
+    $nominatimPhone = '';
+    $nominatimDebug = [
+        'http_status' => 0,
+        'results' => 0,
+        'matched_tags' => false,
+    ];
+
+    if ($coords !== null && $name !== '') {
+        // Respecteer de Nominatim-limiet van maximaal één aanvraag per seconde.
+        usleep(1100000);
+
+        $lat = (float) $coords[0];
+        $lon = (float) $coords[1];
+        $delta = 0.01;
+        $nominatimParams = [
+            'format' => 'jsonv2',
+            'addressdetails' => 1,
+            'extratags' => 1,
+            'q' => trim($name . ' ' . ($address['city'] ?? '')),
+            'limit' => 5,
+            'viewbox' => ($lon - $delta) . ',' . ($lat + $delta) . ',' . ($lon + $delta) . ',' . ($lat - $delta),
+            'bounded' => 1,
+        ];
+        $nominatimUrl = 'https://nominatim.openstreetmap.org/search?' . http_build_query($nominatimParams);
+        $nominatimCh = curl_init($nominatimUrl);
+        curl_setopt_array($nominatimCh, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_CONNECTTIMEOUT => 5,
+            CURLOPT_TIMEOUT => 10,
+            CURLOPT_USERAGENT => $userAgent,
+            CURLOPT_HTTPHEADER => ['Accept: application/json', 'Accept-Language: nl'],
+        ]);
+        $nominatimBody = curl_exec($nominatimCh);
+        $nominatimDebug['http_status'] = (int) curl_getinfo($nominatimCh, CURLINFO_RESPONSE_CODE);
+        curl_close($nominatimCh);
+
+        if ($nominatimBody !== false && $nominatimDebug['http_status'] === 200) {
+            $nominatimRows = json_decode((string) $nominatimBody, true);
+            if (is_array($nominatimRows)) {
+                $nominatimDebug['results'] = count($nominatimRows);
+                foreach ($nominatimRows as $row) {
+                    if (!is_array($row) || !isset($row['extratags']) || !is_array($row['extratags'])) {
+                        continue;
+                    }
+
+                    $tags = $row['extratags'];
+                    $pickExtra = static function (array $source, array $keys): string {
+                        foreach ($keys as $key) {
+                            if (isset($source[$key]) && is_string($source[$key]) && trim($source[$key]) !== '') {
+                                return trim($source[$key]);
+                            }
+                        }
+                        return '';
+                    };
+
+                    $candidateWebsite = $pickExtra($tags, ['website', 'contact:website', 'url']);
+                    $candidatePhone = $pickExtra($tags, ['phone', 'contact:phone']);
+
+                    if ($candidateWebsite !== '' || $candidatePhone !== '') {
+                        $nominatimWebsite = $candidateWebsite;
+                        $nominatimPhone = $candidatePhone;
+                        $nominatimDebug['matched_tags'] = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    if ($mapsPhone === '' && $nominatimPhone !== '') {
+        $mapsPhone = $nominatimPhone;
+    }
+
     $location = array_merge([
         'name' => $name,
         'street' => '',
@@ -450,6 +529,7 @@ try {
         'city' => '',
         'country_code' => '',
         'phone' => $mapsPhone,
+        'website_url' => $nominatimWebsite,
         'latitude' => $coords[0] ?? null,
         'longitude' => $coords[1] ?? null,
     ], $address);
@@ -470,6 +550,7 @@ try {
         'message' => 'Gegevens opgehaald met de Google Maps-methode. Controleer het adres.',
         'location' => $location,
         'phone_debug' => $mapsPhoneDebug,
+        'nominatim_debug' => $nominatimDebug,
     ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
 } catch (Throwable $e) {
     http_response_code(422);
