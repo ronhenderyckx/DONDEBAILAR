@@ -32,6 +32,16 @@ $brandName = $region && !empty($region['name'])
     : 'DONDEBAILAR';
 
 $logoPath = $region['logo_path'] ?? null;
+
+if ((!is_string($logoPath) || $logoPath === '') && $region === null) {
+    $platformLogoSetting = dirname(__DIR__, 2) . '/storage/platform-logo-path.txt';
+    if (is_file($platformLogoSetting)) {
+        $configuredLogo = trim((string) file_get_contents($platformLogoSetting));
+        if (preg_match('#^/uploads/platform/[a-zA-Z0-9._-]+$#', $configuredLogo)) {
+            $logoPath = $configuredLogo;
+        }
+    }
+}
 $primaryColor = $region['primary_color'] ?? '#0A4D9F';
 
 $escape = static fn ($value): string =>
@@ -105,7 +115,7 @@ $escape = static fn ($value): string =>
                         <a href="/admin/organizers.php">Organisatoren</a>
                         <a href="/admin/locations.php">Locaties</a>
                         <a href="/admin/users.php">Gebruikers</a>
-                        <a href="/admin/mail-settings.php">E-mailinstellingen</a>
+                        <a href="/admin/settings.php">Instellingen</a>
                         <a href="/admin/regions.php">Regio's</a>
                     </details>
                 <?php elseif ($canManageRegion || $canManageLocations): ?>
