@@ -38,17 +38,22 @@ $monthEnd = $monthStart->modify('first day of next month');
 $calendarStart = $monthStart->modify('monday this week');
 $calendarEnd = $calendarStart->modify('+41 days');
 
-$view = (string) ($_GET['view'] ?? 'list');
-if (!in_array($view, ['list', 'calendar'], true)) {
-    $view = 'list';
+$view = (string) ($_GET['view'] ?? 'feed');
+if (!in_array($view, ['feed', 'calendar'], true)) {
+    $view = 'feed';
 }
 $categoryId = filter_input(INPUT_GET, 'category_id', FILTER_VALIDATE_INT) ?: 0;
+$city = trim((string) ($_GET['city'] ?? ''));
 $search = trim((string) ($_GET['q'] ?? ''));
 if (mb_strlen($search) > 100) {
     $search = mb_substr($search, 0, 100);
 }
+if (mb_strlen($city) > 120) {
+    $city = mb_substr($city, 0, 120);
+}
 
 $categories = [];
+$cities = [];
 $events = [];
 if ($regionId > 0) {
     $categoryQuery = $db->prepare(
@@ -59,23 +64,35 @@ if ($regionId > 0) {
     $categoryQuery->execute(['region_id' => $regionId]);
     $categories = $categoryQuery->fetchAll();
 
+    $cityQuery = $db->prepare(
+        "SELECT city, MIN(NULLIF(logo_path, '')) AS logo_path
+         FROM locations
+         WHERE region_id = :region_id AND is_active = 1 AND city <> ''
+         GROUP BY city ORDER BY city"
+    );
+    $cityQuery->execute(['region_id' => $regionId]);
+    $cities = $cityQuery->fetchAll();
+    $cityNames = array_column($cities, 'city');
+    if ($city !== '' && !in_array($city, $cityNames, true)) {
+        $city = '';
+    }
+
     $sql = "SELECT e.id, e.title, e.description, e.starts_at, e.ends_at,
                    e.event_language, c.name AS category_name,
                    o.name AS organizer_name, l.name AS location_name,
-                   l.city AS location_city, cover.id AS cover_media_id
+                   l.city AS location_city, l.latitude, l.longitude,
+                   l.google_maps_url,
+                   cover.id AS cover_media_id
             FROM events e
             INNER JOIN organizers o ON o.id = e.organizer_id
             LEFT JOIN categories c ON c.id = e.category_id
             LEFT JOIN locations l ON l.id = e.location_id
-            LEFT JOIN event_media cover ON cover.id = (
-                SELECT em.id
-                FROM event_media em
-                WHERE em.event_id = e.id
-                  AND em.media_context = 'event'
-                  AND em.media_type = 'image'
-                  AND em.media_source = 'upload'
-                ORDER BY em.sort_order, em.id
-                LIMIT 1
+            LEFT JOIN event_media cover ON cover.id = COALESCE(
+                e.cover_media_id,
+                (SELECT em.id FROM event_media em
+                 WHERE em.event_id = e.id AND em.media_context = 'event'
+                   AND em.media_type = 'image' AND em.media_source = 'upload'
+                 ORDER BY em.is_cover DESC, em.sort_order, em.id LIMIT 1)
             )
             WHERE e.region_id = :region_id
               AND e.status = 'published'
@@ -91,6 +108,10 @@ if ($regionId > 0) {
         $params['category_id'] = $categoryId;
     } else {
         $categoryId = 0;
+    }
+    if ($city !== '') {
+        $sql .= " AND l.city = :city";
+        $params['city'] = $city;
     }
     if ($search !== '') {
         $sql .= " AND (e.title LIKE :search_title OR e.description LIKE :search_description OR o.name LIKE :search_organizer)";
@@ -120,6 +141,7 @@ $queryBase = [
     'region_id' => $regionId,
     'month' => $monthInput,
     'category_id' => $categoryId ?: null,
+    'city' => $city !== '' ? $city : null,
     'q' => $search !== '' ? $search : null,
 ];
 $queryBase = array_filter($queryBase, static fn($value) => $value !== null);
@@ -128,29 +150,46 @@ $pageRobots = 'index, follow';
 require dirname(__DIR__) . '/app/views/header.php';
 ?>
 <section class="agenda-page">
-    <div class="agenda-hero">
-        <div>
-            <p class="eyebrow">SALSA · BACHATA · KIZOMBA</p>
-            <h1>Dansagenda<?= $region ? ' ' . $escape($region['name']) : '' ?></h1>
-            <p>Alle dansavonden, feesten, workshops en festivals overzichtelijk bij elkaar.</p>
-        </div>
-        <div class="agenda-hero__month">
-            <span><?= $escape($monthNames[(int) $monthStart->format('n')]) ?></span>
-            <strong><?= $escape($monthStart->format('Y')) ?></strong>
-        </div>
-    </div>
-
     <?php if ($regions === []): ?>
         <section class="agenda-empty"><h2>De agenda wordt voorbereid</h2><p>Er zijn nog geen actieve regio's beschikbaar.</p></section>
     <?php else: ?>
+        <section class="agenda-region-strip" aria-label="Kies een stad">
+            <a class="agenda-city <?= $city === '' ? 'is-active' : '' ?>" href="/?<?= $escape(http_build_query(['region_id' => $regionId, 'month' => $monthInput])) ?>">
+                <span class="agenda-city__round agenda-city__all"><span>✦</span></span>
+                <span>Alle plaatsen</span>
+            </a>
+            <?php foreach ($cities as $cityItem): ?>
+                <a class="agenda-city <?= $city === $cityItem['city'] ? 'is-active' : '' ?>" href="/?<?= $escape(http_build_query(array_merge($queryBase, ['city' => $cityItem['city'], 'view' => 'feed']))) ?>">
+                    <span class="agenda-city__round">
+                        <?php if (!empty($cityItem['logo_path'])): ?>
+                            <img src="<?= $escape($cityItem['logo_path']) ?>" alt="">
+                        <?php else: ?>
+                            <span><?= $escape(mb_strtoupper(mb_substr((string) $cityItem['city'], 0, 1))) ?></span>
+                        <?php endif; ?>
+                    </span>
+                    <span><?= $escape($cityItem['city']) ?></span>
+                </a>
+            <?php endforeach; ?>
+        </section>
+
+        <div class="agenda-heading">
+            <div>
+                <p class="eyebrow">SALSA · BACHATA · KIZOMBA</p>
+                <h1><?= $escape($region['name'] ?? 'Dansagenda') ?></h1>
+                <p>Dansavonden, socials, workshops en festivals in jouw buurt.</p>
+            </div>
+            <form class="agenda-month-select" method="get">
+                <input type="hidden" name="region_id" value="<?= $regionId ?>">
+                <?php if ($city !== ''): ?><input type="hidden" name="city" value="<?= $escape($city) ?>"><?php endif; ?>
+                <label for="agenda-month">Maand</label>
+                <input id="agenda-month" type="month" name="month" value="<?= $escape($monthInput) ?>" onchange="this.form.submit()">
+            </form>
+        </div>
+
         <form class="agenda-filters" method="get" action="/">
-            <label>Regio
-                <select name="region_id" onchange="this.form.submit()">
-                    <?php foreach ($regions as $item): ?>
-                        <option value="<?= (int) $item['id'] ?>" <?= $regionId === (int) $item['id'] ? 'selected' : '' ?>><?= $escape($item['name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </label>
+            <input type="hidden" name="region_id" value="<?= $regionId ?>">
+            <input type="hidden" name="month" value="<?= $escape($monthInput) ?>">
+            <?php if ($city !== ''): ?><input type="hidden" name="city" value="<?= $escape($city) ?>"><?php endif; ?>
             <label>Dansstijl
                 <select name="category_id">
                     <option value="">Alle dansstijlen</option>
@@ -162,9 +201,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <label class="agenda-search">Zoeken
                 <input type="search" name="q" value="<?= $escape($search) ?>" placeholder="Evenement of organisator">
             </label>
-            <input type="hidden" name="month" value="<?= $escape($monthInput) ?>">
-            <input type="hidden" name="view" value="<?= $escape($view) ?>">
-            <button class="button button--primary" type="submit">Toon evenementen</button>
+            <button class="button button--primary" type="submit">Zoeken</button>
             <a class="agenda-reset" href="/?region_id=<?= $regionId ?>&month=<?= $escape($monthInput) ?>">Wis filters</a>
         </form>
 
@@ -173,10 +210,10 @@ require dirname(__DIR__) . '/app/views/header.php';
                 <a class="button" href="/?<?= $escape(http_build_query(array_merge($queryBase, ['month' => $previousMonth, 'view' => $view]))) ?>" aria-label="Vorige maand">‹</a>
                 <h2><?= $escape($monthLabel) ?></h2>
                 <a class="button" href="/?<?= $escape(http_build_query(array_merge($queryBase, ['month' => $nextMonth, 'view' => $view]))) ?>" aria-label="Volgende maand">›</a>
-                <a class="agenda-today" href="/?region_id=<?= $regionId ?>&month=<?= (new DateTimeImmutable('now', $timezone))->format('Y-m') ?>&view=<?= $escape($view) ?>">Vandaag</a>
+                <a class="agenda-today" href="/?region_id=<?= $regionId ?>&month=<?= (new DateTimeImmutable('now', $timezone))->format('Y-m') ?>">Vandaag</a>
             </div>
             <div class="agenda-view-switch" aria-label="Agendaweergave">
-                <a class="<?= $view === 'list' ? 'is-active' : '' ?>" href="/?<?= $escape(http_build_query(array_merge($queryBase, ['view' => 'list']))) ?>">Feed</a>
+                <a class="<?= $view === 'feed' ? 'is-active' : '' ?>" href="/?<?= $escape(http_build_query(array_merge($queryBase, ['view' => 'feed']))) ?>">Feed</a>
                 <a class="<?= $view === 'calendar' ? 'is-active' : '' ?>" href="/?<?= $escape(http_build_query(array_merge($queryBase, ['view' => 'calendar']))) ?>">Kalender</a>
             </div>
         </div>
@@ -206,34 +243,34 @@ require dirname(__DIR__) . '/app/views/header.php';
                     $start = new DateTimeImmutable((string) $event['starts_at'], $timezone);
                     $eventUrl = '/event.php?id=' . (int) $event['id'];
                     $locationLabel = trim((string) ($event['location_name'] ?? '') . (!empty($event['location_city']) ? ', ' . $event['location_city'] : ''));
+                    $mapUrl = (string) ($event['google_maps_url'] ?? '');
+                    if ($mapUrl === '' && $event['latitude'] !== null && $event['longitude'] !== null) {
+                        $mapUrl = 'https://www.google.com/maps?q=' . rawurlencode((string) $event['latitude'] . ',' . (string) $event['longitude']);
+                    }
+                    $shareUrl = 'https://' . ($_SERVER['HTTP_HOST'] ?? '') . $eventUrl;
                     ?>
                     <article class="agenda-card">
                         <a class="agenda-card__image-link" href="<?= $eventUrl ?>" aria-label="Bekijk <?= $escape($event['title']) ?>">
                             <?php if (!empty($event['cover_media_id'])): ?>
                                 <img class="agenda-card__image" src="/event-media.php?id=<?= (int) $event['cover_media_id'] ?>" alt="<?= $escape($event['title']) ?>" loading="lazy">
                             <?php else: ?>
-                                <div class="agenda-card__placeholder">
-                                    <span>SALSA · BACHATA · KIZOMBA</span>
-                                    <strong><?= $escape($event['title']) ?></strong>
-                                </div>
+                                <div class="agenda-card__placeholder"><span>SALSA · BACHATA · KIZOMBA</span><strong><?= $escape($event['title']) ?></strong></div>
                             <?php endif; ?>
-                            <span class="agenda-card__date"><strong><?= $escape($start->format('d')) ?></strong><span><?= $escape($weekdayShort[(int) $start->format('N')] . ' ' . substr($monthNames[(int) $start->format('n')], 0, 3)) ?></span></span>
                         </a>
-                        <div class="agenda-card__content">
-                            <div class="agenda-card__eyebrow">
-                                <?php if (!empty($event['category_name'])): ?><span class="agenda-card__category"><?= $escape($event['category_name']) ?></span><?php endif; ?>
-                                <time datetime="<?= $escape($start->format(DateTimeInterface::ATOM)) ?>"><?= $escape($start->format('H:i')) ?> uur</time>
+                        <div class="agenda-card__details">
+                            <div class="agenda-card__quick">
+                                <span class="agenda-card__quick-date" aria-label="Datum"><?= $escape($start->format('d')) ?></span>
+                                <button type="button" class="agenda-icon-button agenda-share" data-share-title="<?= $escape($event['title']) ?>" data-share-url="<?= $escape($shareUrl) ?>" aria-label="Deel evenement"><span aria-hidden="true">↗</span></button>
+                                <?php if ($mapUrl !== ''): ?><a class="agenda-icon-button" href="<?= $escape($mapUrl) ?>" target="_blank" rel="noopener noreferrer" aria-label="Toon locatie op kaart"><span aria-hidden="true">⌖</span></a><?php endif; ?>
                             </div>
                             <h2><a href="<?= $eventUrl ?>"><?= $escape($event['title']) ?></a></h2>
-                            <p class="agenda-card__organizer"><?= $escape($event['organizer_name']) ?></p>
-                            <?php if ($locationLabel !== ''): ?><p class="agenda-card__location"><span aria-hidden="true">⌖</span> <?= $escape($locationLabel) ?></p><?php endif; ?>
-                            <?php if (!empty($event['description'])): ?><p class="agenda-card__description"><?= $escape(mb_strimwidth(strip_tags((string) $event['description']), 0, 220, '…')) ?></p><?php endif; ?>
-                            <div class="agenda-card__actions">
-                                <a class="button button--primary" href="<?= $eventUrl ?>">Meer info</a>
-                                <button class="agenda-share" type="button" data-share-title="<?= $escape($event['title']) ?>" data-share-url="<?= $eventUrl ?>" aria-label="Deel <?= $escape($event['title']) ?> via WhatsApp">
-                                    <span aria-hidden="true">↗</span> Deel via WhatsApp
-                                </button>
-                            </div>
+                            <p class="agenda-card__tags">
+                                <?php if (!empty($event['category_name'])): ?><span># <?= $escape($event['category_name']) ?></span><?php endif; ?>
+                                <?php if (!empty($event['location_city'])): ?><span># <?= $escape($event['location_city']) ?></span><?php endif; ?>
+                            </p>
+                            <p class="agenda-card__date-line"><?= $escape(strtoupper($start->format('l, d M Y'))) ?> <span>◷</span> <?= $escape($start->format('H:i')) ?><?php if (!empty($event['ends_at'])): ?> – <?= $escape((new DateTimeImmutable((string) $event['ends_at'], $timezone))->format('H:i')) ?><?php endif; ?></p>
+                            <?php if ($locationLabel !== ''): ?><p class="agenda-card__location"><?= $escape($locationLabel) ?></p><?php endif; ?>
+                            <a class="agenda-card__more" href="<?= $eventUrl ?>">Bekijk het volledige evenement</a>
                         </div>
                     </article>
                 <?php endforeach; ?>
@@ -244,16 +281,15 @@ require dirname(__DIR__) . '/app/views/header.php';
 </section>
 
 <style>
-.agenda-page{max-width:1120px;margin:0 auto}.agenda-hero{display:flex;align-items:center;justify-content:space-between;gap:24px;margin:0 0 26px;padding:34px 36px;border-radius:18px;background:linear-gradient(120deg,#202b38,#35475b);color:#fff}.agenda-hero h1{color:#fff;margin-bottom:8px}.agenda-hero p:not(.eyebrow){margin:0;color:#e0e7ef}.agenda-hero .eyebrow{color:#f6b22e}.agenda-hero__month{text-align:center;min-width:100px;padding:15px;border:1px solid #ffffff38;border-radius:12px}.agenda-hero__month span,.agenda-hero__month strong{display:block}.agenda-hero__month span{font-size:13px;text-transform:uppercase;letter-spacing:1px}.agenda-hero__month strong{font-size:27px}.agenda-filters{display:flex;align-items:end;flex-wrap:wrap;gap:12px;margin-bottom:24px;padding:16px;background:#fff;border:1px solid var(--db-border);border-radius:12px}.agenda-filters label{display:flex;flex-direction:column;gap:5px;min-width:165px;color:var(--db-muted);font-size:12px;font-weight:650}.agenda-filters select,.agenda-filters input{height:42px;min-width:0;padding:8px 10px;border:1px solid var(--db-border);border-radius:7px;background:#fff;color:var(--db-text)}.agenda-filters .agenda-search{flex:1}.agenda-filters .agenda-search input{width:100%}.agenda-reset,.agenda-today{font-size:13px;font-weight:650;padding:10px 5px}.agenda-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:0 0 18px}.agenda-month-nav{display:flex;align-items:center;gap:10px}.agenda-month-nav h2{margin:0;min-width:150px;text-align:center}.agenda-month-nav .button{min-width:40px;padding:8px;font-size:22px}.agenda-view-switch{display:flex;padding:4px;background:#e9edf2;border-radius:9px}.agenda-view-switch a{padding:7px 13px;border-radius:6px;color:var(--db-muted);font-size:13px;font-weight:650}.agenda-view-switch a.is-active{background:#fff;color:var(--db-text);box-shadow:0 1px 4px #00000012}.agenda-feed{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:22px;align-items:start}.agenda-card{min-width:0;overflow:hidden;background:#fff;border:1px solid var(--db-border);border-radius:14px;box-shadow:var(--db-shadow)}.agenda-card__image-link{position:relative;display:block;overflow:hidden;background:#202b38;aspect-ratio:4/3}.agenda-card__image{display:block;width:100%;height:100%;object-fit:cover;transition:transform .25s ease}.agenda-card__image-link:hover .agenda-card__image{transform:scale(1.025)}.agenda-card__placeholder{display:flex;width:100%;height:100%;min-height:220px;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:25px;text-align:center;color:#fff;background:radial-gradient(circle at 25% 20%,#f4802a 0,transparent 38%),linear-gradient(135deg,#202b38,#35475b)}.agenda-card__placeholder span{font-size:11px;letter-spacing:2px;color:#f6b22e;font-weight:800}.agenda-card__placeholder strong{font-size:clamp(20px,3vw,30px);line-height:1.15}.agenda-card__date{position:absolute;top:14px;left:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:58px;padding:7px 9px;border-radius:9px;background:#fff;color:#222;box-shadow:0 3px 12px #0002}.agenda-card__date strong{font-size:25px;line-height:1.05}.agenda-card__date span{font-size:10px;text-transform:uppercase;font-weight:750}.agenda-card__content{padding:18px 19px 19px}.agenda-card__eyebrow{display:flex;align-items:center;gap:9px;flex-wrap:wrap;color:var(--db-muted);font-size:12px;font-weight:700}.agenda-card__category{padding:4px 9px;border-radius:20px;background:#fff1df;color:#95500d}.agenda-card__content h2{margin:9px 0 5px;font-size:21px;line-height:1.2}.agenda-card__content h2 a{color:var(--db-text)}.agenda-card__organizer{margin:0 0 5px;font-size:13px;font-weight:700}.agenda-card__location{margin:0 0 9px;color:var(--db-muted);font-size:13px}.agenda-card__description{margin:10px 0 15px;color:var(--db-muted);font-size:13px;line-height:1.55}.agenda-card__actions{display:flex;align-items:center;gap:14px;flex-wrap:wrap}.agenda-card__actions .button{padding:9px 15px}.agenda-share{display:inline-flex;align-items:center;gap:6px;padding:8px 0;border:0;background:none;color:#16834a;font:inherit;font-size:13px;font-weight:750;cursor:pointer}.agenda-share:hover{text-decoration:underline}.agenda-count{margin:15px 2px;color:var(--db-muted);font-size:12px}.agenda-empty{padding:38px 24px;text-align:center;background:#fff;border:1px solid var(--db-border);border-radius:12px}.agenda-empty p{color:var(--db-muted);margin:0}.agenda-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));overflow:hidden;border:1px solid var(--db-border);border-radius:12px;background:#fff}.agenda-calendar__weekday{padding:10px;text-align:center;background:#f2f5f8;color:var(--db-muted);font-size:11px;font-weight:750;text-transform:uppercase}.agenda-calendar__day{min-height:125px;padding:8px;border-top:1px solid var(--db-border);border-right:1px solid var(--db-border);min-width:0}.agenda-calendar__day:nth-child(7n){border-right:0}.agenda-calendar__day.is-outside{background:#fafbfc;color:#aab2bd}.agenda-calendar__day.is-today{background:#fffaf0}.agenda-calendar__number{display:block;margin-bottom:5px;font-size:12px;font-weight:750}.agenda-calendar__event{display:block;margin:4px 0;padding:4px 5px;overflow:hidden;border-radius:5px;background:#eaf1fa;color:#174c83;font-size:11px;line-height:1.35;overflow-wrap:anywhere}.agenda-calendar__event time{font-weight:800;margin-right:3px}.agenda-calendar__event:hover{background:#dbe8f7;color:#123b68}
-@media(max-width:760px){.agenda-feed{grid-template-columns:1fr;max-width:620px;margin:0 auto}.agenda-hero{padding:25px 21px}.agenda-filters{align-items:stretch}.agenda-filters label{flex:1 1 100%;min-width:0}.agenda-toolbar{align-items:flex-start;flex-direction:column}.agenda-calendar__day{min-height:95px;padding:4px}.agenda-calendar__weekday{padding:7px 2px;font-size:9px}.agenda-calendar__event{font-size:9px;padding:3px}}
-@media(max-width:420px){.agenda-hero__month{display:none}.agenda-month-nav{width:100%;gap:6px}.agenda-month-nav h2{flex:1;min-width:0;font-size:18px}.agenda-month-nav .button{min-width:34px}.agenda-calendar__day{min-height:82px}.agenda-calendar__event time{display:none}.agenda-card__content{padding:15px}.agenda-card__content h2{font-size:19px}}
+.agenda-page{width:100%;max-width:1080px;margin:0 auto}.agenda-region-strip{display:flex;align-items:flex-start;gap:25px;overflow-x:auto;padding:2px 4px 20px;margin:-8px 0 22px;border-bottom:1px solid #dedede}.agenda-city{flex:0 0 104px;display:flex;flex-direction:column;align-items:center;gap:7px;color:#171717;font-size:14px;text-align:center}.agenda-city:hover{color:#171717}.agenda-city__round{width:92px;height:92px;padding:5px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(135deg,#c32c9b,#773ad3,#ff8c27);transition:transform .18s ease}.agenda-city__round:after{content:"";position:absolute}.agenda-city__round img,.agenda-city__round>span{width:100%;height:100%;display:grid;place-items:center;border:4px solid #fff;border-radius:50%;background:#fff;object-fit:contain;color:#244c79;font-size:30px;font-weight:800}.agenda-city__all{background:linear-gradient(135deg,#c32c9b,#773ad3,#ff8c27)}.agenda-city__all>span{background:radial-gradient(circle,#fff 45%,#e7f3ff 100%)}.agenda-city.is-active .agenda-city__round,.agenda-city:hover .agenda-city__round{transform:translateY(-3px);box-shadow:0 5px 15px #0002}.agenda-city.is-active>span:last-child{font-weight:800}.agenda-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 0 20px}.agenda-heading h1{margin:0 0 4px}.agenda-heading p:not(.eyebrow){margin:0;color:var(--db-muted)}.agenda-month-select{display:flex;align-items:center;gap:9px;color:var(--db-muted);font-size:12px;font-weight:700}.agenda-month-select input{padding:9px;border:1px solid var(--db-border);border-radius:8px;background:#fff;color:var(--db-text)}.agenda-filters{display:flex;align-items:end;flex-wrap:wrap;gap:10px;margin-bottom:20px;padding:13px;background:#fff;border:1px solid var(--db-border);border-radius:10px}.agenda-filters label{display:flex;flex-direction:column;gap:4px;min-width:155px;color:var(--db-muted);font-size:11px;font-weight:700}.agenda-filters select,.agenda-filters input{height:40px;min-width:0;padding:7px 10px;border:1px solid var(--db-border);border-radius:7px;background:#fff;color:var(--db-text)}.agenda-filters .agenda-search{flex:1}.agenda-filters .agenda-search input{width:100%}.agenda-reset,.agenda-today{font-size:12px;font-weight:700;padding:9px 5px}.agenda-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:0 0 15px}.agenda-month-nav{display:flex;align-items:center;gap:9px}.agenda-month-nav h2{margin:0;min-width:140px;text-align:center;font-size:18px}.agenda-month-nav .button{min-width:36px;padding:6px;font-size:20px}.agenda-view-switch{display:flex;padding:3px;background:#eceff2;border-radius:8px}.agenda-view-switch a{padding:6px 11px;border-radius:6px;color:var(--db-muted);font-size:12px;font-weight:700}.agenda-view-switch a.is-active{background:#fff;color:var(--db-text);box-shadow:0 1px 4px #0001}.agenda-feed{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;max-width:880px;margin:0 auto}.agenda-card{overflow:hidden;border:1px solid #65c99b;border-radius:15px;background:#f78d19;box-shadow:0 4px 18px #0000000d}.agenda-card__image-link{display:block;overflow:hidden;background:#171717;aspect-ratio:4/3}.agenda-card__image{display:block;width:100%;height:100%;object-fit:contain;background:#171717}.agenda-card__placeholder{display:flex;width:100%;height:100%;min-height:230px;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:25px;text-align:center;color:#fff;background:radial-gradient(circle at 25% 20%,#f4802a 0,transparent 38%),linear-gradient(135deg,#202b38,#35475b)}.agenda-card__placeholder span{font-size:11px;letter-spacing:2px;color:#ffd36c;font-weight:800}.agenda-card__placeholder strong{font-size:clamp(20px,3vw,30px);line-height:1.15}.agenda-card__details{padding:17px 20px 20px;color:#fff}.agenda-card__quick{display:flex;align-items:center;gap:17px;margin:0 0 13px}.agenda-card__quick-date{min-width:34px;color:#fff;font-size:22px;font-weight:800}.agenda-icon-button{width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;color:#fff;font-size:31px;line-height:1;cursor:pointer}.agenda-icon-button:hover{background:#ffffff26;color:#fff}.agenda-card__details h2{margin:0 0 7px;color:#fff;font-size:22px}.agenda-card__details h2 a{color:inherit}.agenda-card__tags{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 10px;color:#fff;font-size:15px}.agenda-card__date-line{margin:0 0 7px;color:#fff;font-size:14px;font-weight:600}.agenda-card__date-line span{margin:0 8px}.agenda-card__location{margin:0 0 7px;color:#fff;font-size:13px}.agenda-card__more{display:inline-block;color:#fff;text-decoration:underline;text-underline-offset:3px;font-size:14px;font-weight:600}.agenda-card__more:hover{color:#fff}.agenda-count{margin:15px 2px;color:var(--db-muted);font-size:12px}.agenda-empty{padding:38px 24px;text-align:center;background:#fff;border:1px solid var(--db-border);border-radius:12px}.agenda-empty p{color:var(--db-muted);margin:0}.agenda-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));overflow:hidden;border:1px solid var(--db-border);border-radius:12px;background:#fff}.agenda-calendar__weekday{padding:10px;text-align:center;background:#f2f5f8;color:var(--db-muted);font-size:11px;font-weight:750;text-transform:uppercase}.agenda-calendar__day{min-height:125px;padding:8px;border-top:1px solid var(--db-border);border-right:1px solid var(--db-border);min-width:0}.agenda-calendar__day:nth-child(7n){border-right:0}.agenda-calendar__day.is-outside{background:#fafbfc;color:#aab2bd}.agenda-calendar__day.is-today{background:#fffaf0}.agenda-calendar__number{display:block;margin-bottom:5px;font-size:12px;font-weight:750}.agenda-calendar__event{display:block;margin:4px 0;padding:4px 5px;overflow:hidden;border-radius:5px;background:#eaf1fa;color:#174c83;font-size:11px;line-height:1.35;overflow-wrap:anywhere}.agenda-calendar__event time{font-weight:800;margin-right:3px}
+@media(max-width:700px){.agenda-heading{align-items:flex-start;flex-direction:column}.agenda-region-strip{gap:15px}.agenda-city{flex-basis:88px;font-size:13px}.agenda-city__round{width:78px;height:78px}.agenda-filters{align-items:stretch}.agenda-filters label{flex:1 1 100%;min-width:0}.agenda-toolbar{align-items:flex-start;flex-direction:column}.agenda-calendar__day{min-height:95px;padding:4px}.agenda-calendar__weekday{padding:7px 2px;font-size:9px}.agenda-calendar__event{font-size:9px;padding:3px}.agenda-card__image-link{aspect-ratio:4/3}.agenda-card__details{padding:15px 17px 18px}}
+@media(max-width:420px){.agenda-month-nav{width:100%;gap:6px}.agenda-month-nav h2{flex:1;min-width:0;font-size:17px}.agenda-month-nav .button{min-width:34px}.agenda-calendar__day{min-height:82px}.agenda-calendar__event time{display:none}}
 </style>
 <script>
 document.addEventListener('click', function (event) {
     const button = event.target.closest('[data-share-url]');
     if (!button) return;
-    const url = new URL(button.dataset.shareUrl, window.location.origin).href;
-    const text = button.dataset.shareTitle + ' — ' + url;
+    const text = button.dataset.shareTitle + ' — ' + button.dataset.shareUrl;
     window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener,noreferrer');
 });
 </script>
