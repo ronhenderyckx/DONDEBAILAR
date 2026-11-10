@@ -63,6 +63,7 @@ function locationSearchFetch(string $url, int $limit = 1500000): string
         $ch = curl_init($url);
         curl_setopt_array($ch, [
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HEADER => true,
             CURLOPT_FOLLOWLOCATION => false,
             CURLOPT_CONNECTTIMEOUT => 8,
             CURLOPT_TIMEOUT => 18,
