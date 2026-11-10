@@ -148,7 +148,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 (() => {
  const mapsInput=document.getElementById('google_maps_url');
  const csrf=document.querySelector('input[name="csrf_token"]')?.value||'';
- const fields=['name','street','house_number','postal_code','city','country_code','latitude','longitude','phone','website_url'];
+ const fields=['name','street','house_number','postal_code','city','country_code','latitude','longitude'];
  const logoField=document.getElementById('discovered_logo_url');
  const preview=document.getElementById('brand-logo-preview');
  if(!mapsInput||!csrf)return;
@@ -174,8 +174,6 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
    }
    const website=document.getElementById('website_url');
    if(website&&result.website_url)website.value=result.website_url;
-   const phone=document.getElementById('phone');
-   if(phone&&result.phone&&!phone.value.trim())phone.value=result.phone;
    if(result.logo_url&&logoField&&preview){
     logoField.value=result.logo_url;
     const img=document.createElement('img');
@@ -210,22 +208,12 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     const el=document.getElementById(key);
     if(el&&data.location[key]!==undefined&&data.location[key]!==null&&data.location[key]!=='')el.value=data.location[key];
    }
-   let mapsMessage=data.message||'Adresgegevens ingevuld. Controleer het resultaat.';
-   if(!data.location.phone&&data.phone_debug){
-    mapsMessage+=' Telefoon niet gevonden. Maps HTTP '+data.phone_debug.http_status+' ('+data.phone_debug.page_bytes+' bytes).';
-   }
-   showMapsStatus(mapsMessage,!data.location.phone);
+   const mapsMessage=data.message||'Adresgegevens ingevuld. Controleer het resultaat.';
+   showMapsStatus(mapsMessage);
    // Maps may have just supplied a new venue name/city. Force a fresh Google
    // search even if the same form values were searched before the Maps lookup.
    lastBrandSearch='';
-   const phoneWasEmpty=!(document.getElementById('phone')?.value.trim());
    await searchLocationBranding();
-   const phoneAfterSearch=document.getElementById('phone')?.value.trim()||'';
-   if(phoneWasEmpty&&phoneAfterSearch){
-    showMapsStatus('Telefoonnummer gevonden via Google. Controleer het nummer.',false);
-   }else if(!phoneAfterSearch){
-    showMapsStatus(mapsMessage+' Google heeft ook geen telefoonnummer teruggegeven.',true);
-   }
   }catch(error){
    lastUrl='';
    const message=error&&error.message?error.message:'Onbekende fout tijdens de aanvraag.';
