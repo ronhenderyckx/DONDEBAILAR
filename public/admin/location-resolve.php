@@ -174,45 +174,8 @@ try {
         throw new RuntimeException('De Google Maps-pagina kon niet worden opgehaald.');
     }
     $mapsHtml = '';
-    $mapsPhone = '';
-    $mapsPhoneDebug = [
-        'http_status' => (int) $mapsPage['status'],
-        'page_bytes' => strlen((string) $mapsPage['body']),
-    ];
     if ($mapsPage['status'] >= 200 && $mapsPage['status'] < 300 && $mapsPage['body'] !== '') {
         $mapsHtml = html_entity_decode((string) $mapsPage['body'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        // Google Maps kan delen van zijn ingesloten gegevens URL- of JSON-escaped leveren.
-        $mapsSearchText = str_replace(
-            ['\\u003a', '\\u002b', '\\u002d', '\\u002f', '\\u003d', '&#43;'],
-            [':', '+', '-', '/', '=', '+'],
-            rawurldecode($mapsHtml)
-        );
-
-        // Zoek zowel de bekende Maps-velden als zichtbare telefoonlabels en tel-links.
-        if ($mapsPhone === '') {
-            $phonePatterns = [
-                '~"(?:phoneNumber|telephone|phone)"\s*:\s*"([^"]{7,60})"~i',
-                '~"phoneNumber"\s*,\s*"([^"]{7,60})"~i',
-                '~data-item-id=["\x27]phone:tel:([^"\x27]+)["\x27]~i',
-                '~(?:href|data-href)=["\x27]tel:([^"\x27]+)["\x27]~i',
-                '~(?:aria-label|title)=["\x27][^"\x27]*(?:Telefoonnummer|Phone number|Telephone|Tel[eé]fono)\s*[:：]?\s*(\+?[0-9][0-9().\s\/-]{6,})[^"\x27]*["\x27]~iu',
-                '~(?:Telefoonnummer|Phone number|Telephone|Tel[eé]fono)\s*[:：]\s*(\+?[0-9][0-9().\s\/-]{6,})~iu',
-            ];
-            foreach ($phonePatterns as $phonePattern) {
-                if (!preg_match_all($phonePattern, $mapsSearchText, $phoneMatches) || empty($phoneMatches[1])) continue;
-                foreach ($phoneMatches[1] as $rawCandidate) {
-                    $candidatePhone = trim(rawurldecode(stripcslashes((string) $rawCandidate)));
-                    $candidatePhone = preg_replace('/[^\d+().\/\s-]/u', '', $candidatePhone) ?? '';
-                    $digits = preg_replace('/\D+/', '', $candidatePhone);
-                    if (strlen((string) $digits) >= 7 && strlen((string) $digits) <= 15) {
-                        $mapsPhone = trim($candidatePhone);
-                        break 2;
-                    }
-                }
-            }
-        }
-    }
-    $mapsPhoneDebug['found'] = $mapsPhone !== '';
 
     // Extract the exact place pin first; only use the map viewport as fallback.
     $pair = '(-?\d{1,3}(?:\.\d+)?)';
@@ -415,7 +378,7 @@ try {
         }
     }
 
-    // Structured data, when Google includes it, can contain the complete postal address and phone.
+    // Structured data can supplement the place name and postal address.
     if (preg_match_all('~<script[^>]*type=["\x27]application/ld\\+json["\x27][^>]*>(.*?)</script>~is', $mapsHtml, $jsonBlocks)) {
         foreach ($jsonBlocks[1] as $jsonBlock) {
         $structured = json_decode(html_entity_decode((string) $jsonBlock, ENT_QUOTES | ENT_HTML5, 'UTF-8'), true);
@@ -424,7 +387,6 @@ try {
         foreach ($items as $item) {
             if (!is_array($item)) continue;
             if ($name === '' && !empty($item['name']) && is_string($item['name'])) $name = trim($item['name']);
-            if ($mapsPhone === '' && !empty($item['telephone']) && is_string($item['telephone'])) $mapsPhone = trim($item['telephone']);
             $structuredAddress = $item['address'] ?? null;
             if (is_array($structuredAddress)) {
             $address['street'] = trim((string) ($structuredAddress['streetAddress'] ?? $address['street']));
@@ -455,7 +417,6 @@ try {
         'postal_code' => '',
         'city' => '',
         'country_code' => '',
-        'phone' => $mapsPhone,
         'latitude' => $coords[0] ?? null,
         'longitude' => $coords[1] ?? null,
     ], $address);
@@ -475,7 +436,6 @@ try {
         'success' => true,
         'message' => 'Gegevens opgehaald met de Google Maps-methode. Controleer het adres.',
         'location' => $location,
-        'phone_debug' => $mapsPhoneDebug,
     ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
 } catch (Throwable $e) {
     http_response_code(422);
