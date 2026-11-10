@@ -23,9 +23,7 @@ $db->exec(
         from_email VARCHAR(190) NOT NULL,
         from_name VARCHAR(190) NOT NULL DEFAULT 'DONDEBAILAR',
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        updated_by INT UNSIGNED NULL,
-        CONSTRAINT fk_platform_mail_settings_user
-            FOREIGN KEY (updated_by) REFERENCES users(id) ON DELETE SET NULL
+        updated_by INT UNSIGNED NULL
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
 );
 
