@@ -60,6 +60,17 @@ $escape = static fn ($value): string =>
             <span class="site-brand__name"><?= $escape($brandName) ?></span>
         </a>
 
+        <?php if (isset($regions) && is_array($regions) && count($regions) > 1): ?>
+            <form class="site-region-choice" method="get" action="/" aria-label="Kies regio">
+                <label for="header-region">Regio</label>
+                <select id="header-region" name="region_id" onchange="this.form.submit()">
+                    <?php foreach ($regions as $regionOption): ?>
+                        <option value="<?= (int) $regionOption['id'] ?>" <?= $regionId === (int) $regionOption['id'] ? 'selected' : '' ?>><?= $escape($regionOption['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </form>
+        <?php endif; ?>
+
         <details class="site-menu">
             <summary class="site-menu__toggle">
                 <span>Menu</span>
@@ -109,6 +120,11 @@ $escape = static fn ($value): string =>
         </details>
 
     </div>
+
+<style>
+.site-header__inner{display:flex;align-items:center;gap:16px}.site-region-choice{display:flex;align-items:center;gap:8px;margin-left:auto}.site-region-choice label{font-size:12px;font-weight:700;color:var(--db-muted)}.site-region-choice select{max-width:190px;height:38px;padding:6px 10px;border:1px solid var(--db-border);border-radius:8px;background:#fff;color:var(--db-text);font:inherit}.site-menu{margin-left:0}
+@media(max-width:600px){.site-header__inner{gap:9px}.site-region-choice{gap:4px}.site-region-choice label{display:none}.site-region-choice select{max-width:130px;font-size:13px}}
+</style>
 </header>
 
 <main class="site-main">
