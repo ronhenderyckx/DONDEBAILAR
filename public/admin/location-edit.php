@@ -206,6 +206,11 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
   clearTimeout(timer);
   timer=setTimeout(resolveAndSearch,900);
  });
+ // Existing locations already have a Maps link when the edit form opens.
+ // Resolve it on page load as well as after a manual paste/change.
+ if(mapsInput.value.trim()){
+  setTimeout(resolveAndSearch,150);
+ }
 })();
 </script>
 
