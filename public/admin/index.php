@@ -109,10 +109,10 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     <section class="admin-section">
         <div class="section-heading">
             <div>
-                <h2>E-mailinstellingen</h2>
-                <p>Beheer de centrale SMTP-server en afzender voor systeemmails.</p>
+                <h2>Instellingen</h2>
+                <p>Beheer de algemene platforminstellingen, het DONDEBAILAR-logo en de e-mailserver.</p>
             </div>
-            <a class="button button--primary" href="/admin/mail-settings.php">E-mail instellen</a>
+            <a class="button button--primary" href="/admin/settings.php">Instellingen beheren</a>
         </div>
     </section>
 
