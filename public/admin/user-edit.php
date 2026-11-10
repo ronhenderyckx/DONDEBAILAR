@@ -168,12 +168,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $db->rollBack();
             }
 
-            if ($exception instanceof PDOException && $exception->getCode() === '23000') {
-                $errorMessage = 'Dit e-mailadres bestaat al bij een andere gebruiker.';
-            } else {
-                error_log('DONDEBAILAR gebruiker wijzigen: ' . $exception->getMessage());
-                $errorMessage = 'De gebruiker kon niet worden bijgewerkt. Controleer de serverlog.';
-            }
+            error_log('DONDEBAILAR gebruiker wijzigen: ' . $exception->getMessage());
+            $errorMessage = 'De gebruiker kon niet worden bijgewerkt. Controleer de serverlog.';
         }
     }
 }
