@@ -28,8 +28,6 @@ function organizerManageableRegions(PDO $db, array $user): array
 /** Alleen platformbeheerders en beheerders van de betreffende regio mogen beheren. */
 function organizerCanManageRegion(int $regionId, array $user): bool
 {
-    return $regionId > 0 && (
-        isPlatformAdmin($user)
-        || userHasRegionRole($regionId, ['region_admin'], $user)
-    );
+    return isPlatformAdmin($user)
+        || ($regionId > 0 && userHasRegionRole($regionId, ['region_admin'], $user));
 }
