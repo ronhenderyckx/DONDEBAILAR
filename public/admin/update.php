@@ -107,10 +107,10 @@ function migrateDuplicateUserEmails(PDO $db): void
 
 
 /**
- * Koppel organisatoren aan een regio. Bestaande records blijven NULL totdat
- * een platformbeheerder ze bewust aan een regio toewijst.
+ * Organisatoren zijn platformbreed en hebben geen eigen regio.
+ * Verwijder de eerder toegevoegde, foutieve region_id-kolom indien aanwezig.
  */
-function migrateOrganizerRegions(PDO $db): void
+function removeOrganizerRegionColumn(PDO $db): void
 {
     $column = $db->query(
         "SELECT COUNT(*) FROM information_schema.COLUMNS
@@ -120,7 +120,7 @@ function migrateOrganizerRegions(PDO $db): void
     )->fetchColumn();
 
     if ((int) $column === 0) {
-        $db->exec("ALTER TABLE organizers ADD COLUMN region_id INT UNSIGNED NULL AFTER id");
+        return;
     }
 
     $index = $db->query(
@@ -130,23 +130,11 @@ function migrateOrganizerRegions(PDO $db): void
            AND INDEX_NAME = 'idx_organizers_region_id'"
     )->fetchColumn();
 
-    if ((int) $index === 0) {
-        $db->exec("CREATE INDEX idx_organizers_region_id ON organizers (region_id)");
+    if ((int) $index > 0) {
+        $db->exec("DROP INDEX idx_organizers_region_id ON organizers");
     }
 
-    // Bij een installatie met precies één actieve regio horen bestaande
-    // organisatoren automatisch bij die regio. Bij meerdere regio's blijft
-    // toewijzing bewust aan de platformbeheerder.
-    $activeRegions = $db->query(
-        "SELECT id FROM regions WHERE is_active = 1 ORDER BY id"
-    )->fetchAll(PDO::FETCH_COLUMN);
-
-    if (count($activeRegions) === 1) {
-        $assignExisting = $db->prepare(
-            "UPDATE organizers SET region_id = :region_id WHERE region_id IS NULL"
-        );
-        $assignExisting->execute(['region_id' => (int) $activeRegions[0]]);
-    }
+    $db->exec("ALTER TABLE organizers DROP COLUMN region_id");
 }
 
 
@@ -274,23 +262,8 @@ try {
     // eerdere update waarbij de database-aanpassing nog niet kon worden afgerond.
     $db = Database::connection();
 
-    // Eerst de kolom toevoegen die de organisatorenpagina nodig heeft.
-    // Zo wordt deze migratie ook uitgevoerd als een latere migratie problemen geeft.
-    migrateOrganizerRegions($db);
-
-    $regionColumnExists = (int) $db->query(
-        "SELECT COUNT(*) FROM information_schema.COLUMNS
-         WHERE TABLE_SCHEMA = DATABASE()
-           AND TABLE_NAME = 'organizers'
-           AND COLUMN_NAME = 'region_id'"
-    )->fetchColumn();
-
-    if ($regionColumnExists !== 1) {
-        throw new RuntimeException(
-            'Database-update onvolledig: organizers.region_id kon niet worden aangemaakt.'
-        );
-    }
-    $messages[] = 'Database: regio-koppeling voor organisatoren is gecontroleerd.';
+    removeOrganizerRegionColumn($db);
+    $messages[] = 'Database: organisatoren zijn platformbreed; foutieve regio-koppeling verwijderd indien aanwezig.';
 
     migrateDuplicateUserEmails($db);
     migrateAuditTracking($db);
