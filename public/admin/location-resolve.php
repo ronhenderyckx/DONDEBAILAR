@@ -147,46 +147,6 @@ try {
     if ($mapsPage['status'] >= 200 && $mapsPage['status'] < 300 && $mapsPage['body'] !== '') {
         $mapsHtml = html_entity_decode((string) $mapsPage['body'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-        // Prefer the explicit place title, not the generic Google Maps page title.
-        $metaPatterns = [
-            '~<meta[^>]+(?:property|name)=["\\'](?:og:title|twitter:title)["\\'][^>]+content=["\\']([^"\\']+)["\\']~i',
-            '~<meta[^>]+content=["\\']([^"\\']+)["\\'][^>]+(?:property|name)=["\\'](?:og:title|twitter:title)["\\']~i',
-            '~<title[^>]*>(.*?)</title>~is',
-        ];
-        foreach ($metaPatterns as $metaPattern) {
-            if (preg_match($metaPattern, $mapsHtml, $metaMatch)) {
-                $candidate = trim(html_entity_decode(strip_tags((string) $metaMatch[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
-                $candidate = preg_replace('/\\s*[-–|]\\s*Google Maps\\s*$/iu', '', $candidate) ?? $candidate;
-                if ($candidate !== '' && stripos($candidate, 'Google Maps') === false) {
-                    $name = $candidate;
-                    break;
-                }
-            }
-        }
-
-        // Structured data, when Google includes it, can contain the complete postal address and phone.
-        if (preg_match_all('~<script[^>]*type=["\\']application/ld\\+json["\\'][^>]*>(.*?)</script>~is', $mapsHtml, $jsonBlocks)) {
-            foreach ($jsonBlocks[1] as $jsonBlock) {
-                $structured = json_decode(html_entity_decode((string) $jsonBlock, ENT_QUOTES | ENT_HTML5, 'UTF-8'), true);
-                if (!is_array($structured)) continue;
-                $items = isset($structured['@graph']) && is_array($structured['@graph']) ? $structured['@graph'] : [$structured];
-                foreach ($items as $item) {
-                    if (!is_array($item)) continue;
-                    if ($name === '' && !empty($item['name']) && is_string($item['name'])) $name = trim($item['name']);
-                    if ($mapsPhone === '' && !empty($item['telephone']) && is_string($item['telephone'])) $mapsPhone = trim($item['telephone']);
-                    $structuredAddress = $item['address'] ?? null;
-                    if (is_array($structuredAddress)) {
-                        $address['street'] = trim((string) ($structuredAddress['streetAddress'] ?? $address['street']));
-                        $address['postal_code'] = trim((string) ($structuredAddress['postalCode'] ?? $address['postal_code']));
-                        $address['city'] = trim((string) ($structuredAddress['addressLocality'] ?? $address['city']));
-                        $country = $structuredAddress['addressCountry'] ?? '';
-                        if (is_array($country)) $country = $country['name'] ?? '';
-                        if (is_string($country) && preg_match('/^[A-Z]{2}$/i', $country)) $address['country_code'] = strtoupper($country);
-                    }
-                }
-            }
-        }
-
         // Phone numbers occur in several embedded Maps payload formats, not just JSON-LD.
         if ($mapsPhone === '') {
             $phonePatterns = [
@@ -398,7 +358,49 @@ try {
         }
     }
 
-    // Phone/name/address were extracted from the same Maps response above.
+    // Prefer the explicit place title, not the generic Google Maps page title.
+    $metaPatterns = [
+        '~<meta[^>]+(?:property|name)=["\\'](?:og:title|twitter:title)["\\'][^>]+content=["\\']([^"\\']+)["\\']~i',
+        '~<meta[^>]+content=["\\']([^"\\']+)["\\'][^>]+(?:property|name)=["\\'](?:og:title|twitter:title)["\\']~i',
+        '~<title[^>]*>(.*?)</title>~is',
+    ];
+    foreach ($metaPatterns as $metaPattern) {
+        if (preg_match($metaPattern, $mapsHtml, $metaMatch)) {
+        $candidate = trim(html_entity_decode(strip_tags((string) $metaMatch[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        $candidate = preg_replace('/\\s*[-–|]\\s*Google Maps\\s*$/iu', '', $candidate) ?? $candidate;
+        if ($candidate !== '' && stripos($candidate, 'Google Maps') === false) {
+            $name = $candidate;
+            break;
+        }
+        }
+    }
+
+    // Structured data, when Google includes it, can contain the complete postal address and phone.
+    if (preg_match_all('~<script[^>]*type=["\\']application/ld\\+json["\\'][^>]*>(.*?)</script>~is', $mapsHtml, $jsonBlocks)) {
+        foreach ($jsonBlocks[1] as $jsonBlock) {
+        $structured = json_decode(html_entity_decode((string) $jsonBlock, ENT_QUOTES | ENT_HTML5, 'UTF-8'), true);
+        if (!is_array($structured)) continue;
+        $items = isset($structured['@graph']) && is_array($structured['@graph']) ? $structured['@graph'] : [$structured];
+        foreach ($items as $item) {
+            if (!is_array($item)) continue;
+            if ($name === '' && !empty($item['name']) && is_string($item['name'])) $name = trim($item['name']);
+            if ($mapsPhone === '' && !empty($item['telephone']) && is_string($item['telephone'])) $mapsPhone = trim($item['telephone']);
+            $structuredAddress = $item['address'] ?? null;
+            if (is_array($structuredAddress)) {
+            $address['street'] = trim((string) ($structuredAddress['streetAddress'] ?? $address['street']));
+            $address['postal_code'] = trim((string) ($structuredAddress['postalCode'] ?? $address['postal_code']));
+            $address['city'] = trim((string) ($structuredAddress['addressLocality'] ?? $address['city']));
+            $country = $structuredAddress['addressCountry'] ?? '';
+            if (is_array($country)) $country = $country['name'] ?? '';
+            if (is_string($country) && preg_match('/^[A-Z]{2}$/i', $country)) $address['country_code'] = strtoupper($country);
+            }
+        }
+        }
+    }
+
+
+    // Google Maps page metadata can supplement the geocoded address.
+
 
 
     // If the Maps place text is just the street address, do not use it as the venue name.
