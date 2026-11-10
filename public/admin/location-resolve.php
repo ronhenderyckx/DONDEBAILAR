@@ -137,7 +137,42 @@ try {
 
     // Download the resolved Maps page once. Shared links sometimes contain only a CID,
     // so the place name/address must also be read from the page metadata and embedded JSON.
-    $mapsPage = $httpGet($finalUrl);
+    $mapsPage = null;
+    for ($pageHop = 0; $pageHop < 6; $pageHop++) {
+        if ($hostKind($finalUrl) === '') {
+            throw new RuntimeException('Google Maps stuurde door naar een niet-toegestane website.');
+        }
+
+        $mapsPage = $httpGet($finalUrl);
+        $pageStatus = (int) $mapsPage['status'];
+        $redirectLocation = trim((string) $mapsPage['location']);
+
+        if (!in_array($pageStatus, [301, 302, 303, 307, 308], true) || $redirectLocation === '') {
+            break;
+        }
+
+        // Google can return absolute, protocol-relative or root-relative redirects.
+        if (str_starts_with($redirectLocation, '//')) {
+            $scheme = (string) (parse_url($finalUrl, PHP_URL_SCHEME) ?: 'https');
+            $redirectLocation = $scheme . ':' . $redirectLocation;
+        } elseif (str_starts_with($redirectLocation, '/')) {
+            $parts = parse_url($finalUrl);
+            $origin = (string) ($parts['scheme'] ?? 'https') . '://' . (string) ($parts['host'] ?? '');
+            if (isset($parts['port'])) $origin .= ':' . (int) $parts['port'];
+            $redirectLocation = $origin . $redirectLocation;
+        } elseif (!preg_match('#^https?://#i', $redirectLocation)) {
+            throw new RuntimeException('Google Maps gaf een ongeldige doorverwijzing.');
+        }
+
+        if ($hostKind($redirectLocation) === '') {
+            throw new RuntimeException('Google Maps stuurde door naar een niet-toegestane website.');
+        }
+        $finalUrl = $redirectLocation;
+    }
+
+    if (!is_array($mapsPage)) {
+        throw new RuntimeException('De Google Maps-pagina kon niet worden opgehaald.');
+    }
     $mapsHtml = '';
     $mapsPhone = '';
     $mapsPhoneDebug = [
