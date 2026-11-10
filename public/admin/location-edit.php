@@ -16,12 +16,18 @@ $statement = $db->prepare("SELECT * FROM locations WHERE id = :id LIMIT 1");
 $statement->execute(['id' => $id]);
 $location = $statement->fetch();
 if (!$location) { http_response_code(404); exit('Locatie niet gevonden.'); }
-$regionId = (int) $location['region_id'];
-if (!locationCanManageRegion($regionId, $user)) { http_response_code(403); exit('Je hebt geen rechten om deze locatie te wijzigen.'); }
-
-$regionStatement = $db->prepare("SELECT id, name, country_code FROM regions WHERE id = :id LIMIT 1");
-$regionStatement->execute(['id' => $regionId]);
-$region = $regionStatement->fetch();
+$originalRegionId = (int) $location['region_id'];
+if (!locationCanManageRegion($originalRegionId, $user)) { http_response_code(403); exit('Je hebt geen rechten om deze locatie te wijzigen.'); }
+$manageableRegions = locationManageableRegions($db, $user);
+$manageableRegionIds = array_map(static fn(array $item): int => (int) $item['id'], $manageableRegions);
+$regionId = $originalRegionId;
+$region = null;
+foreach ($manageableRegions as $item) { if ((int) $item['id'] === $regionId) { $region = $item; break; } }
+if ($region === null) {
+    $regionStatement = $db->prepare("SELECT id, name, country_code FROM regions WHERE id = :id LIMIT 1");
+    $regionStatement->execute(['id' => $regionId]);
+    $region = $regionStatement->fetch();
+}
 $errors = [];
 $name = (string) $location['name'];
 $street = (string) ($location['street'] ?? '');
@@ -40,6 +46,9 @@ $isActive = (int) $location['is_active'] === 1;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) $errors[] = 'De beveiligingscontrole is verlopen. Vernieuw de pagina.';
+    $requestedRegionId = (int) ($_POST['region_id'] ?? $originalRegionId);
+    if (!in_array($requestedRegionId, $manageableRegionIds, true)) $errors[] = 'Je hebt geen rechten voor de gekozen regio.';
+    else $regionId = $requestedRegionId;
     $name = trim((string) ($_POST['name'] ?? ''));
     $street = trim((string) ($_POST['street'] ?? ''));
     $houseNumber = trim((string) ($_POST['house_number'] ?? ''));
@@ -72,15 +81,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $uploadedLogo = storeUploadedLocationLogo($_FILES['logo_file'] ?? []);
             $logoPath = $uploadedLogo ?? storeDiscoveredLocationLogo($logoUrl);
             $update = $db->prepare(
-                "UPDATE locations SET name = :name, street = :street, house_number = :house_number,
+                "UPDATE locations SET region_id = :new_region_id, name = :name, street = :street, house_number = :house_number,
                     postal_code = :postal_code, city = :city, country_code = :country_code,
                     latitude = :latitude, longitude = :longitude, google_maps_url = :google_maps_url,
                     phone = :phone, website_url = :website_url,
                     logo_path = COALESCE(:logo_path, logo_path), notes = :notes, is_active = :is_active
-                 WHERE id = :id AND region_id = :region_id"
+                 WHERE id = :id AND region_id = :original_region_id"
             );
             $update->execute([
-                'name' => $name, 'street' => $street !== '' ? $street : null,
+                'new_region_id' => $regionId, 'name' => $name, 'street' => $street !== '' ? $street : null,
                 'house_number' => $houseNumber !== '' ? $houseNumber : null,
                 'postal_code' => $postalCode !== '' ? $postalCode : null,
                 'city' => $city, 'country_code' => $countryCode,
@@ -91,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'website_url' => $website !== '' ? $website : null,
                 'logo_path' => $logoPath,
                 'notes' => $notes !== '' ? $notes : null,
-                'is_active' => $isActive ? 1 : 0, 'id' => $id, 'region_id' => $regionId,
+                'is_active' => $isActive ? 1 : 0, 'id' => $id, 'original_region_id' => $originalRegionId,
             ]);
             header('Location: /admin/locations.php?updated=1');
             exit;
@@ -116,6 +125,12 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <label for="google_maps_url">Google Maps-link</label>
             <div class="maps-url-row"><input id="google_maps_url" name="google_maps_url" type="url" maxlength="700" value="<?= escapeHtml($mapsUrl) ?>" placeholder="https://maps.google.com/?cid=..."><button type="button" id="maps-lookup-button" aria-label="Haal adresgegevens op uit Google Maps" style="display:inline-flex!important;visibility:visible!important;opacity:1!important;align-items:center;justify-content:center;flex:0 0 auto;min-height:42px;padding:9px 16px;border:1px solid #1769aa;border-radius:7px;background:#1769aa;color:#fff;font-weight:700;white-space:nowrap;cursor:pointer;position:relative;z-index:2">Haal gegevens</button></div>
             <p id="maps-lookup-status" class="location-form-note" role="status" aria-live="polite">Plak een Google Maps-link om het adres automatisch op te halen.</p>
+            <label for="region_id">Regio *</label>
+            <select id="region_id" name="region_id" required>
+                <?php foreach ($manageableRegions as $item): ?>
+                    <option value="<?= (int) $item['id'] ?>" <?= $regionId === (int) $item['id'] ? 'selected' : '' ?>><?= escapeHtml($item['name']) ?></option>
+                <?php endforeach; ?>
+            </select>
             <label for="name">Naam locatie *</label><input id="name" name="name" maxlength="190" required value="<?= escapeHtml($name) ?>">
             <div class="location-form-grid">
                 <div><label for="street">Straat</label><input id="street" name="street" maxlength="190" value="<?= escapeHtml($street) ?>"></div>
