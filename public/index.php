@@ -117,14 +117,6 @@ require dirname(__DIR__) . '/app/views/header.php';
     <?php if ($regions === []): ?>
         <section class="agenda-empty"><h2>De agenda wordt voorbereid</h2><p>Er zijn nog geen actieve regio's beschikbaar.</p></section>
     <?php else: ?>
-        <div class="agenda-heading">
-            <div>
-                <p class="eyebrow">SALSA · BACHATA · KIZOMBA</p>
-                <h1><?= $escape($region['name'] ?? 'Dansagenda') ?></h1>
-                <p>Dansavonden, socials, workshops en festivals in jouw buurt.</p>
-            </div>
-        </div>
-
         <form class="agenda-selectors" method="get" action="/">
             <div class="agenda-selector-buttons" role="group" aria-label="Kies een filter">
                 <button type="button" class="agenda-selector-button is-active" data-filter-panel="region">1. Regio <span>⌄</span></button>
