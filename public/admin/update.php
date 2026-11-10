@@ -196,19 +196,21 @@ function migrateAuditTracking(PDO $db): void
             }
         }
 
-        // Vult oude records die nog geen aanmaakdatum hebben eenmalig aan.
-        $db->exec(
-            'UPDATE ' . $quotedTable .
-            ' SET `created_at` = COALESCE(`created_at`, NOW()),' .
-            ' `updated_at` = COALESCE(`updated_at`, `created_at`, NOW())'
-        );
-
         $suffix = substr(hash('sha256', $tableName), 0, 12);
         $insertTrigger = 'db_audit_bi_' . $suffix;
         $updateTrigger = 'db_audit_bu_' . $suffix;
 
+        // Verwijder eerst onze eigen triggers, zodat het eenmalig aanvullen
+        // van oude datums niet als een gebruikerswijziging wordt geregistreerd.
         $db->exec('DROP TRIGGER IF EXISTS `' . $insertTrigger . '`');
         $db->exec('DROP TRIGGER IF EXISTS `' . $updateTrigger . '`');
+
+        $db->exec(
+            'UPDATE ' . $quotedTable .
+            ' SET `created_at` = COALESCE(`created_at`, NOW()),' .
+            ' `updated_at` = COALESCE(`updated_at`, `created_at`, NOW())' .
+            ' WHERE `created_at` IS NULL OR `updated_at` IS NULL'
+        );
 
         $db->exec(
             'CREATE TRIGGER `' . $insertTrigger . '` BEFORE INSERT ON ' . $quotedTable .
