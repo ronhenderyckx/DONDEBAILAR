@@ -58,12 +58,19 @@ if ($regionId > 0) {
     }
 
     $cityQuery = $db->prepare(
-        "SELECT DISTINCT city
-         FROM locations
-         WHERE region_id = :region_id AND is_active = 1 AND city <> ''
-         ORDER BY city"
+        "SELECT DISTINCT l.city
+         FROM locations l
+         INNER JOIN events e ON e.location_id = l.id
+         WHERE l.region_id = :region_id AND l.is_active = 1 AND l.city <> ''
+           AND e.region_id = :event_region_id AND e.status = 'published'
+           AND e.starts_at >= :now
+         ORDER BY l.city"
     );
-    $cityQuery->execute(['region_id' => $regionId]);
+    $cityQuery->execute([
+        'region_id' => $regionId,
+        'event_region_id' => $regionId,
+        'now' => $now->format('Y-m-d H:i:s'),
+    ]);
     $cities = $cityQuery->fetchAll();
     $cityNames = array_column($cities, 'city');
     if ($city !== '' && !in_array($city, $cityNames, true)) {
@@ -123,16 +130,16 @@ require dirname(__DIR__) . '/app/views/header.php';
                 <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" aria-label="Wissel filter" title="Wissel filter"><span class="agenda-filter-icon" aria-hidden="true">👥</span></button>
                 <div class="agenda-selector-panel is-open" data-panel="organizer">
                     <div class="agenda-organizer-strip" aria-label="Organisatoren met toekomstige evenementen">
-                        <a class="agenda-organizer-item<?= $organizerId === 0 ? ' is-selected' : '' ?>" href="/?region_id=<?= $regionId ?>" aria-label="Alle organisatoren" title="Alle organisatoren">
-                            <span class="agenda-organizer-all" aria-hidden="true">Alle</span>
-                            <span class="agenda-organizer-name">Alle</span>
-                        </a>
                         <?php foreach ($organizers as $organizerOption): ?>
                             <?php
                             $logoFilename = basename((string) ($organizerOption['logo_path'] ?? ''));
                             $hasOrganizerLogo = preg_match('/\\A[a-f0-9]{32}\\.(jpg|png|webp)\\z/', $logoFilename) === 1;
+                            $organizerSelected = $organizerId === (int) $organizerOption['id'];
+                            $organizerHref = $organizerSelected
+                                ? '/?region_id=' . $regionId
+                                : '/?region_id=' . $regionId . '&organizer_id=' . (int) $organizerOption['id'];
                             ?>
-                            <a class="agenda-organizer-item<?= $organizerId === (int) $organizerOption['id'] ? ' is-selected' : '' ?>" href="/?region_id=<?= $regionId ?>&amp;organizer_id=<?= (int) $organizerOption['id'] ?>" title="<?= $escape($organizerOption['name']) ?>" aria-label="Toon evenementen van <?= $escape($organizerOption['name']) ?>">
+                            <a class="agenda-organizer-item<?= $organizerSelected ? ' is-selected' : '' ?>" href="<?= $escape($organizerHref) ?>" title="<?= $escape($organizerOption['name']) ?>" aria-label="<?= $organizerSelected ? 'Verwijder filter voor ' : 'Toon evenementen van ' ?><?= $escape($organizerOption['name']) ?>">
                                 <?php if ($hasOrganizerLogo): ?>
                                     <img src="/organizer-logo.php?file=<?= rawurlencode($logoFilename) ?>" alt="" loading="lazy">
                                 <?php else: ?>
@@ -144,16 +151,22 @@ require dirname(__DIR__) . '/app/views/header.php';
                     </div>
                 </div>
                 <div class="agenda-selector-panel" data-panel="city" hidden>
-                    <select id="agenda-city" name="city" disabled aria-label="Kies stad">
-                        <option value="">Alle steden</option>
+                    <div class="agenda-organizer-strip" aria-label="Steden met toekomstige evenementen">
                         <?php foreach ($cities as $cityOption): ?>
-                            <option value="<?= $escape($cityOption['city']) ?>" <?= $city === $cityOption['city'] ? 'selected' : '' ?>><?= $escape($cityOption['city']) ?></option>
+                            <?php
+                            $cityName = (string) $cityOption['city'];
+                            $citySelected = $city === $cityName;
+                            $cityHref = $citySelected
+                                ? '/?region_id=' . $regionId
+                                : '/?region_id=' . $regionId . '&city=' . rawurlencode($cityName);
+                            ?>
+                            <a class="agenda-organizer-item<?= $citySelected ? ' is-selected' : '' ?>" href="<?= $escape($cityHref) ?>" title="<?= $escape($cityName) ?>" aria-label="<?= $citySelected ? 'Verwijder stadsfilter ' : 'Toon evenementen in ' ?><?= $escape($cityName) ?>">
+                                <span class="agenda-organizer-fallback" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr($cityName, 0, 1))) ?></span>
+                                <span class="agenda-organizer-name"><?= $escape($cityName) ?></span>
+                            </a>
                         <?php endforeach; ?>
-                    </select>
+                    </div>
                 </div>
-            </div>
-            <div class="agenda-selector-actions">
-                <a class="agenda-reset" href="/?region_id=<?= $regionId ?>">Wis filters</a>
             </div>
         </form>
 
@@ -233,15 +246,6 @@ if (agendaFilterSwitch) {
     });
     showAgendaFilter(0);
 }
-const agendaFilterForm = document.querySelector('.agenda-selectors');
-['agenda-organizer', 'agenda-city'].forEach(function (id) {
-    const select = document.getElementById(id);
-    if (select) {
-        select.addEventListener('change', function () {
-            if (agendaFilterForm) agendaFilterForm.requestSubmit();
-        });
-    }
-});
 document.addEventListener('click', function (event) {
     const shareButton = event.target.closest('[data-share-url]');
     if (!shareButton) return;
