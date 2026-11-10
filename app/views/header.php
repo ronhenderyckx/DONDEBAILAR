@@ -102,7 +102,7 @@ $escape = static fn ($value): string =>
                 <?php endif; ?>
 
                 <?php if ($canManageRegion || $canManageLocations || $isAdmin): ?>
-                    <a href="/admin/">Beheer</a>
+                    <a href="<?= $isAdmin ? '/admin/' : '/admin/locations.php' ?>">Beheer</a>
                 <?php endif; ?>
 
                 <div class="site-menu__divider"></div>
