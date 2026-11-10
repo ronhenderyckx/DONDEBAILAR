@@ -120,21 +120,21 @@ try {
         // Afbeeldingen waarvan class of id expliciet "logo" vermeldt.
         if (preg_match_all('~<img\\b[^>]*>~i', $siteHtml, $images)) {
             foreach ($images[0] as $imageTag) {
-                if (!preg_match('~(?:class|id)=["\\'][^"\\']*logo[^"\\']*["\\']~i', $imageTag)) continue;
-                if (preg_match('~\\bsrc=["\\']([^"\\']+)["\\']~i', $imageTag, $src)) $logoCandidates[] = $src[1];
-                elseif (preg_match('~\\bdata-src=["\\']([^"\\']+)["\\']~i', $imageTag, $src)) $logoCandidates[] = $src[1];
+                if (!preg_match('~(?:class|id)=["\'][^"\']*logo[^"\']*["\']~i', $imageTag)) continue;
+                if (preg_match('~\\bsrc=["\']([^"\']+)["\']~i', $imageTag, $src)) $logoCandidates[] = $src[1];
+                elseif (preg_match('~\\bdata-src=["\']([^"\']+)["\']~i', $imageTag, $src)) $logoCandidates[] = $src[1];
             }
         }
         // Open Graph / Twitter-afbeelding als bruikbare terugval.
-        if (preg_match_all('~<meta\\b[^>]*(?:property|name)=["\\'](?:og:image|twitter:image)["\\'][^>]*>~i', $siteHtml, $metas)) {
+        if (preg_match_all('~<meta\\b[^>]*(?:property|name)=["\'](?:og:image|twitter:image)["\'][^>]*>~i', $siteHtml, $metas)) {
             foreach ($metas[0] as $meta) {
-                if (preg_match('~content=["\\']([^"\\']+)["\\']~i', $meta, $src)) $logoCandidates[] = $src[1];
+                if (preg_match('~content=["\']([^"\']+)["\']~i', $meta, $src)) $logoCandidates[] = $src[1];
             }
         }
         // Apple touch icon en gewone favicon als laatste website-opties.
-        if (preg_match_all('~<link\\b[^>]*rel=["\\'][^"\\']*(?:apple-touch-icon|icon)[^"\\']*["\\'][^>]*>~i', $siteHtml, $links)) {
+        if (preg_match_all('~<link\\b[^>]*rel=["\'][^"\']*(?:apple-touch-icon|icon)[^"\']*["\'][^>]*>~i', $siteHtml, $links)) {
             foreach ($links[0] as $link) {
-                if (preg_match('~href=["\\']([^"\\']+)["\\']~i', $link, $href)) $logoCandidates[] = $href[1];
+                if (preg_match('~href=["\']([^"\']+)["\']~i', $link, $href)) $logoCandidates[] = $href[1];
             }
         }
     }
