@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'google_maps_url' => $mapsUrl !== '' ? $mapsUrl : null,
                 'phone' => $phone !== '' ? $phone : null,
                 'website_url' => $website !== '' ? $website : null,
-                'logo_path' => storeDiscoveredLocationLogo($logoUrl),
+                'logo_path' => $logoPath,
                 'notes' => $notes !== '' ? $notes : null,
                 'is_active' => $isActive ? 1 : 0, 'created_by' => (int) $user['id'],
             ]);
@@ -93,7 +93,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <section class="admin-section"><p>Je hebt geen rechten om locaties toe te voegen.</p></section>
     <?php else: ?>
     <section class="admin-section location-form-section">
-        <form method="post" class="auth-form">
+        <form method="post" enctype="multipart/form-data" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="region_id">Regio *</label>
             <select id="region_id" name="region_id" required>
@@ -115,7 +115,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 <div><label for="longitude">Lengtegraad</label><input id="longitude" name="longitude" type="number" step="any" min="-180" max="180" value="<?= escapeHtml($longitude) ?>"></div>
             </div>
             <label for="website_url">Website</label><input id="website_url" name="website_url" type="url" maxlength="500" value="<?= escapeHtml($website) ?>" placeholder="https://">
-            <input type="hidden" id="discovered_logo_url" name="discovered_logo_url" value="<?= escapeHtml($logoUrl) ?>">
+            <label for="logo_file">Logo uploaden (PNG, JPG of WebP – maximaal 5 MB)</label>\n            <input id="logo_file" name="logo_file" type="file" accept="image/png,image/jpeg,image/webp">\n            <input type="hidden" id="discovered_logo_url" name="discovered_logo_url" value="<?= escapeHtml($logoUrl) ?>">
             <div class="location-brand-search"><button class="button" type="button" id="search-location-brand">Website en logo zoeken</button><span id="brand-search-status" role="status" aria-live="polite"></span><div id="brand-logo-preview"></div></div>
             <label for="notes">Opmerkingen</label><textarea id="notes" name="notes" rows="5"><?= escapeHtml($notes) ?></textarea>
             <label class="checkbox-label"><input type="checkbox" name="is_active" value="1" <?= $isActive ? 'checked' : '' ?>> Actieve locatie</label>
