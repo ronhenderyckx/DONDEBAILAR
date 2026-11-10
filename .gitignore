@@ -12,6 +12,7 @@ config/secrets.php
 # User-generated and runtime data
 /uploads/*
 !/uploads/.gitkeep
+/public/uploads/
 /storage/*
 !/storage/.gitkeep
 /logs/
