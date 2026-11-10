@@ -125,6 +125,9 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 <div><label for="longitude">Lengtegraad</label><input id="longitude" name="longitude" type="number" step="any" min="-180" max="180" value="<?= escapeHtml($longitude) ?>"></div>
             </div>
             <label for="website_url">Website</label><input id="website_url" name="website_url" type="url" maxlength="500" value="<?= escapeHtml($website) ?>">
+            <?php if (preg_match('~\\Auploads/locations/[a-f0-9]{32}\\.(?:jpg|png|webp)\\z~D', (string) ($location['logo_path'] ?? ''))): ?>
+                <div class="current-location-logo"><img src="/location-logo.php?file=<?= rawurlencode(basename((string) $location['logo_path'])) ?>" alt="Huidig locatielogo"></div>
+            <?php endif; ?>
             <input type="hidden" id="discovered_logo_url" name="discovered_logo_url" value="<?= escapeHtml($logoUrl) ?>">
             <div class="location-brand-search"><button class="button" type="button" id="search-location-brand">Website en logo zoeken</button><span id="brand-search-status" role="status" aria-live="polite"></span><div id="brand-logo-preview"></div></div>
             <label for="notes">Opmerkingen</label><textarea id="notes" name="notes" rows="5"><?= escapeHtml($notes) ?></textarea>
@@ -134,7 +137,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     </section>
 </section>
 <style>
-.location-form-section{max-width:900px}.location-form-section .auth-form{max-width:760px}.location-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.location-form-grid>div{min-width:0}.location-form-note{font-size:13px;color:var(--db-muted)}@media(max-width:600px){.location-form-grid{grid-template-columns:1fr}}
+.location-form-section{max-width:900px}.location-form-section .auth-form{max-width:760px}.location-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.location-form-grid>div{min-width:0}.location-form-note{font-size:13px;color:var(--db-muted)}.location-brand-search{margin:12px 0 18px}.location-brand-search span{display:block;font-size:13px;color:var(--db-muted);margin-top:6px}.location-brand-search img,.current-location-logo img{max-width:180px;max-height:100px;object-fit:contain;background:#fff;padding:8px;border:1px solid #ddd;border-radius:6px}.current-location-logo{margin:10px 0 16px}@media(max-width:600px){.location-form-grid{grid-template-columns:1fr}}
 </style>
 <script>
 (() => {
