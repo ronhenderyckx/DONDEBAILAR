@@ -31,15 +31,36 @@ $brandName = $region && !empty($region['name'])
     ? (string) $region['name']
     : 'DONDEBAILAR';
 
-$logoPath = $region['logo_path'] ?? null;
+$projectRoot = dirname(__DIR__, 2);
+$platformLogoPath = '';
+$platformLogoSetting = $projectRoot . '/storage/platform-logo-path.txt';
+if (is_file($platformLogoSetting)) {
+    $configuredLogo = trim((string) file_get_contents($platformLogoSetting));
+    if (preg_match('#^/uploads/platform/[a-zA-Z0-9._-]+$#', $configuredLogo)) {
+        $platformLogoPath = $configuredLogo;
+    }
+}
 
-if ((!is_string($logoPath) || $logoPath === '') && $region === null) {
-    $platformLogoSetting = dirname(__DIR__, 2) . '/storage/platform-logo-path.txt';
-    if (is_file($platformLogoSetting)) {
-        $configuredLogo = trim((string) file_get_contents($platformLogoSetting));
-        if (preg_match('#^/uploads/platform/[a-zA-Z0-9._-]+$#', $configuredLogo)) {
-            $logoPath = $configuredLogo;
+$regionLogoPath = '';
+if ($region !== null) {
+    $candidateRegionLogo = trim((string) ($region['logo_path'] ?? ''));
+    if ($candidateRegionLogo !== '' && preg_match('#^/uploads/regions/[a-zA-Z0-9._/-]+$#', $candidateRegionLogo)) {
+        $regionLogoPath = $candidateRegionLogo;
+    }
+}
+
+$nextRegionId = 0;
+if (isset($regions) && is_array($regions) && count($regions) > 1 && $regionId > 0) {
+    $regionPosition = null;
+    foreach ($regions as $position => $regionOption) {
+        if ((int) ($regionOption['id'] ?? 0) === $regionId) {
+            $regionPosition = $position;
+            break;
         }
+    }
+    if ($regionPosition !== null) {
+        $nextRegion = $regions[($regionPosition + 1) % count($regions)];
+        $nextRegionId = (int) $nextRegion['id'];
     }
 }
 $primaryColor = $region['primary_color'] ?? '#0A4D9F';
@@ -62,34 +83,36 @@ $escape = static fn ($value): string =>
 <header class="site-header">
     <div class="site-header__inner">
 
-        <a class="site-brand" href="/" aria-label="DONDEBAILAR startpagina">
-            <?php if (is_string($logoPath) && $logoPath !== ''): ?>
-                <img
-                    src="<?= $escape($logoPath) ?>"
-                    alt="<?= $escape($brandName) ?>"
-                    class="site-brand__logo"
-                >
-            <?php else: ?>
-                <span
-                    class="site-brand__mark"
-                    style="--brand-color:<?= $escape($primaryColor) ?>"
-                    aria-hidden="true"
-                >D</span>
+        <div class="site-brand-group">
+            <a class="site-brand site-brand--platform" href="/" aria-label="DONDEBAILAR agenda">
+                <?php if ($platformLogoPath !== ''): ?>
+                    <img src="<?= $escape($platformLogoPath) ?>" alt="DONDEBAILAR" class="site-brand__logo">
+                <?php else: ?>
+                    <span class="site-brand__mark" style="--brand-color:<?= $escape($primaryColor) ?>" aria-hidden="true">D</span>
+                    <span class="site-brand__name">DONDEBAILAR</span>
+                <?php endif; ?>
+            </a>
+
+            <?php if ($region !== null): ?>
+                <?php if ($nextRegionId > 0): ?>
+                    <a class="site-brand site-brand--region" href="/?region_id=<?= $nextRegionId ?>" aria-label="Volgende regio: <?= $escape($brandName) ?>" title="Klik voor de volgende regio">
+                <?php else: ?>
+                    <span class="site-brand site-brand--region">
+                <?php endif; ?>
+                    <?php if ($regionLogoPath !== ''): ?>
+                        <img src="<?= $escape($regionLogoPath) ?>" alt="<?= $escape($brandName) ?>" class="site-brand__logo">
+                    <?php else: ?>
+                        <span class="site-brand__region-name"><?= $escape($brandName) ?></span>
+                    <?php endif; ?>
+                <?php if ($nextRegionId > 0): ?>
+                    </a>
+                <?php else: ?>
+                    </span>
+                <?php endif; ?>
             <?php endif; ?>
+        </div>
 
-            <span class="site-brand__name"><?= $escape($brandName) ?></span>
-        </a>
 
-        <?php if (isset($regions) && is_array($regions) && count($regions) > 1): ?>
-            <form class="site-region-choice" method="get" action="/" aria-label="Kies regio">
-                <label for="header-region">Regio</label>
-                <select id="header-region" name="region_id" onchange="this.form.submit()">
-                    <?php foreach ($regions as $regionOption): ?>
-                        <option value="<?= (int) $regionOption['id'] ?>" <?= $regionId === (int) $regionOption['id'] ? 'selected' : '' ?>><?= $escape($regionOption['name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </form>
-        <?php endif; ?>
 
         <details class="site-menu">
             <summary class="site-menu__toggle">
@@ -160,8 +183,15 @@ $escape = static fn ($value): string =>
     </div>
 
 <style>
-.site-header__inner{display:flex;align-items:center;gap:16px}.site-region-choice{display:flex;align-items:center;gap:8px;margin-left:auto}.site-region-choice label{font-size:12px;font-weight:700;color:var(--db-muted)}.site-region-choice select{max-width:190px;height:38px;padding:6px 10px;border:1px solid var(--db-border);border-radius:8px;background:#fff;color:var(--db-text);font:inherit}.site-menu{margin-left:0}
-@media(max-width:600px){.site-header__inner{gap:9px}.site-region-choice{gap:4px}.site-region-choice label{display:none}.site-region-choice select{max-width:130px;font-size:13px}}
+.site-header__inner{display:flex;align-items:center;gap:16px}
+.site-brand-group{display:flex;align-items:center;gap:12px;min-width:0}
+.site-brand{display:flex;align-items:center;gap:8px;text-decoration:none;min-width:0}
+.site-brand--platform,.site-brand--region{min-height:48px}
+.site-brand__logo{display:block;max-width:170px;max-height:52px;width:auto;height:auto;object-fit:contain}
+.site-brand--region{padding-left:12px;border-left:1px solid var(--db-border)}
+.site-brand__region-name{font-size:15px;font-weight:700;color:var(--db-text);white-space:nowrap}
+.site-menu{margin-left:auto}
+@media(max-width:600px){.site-header__inner{gap:8px}.site-brand-group{gap:7px}.site-brand--region{padding-left:7px}.site-brand__logo{max-width:112px;max-height:42px}.site-brand__region-name{font-size:12px}}
 </style>
 </header>
 
