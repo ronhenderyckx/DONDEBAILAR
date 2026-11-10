@@ -213,15 +213,19 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
    let mapsMessage=data.message||'Adresgegevens ingevuld. Controleer het resultaat.';
    if(!data.location.phone&&data.phone_debug){
     mapsMessage+=' Telefoon niet gevonden. Maps HTTP '+data.phone_debug.http_status+' ('+data.phone_debug.page_bytes+' bytes).';
-    if(data.nominatim_debug){
-     mapsMessage+=' Nominatim HTTP '+data.nominatim_debug.http_status+', '+data.nominatim_debug.results+' resultaten in de omgeving.';
-    }
    }
    showMapsStatus(mapsMessage,!data.location.phone);
    // Maps may have just supplied a new venue name/city. Force a fresh Google
    // search even if the same form values were searched before the Maps lookup.
    lastBrandSearch='';
+   const phoneWasEmpty=!(document.getElementById('phone')?.value.trim());
    await searchLocationBranding();
+   const phoneAfterSearch=document.getElementById('phone')?.value.trim()||'';
+   if(phoneWasEmpty&&phoneAfterSearch){
+    showMapsStatus('Telefoonnummer gevonden via Google. Controleer het nummer.',false);
+   }else if(!phoneAfterSearch){
+    showMapsStatus(mapsMessage+' Google heeft ook geen telefoonnummer teruggegeven.',true);
+   }
   }catch(error){
    lastUrl='';
    const message=error&&error.message?error.message:'Onbekende fout tijdens de aanvraag.';
