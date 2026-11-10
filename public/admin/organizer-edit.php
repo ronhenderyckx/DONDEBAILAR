@@ -163,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 "UPDATE organizers
                  SET region_id = :region_id, name = :name, phone = :phone, website = :website,
                      logo_path = :logo_path, notes = :notes, is_active = :is_active
-                 WHERE id = :id AND region_id = :original_region_id"
+                 WHERE id = :id"
             );
 
             $update->execute([
@@ -175,7 +175,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'notes' => $notes !== '' ? $notes : null,
                 'is_active' => $isActive ? 1 : 0,
                 'id' => $id,
-                'original_region_id' => $originalRegionId,
             ]);
 
             // Pas na een geslaagde database-update het oude logo verwijderen.
