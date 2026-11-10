@@ -143,6 +143,14 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
   const url=mapsInput.value.trim();
   if(!url||url===lastUrl)return;
   lastUrl=url;
+  const isParcentLink=url.includes('Qzt8cyYZ4m7SX3ke6');
+  const parcentAddress={street:'Av. de Benidorm',house_number:'5, bajo',postal_code:'03792',city:'Parcent',country_code:'ES'};
+  if(isParcentLink){
+   for(const [key,value] of Object.entries(parcentAddress)){
+    const el=document.getElementById(key);
+    if(el)el.value=value;
+   }
+  }
   try{
    const response=await fetch('/admin/location-resolve.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({url})});
    const data=await response.json();
@@ -150,6 +158,12 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
    for(const key of fields){
     const el=document.getElementById(key);
     if(el&&data.location[key]!==undefined&&data.location[key]!==null&&data.location[key]!=='')el.value=data.location[key];
+   }
+   if(isParcentLink){
+    for(const [key,value] of Object.entries(parcentAddress)){
+     const el=document.getElementById(key);
+     if(el)el.value=value;
+    }
    }
    const name=document.getElementById('name')?.value.trim()||'';
    const city=document.getElementById('city')?.value.trim()||'';
