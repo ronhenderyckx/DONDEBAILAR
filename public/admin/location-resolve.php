@@ -138,13 +138,10 @@ try {
     // Extract the exact place pin first; only use the map viewport as fallback.
     $pair = '(-?\d{1,3}(?:\.\d+)?)';
     $coords = null;
-    $viewportCoords = null;
     $match = [];
     if (preg_match('/!3d' . $pair . '!4d' . $pair . '/', $finalUrl, $match)) {
+        // Google's !3d/!4d pair identifies the selected place pin.
         $coords = [(float) $match[1], (float) $match[2]];
-    } elseif (preg_match('/@' . $pair . ',' . $pair . '/', $finalUrl, $match)) {
-        // @ coordinates are the visible map centre, not necessarily the selected venue.
-        $viewportCoords = [(float) $match[1], (float) $match[2]];
     }
 
     $parts = parse_url($finalUrl);
@@ -166,7 +163,6 @@ try {
     }
 
     if ($coords !== null && (abs($coords[0]) > 90 || abs($coords[1]) > 180)) $coords = null;
-    if ($viewportCoords !== null && (abs($viewportCoords[0]) > 90 || abs($viewportCoords[1]) > 180)) $viewportCoords = null;
 
     $placeText = '';
     if (preg_match('#/maps/(?:place|search)/([^/@]+)#', $path, $match)) {
@@ -224,13 +220,12 @@ try {
                     'street' => $pick($a, ['road', 'pedestrian', 'footway', 'path', 'square', 'residential']),
                     'house_number' => $pick($a, ['house_number']),
                     'postal_code' => $pick($a, ['postcode']),
-                    'city' => $pick($a, ['city', 'town', 'village', 'municipality', 'hamlet', 'suburb']),
+                    'city' => $pick($a, ['city', 'town', 'village', 'municipality', 'hamlet', 'locality']),
                     'country_code' => strtoupper($pick($a, ['country_code'])),
                 ];
             }
         }
     }
-    if ($coords === null && $viewportCoords !== null) $coords = $viewportCoords;
 
     // Same Nominatim reverse lookup and address-field priority as the supplied working code.
     if ($coords !== null && ($address['street'] === '' || $address['city'] === '')) {
@@ -271,7 +266,7 @@ try {
                 'street' => $pick($a, ['road', 'pedestrian', 'footway', 'path', 'square', 'residential']),
                 'house_number' => $pick($a, ['house_number']),
                 'postal_code' => $pick($a, ['postcode']),
-                'city' => $pick($a, ['city', 'town', 'village', 'municipality', 'hamlet', 'suburb']),
+                'city' => $pick($a, ['city', 'town', 'village', 'municipality', 'hamlet', 'locality']),
                 'country_code' => strtoupper($pick($a, ['country_code'])),
             ];
             if ($name === '' && !empty($geoData['name'])) {
