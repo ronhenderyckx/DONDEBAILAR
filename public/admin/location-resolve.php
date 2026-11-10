@@ -154,8 +154,8 @@ try {
                 '~"telephone"\\s*:\\s*"((?:\\\\\\\\.|[^"\\\\\\\\])*)"~i',
                 '~"phone"\\s*:\\s*"((?:\\\\\\\\.|[^"\\\\\\\\])*)"~i',
                 '~"phoneNumber"\\s*,\\s*"([^"]+)"~i',
-                '~data-item-id=["\\']phone:tel:([^"\\']+)["\\']~i',
-                '~href=["\\']tel:([^"\\']+)["\\']~i',
+                '~data-item-id=["\x27]phone:tel:([^"\x27]+)["\x27]~i',
+                '~href=["\x27]tel:([^"\x27]+)["\x27]~i',
                 '~(?:Telefoonnummer|Phone number|Telephone|Tel[eé]fono)\\s*[:：]\\s*(\\+?[0-9][0-9().\\s\\/-]{6,})~iu',
             ];
             foreach ($phonePatterns as $phonePattern) {
@@ -360,8 +360,8 @@ try {
 
     // Prefer the explicit place title, not the generic Google Maps page title.
     $metaPatterns = [
-        '~<meta[^>]+(?:property|name)=["\\'](?:og:title|twitter:title)["\\'][^>]+content=["\\']([^"\\']+)["\\']~i',
-        '~<meta[^>]+content=["\\']([^"\\']+)["\\'][^>]+(?:property|name)=["\\'](?:og:title|twitter:title)["\\']~i',
+        '~<meta[^>]+(?:property|name)=["\x27](?:og:title|twitter:title)["\x27][^>]+content=["\x27]([^"\x27]+)["\x27]~i',
+        '~<meta[^>]+content=["\x27]([^"\x27]+)["\x27][^>]+(?:property|name)=["\x27](?:og:title|twitter:title)["\x27]~i',
         '~<title[^>]*>(.*?)</title>~is',
     ];
     foreach ($metaPatterns as $metaPattern) {
@@ -376,7 +376,7 @@ try {
     }
 
     // Structured data, when Google includes it, can contain the complete postal address and phone.
-    if (preg_match_all('~<script[^>]*type=["\\']application/ld\\+json["\\'][^>]*>(.*?)</script>~is', $mapsHtml, $jsonBlocks)) {
+    if (preg_match_all('~<script[^>]*type=["\x27]application/ld\\+json["\x27][^>]*>(.*?)</script>~is', $mapsHtml, $jsonBlocks)) {
         foreach ($jsonBlocks[1] as $jsonBlock) {
         $structured = json_decode(html_entity_decode((string) $jsonBlock, ENT_QUOTES | ENT_HTML5, 'UTF-8'), true);
         if (!is_array($structured)) continue;
