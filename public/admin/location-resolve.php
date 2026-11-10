@@ -140,7 +140,10 @@ try {
     $coords = null;
     $match = [];
     if (preg_match('/!3d' . $pair . '!4d' . $pair . '/', $finalUrl, $match)) {
-        // Google's !3d/!4d pair identifies the selected place pin.
+        // Exact selected place coordinates, as in the supplied working implementation.
+        $coords = [(float) $match[1], (float) $match[2]];
+    } elseif (preg_match('/@' . $pair . ',' . $pair . '/', $finalUrl, $match)) {
+        // Use the @ coordinates as fallback, matching the supplied implementation.
         $coords = [(float) $match[1], (float) $match[2]];
     }
 
@@ -220,7 +223,7 @@ try {
                     'street' => $pick($a, ['road', 'pedestrian', 'footway', 'path', 'square', 'residential']),
                     'house_number' => $pick($a, ['house_number']),
                     'postal_code' => $pick($a, ['postcode']),
-                    'city' => $pick($a, ['city', 'town', 'village', 'municipality', 'hamlet', 'locality']),
+                    'city' => $pick($a, ['city', 'town', 'village', 'municipality', 'hamlet', 'suburb']),
                     'country_code' => strtoupper($pick($a, ['country_code'])),
                 ];
             }
@@ -266,7 +269,7 @@ try {
                 'street' => $pick($a, ['road', 'pedestrian', 'footway', 'path', 'square', 'residential']),
                 'house_number' => $pick($a, ['house_number']),
                 'postal_code' => $pick($a, ['postcode']),
-                'city' => $pick($a, ['city', 'town', 'village', 'municipality', 'hamlet', 'locality']),
+                'city' => $pick($a, ['city', 'town', 'village', 'municipality', 'hamlet', 'suburb']),
                 'country_code' => strtoupper($pick($a, ['country_code'])),
             ];
             if ($name === '' && !empty($geoData['name'])) {
