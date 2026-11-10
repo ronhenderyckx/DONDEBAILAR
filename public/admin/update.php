@@ -29,7 +29,20 @@ function runUpdateGit(array $arguments, string $workingDirectory): array
         throw new RuntimeException('PHP proc_open is niet beschikbaar op de server.');
     }
 
-    $command = array_merge(['git'], $arguments);
+    // Gebruik op de Raspberry Pi de bestaande repository-deploysleutel.
+    // Deze sleutel werkt zonder interactieve passphrase en heeft alleen toegang
+    // tot deze repository. De persoonlijke schrijfsleutel blijft ongemoeid.
+    $deployKey = '/home/pi/.ssh/dondebailar_deploy';
+    if (is_file($deployKey)) {
+        $sshCommand = 'ssh -i ' . escapeshellarg($deployKey)
+            . ' -o IdentitiesOnly=yes -o BatchMode=yes';
+        $command = array_merge(
+            ['git', '-c', 'core.sshCommand=' . $sshCommand],
+            $arguments
+        );
+    } else {
+        $command = array_merge(['git'], $arguments);
+    }
     $descriptors = [
         0 => ['pipe', 'r'],
         1 => ['pipe', 'w'],
