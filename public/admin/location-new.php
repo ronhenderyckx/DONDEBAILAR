@@ -98,7 +98,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <form method="post" enctype="multipart/form-data" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="google_maps_url">Google Maps-link</label>
-            <input id="google_maps_url" name="google_maps_url" type="url" maxlength="700" placeholder="https://maps.google.com/?cid=..." value="<?= escapeHtml($mapsUrl) ?>">
+            <div class="maps-url-row"><input id="google_maps_url" name="google_maps_url" type="url" maxlength="700" placeholder="https://maps.google.com/?cid=..." value="<?= escapeHtml($mapsUrl) ?>"><button class="button" type="button" id="maps-lookup-button">Haal gegevens</button></div>
             <p id="maps-lookup-status" class="location-form-note" role="status" aria-live="polite">Plak een Google Maps-link om het adres automatisch op te halen.</p>
             <label for="region_id">Regio *</label>
             <select id="region_id" name="region_id" required>
@@ -129,7 +129,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     <?php endif; ?>
 </section>
 <style>
-.location-form-section{max-width:900px}.location-form-section .auth-form{max-width:760px}.location-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.location-form-grid>div{min-width:0}.location-brand-search{margin:12px 0 18px}.location-brand-search span{display:block;font-size:13px;color:var(--db-muted);margin-top:6px}.location-brand-search img{background:#fff;padding:8px;border:1px solid #ddd;border-radius:6px}.location-form-note,.location-form-section small{font-size:13px;color:var(--db-muted)}@media(max-width:600px){.location-form-grid{grid-template-columns:1fr}}
+.location-form-section{max-width:900px}.location-form-section .auth-form{max-width:760px}.location-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.location-form-grid>div{min-width:0}.location-brand-search{margin:12px 0 18px}.location-brand-search span{display:block;font-size:13px;color:var(--db-muted);margin-top:6px}.location-brand-search img{background:#fff;padding:8px;border:1px solid #ddd;border-radius:6px}.location-form-note,.location-form-section small{font-size:13px;color:var(--db-muted)}.maps-url-row{display:flex;gap:10px;align-items:stretch}.maps-url-row input{flex:1;min-width:0}.maps-url-row button{white-space:nowrap;align-self:flex-start}@media(max-width:600px){.location-form-grid{grid-template-columns:1fr}}
 </style>
 <script>
 (() => {
@@ -196,6 +196,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
    field.addEventListener('change',()=>{lastBrandSearch='';searchLocationBranding();});
   }
  });
+ document.getElementById('maps-lookup-button')?.addEventListener('click',()=>{clearTimeout(timer);lastUrl='';resolveAndSearch();});
  mapsInput.addEventListener('input',()=>{
   clearTimeout(timer);lastUrl='';
   timer=setTimeout(resolveAndSearch,700);
