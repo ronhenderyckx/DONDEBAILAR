@@ -6,6 +6,10 @@ require_once dirname(__DIR__, 2) . '/app/Security.php';
 require_once dirname(__DIR__, 2) . '/app/Locations.php';
 header('Content-Type: application/json; charset=utf-8');
 $user = requireLogin();
+$db = Database::connection();
+if (locationManageableRegions($db, $user) === []) {
+ http_response_code(403); echo json_encode(['success'=>false,'message'=>'Je hebt geen rechten om locaties te beheren.']); exit;
+}
 $input = json_decode((string) file_get_contents('php://input'), true);
 if (!is_array($input) || !verifyCsrfToken($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null)) {
  http_response_code(400); echo json_encode(['success'=>false,'message'=>'Beveiligingscontrole mislukt. Vernieuw de pagina.']); exit;
