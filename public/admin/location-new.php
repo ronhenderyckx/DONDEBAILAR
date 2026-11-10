@@ -49,6 +49,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($errors === []) {
         try {
+            $uploadedLogo = storeUploadedLocationLogo($_FILES['logo_file'] ?? []);
+            $logoPath = $uploadedLogo ?? storeDiscoveredLocationLogo($logoUrl);
             $statement = $db->prepare(
                 "INSERT INTO locations
                     (region_id, name, street, house_number, postal_code, city, country_code,
