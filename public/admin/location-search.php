@@ -118,7 +118,7 @@ function locationSearchFetch(string $url, int $limit = 1500000): string
 try {
     $countryNames = ['ES' => 'Spain', 'BE' => 'Belgium', 'NL' => 'Netherlands', 'FR' => 'France', 'DE' => 'Germany', 'PT' => 'Portugal', 'IT' => 'Italy'];
     $countryName = $countryNames[$countryCode] ?? $countryCode;
-    // Search official sites first, then use a Facebook page as a fallback.
+    // Zoek eerst een eigen website en daarna sociale pagina's.
     $cityNeedle = mb_strtolower($city);
     $findResult = static function (string $searchHtml, string $socialOnly = '') use ($cityNeedle): string {
         if (!preg_match_all('~<a\b[^>]*>.*?</a>~is', $searchHtml, $anchors, PREG_OFFSET_CAPTURE)) return '';
@@ -169,11 +169,6 @@ try {
         $instagramHtml = locationSearchFetch('https://www.google.com/search?hl=es&num=10&q=' . rawurlencode($instagramTerms));
         $website = $findResult($instagramHtml, 'instagram');
         if ($website !== '') $socialType = 'Instagram';
-    }    if ($website === '') {
-        $facebookTerms = 'site:facebook.com "' . $name . '" "' . $city . '" "' . $countryName . '"';
-        $facebookHtml = locationSearchFetch('https://www.google.com/search?hl=es&num=10&q=' . rawurlencode($facebookTerms));
-        $website = $findResult($facebookHtml, true);
-        $isFacebook = $website !== '';
     }
     if ($website === '') {
         throw new RuntimeException('Geen betrouwbare website, Facebook- of Instagrampagina gevonden voor ' . $name . ' in ' . $city . ', ' . $countryName . '. Controleer de gegevens of vul de link handmatig in.');
