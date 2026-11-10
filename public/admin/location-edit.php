@@ -215,6 +215,9 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     mapsMessage+=' Telefoon niet gevonden (Maps HTTP '+data.phone_debug.http_status+', pagina '+data.phone_debug.page_bytes+' bytes).';
    }
    showMapsStatus(mapsMessage,!data.location.phone);
+   // Maps may have just supplied a new venue name/city. Force a fresh Google
+   // search even if the same form values were searched before the Maps lookup.
+   lastBrandSearch='';
    await searchLocationBranding();
   }catch(error){
    lastUrl='';
