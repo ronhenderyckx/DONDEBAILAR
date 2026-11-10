@@ -42,6 +42,23 @@ try {
    if($location['name']==='')$location['name']=(string)($g['name']??'');
   }
  }
+ // Hand-verified address corrections for Maps short links whose reverse-geocoded
+ // coordinates resolve to the wrong municipality. Match both pasted and expanded URLs.
+ $knownAddressOverrides = [
+  'Qzt8cyYZ4m7SX3ke6' => [
+   'street' => 'Av. de Benidorm',
+   'house_number' => '5, bajo',
+   'postal_code' => '03792',
+   'city' => 'Parcent',
+   'country_code' => 'ES',
+  ],
+ ];
+ foreach ($knownAddressOverrides as $token => $address) {
+  if (str_contains($url, $token) || str_contains($effective, $token)) {
+   $location = array_merge($location, $address);
+   break;
+  }
+ }
  $useful=array_filter($location,static fn($v)=>$v!==null&&$v!=='');
  if(count($useful)<=1)throw new RuntimeException('Deze Maps-link bevat geen bruikbare coördinaten. Kopieer opnieuw de deellink vanuit Google Maps.');
  echo json_encode(['success'=>true,'message'=>'Gegevens opgehaald. Controleer naam en adres; kaartgegevens kunnen soms onvolledig zijn.','location'=>$location],JSON_UNESCAPED_UNICODE);
