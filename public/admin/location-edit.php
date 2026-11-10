@@ -212,7 +212,10 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
    }
    let mapsMessage=data.message||'Adresgegevens ingevuld. Controleer het resultaat.';
    if(!data.location.phone&&data.phone_debug){
-    mapsMessage+=' Telefoon niet gevonden (Maps HTTP '+data.phone_debug.http_status+', pagina '+data.phone_debug.page_bytes+' bytes).';
+    mapsMessage+=' Telefoon niet gevonden. Maps HTTP '+data.phone_debug.http_status+' ('+data.phone_debug.page_bytes+' bytes).';
+    if(data.nominatim_debug){
+     mapsMessage+=' Nominatim HTTP '+data.nominatim_debug.http_status+', '+data.nominatim_debug.results+' resultaten in de omgeving.';
+    }
    }
    showMapsStatus(mapsMessage,!data.location.phone);
    // Maps may have just supplied a new venue name/city. Force a fresh Google
