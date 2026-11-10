@@ -135,6 +135,85 @@ try {
         throw new RuntimeException('Google Maps-link bevat te veel doorverwijzingen.');
     }
 
+    // Download the resolved Maps page once. Shared links sometimes contain only a CID,
+    // so the place name/address must also be read from the page metadata and embedded JSON.
+    $mapsPage = $httpGet($finalUrl);
+    $mapsHtml = '';
+    $mapsPhone = '';
+    $mapsPhoneDebug = [
+        'http_status' => (int) $mapsPage['status'],
+        'page_bytes' => strlen((string) $mapsPage['body']),
+    ];
+    if ($mapsPage['status'] >= 200 && $mapsPage['status'] < 300 && $mapsPage['body'] !== '') {
+        $mapsHtml = html_entity_decode((string) $mapsPage['body'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        // Prefer the explicit place title, not the generic Google Maps page title.
+        $metaPatterns = [
+            '~<meta[^>]+(?:property|name)=["\\'](?:og:title|twitter:title)["\\'][^>]+content=["\\']([^"\\']+)["\\']~i',
+            '~<meta[^>]+content=["\\']([^"\\']+)["\\'][^>]+(?:property|name)=["\\'](?:og:title|twitter:title)["\\']~i',
+            '~<title[^>]*>(.*?)</title>~is',
+        ];
+        foreach ($metaPatterns as $metaPattern) {
+            if (preg_match($metaPattern, $mapsHtml, $metaMatch)) {
+                $candidate = trim(html_entity_decode(strip_tags((string) $metaMatch[1]), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                $candidate = preg_replace('/\\s*[-–|]\\s*Google Maps\\s*$/iu', '', $candidate) ?? $candidate;
+                if ($candidate !== '' && stripos($candidate, 'Google Maps') === false) {
+                    $name = $candidate;
+                    break;
+                }
+            }
+        }
+
+        // Structured data, when Google includes it, can contain the complete postal address and phone.
+        if (preg_match_all('~<script[^>]*type=["\\']application/ld\\+json["\\'][^>]*>(.*?)</script>~is', $mapsHtml, $jsonBlocks)) {
+            foreach ($jsonBlocks[1] as $jsonBlock) {
+                $structured = json_decode(html_entity_decode((string) $jsonBlock, ENT_QUOTES | ENT_HTML5, 'UTF-8'), true);
+                if (!is_array($structured)) continue;
+                $items = isset($structured['@graph']) && is_array($structured['@graph']) ? $structured['@graph'] : [$structured];
+                foreach ($items as $item) {
+                    if (!is_array($item)) continue;
+                    if ($name === '' && !empty($item['name']) && is_string($item['name'])) $name = trim($item['name']);
+                    if ($mapsPhone === '' && !empty($item['telephone']) && is_string($item['telephone'])) $mapsPhone = trim($item['telephone']);
+                    $structuredAddress = $item['address'] ?? null;
+                    if (is_array($structuredAddress)) {
+                        $address['street'] = trim((string) ($structuredAddress['streetAddress'] ?? $address['street']));
+                        $address['postal_code'] = trim((string) ($structuredAddress['postalCode'] ?? $address['postal_code']));
+                        $address['city'] = trim((string) ($structuredAddress['addressLocality'] ?? $address['city']));
+                        $country = $structuredAddress['addressCountry'] ?? '';
+                        if (is_array($country)) $country = $country['name'] ?? '';
+                        if (is_string($country) && preg_match('/^[A-Z]{2}$/i', $country)) $address['country_code'] = strtoupper($country);
+                    }
+                }
+            }
+        }
+
+        // Phone numbers occur in several embedded Maps payload formats, not just JSON-LD.
+        if ($mapsPhone === '') {
+            $phonePatterns = [
+                '~"phoneNumber"\\s*:\\s*"((?:\\\\\\\\.|[^"\\\\\\\\])*)"~i',
+                '~"telephone"\\s*:\\s*"((?:\\\\\\\\.|[^"\\\\\\\\])*)"~i',
+                '~"phone"\\s*:\\s*"((?:\\\\\\\\.|[^"\\\\\\\\])*)"~i',
+                '~"phoneNumber"\\s*,\\s*"([^"]+)"~i',
+                '~data-item-id=["\\']phone:tel:([^"\\']+)["\\']~i',
+                '~href=["\\']tel:([^"\\']+)["\\']~i',
+                '~(?:Telefoonnummer|Phone number|Telephone|Tel[eé]fono)\\s*[:：]\\s*(\\+?[0-9][0-9().\\s\\/-]{6,})~iu',
+            ];
+            foreach ($phonePatterns as $phonePattern) {
+                if (!preg_match_all($phonePattern, $mapsHtml, $phoneMatches) || empty($phoneMatches[1])) continue;
+                foreach ($phoneMatches[1] as $rawCandidate) {
+                    $candidatePhone = trim(rawurldecode(stripcslashes((string) $rawCandidate)));
+                    $candidatePhone = preg_replace('/[^\\d+().\\/\\s-]/u', '', $candidatePhone) ?? '';
+                    $digits = preg_replace('/\\D+/', '', $candidatePhone);
+                    if (strlen((string) $digits) >= 7 && strlen((string) $digits) <= 15) {
+                        $mapsPhone = trim($candidatePhone);
+                        break 2;
+                    }
+                }
+            }
+        }
+    }
+    $mapsPhoneDebug['found'] = $mapsPhone !== '';
+
     // Extract the exact place pin first; only use the map viewport as fallback.
     $pair = '(-?\d{1,3}(?:\.\d+)?)';
     $coords = null;
@@ -319,41 +398,8 @@ try {
         }
     }
 
-    // Haal het telefoonnummer uit meerdere bekende Google Maps-formaten.
-    // Google wisselt regelmatig tussen JSON, data-attributen en tel-links.
-    $mapsPhone = '';
-    $mapsPage = $httpGet($finalUrl);
-    $mapsPhoneDebug = [
-        'http_status' => (int) $mapsPage['status'],
-        'page_bytes' => strlen((string) $mapsPage['body']),
-    ];
-    if ($mapsPage['status'] >= 200 && $mapsPage['status'] < 300 && $mapsPage['body'] !== '') {
-        $mapsHtml = html_entity_decode((string) $mapsPage['body'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-        $phonePatterns = [
-            '~"phoneNumber"\s*:\s*"((?:\\\\.|[^"\\\\])*)"~i',
-            '~"telephone"\s*:\s*"((?:\\\\.|[^"\\\\])*)"~i',
-            '~"phone"\s*:\s*"((?:\\\\.|[^"\\\\])*)"~i',
-            '~"phoneNumber"\s*,\s*"([^"]+)"~i',
-            '~"telephone"\s*,\s*"([^"]+)"~i',
-            '~data-item-id=["\']phone:tel:([^"\']+)["\']~i',
-            '~href=["\']tel:([^"\']+)["\']~i',
-            '~aria-label=["\'][^"\']*(?:telefoon|phone|tel[eé]fono)[^"\']*?(\+?[0-9][0-9().\s\/-]{6,})["\']~iu',
-            '~(?:Telefoonnummer|Phone number|Telephone|Tel[eé]fono)\s*[:：]\s*(\+?[0-9][0-9().\s\/-]{6,})~iu',
-        ];
-        foreach ($phonePatterns as $phonePattern) {
-            if (!preg_match_all($phonePattern, $mapsHtml, $phoneMatches) || empty($phoneMatches[1])) continue;
-            foreach ($phoneMatches[1] as $rawCandidate) {
-                $candidatePhone = trim(rawurldecode(stripcslashes((string) $rawCandidate)));
-                $candidatePhone = preg_replace('/[^\d+().\/\s-]/u', '', $candidatePhone) ?? '';
-                $digits = preg_replace('/\D+/', '', $candidatePhone);
-                if (strlen((string) $digits) >= 7 && strlen((string) $digits) <= 15) {
-                    $mapsPhone = trim($candidatePhone);
-                    break 2;
-                }
-            }
-        }
-    }
-    $mapsPhoneDebug['found'] = $mapsPhone !== '';
+    // Phone/name/address were extracted from the same Maps response above.
+
 
     // If the Maps place text is just the street address, do not use it as the venue name.
     if ($name !== '' && $address['street'] !== '' && stripos($name, $address['street']) !== false) {
