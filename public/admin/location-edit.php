@@ -152,6 +152,31 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
  const preview=document.getElementById('brand-logo-preview');
  if(!mapsInput||!csrf||!logoField||!preview)return;
  let timer=null, lastUrl='';
+ let lastBrandSearch='';
+ async function searchLocationBranding(){
+  const name=document.getElementById('name')?.value.trim()||'';
+  const city=document.getElementById('city')?.value.trim()||'';
+  const countryCode=document.getElementById('country_code')?.value.trim().toUpperCase()||'';
+  if(!name||!city||!/^[A-Z]{2}$/.test(countryCode))return;
+  const searchKey=[name,city,countryCode].join('|');
+  if(searchKey===lastBrandSearch)return;
+  lastBrandSearch=searchKey;
+  try{
+   const search=await fetch('/admin/location-search.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({name,city,country_code:countryCode})});
+   const result=await search.json();
+   if(!search.ok||!result.success){lastBrandSearch='';return;}
+   const website=document.getElementById('website_url');
+   if(website&&result.website_url)website.value=result.website_url;
+   if(result.logo_url){
+    logoField.value=result.logo_url;
+    const img=document.createElement('img');
+    img.src=result.logo_url;img.alt='Locatielogo';img.referrerPolicy='no-referrer';
+    img.style='max-width:180px;max-height:100px;object-fit:contain;display:block;margin-top:8px';
+    img.onerror=()=>{logoField.value='';img.remove();};
+    preview.replaceChildren(img);
+   }
+  }catch(error){lastBrandSearch='';}
+ }
  async function resolveAndSearch(){
   const url=mapsInput.value.trim();
   if(!url||url===lastUrl)return;
@@ -178,26 +203,18 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
      if(el)el.value=value;
     }
    }
-   const name=document.getElementById('name')?.value.trim()||'';
-   const city=document.getElementById('city')?.value.trim()||'';
-   if(!name)return;
-   const search=await fetch('/admin/location-search.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({name,city,country_code:document.getElementById('country_code')?.value.trim()||''})});
-   const result=await search.json();
-   if(!search.ok||!result.success)return;
-   const website=document.getElementById('website_url');
-   if(website&&result.website_url)website.value=result.website_url;
-   if(result.logo_url){
-    logoField.value=result.logo_url;
-    const img=document.createElement('img');
-    img.src=result.logo_url;img.alt='Locatielogo';img.referrerPolicy='no-referrer';
-    img.style='max-width:180px;max-height:100px;object-fit:contain;display:block;margin-top:8px';
-    img.onerror=()=>{logoField.value='';img.remove();};
-    preview.replaceChildren(img);
-   }
+   await searchLocationBranding();
   }catch(error){
    // Automatisch ophalen blijft stil; handmatige invoer blijft mogelijk.
   }
  }
+ ['name','city','country_code'].forEach(id=>{
+  const field=document.getElementById(id);
+  if(field){
+   field.addEventListener('input',()=>{lastBrandSearch='';searchLocationBranding();});
+   field.addEventListener('change',()=>{lastBrandSearch='';searchLocationBranding();});
+  }
+ });
  mapsInput.addEventListener('input',()=>{
   clearTimeout(timer);
   timer=setTimeout(resolveAndSearch,700);
