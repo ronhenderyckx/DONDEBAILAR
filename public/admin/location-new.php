@@ -5,6 +5,7 @@ require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
 require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
 require_once dirname(__DIR__, 2) . '/app/Locations.php';
+require_once dirname(__DIR__, 2) . '/app/LocationBranding.php';
 
 $user = requireLogin();
 $db = Database::connection();
@@ -25,6 +26,7 @@ $countryCode = strtoupper(trim((string) ($_POST['country_code'] ?? ($region['cou
 $mapsUrl = trim((string) ($_POST['google_maps_url'] ?? ''));
 $phone = trim((string) ($_POST['phone'] ?? ''));
 $website = trim((string) ($_POST['website_url'] ?? ''));
+$logoUrl = trim((string) ($_POST['discovered_logo_url'] ?? ''));
 $latitude = trim((string) ($_POST['latitude'] ?? ''));
 $longitude = trim((string) ($_POST['longitude'] ?? ''));
 $notes = trim((string) ($_POST['notes'] ?? ''));
@@ -50,10 +52,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $statement = $db->prepare(
                 "INSERT INTO locations
                     (region_id, name, street, house_number, postal_code, city, country_code,
-                     latitude, longitude, google_maps_url, phone, website_url, notes, is_active, created_by)
+                     latitude, longitude, google_maps_url, phone, website_url, logo_path, notes, is_active, created_by)
                  VALUES
                     (:region_id, :name, :street, :house_number, :postal_code, :city, :country_code,
-                     :latitude, :longitude, :google_maps_url, :phone, :website_url, :notes, :is_active, :created_by)"
+                      :latitude, :longitude, :google_maps_url, :phone, :website_url, :logo_path, :notes, :is_active, :created_by)"
             );
             $statement->execute([
                 'region_id' => $regionId, 'name' => $name,
@@ -66,6 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'google_maps_url' => $mapsUrl !== '' ? $mapsUrl : null,
                 'phone' => $phone !== '' ? $phone : null,
                 'website_url' => $website !== '' ? $website : null,
+                'logo_path' => storeDiscoveredLocationLogo($logoUrl),
                 'notes' => $notes !== '' ? $notes : null,
                 'is_active' => $isActive ? 1 : 0, 'created_by' => (int) $user['id'],
             ]);
@@ -112,6 +115,8 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 <div><label for="longitude">Lengtegraad</label><input id="longitude" name="longitude" type="number" step="any" min="-180" max="180" value="<?= escapeHtml($longitude) ?>"></div>
             </div>
             <label for="website_url">Website</label><input id="website_url" name="website_url" type="url" maxlength="500" value="<?= escapeHtml($website) ?>" placeholder="https://">
+            <input type="hidden" id="discovered_logo_url" name="discovered_logo_url" value="<?= escapeHtml($logoUrl) ?>">
+            <div class="location-brand-search"><button class="button" type="button" id="search-location-brand">Website en logo zoeken</button><span id="brand-search-status" role="status" aria-live="polite"></span><div id="brand-logo-preview"></div></div>
             <label for="notes">Opmerkingen</label><textarea id="notes" name="notes" rows="5"><?= escapeHtml($notes) ?></textarea>
             <label class="checkbox-label"><input type="checkbox" name="is_active" value="1" <?= $isActive ? 'checked' : '' ?>> Actieve locatie</label>
             <div class="form-actions"><button class="button button--primary" type="submit">Locatie opslaan</button><a class="button" href="/admin/locations.php">Annuleren</a></div>
@@ -120,7 +125,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     <?php endif; ?>
 </section>
 <style>
-.location-form-section{max-width:900px}.location-form-section .auth-form{max-width:760px}.location-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.location-form-grid>div{min-width:0}.location-form-note,.location-form-section small{font-size:13px;color:var(--db-muted)}@media(max-width:600px){.location-form-grid{grid-template-columns:1fr}}
+.location-form-section{max-width:900px}.location-form-section .auth-form{max-width:760px}.location-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}.location-form-grid>div{min-width:0}.location-brand-search{margin:12px 0 18px}.location-brand-search span{display:block;font-size:13px;color:var(--db-muted);margin-top:6px}.location-brand-search img{background:#fff;padding:8px;border:1px solid #ddd;border-radius:6px}.location-form-note,.location-form-section small{font-size:13px;color:var(--db-muted)}@media(max-width:600px){.location-form-grid{grid-template-columns:1fr}}
 </style>
 <script>
 (() => {
@@ -139,4 +144,36 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
  });
 })();
 </script>
+
+<script>
+(() => {
+ const button=document.getElementById('search-location-brand');
+ const status=document.getElementById('brand-search-status');
+ const logoField=document.getElementById('discovered_logo_url');
+ const preview=document.getElementById('brand-logo-preview');
+ if(!button||!status||!logoField||!preview)return;
+ button.addEventListener('click',async()=>{
+  const name=document.getElementById('name')?.value.trim()||'';
+  const city=document.getElementById('city')?.value.trim()||'';
+  if(!name){status.textContent='Vul eerst de locatienaam in.';return;}
+  button.disabled=true;status.textContent='Gratis zoeken naar website en logo…';preview.replaceChildren();logoField.value='';
+  try{
+   const response=await fetch('/admin/location-search.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="csrf_token"]').value},body:JSON.stringify({name,city})});
+   const data=await response.json();
+   if(!response.ok||!data.success)throw new Error(data.message||'Zoeken is mislukt.');
+   document.getElementById('website_url').value=data.website_url||'';
+   if(data.logo_url){
+    logoField.value=data.logo_url;
+    const img=document.createElement('img');img.src=data.logo_url;img.alt='Voorbeeld gevonden locatielogo';img.referrerPolicy='no-referrer';img.style='max-width:180px;max-height:100px;object-fit:contain;display:block;margin-top:8px';
+    img.onerror=()=>{preview.textContent='Website gevonden, maar het logo kon niet worden getoond.';logoField.value='';};
+    preview.appendChild(img);
+    const note=document.createElement('small');note.textContent='Logo gevonden. Het wordt bij opslaan lokaal bewaard.';preview.appendChild(note);
+   }else{preview.textContent='Website gevonden, maar er werd geen logo-afbeelding gevonden.';}
+   status.textContent=data.message||'Website gevonden.';
+  }catch(error){status.textContent=error.message||'Zoeken is mislukt.';}
+  finally{button.disabled=false;}
+ });
+})();
+</script>
+
 <?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
