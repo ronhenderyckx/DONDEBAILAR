@@ -195,10 +195,24 @@ try {
         try {
             $phoneHtml = locationSearchFetch('https://www.google.com/search?hl=es&num=10&q=' . rawurlencode($phoneTerms));
             $phoneText = html_entity_decode(strip_tags($phoneHtml), ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            if (preg_match('~(?:tel(?:éfono|efono)?|phone|contacto|call|llamar)\D{0,35}(\+?[0-9][0-9\s()./-]{6,24}[0-9])~iu', $phoneText, $phoneMatch)) {
-                $candidatePhone = trim($phoneMatch[1]);
-                $digits = preg_replace('/\D+/', '', $candidatePhone);
-                if (strlen((string) $digits) >= 7 && strlen((string) $digits) <= 15) $phone = $candidatePhone;
+            // Google-result snippets can show the phone before its label,
+            // or show a Spanish 9-digit number without any label.
+            $phonePatterns = [
+                '~(?:tel(?:éfono|efono)?|phone|contacto|call|llamar)\\D{0,45}(\\+?[0-9][0-9\\s()./-]{6,24}[0-9])~iu',
+                '~(\\+?[0-9][0-9\\s()./-]{6,24}[0-9])\\D{0,45}(?:tel(?:éfono|efono)?|phone|contacto|call|llamar)~iu',
+                '~(?:\\+34[\\s.-]?)?[6789](?:[\\s.-]?[0-9]){8}~u',
+            ];
+            foreach ($phonePatterns as $phonePattern) {
+                if (!preg_match_all($phonePattern, $phoneText, $phoneMatches)) continue;
+                $candidates = $phoneMatches[1] ?? $phoneMatches[0];
+                foreach ($candidates as $rawPhone) {
+                    $candidatePhone = trim((string) $rawPhone);
+                    $digits = preg_replace('/\\D+/', '', $candidatePhone);
+                    if (strlen((string) $digits) >= 9 && strlen((string) $digits) <= 15) {
+                        $phone = $candidatePhone;
+                        break 2;
+                    }
+                }
             }
         } catch (Throwable $ignored) {
             // Telefoon zoeken mag de website- en logovondst niet blokkeren.
