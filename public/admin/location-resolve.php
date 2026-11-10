@@ -319,6 +319,31 @@ try {
         }
     }
 
+    // Google Maps bevat het telefoonnummer vaak in de ingebedde place-data.
+    // Lees de uiteindelijke Maps-pagina uit en haal alleen expliciete telefoonvelden op.
+    $mapsPhone = '';
+    $mapsPage = $httpGet($finalUrl);
+    if ($mapsPage['status'] >= 200 && $mapsPage['status'] < 300 && $mapsPage['body'] !== '') {
+        $mapsHtml = html_entity_decode($mapsPage['body'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $phonePatterns = [
+            '~"phoneNumber"\s*:\s*"((?:\\\\.|[^"\\\\])*)"~i',
+            '~"telephone"\s*:\s*"((?:\\\\.|[^"\\\\])*)"~i',
+            '~"phone"\s*:\s*"((?:\\\\.|[^"\\\\])*)"~i',
+            '~href=["\']tel:([^"\']+)["\']~i',
+        ];
+        foreach ($phonePatterns as $phonePattern) {
+            if (!preg_match($phonePattern, $mapsHtml, $phoneMatch)) continue;
+            $candidatePhone = stripcslashes((string) $phoneMatch[1]);
+            $candidatePhone = trim(rawurldecode($candidatePhone));
+            $candidatePhone = preg_replace('/[^\d+().\/\s-]/u', '', $candidatePhone) ?? '';
+            $digits = preg_replace('/\D+/', '', $candidatePhone);
+            if (strlen((string) $digits) >= 7 && strlen((string) $digits) <= 15) {
+                $mapsPhone = trim($candidatePhone);
+                break;
+            }
+        }
+    }
+
     // If the Maps place text is just the street address, do not use it as the venue name.
     if ($name !== '' && $address['street'] !== '' && stripos($name, $address['street']) !== false) {
         $name = '';
@@ -331,6 +356,7 @@ try {
         'postal_code' => '',
         'city' => '',
         'country_code' => '',
+        'phone' => $mapsPhone,
         'latitude' => $coords[0] ?? null,
         'longitude' => $coords[1] ?? null,
     ], $address);
