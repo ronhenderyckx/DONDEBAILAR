@@ -38,11 +38,13 @@ if (str_contains($url, 'Qzt8cyYZ4m7SX3ke6')) {
 if(!function_exists('curl_init')){http_response_code(503);echo json_encode(['success'=>false,'message'=>'Automatisch ophalen is niet beschikbaar: cURL ontbreekt op de server.']);exit;}
 try {
  $ch=curl_init($url);
- curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_FOLLOWLOCATION=>true,CURLOPT_MAXREDIRS=>6,CURLOPT_CONNECTTIMEOUT=>8,CURLOPT_TIMEOUT=>15,CURLOPT_USERAGENT=>'DONDEBAILAR location resolver/1.0',CURLOPT_RANGE=>'0-2048',CURLOPT_PROTOCOLS=>CURLPROTO_HTTP|CURLPROTO_HTTPS,CURLOPT_REDIR_PROTOCOLS=>CURLPROTO_HTTP|CURLPROTO_HTTPS]);
- curl_exec($ch);$effective=(string)curl_getinfo($ch,CURLINFO_EFFECTIVE_URL);curl_close($ch);
+ curl_setopt_array($ch,[CURLOPT_RETURNTRANSFER=>true,CURLOPT_FOLLOWLOCATION=>true,CURLOPT_MAXREDIRS=>10,CURLOPT_CONNECTTIMEOUT=>10,CURLOPT_TIMEOUT=>25,CURLOPT_USERAGENT=>'Mozilla/5.0 (compatible; DONDEBAILAR/1.0; location lookup)',CURLOPT_PROTOCOLS=>CURLPROTO_HTTP|CURLPROTO_HTTPS,CURLOPT_REDIR_PROTOCOLS=>CURLPROTO_HTTP|CURLPROTO_HTTPS]);
+ $responseBody=curl_exec($ch);$curlError=curl_error($ch);$httpStatus=(int)curl_getinfo($ch,CURLINFO_HTTP_CODE);$effective=(string)curl_getinfo($ch,CURLINFO_EFFECTIVE_URL);curl_close($ch);
+ if($responseBody===false||$effective==='')throw new RuntimeException('Google Maps-link kon niet worden opgehaald'.($curlError!==''?': '.$curlError:'.'));
+ if($httpStatus>=400)throw new RuntimeException('Google Maps gaf een foutmelding (HTTP '.$httpStatus.'). Controleer of de link openbaar gedeeld is.');
  if($effective==='')throw new RuntimeException('Google Maps-link kon niet worden geopend.');
  $parts=parse_url($effective);$host=strtolower((string)($parts['host']??''));
- if(!in_array($host,['google.com','www.google.com','maps.google.com'],true))throw new RuntimeException('De link verwijst niet naar een herkenbare Google Maps-pagina.');
+ if(!in_array($host,['google.com','www.google.com','maps.google.com','maps.app.goo.gl','goo.gl'],true))throw new RuntimeException('De link verwijst niet naar een herkenbare Google Maps-pagina.');
  $lat=null;$lon=null;
  // Prefer the exact place coordinates (!3d/!4d) over the map viewport center (@lat,lon).
  if(preg_match('/!3d(-?\d{1,3}(?:\.\d+)?)!4d(-?\d{1,3}(?:\.\d+)?)/',$effective,$m)||preg_match('/@(-?\d{1,3}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)/',$effective,$m)){$lat=(float)$m[1];$lon=(float)$m[2];}
@@ -79,6 +81,6 @@ try {
   }
  }
  $useful=array_filter($location,static fn($v)=>$v!==null&&$v!=='');
- if(count($useful)<=1)throw new RuntimeException('Deze Maps-link bevat geen bruikbare coördinaten. Kopieer opnieuw de deellink vanuit Google Maps.');
+ if(count($useful)<=1)throw new RuntimeException('Google Maps heeft geen plaatsgegevens of coördinaten meegestuurd. Open de locatie in Google Maps en kies Delen > Link kopiëren.');
  echo json_encode(['success'=>true,'message'=>'Gegevens opgehaald. Controleer naam en adres; kaartgegevens kunnen soms onvolledig zijn.','location'=>$location],JSON_UNESCAPED_UNICODE);
 } catch(Throwable $e){http_response_code(422);echo json_encode(['success'=>false,'message'=>$e->getMessage()],JSON_UNESCAPED_UNICODE);}
