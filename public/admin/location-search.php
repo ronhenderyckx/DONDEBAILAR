@@ -95,7 +95,8 @@ try {
     try { $siteHtml = locationSearchFetch($website); } catch (Throwable $ignored) {}
     $logo = '';
     if ($siteHtml !== '') {
-        if (preg_match('~(?:"|\\\')logo(?:"|\\\')\\s*:\\s*(?:"|\\\')([^"\\\']+)~i', $siteHtml, $m)) {
+        $jsonLogoPattern = "~(?:\\\"|\\\')logo(?:\\\"|\\\')\\\\s*:\\\\s*(?:\\\"|\\\')([^\\\"\\\']+)~i";
+        if (preg_match($jsonLogoPattern, $siteHtml, $m)) {
             $logo = html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
         } elseif (preg_match('~<meta[^>]+(?:property|name)=["\'](?:og:image|twitter:image)["\'][^>]+content=["\']([^"\']+)~i', $siteHtml, $m)
             || preg_match('~<meta[^>]+content=["\']([^"\']+)["\'][^>]+(?:property|name)=["\'](?:og:image|twitter:image)["\']~i', $siteHtml, $m)) {
