@@ -176,6 +176,7 @@ try {
     $mapsHtml = '';
     if ($mapsPage['status'] >= 200 && $mapsPage['status'] < 300 && $mapsPage['body'] !== '') {
         $mapsHtml = html_entity_decode((string) $mapsPage['body'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    }
 
     // Extract the exact place pin first; only use the map viewport as fallback.
     $pair = '(-?\d{1,3}(?:\.\d+)?)';
