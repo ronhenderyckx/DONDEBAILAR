@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'google_maps_url' => $mapsUrl !== '' ? $mapsUrl : null,
                 'phone' => $phone !== '' ? $phone : null,
                 'website_url' => $website !== '' ? $website : null,
-                'logo_path' => storeDiscoveredLocationLogo($logoUrl),
+                'logo_path' => $logoPath,
                 'notes' => $notes !== '' ? $notes : null,
                 'is_active' => $isActive ? 1 : 0, 'id' => $id, 'region_id' => $regionId,
             ]);
@@ -109,7 +109,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     </div>
     <?php foreach ($errors as $error): ?><div class="message message--error"><?= escapeHtml($error) ?></div><?php endforeach; ?>
     <section class="admin-section location-form-section">
-        <form method="post" class="auth-form">
+        <form method="post" enctype="multipart/form-data" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="name">Naam locatie *</label><input id="name" name="name" maxlength="190" required value="<?= escapeHtml($name) ?>">
             <label for="google_maps_url">Google Maps-link</label><input id="google_maps_url" name="google_maps_url" type="url" maxlength="700" value="<?= escapeHtml($mapsUrl) ?>" placeholder="https://maps.google.com/?cid=...">
@@ -128,7 +128,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <?php if (preg_match('~\\Auploads/locations/[a-f0-9]{32}\\.(?:jpg|png|webp)\\z~D', (string) ($location['logo_path'] ?? ''))): ?>
                 <div class="current-location-logo"><img src="/location-logo.php?file=<?= rawurlencode(basename((string) $location['logo_path'])) ?>" alt="Huidig locatielogo"></div>
             <?php endif; ?>
-            <input type="hidden" id="discovered_logo_url" name="discovered_logo_url" value="<?= escapeHtml($logoUrl) ?>">
+            <label for="logo_file">Logo uploaden (PNG, JPG of WebP – maximaal 5 MB)</label>\n            <input id="logo_file" name="logo_file" type="file" accept="image/png,image/jpeg,image/webp">\n            <input type="hidden" id="discovered_logo_url" name="discovered_logo_url" value="<?= escapeHtml($logoUrl) ?>">
             <div class="location-brand-search"><button class="button" type="button" id="search-location-brand">Website en logo zoeken</button><span id="brand-search-status" role="status" aria-live="polite"></span><div id="brand-logo-preview"></div></div>
             <label for="notes">Opmerkingen</label><textarea id="notes" name="notes" rows="5"><?= escapeHtml($notes) ?></textarea>
             <label class="checkbox-label"><input type="checkbox" name="is_active" value="1" <?= $isActive ? 'checked' : '' ?>> Actieve locatie</label>
