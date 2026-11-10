@@ -319,30 +319,41 @@ try {
         }
     }
 
-    // Google Maps bevat het telefoonnummer vaak in de ingebedde place-data.
-    // Lees de uiteindelijke Maps-pagina uit en haal alleen expliciete telefoonvelden op.
+    // Haal het telefoonnummer uit meerdere bekende Google Maps-formaten.
+    // Google wisselt regelmatig tussen JSON, data-attributen en tel-links.
     $mapsPhone = '';
     $mapsPage = $httpGet($finalUrl);
+    $mapsPhoneDebug = [
+        'http_status' => (int) $mapsPage['status'],
+        'page_bytes' => strlen((string) $mapsPage['body']),
+    ];
     if ($mapsPage['status'] >= 200 && $mapsPage['status'] < 300 && $mapsPage['body'] !== '') {
-        $mapsHtml = html_entity_decode($mapsPage['body'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $mapsHtml = html_entity_decode((string) $mapsPage['body'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $phonePatterns = [
             '~"phoneNumber"\s*:\s*"((?:\\\\.|[^"\\\\])*)"~i',
             '~"telephone"\s*:\s*"((?:\\\\.|[^"\\\\])*)"~i',
             '~"phone"\s*:\s*"((?:\\\\.|[^"\\\\])*)"~i',
+            '~"phoneNumber"\s*,\s*"([^"]+)"~i',
+            '~"telephone"\s*,\s*"([^"]+)"~i',
+            '~data-item-id=["\']phone:tel:([^"\']+)["\']~i',
             '~href=["\']tel:([^"\']+)["\']~i',
+            '~aria-label=["\'][^"\']*(?:telefoon|phone|tel[eé]fono)[^"\']*?(\+?[0-9][0-9().\s\/-]{6,})["\']~iu',
+            '~(?:Telefoonnummer|Phone number|Telephone|Tel[eé]fono)\s*[:：]\s*(\+?[0-9][0-9().\s\/-]{6,})~iu',
         ];
         foreach ($phonePatterns as $phonePattern) {
-            if (!preg_match($phonePattern, $mapsHtml, $phoneMatch)) continue;
-            $candidatePhone = stripcslashes((string) $phoneMatch[1]);
-            $candidatePhone = trim(rawurldecode($candidatePhone));
-            $candidatePhone = preg_replace('/[^\d+().\/\s-]/u', '', $candidatePhone) ?? '';
-            $digits = preg_replace('/\D+/', '', $candidatePhone);
-            if (strlen((string) $digits) >= 7 && strlen((string) $digits) <= 15) {
-                $mapsPhone = trim($candidatePhone);
-                break;
+            if (!preg_match_all($phonePattern, $mapsHtml, $phoneMatches) || empty($phoneMatches[1])) continue;
+            foreach ($phoneMatches[1] as $rawCandidate) {
+                $candidatePhone = trim(rawurldecode(stripcslashes((string) $rawCandidate)));
+                $candidatePhone = preg_replace('/[^\d+().\/\s-]/u', '', $candidatePhone) ?? '';
+                $digits = preg_replace('/\D+/', '', $candidatePhone);
+                if (strlen((string) $digits) >= 7 && strlen((string) $digits) <= 15) {
+                    $mapsPhone = trim($candidatePhone);
+                    break 2;
+                }
             }
         }
     }
+    $mapsPhoneDebug['found'] = $mapsPhone !== '';
 
     // If the Maps place text is just the street address, do not use it as the venue name.
     if ($name !== '' && $address['street'] !== '' && stripos($name, $address['street']) !== false) {
@@ -376,6 +387,7 @@ try {
         'success' => true,
         'message' => 'Gegevens opgehaald met de Google Maps-methode. Controleer het adres.',
         'location' => $location,
+        'phone_debug' => $mapsPhoneDebug,
     ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
 } catch (Throwable $e) {
     http_response_code(422);
