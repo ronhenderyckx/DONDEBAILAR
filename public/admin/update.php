@@ -133,6 +133,20 @@ function migrateOrganizerRegions(PDO $db): void
     if ((int) $index === 0) {
         $db->exec("CREATE INDEX idx_organizers_region_id ON organizers (region_id)");
     }
+
+    // Bij een installatie met precies één actieve regio horen bestaande
+    // organisatoren automatisch bij die regio. Bij meerdere regio's blijft
+    // toewijzing bewust aan de platformbeheerder.
+    $activeRegions = $db->query(
+        "SELECT id FROM regions WHERE is_active = 1 ORDER BY id"
+    )->fetchAll(PDO::FETCH_COLUMN);
+
+    if (count($activeRegions) === 1) {
+        $assignExisting = $db->prepare(
+            "UPDATE organizers SET region_id = :region_id WHERE region_id IS NULL"
+        );
+        $assignExisting->execute(['region_id' => (int) $activeRegions[0]]);
+    }
 }
 
 try {
