@@ -105,7 +105,7 @@ if ($regionId > 0) {
         $params['search_description'] = $term;
         $params['search_organizer'] = $term;
     }
-    $sql .= " ORDER BY e.starts_at ASC, e.id ASC LIMIT 500";
+    $sql .= " ORDER BY e.starts_at ASC, e.id ASC";
     $eventQuery = $db->prepare($sql);
     $eventQuery->execute($params);
     $events = $eventQuery->fetchAll();
