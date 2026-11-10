@@ -773,3 +773,5 @@ p {
         transition-duration: .01ms !important;
     }
 }
+
+.site-menu__admin{margin:2px 0}.site-menu__admin>summary{padding:10px 12px;border-radius:7px;color:var(--db-text);font-size:14px;font-weight:650;cursor:pointer;list-style:none}.site-menu__admin>summary::-webkit-details-marker{display:none}.site-menu__admin>summary::after{content:"＋";float:right;color:var(--db-muted)}.site-menu__admin[open]>summary::after{content:"−"}.site-menu__admin>summary:hover{background:#F3F6F9;color:var(--db-primary)}.site-menu__admin>a{display:block;padding:8px 12px 8px 24px;border-radius:7px;color:var(--db-text);font-size:13px}.site-menu__admin>a:hover{background:#F3F6F9;color:var(--db-primary)}
