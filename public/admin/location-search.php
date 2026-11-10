@@ -22,7 +22,8 @@ if (!is_array($input) || !verifyCsrfToken($_SERVER['HTTP_X_CSRF_TOKEN'] ?? null)
 }
 $name = trim((string) ($input['name'] ?? ''));
 $city = trim((string) ($input['city'] ?? ''));
-if ($name === '' || mb_strlen($name) > 190 || mb_strlen($city) > 120) {
+$countryCode = strtoupper(trim((string) ($input['country_code'] ?? '')));
+if ($name === '' || mb_strlen($name) > 190 || mb_strlen($city) > 120 || !preg_match('/\\A[A-Z]{2}\\z/', $countryCode)) {
     http_response_code(422);
     echo json_encode(['success' => false, 'message' => 'Vul eerst de naam van de locatie in en eventueel de gemeente.']);
     exit;
@@ -66,13 +67,22 @@ function locationSearchFetch(string $url, int $limit = 1500000): string
 }
 
 try {
-    $query = rawurlencode($name . ($city !== '' ? ' ' . $city : '') . ' officiële website');
+    $countryNames = ['ES' => 'Spain', 'BE' => 'Belgium', 'NL' => 'Netherlands', 'FR' => 'France', 'DE' => 'Germany', 'PT' => 'Portugal', 'IT' => 'Italy'];
+    $countryName = $countryNames[$countryCode] ?? $countryCode;
+    // Search explicitly with municipality AND country; never silently accept the first unrelated result.
+    $searchTerms = '"' . $name . '" "' . $city . '" "' . $countryName . '" official website';
+    $query = rawurlencode($searchTerms);
     $html = locationSearchFetch('https://html.duckduckgo.com/html/?q=' . $query);
     $website = '';
-    if (preg_match_all('~class="result__a"[^>]*href="([^"]+)"~i', $html, $matches)) {
-        foreach ($matches[1] as $href) {
-            $href = html_entity_decode($href, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            $candidate = str_starts_with($href, '//') ? 'https:' . $href : $href;
+    $cityNeedle = mb_strtolower($city);
+    if (preg_match_all('~<div[^>]+class="[^"]*result[^"]*"[^>]*>.*?</div>\\s*</div>~is', $html, $blocks)) {
+        foreach ($blocks[0] as $block) {
+            if (!preg_match('~class="result__a"[^>]*href="([^"]+)"~i', $block, $linkMatch)) continue;
+            $resultText = html_entity_decode(strip_tags($block), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            // Require the exact municipality to appear in the search result title/snippet.
+            if (!str_contains(mb_strtolower($resultText), $cityNeedle)) continue;
+            $candidate = html_entity_decode($linkMatch[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            if (str_starts_with($candidate, '//')) $candidate = 'https:' . $candidate;
             $parts = parse_url($candidate);
             if (isset($parts['query'])) {
                 parse_str($parts['query'], $params);
@@ -81,16 +91,15 @@ try {
             $candidateParts = parse_url($candidate);
             $host = strtolower((string) ($candidateParts['host'] ?? ''));
             if (in_array(strtolower((string) ($candidateParts['scheme'] ?? '')), ['http', 'https'], true)
-                && $host !== '' && !preg_match('/(^|\.)(duckduckgo\.com|facebook\.com|instagram\.com|tripadvisor\.[a-z.]+)$/i', $host)) {
+                && $host !== '' && !preg_match('/(^|\\.)(duckduckgo\\.com|facebook\\.com|instagram\\.com|tripadvisor\\.[a-z.]+)$/i', $host)) {
                 $website = $candidate;
                 break;
             }
         }
     }
     if ($website === '') {
-        throw new RuntimeException('Geen website gevonden. Probeer een specifiekere locatienaam.');
+        throw new RuntimeException('Geen betrouwbare website gevonden voor deze locatienaam in gemeente ' . $city . ', ' . $countryName . '. Controleer de gemeente of vul de website handmatig in.');
     }
-
     $siteHtml = '';
     try { $siteHtml = locationSearchFetch($website); } catch (Throwable $ignored) {}
     $logo = '';
