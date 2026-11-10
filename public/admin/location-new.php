@@ -158,7 +158,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
   if(!name){status.textContent='Vul eerst de locatienaam in.';return;}
   button.disabled=true;status.textContent='Gratis zoeken naar website en logo…';preview.replaceChildren();logoField.value='';
   try{
-   const response=await fetch('/admin/location-search.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="csrf_token"]').value},body:JSON.stringify({name,city})});
+   const response=await fetch('/admin/location-search.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':document.querySelector('input[name="csrf_token"]').value},body:JSON.stringify({name,city,country_code:document.getElementById('country_code')?.value.trim()||''})});
    const data=await response.json();
    if(!response.ok||!data.success)throw new Error(data.message||'Zoeken is mislukt.');
    document.getElementById('website_url').value=data.website_url||'';
