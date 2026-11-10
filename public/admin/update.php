@@ -74,23 +74,34 @@ function runRequiredGit(array $arguments, string $workingDirectory): string
  */
 function migrateDuplicateUserEmails(PDO $db): void
 {
-    $statement = $db->query(
-        "SELECT s.INDEX_NAME
-         FROM information_schema.STATISTICS s
-         WHERE s.TABLE_SCHEMA = DATABASE()
-           AND s.TABLE_NAME = 'users'
-           AND s.NON_UNIQUE = 0
-         GROUP BY s.INDEX_NAME
-         HAVING COUNT(*) = 1
-            AND MAX(s.COLUMN_NAME) = 'email'"
-    );
+    // SHOW INDEX leest de daadwerkelijke indexdefinitie van de actieve database.
+    $rows = $db->query('SHOW INDEX FROM `users`')->fetchAll(PDO::FETCH_ASSOC);
+    $indexes = [];
 
-    foreach ($statement->fetchAll(PDO::FETCH_COLUMN) as $indexName) {
-        if (!is_string($indexName) || !preg_match('/^[A-Za-z0-9_]+$/', $indexName)) {
+    foreach ($rows as $row) {
+        $name = (string) ($row['Key_name'] ?? '');
+        if ($name === '' || !isset($row['Column_name'])) {
             continue;
         }
 
-        $db->exec('ALTER TABLE users DROP INDEX `' . $indexName . '`');
+        $indexes[$name][] = [
+            'column' => (string) $row['Column_name'],
+            'unique' => (int) ($row['Non_unique'] ?? 1) === 0,
+        ];
+    }
+
+    foreach ($indexes as $indexName => $columns) {
+        // Alleen een UNIQUE-index die uitsluitend uit users.email bestaat verwijderen.
+        if (
+            count($columns) !== 1
+            || $columns[0]['column'] !== 'email'
+            || !$columns[0]['unique']
+            || !preg_match('/^[A-Za-z0-9_]+$/', $indexName)
+        ) {
+            continue;
+        }
+
+        $db->exec('ALTER TABLE `users` DROP INDEX `' . $indexName . '`');
     }
 }
 
