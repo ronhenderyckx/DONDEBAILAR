@@ -25,7 +25,8 @@ try {
  $parts=parse_url($effective);$host=strtolower((string)($parts['host']??''));
  if(!in_array($host,['google.com','www.google.com','maps.google.com'],true))throw new RuntimeException('De link verwijst niet naar een herkenbare Google Maps-pagina.');
  $lat=null;$lon=null;
- if(preg_match('/@(-?\d{1,3}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)/',$effective,$m)||preg_match('/!3d(-?\d{1,3}(?:\.\d+)?)!4d(-?\d{1,3}(?:\.\d+)?)/',$effective,$m)){$lat=(float)$m[1];$lon=(float)$m[2];}
+ // Prefer the exact place coordinates (!3d/!4d) over the map viewport center (@lat,lon).
+ if(preg_match('/!3d(-?\d{1,3}(?:\.\d+)?)!4d(-?\d{1,3}(?:\.\d+)?)/',$effective,$m)||preg_match('/@(-?\d{1,3}(?:\.\d+)?),(-?\d{1,3}(?:\.\d+)?)/',$effective,$m)){$lat=(float)$m[1];$lon=(float)$m[2];}
  $name='';if(preg_match('~/place/([^/?]+)~',(string)($parts['path']??''),$m))$name=trim(rawurldecode(str_replace('+',' ',$m[1])));
  $location=['name'=>$name,'latitude'=>$lat,'longitude'=>$lon];
  if($lat!==null&&$lon!==null&&$lat>=-90&&$lat<=90&&$lon>=-180&&$lon<=180){
