@@ -181,19 +181,26 @@ try {
     ];
     if ($mapsPage['status'] >= 200 && $mapsPage['status'] < 300 && $mapsPage['body'] !== '') {
         $mapsHtml = html_entity_decode((string) $mapsPage['body'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        // Google Maps kan delen van zijn ingesloten gegevens URL- of JSON-escaped leveren.
+        $mapsSearchText = str_replace(
+            ['\\u003a', '\\u002b', '\\u002d', '\\u002f', '\\u003d', '&#43;'],
+            [':', '+', '-', '/', '=', '+'],
+            rawurldecode($mapsHtml)
+        );
 
-        // Search the raw Maps payload using PHP single-quoted regexes.
-        // Keep regex escapes single: PHP preserves backslashes in single-quoted strings.
+        // Zoek zowel de bekende Maps-velden als zichtbare telefoonlabels en tel-links.
         if ($mapsPhone === '') {
             $phonePatterns = [
-                '~"(?:phoneNumber|telephone|phone)"\s*:\s*"([^"]{7,40})"~i',
-                '~"phoneNumber"\s*,\s*"([^"]{7,40})"~i',
+                '~"(?:phoneNumber|telephone|phone)"\s*:\s*"([^"]{7,60})"~i',
+                '~(?:phoneNumber|telephone|phone)\\?"?\s*[,=:]\s*\\?"([^"\\]{7,60})~i',
+                '~"phoneNumber"\s*,\s*"([^"]{7,60})"~i',
                 '~data-item-id=["\x27]phone:tel:([^"\x27]+)["\x27]~i',
-                '~href=["\x27]tel:([^"\x27]+)["\x27]~i',
+                '~(?:href|data-href)=["\x27]tel:([^"\x27]+)["\x27]~i',
+                '~(?:aria-label|title)=["\x27][^"\x27]*(?:Telefoonnummer|Phone number|Telephone|Tel[eé]fono)\s*[:：]?\s*(\+?[0-9][0-9().\s\/-]{6,})[^"\x27]*["\x27]~iu',
                 '~(?:Telefoonnummer|Phone number|Telephone|Tel[eé]fono)\s*[:：]\s*(\+?[0-9][0-9().\s\/-]{6,})~iu',
             ];
             foreach ($phonePatterns as $phonePattern) {
-                if (!preg_match_all($phonePattern, $mapsHtml, $phoneMatches) || empty($phoneMatches[1])) continue;
+                if (!preg_match_all($phonePattern, $mapsSearchText, $phoneMatches) || empty($phoneMatches[1])) continue;
                 foreach ($phoneMatches[1] as $rawCandidate) {
                     $candidatePhone = trim(rawurldecode(stripcslashes((string) $rawCandidate)));
                     $candidatePhone = preg_replace('/[^\d+().\/\s-]/u', '', $candidatePhone) ?? '';
@@ -442,85 +449,6 @@ try {
         $name = '';
     }
 
-    /*
-     * Zoek aanvullend in OpenStreetMap op de naam van de locatie,
-     * beperkt tot een kleine omgeving rond de exacte Google Maps-pin.
-     * Dit is dezelfde Nominatim-methode als in de werkende oude website.
-     */
-    $nominatimWebsite = '';
-    $nominatimPhone = '';
-    $nominatimDebug = [
-        'http_status' => 0,
-        'results' => 0,
-        'matched_tags' => false,
-    ];
-
-    if ($coords !== null && $name !== '') {
-        // Respecteer de Nominatim-limiet van maximaal één aanvraag per seconde.
-        usleep(1100000);
-
-        $lat = (float) $coords[0];
-        $lon = (float) $coords[1];
-        $delta = 0.01;
-        $nominatimParams = [
-            'format' => 'jsonv2',
-            'addressdetails' => 1,
-            'extratags' => 1,
-            'q' => trim($name . ' ' . ($address['city'] ?? '')),
-            'limit' => 5,
-            'viewbox' => ($lon - $delta) . ',' . ($lat + $delta) . ',' . ($lon + $delta) . ',' . ($lat - $delta),
-            'bounded' => 1,
-        ];
-        $nominatimUrl = 'https://nominatim.openstreetmap.org/search?' . http_build_query($nominatimParams);
-        $nominatimCh = curl_init($nominatimUrl);
-        curl_setopt_array($nominatimCh, [
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_CONNECTTIMEOUT => 5,
-            CURLOPT_TIMEOUT => 10,
-            CURLOPT_USERAGENT => $userAgent,
-            CURLOPT_HTTPHEADER => ['Accept: application/json', 'Accept-Language: nl'],
-        ]);
-        $nominatimBody = curl_exec($nominatimCh);
-        $nominatimDebug['http_status'] = (int) curl_getinfo($nominatimCh, CURLINFO_RESPONSE_CODE);
-        curl_close($nominatimCh);
-
-        if ($nominatimBody !== false && $nominatimDebug['http_status'] === 200) {
-            $nominatimRows = json_decode((string) $nominatimBody, true);
-            if (is_array($nominatimRows)) {
-                $nominatimDebug['results'] = count($nominatimRows);
-                foreach ($nominatimRows as $row) {
-                    if (!is_array($row) || !isset($row['extratags']) || !is_array($row['extratags'])) {
-                        continue;
-                    }
-
-                    $tags = $row['extratags'];
-                    $pickExtra = static function (array $source, array $keys): string {
-                        foreach ($keys as $key) {
-                            if (isset($source[$key]) && is_string($source[$key]) && trim($source[$key]) !== '') {
-                                return trim($source[$key]);
-                            }
-                        }
-                        return '';
-                    };
-
-                    $candidateWebsite = $pickExtra($tags, ['website', 'contact:website', 'url']);
-                    $candidatePhone = $pickExtra($tags, ['phone', 'contact:phone']);
-
-                    if ($candidateWebsite !== '' || $candidatePhone !== '') {
-                        $nominatimWebsite = $candidateWebsite;
-                        $nominatimPhone = $candidatePhone;
-                        $nominatimDebug['matched_tags'] = true;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    if ($mapsPhone === '' && $nominatimPhone !== '') {
-        $mapsPhone = $nominatimPhone;
-    }
-
     $location = array_merge([
         'name' => $name,
         'street' => '',
@@ -529,7 +457,6 @@ try {
         'city' => '',
         'country_code' => '',
         'phone' => $mapsPhone,
-        'website_url' => $nominatimWebsite,
         'latitude' => $coords[0] ?? null,
         'longitude' => $coords[1] ?? null,
     ], $address);
@@ -550,7 +477,6 @@ try {
         'message' => 'Gegevens opgehaald met de Google Maps-methode. Controleer het adres.',
         'location' => $location,
         'phone_debug' => $mapsPhoneDebug,
-        'nominatim_debug' => $nominatimDebug,
     ], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
 } catch (Throwable $e) {
     http_response_code(422);
