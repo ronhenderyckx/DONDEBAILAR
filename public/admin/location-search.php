@@ -105,7 +105,9 @@ try {
             $logo = html_entity_decode($m[1], ENT_QUOTES | ENT_HTML5, 'UTF-8');
         }
     }
-    if ($logo !== '' && !preg_match('~^https?://~i', $logo)) {
+    if (str_starts_with($logo, '//')) {
+        $logo = 'https:' . $logo;
+    } elseif ($logo !== '' && !preg_match('~^https?://~i', $logo)) {
         $base = parse_url($website);
         $origin = ($base['scheme'] ?? 'https') . '://' . ($base['host'] ?? '');
         $logo = str_starts_with($logo, '/') ? $origin . $logo : $origin . '/' . $logo;
