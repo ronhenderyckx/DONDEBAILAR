@@ -36,34 +36,82 @@ if (!function_exists('curl_init')) {
 
 function locationSearchFetch(string $url, int $limit = 1500000): string
 {
-    $parts = parse_url($url);
-    $host = strtolower((string) ($parts['host'] ?? ''));
-    if (!in_array(strtolower((string) ($parts['scheme'] ?? '')), ['http', 'https'], true)
-        || $host === '' || in_array($host, ['localhost', '127.0.0.1', '::1'], true)) {
-        throw new RuntimeException('Ongeldige website.');
-    }
-    $ips = gethostbynamel($host);
-    if (!$ips) throw new RuntimeException('Website niet bereikbaar.');
-    foreach ($ips as $ip) {
-        if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
-            throw new RuntimeException('Ongeldig website-adres.');
+    // Volg omleidingen zelf, zodat elke tussenliggende host opnieuw op veiligheid
+    // wordt gecontroleerd. Veel websites sturen www/non-www en HTTP door.
+    for ($redirect = 0; $redirect <= 5; $redirect++) {
+        $parts = parse_url($url);
+        $scheme = strtolower((string) ($parts['scheme'] ?? ''));
+        $host = strtolower((string) ($parts['host'] ?? ''));
+        if (!in_array($scheme, ['http', 'https'], true) || $host === ''
+            || in_array($host, ['localhost', '127.0.0.1', '::1'], true)
+            || isset($parts['user']) || isset($parts['pass'])) {
+            throw new RuntimeException('Ongeldige website.');
         }
+
+        $ips = gethostbynamel($host);
+        if (!$ips) {
+            $ipv6 = filter_var(trim($host, '[]'), FILTER_VALIDATE_IP, FILTER_FLAG_IPV6);
+            if ($ipv6 !== false) $ips = [$ipv6];
+        }
+        if (!$ips) throw new RuntimeException('Website niet bereikbaar (DNS).');
+        foreach ($ips as $ip) {
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) === false) {
+                throw new RuntimeException('Ongeldig website-adres.');
+            }
+        }
+
+        $ch = curl_init($url);
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => false,
+            CURLOPT_CONNECTTIMEOUT => 8,
+            CURLOPT_TIMEOUT => 18,
+            CURLOPT_USERAGENT => 'Mozilla/5.0 (compatible; DONDEBAILAR/1.0; +https://dondebailar.eu)',
+            CURLOPT_HTTPHEADER => ['Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'Accept-Language: es-ES,es;q=0.9,en;q=0.8,nl;q=0.7'],
+            CURLOPT_ENCODING => '',
+            CURLOPT_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
+            CURLOPT_MAXFILESIZE => $limit,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+        ]);
+        $body = curl_exec($ch);
+        $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $redirectUrl = (string) curl_getinfo($ch, CURLINFO_REDIRECT_URL);
+        $headerSize = (int) curl_getinfo($ch, CURLINFO_HEADER_SIZE);
+        $curlError = curl_error($ch);
+        $location = '';
+        if (is_string($body) && $headerSize > 0) {
+            $headers = substr($body, 0, $headerSize);
+            if (preg_match('~^Location:\s*(.+?)\s*$~im', $headers, $match)) $location = trim($match[1]);
+            $body = substr($body, $headerSize);
+        }
+        curl_close($ch);
+
+        if ($status >= 300 && $status < 400) {
+            $target = $location !== '' ? $location : $redirectUrl;
+            if ($target === '') throw new RuntimeException('Website stuurde een ongeldige omleiding.');
+            if (str_starts_with($target, '//')) {
+                $target = $scheme . ':' . $target;
+            } elseif (!preg_match('~^https?://~i', $target)) {
+                $base = $scheme . '://' . $host . (isset($parts['port']) ? ':' . $parts['port'] : '');
+                if (str_starts_with($target, '/')) {
+                    $target = $base . $target;
+                } else {
+                    $path = (string) ($parts['path'] ?? '/');
+                    $target = $base . substr($path, 0, (int) strrpos($path, '/') + 1) . $target;
+                }
+            }
+            $url = $target;
+            continue;
+        }
+
+        if (!is_string($body) || $status < 200 || $status >= 300 || strlen($body) > $limit) {
+            $reason = $curlError !== '' ? ' (' . $curlError . ')' : ' (HTTP ' . $status . ')';
+            throw new RuntimeException('Website kon niet worden gelezen' . $reason . '.');
+        }
+        return $body;
     }
-    $ch = curl_init($url);
-    curl_setopt_array($ch, [
-        CURLOPT_RETURNTRANSFER => true, CURLOPT_FOLLOWLOCATION => false,
-        CURLOPT_CONNECTTIMEOUT => 5, CURLOPT_TIMEOUT => 10,
-        CURLOPT_USERAGENT => 'DONDEBAILAR/1.0 (+https://dondebailar.eu)',
-        CURLOPT_PROTOCOLS => CURLPROTO_HTTP | CURLPROTO_HTTPS,
-        CURLOPT_MAXFILESIZE => $limit,
-    ]);
-    $body = curl_exec($ch);
-    $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
-    if (!is_string($body) || $status < 200 || $status >= 300 || strlen($body) > $limit) {
-        throw new RuntimeException('Website kon niet worden gelezen.');
-    }
-    return $body;
+    throw new RuntimeException('Website stuurde te veel omleidingen.');
 }
 
 try {
