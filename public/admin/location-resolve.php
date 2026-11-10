@@ -182,23 +182,22 @@ try {
     if ($mapsPage['status'] >= 200 && $mapsPage['status'] < 300 && $mapsPage['body'] !== '') {
         $mapsHtml = html_entity_decode((string) $mapsPage['body'], ENT_QUOTES | ENT_HTML5, 'UTF-8');
 
-        // Phone numbers occur in several embedded Maps payload formats, not just JSON-LD.
+        // Search the raw Maps payload using PHP single-quoted regexes.
+        // Keep regex escapes single: PHP preserves backslashes in single-quoted strings.
         if ($mapsPhone === '') {
             $phonePatterns = [
-                '~"phoneNumber"\\s*:\\s*"((?:\\\\\\\\.|[^"\\\\\\\\])*)"~i',
-                '~"telephone"\\s*:\\s*"((?:\\\\\\\\.|[^"\\\\\\\\])*)"~i',
-                '~"phone"\\s*:\\s*"((?:\\\\\\\\.|[^"\\\\\\\\])*)"~i',
-                '~"phoneNumber"\\s*,\\s*"([^"]+)"~i',
+                '~"(?:phoneNumber|telephone|phone)"\s*:\s*"([^"]{7,40})"~i',
+                '~"phoneNumber"\s*,\s*"([^"]{7,40})"~i',
                 '~data-item-id=["\x27]phone:tel:([^"\x27]+)["\x27]~i',
                 '~href=["\x27]tel:([^"\x27]+)["\x27]~i',
-                '~(?:Telefoonnummer|Phone number|Telephone|Tel[eé]fono)\\s*[:：]\\s*(\\+?[0-9][0-9().\\s\\/-]{6,})~iu',
+                '~(?:Telefoonnummer|Phone number|Telephone|Tel[eé]fono)\s*[:：]\s*(\+?[0-9][0-9().\s\/-]{6,})~iu',
             ];
             foreach ($phonePatterns as $phonePattern) {
                 if (!preg_match_all($phonePattern, $mapsHtml, $phoneMatches) || empty($phoneMatches[1])) continue;
                 foreach ($phoneMatches[1] as $rawCandidate) {
                     $candidatePhone = trim(rawurldecode(stripcslashes((string) $rawCandidate)));
-                    $candidatePhone = preg_replace('/[^\\d+().\\/\\s-]/u', '', $candidatePhone) ?? '';
-                    $digits = preg_replace('/\\D+/', '', $candidatePhone);
+                    $candidatePhone = preg_replace('/[^\d+().\/\s-]/u', '', $candidatePhone) ?? '';
+                    $digits = preg_replace('/\D+/', '', $candidatePhone);
                     if (strlen((string) $digits) >= 7 && strlen((string) $digits) <= 15) {
                         $mapsPhone = trim($candidatePhone);
                         break 2;
