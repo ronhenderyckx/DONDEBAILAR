@@ -74,8 +74,8 @@ try {
     $findResult = static function (string $searchHtml, bool $facebookOnly) use ($cityNeedle): string {
         if (!preg_match_all('~<a\\b[^>]*>.*?</a>~is', $searchHtml, $anchors, PREG_OFFSET_CAPTURE)) return '';
         foreach ($anchors[0] as [$anchor, $offset]) {
-            if (!preg_match('~class=["\\'][^"\\']*result__a[^"\\']*["\\']~i', $anchor)
-                || !preg_match('~href=["\\']([^"\\']+)["\\']~i', $anchor, $hrefMatch)) continue;
+            if (!preg_match('~class=["\'][^"\']*result__a[^"\']*["\']~i', $anchor)
+                || !preg_match('~href=["\']([^"\']+)["\']~i', $anchor, $hrefMatch)) continue;
             $context = substr($searchHtml, max(0, $offset - 900), 2600);
             $resultText = mb_strtolower(html_entity_decode(strip_tags($context), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
             if (!str_contains($resultText, $cityNeedle)) continue;
