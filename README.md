@@ -24,17 +24,16 @@ Regionale agenda en sociale feed voor dansactiviteiten en evenementen.
 2. Kopieer `config/config.example.php` naar `config/config.local.php`.
 3. Vul in `config/config.local.php` de lokale databasegegevens in. Dit lokale bestand wordt door Git genegeerd.
 4. Maak de lege database `dondebailar` aan.
-5. Voer de SQL-migraties in numerieke volgorde uit. Op een bestaande installatie die migraties 001 t/m 004 al heeft toegepast, voer je alleen de nieuwe migratie 005 uit:
-   `database/migrations/005_event_media_reels.sql`.
-   Registreer de migratie daarna in `schema_migrations` als die tabel op de installatie wordt gebruikt.
-6. Voer op bestaande installaties ook migratie 006 uit om openbare Facebook- en Instagram-berichten/reels aan evenementen te koppelen.\n7. Zorg voor voldoende PHP-uploadruimte voor media: `upload_max_filesize=80M` en `post_max_size=256M`. De applicatie controleert foto's tot 15 MB en video's/reels tot 80 MB per bestand.
+5. Voer de SQL-migraties in numerieke volgorde uit. Op een bestaande installatie die migraties 001 t/m 004 al heeft toegepast, voer je alleen de nieuwe migratie 005 uit: `database/migrations/005_event_media_reels.sql`.
+6. Voer op bestaande installaties migratie 006 uit om openbare Facebook- en Instagram-berichten/reels aan evenementen te koppelen.
+7. Zorg voor voldoende PHP-uploadruimte voor media: `upload_max_filesize=80M` en `post_max_size=256M`. De applicatie controleert foto's tot 15 MB en video's/reels tot 80 MB per bestand.
 8. Start de lokale server:
 
    ```powershell
    D:\Projecten\DONDEBAILAR\.tools\php-8.1.34\php.exe -S 127.0.0.1:8000 -t D:\Projecten\DONDEBAILAR\public
    ```
 
-8. Open `http://127.0.0.1:8000`.
+9. Open `http://127.0.0.1:8000`.
 
 ## Architectuurafspraken
 
@@ -45,6 +44,9 @@ Regionale agenda en sociale feed voor dansactiviteiten en evenementen.
 - De gebruikersvoorkeurstaal staat los van de inhoudstaal van een evenement.
 - Geheimen, lokale configuratie, database-dumps, uploads, logs, sessies en de lokale PHP-runtime worden nooit naar Git gecommit.
 
-## Status
+## Agenda
 
-De eerste technische basis is in opbouw. De volledige applicatie, beheeromgeving en regionale feed zijn nog niet geïmplementeerd.
+- De publieke startpagina toont gepubliceerde evenementen per regio.
+- Bezoekers kunnen filteren op categorie en zoeken op evenement of organisator.
+- De agenda heeft een lijstweergave en een maandkalender.
+- Een evenement opent de publieke detailpagina met gekoppelde media en sociale berichten.
