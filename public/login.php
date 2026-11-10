@@ -7,7 +7,7 @@ require_once dirname(__DIR__) . '/app/Security.php';
 
 $pageTitle = 'Inloggen - DONDEBAILAR';
 $errorMessage = '';
-$email = '';
+$login = '';
 
 $returnTo = $_GET['return'] ?? $_POST['return'] ?? '/admin/';
 
@@ -26,22 +26,25 @@ if (currentUser() !== null) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim((string) ($_POST['email'] ?? ''));
+    $login = trim((string) ($_POST['login'] ?? ''));
     $password = (string) ($_POST['password'] ?? '');
     $token = $_POST['csrf_token'] ?? null;
 
     if (!verifyCsrfToken(is_string($token) ? $token : null)) {
         $errorMessage = 'Je sessie is verlopen. Vernieuw de pagina en probeer opnieuw.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || $password === '') {
-        $errorMessage = 'Vul een geldig e-mailadres en wachtwoord in.';
+    } elseif ($login === '' || strlen($login) > 190 || $password === '') {
+        $errorMessage = 'Vul je gebruikersnaam of e-mailadres en wachtwoord in.';
     } else {
         $statement = Database::connection()->prepare(
             "SELECT id, password_hash, status
              FROM users
-             WHERE email = :email
+             WHERE email = :email OR display_name = :display_name
              ORDER BY id DESC"
         );
-        $statement->execute(['email' => strtolower($email)]);
+        $statement->execute([
+            'email' => strtolower($login),
+            'display_name' => $login,
+        ]);
         $matchingUsers = $statement->fetchAll();
         $user = null;
 
@@ -58,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($user === null) {
-            $errorMessage = 'E-mailadres of wachtwoord is niet correct.';
+            $errorMessage = 'Gebruikersnaam/e-mailadres of wachtwoord is niet correct.';
         } else {
             session_regenerate_id(true);
 
@@ -97,12 +100,12 @@ require dirname(__DIR__) . '/app/views/header.php';
             value="<?= escapeHtml($returnTo) ?>"
         >
 
-        <label for="email">E-mailadres</label>
+        <label for="login">Gebruikersnaam of e-mailadres</label>
         <input
-            type="email"
-            id="email"
-            name="email"
-            value="<?= escapeHtml($email) ?>"
+            type="text"
+            id="login"
+            name="login"
+            value="<?= escapeHtml($login) ?>"
             autocomplete="username"
             maxlength="190"
             required
