@@ -101,7 +101,9 @@ foreach ($events as $event) {
     $eventsByDay[$day][] = $event;
 }
 $escape = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-$monthLabel = $monthStart->format('F Y');
+$monthNames = [1 => 'januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'];
+$weekdayShort = [1 => 'ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'];
+$monthLabel = $monthNames[(int) $monthStart->format('n')] . ' ' . $monthStart->format('Y');
 $previousMonth = $monthStart->modify('-1 month')->format('Y-m');
 $nextMonth = $monthStart->modify('+1 month')->format('Y-m');
 $queryBase = [
@@ -123,7 +125,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <p>Vind dansavonden, feesten, workshops en festivals bij jou in de buurt.</p>
         </div>
         <div class="agenda-hero__month">
-            <span><?= $escape($monthStart->format('F')) ?></span>
+            <span><?= $escape($monthNames[(int) $monthStart->format('n')]) ?></span>
             <strong><?= $escape($monthStart->format('Y')) ?></strong>
         </div>
     </div>
@@ -193,9 +195,9 @@ require dirname(__DIR__) . '/app/views/header.php';
                     <?php $start = new DateTimeImmutable((string) $event['starts_at'], $timezone); ?>
                     <article class="agenda-event">
                         <div class="agenda-event__date">
-                            <span><?= $escape($start->format('D')) ?></span>
+                            <span><?= $escape($weekdayShort[(int) $start->format('N')]) ?></span>
                             <strong><?= $escape($start->format('d')) ?></strong>
-                            <span><?= $escape($start->format('M')) ?></span>
+                            <span><?= $escape(substr($monthNames[(int) $start->format('n')], 0, 3)) ?></span>
                         </div>
                         <div class="agenda-event__body">
                             <div class="agenda-event__meta">
