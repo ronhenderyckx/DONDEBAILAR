@@ -6,10 +6,8 @@ require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
 require_once dirname(__DIR__, 2) . '/app/Organizers.php';
 
-$user = requireLogin();
+$user = requireOrganizerManagement();
 $db = Database::connection();
-$regions = organizerManageableRegions($db, $user);
-$regionIds = array_map(static fn(array $item): int => (int) $item['id'], $regions);
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id || $id < 1) {
     http_response_code(400);
@@ -23,17 +21,6 @@ if (!$organizer) {
     http_response_code(404);
     exit('Organisator niet gevonden.');
 }
-$originalRegionId = (int) ($organizer['region_id'] ?? 0);
-if (!organizerCanManageRegion($originalRegionId, $user)) {
-    http_response_code(403);
-    exit('Je hebt geen rechten om deze organisator te wijzigen.');
-}
-if ($regions === []) {
-    http_response_code(403);
-    exit('Je hebt geen rechten om organisatoren te beheren.');
-}
-$regionId = $originalRegionId;
-
 $pageTitle = 'Organisator wijzigen - DONDEBAILAR';
 $errors = [];
 $name = (string) $organizer['name'];
@@ -115,10 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors[] = 'De beveiligingscontrole is verlopen. Vernieuw de pagina en probeer opnieuw.';
     }
 
-    $regionId = (int) ($_POST['region_id'] ?? $originalRegionId);
-    if (!in_array($regionId, $regionIds, true)) {
-        $errors[] = 'Je hebt geen rechten voor de gekozen regio.';
-    }
     $name = trim((string) ($_POST['name'] ?? ''));
     $phone = trim((string) ($_POST['phone'] ?? ''));
     $website = trim((string) ($_POST['website'] ?? ''));
@@ -161,13 +144,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $update = $db->prepare(
                 "UPDATE organizers
-                 SET region_id = :region_id, name = :name, phone = :phone, website = :website,
+                 SET name = :name, phone = :phone, website = :website,
                      logo_path = :logo_path, notes = :notes, is_active = :is_active
                  WHERE id = :id"
             );
 
             $update->execute([
-                'region_id' => $regionId,
                 'name' => $name,
                 'phone' => $phone !== '' ? $phone : null,
                 'website' => $website !== '' ? $website : null,
@@ -201,9 +183,9 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 <section class="admin-page">
     <div class="admin-heading">
         <div>
-            <p class="eyebrow">REGIOBEHEER</p>
+            <p class="eyebrow">BEHEER</p>
             <h1>Organisator wijzigen</h1>
-            <p>Wijzig de organisator binnen de regio.</p>
+            <p>Wijzig de platformbrede organisator.</p>
         </div>
         <a class="button" href="/admin/organizers.php">Terug naar organisatoren</a>
     </div>
@@ -215,13 +197,6 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     <section class="admin-section organizer-form-section">
         <form method="post" enctype="multipart/form-data" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
-
-            <label for="region_id">Regio *</label>
-            <select id="region_id" name="region_id" required>
-                <?php foreach ($regions as $item): ?>
-                    <option value="<?= (int) $item['id'] ?>" <?= $regionId === (int) $item['id'] ? 'selected' : '' ?>><?= escapeHtml($item['name']) ?></option>
-                <?php endforeach; ?>
-            </select>
 
             <label for="name">Naam organisator *</label>
             <input id="name" name="name" type="text" maxlength="190"
