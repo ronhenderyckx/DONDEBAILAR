@@ -31,6 +31,7 @@ date_default_timezone_set($timezone->getName());
 $now = new DateTimeImmutable('now', $timezone);
 $organizerId = filter_input(INPUT_GET, 'organizer_id', FILTER_VALIDATE_INT) ?: 0;
 $city = trim((string) ($_GET['city'] ?? ''));
+$activeFilter = (($_GET['filter'] ?? '') === 'city') ? 'city' : 'organizer';
 if (mb_strlen($city) > 120) {
     $city = mb_substr($city, 0, 120);
 }
@@ -175,8 +176,8 @@ require dirname(__DIR__) . '/app/views/header.php';
                             $hasOrganizerLogo = preg_match('/\\A[a-f0-9]{32}\\.(jpg|png|webp)\\z/', $logoFilename) === 1;
                             $organizerSelected = $organizerId === (int) $organizerOption['id'];
                             $organizerHref = $organizerSelected
-                                ? '/?region_id=' . $regionId
-                                : '/?region_id=' . $regionId . '&organizer_id=' . (int) $organizerOption['id'];
+                                ? '/?region_id=' . $regionId . '&filter=organizer'
+                                : '/?region_id=' . $regionId . '&filter=organizer&organizer_id=' . (int) $organizerOption['id'];
                             ?>
                             <a class="agenda-organizer-item<?= $organizerSelected ? ' is-selected' : '' ?>" href="<?= $escape($organizerHref) ?>" title="<?= $escape($organizerOption['name']) ?>" aria-label="<?= $organizerSelected ? 'Verwijder filter voor ' : 'Toon evenementen van ' ?><?= $escape($organizerOption['name']) ?>">
                                 <?php if ($hasOrganizerLogo): ?>
@@ -196,8 +197,8 @@ require dirname(__DIR__) . '/app/views/header.php';
                             $cityName = (string) $cityOption['city'];
                             $citySelected = $city === $cityName;
                             $cityHref = $citySelected
-                                ? '/?region_id=' . $regionId
-                                : '/?region_id=' . $regionId . '&city=' . rawurlencode($cityName);
+                                ? '/?region_id=' . $regionId . '&filter=city'
+                                : '/?region_id=' . $regionId . '&filter=city&city=' . rawurlencode($cityName);
                             ?>
                             <a class="agenda-organizer-item<?= $citySelected ? ' is-selected' : '' ?>" href="<?= $escape($cityHref) ?>" title="<?= $escape($cityName) ?>" aria-label="<?= $citySelected ? 'Verwijder stadsfilter ' : 'Toon evenementen in ' ?><?= $escape($cityName) ?>">
                                 <span class="agenda-organizer-fallback" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr($cityName, 0, 1))) ?></span>
@@ -389,7 +390,7 @@ foreach ($events as $instagramCheckEvent) {
 <script>
 const agendaFilterIcons = ['👥', '🗺️'];
 const agendaFilterLabels = ['Organisator', 'Stad'];
-let agendaFilterIndex = 0;
+let agendaFilterIndex = <?= $activeFilter === 'city' ? '1' : '0' ?>;
 const agendaFilterSwitch = document.getElementById('agenda-filter-switch');
 function showAgendaFilter(index) {
     agendaFilterIndex = index % agendaFilterIcons.length;
@@ -409,7 +410,7 @@ if (agendaFilterSwitch) {
     agendaFilterSwitch.addEventListener('click', function () {
         showAgendaFilter(agendaFilterIndex + 1);
     });
-    showAgendaFilter(0);
+    showAgendaFilter(agendaFilterIndex);
 }
 document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
     const track = gallery.querySelector('[data-gallery-track]');
