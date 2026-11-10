@@ -167,7 +167,11 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
   try{
    const search=await fetch('/admin/location-search.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({name,city,country_code:countryCode})});
    const result=await search.json();
-   if(!search.ok||!result.success){lastBrandSearch='';return;}
+   if(!search.ok||!result.success){
+    lastBrandSearch='';
+    if(preview)preview.textContent='Website/logo niet gevonden: '+(result.message||'Zoeken is mislukt.');
+    return;
+   }
    const website=document.getElementById('website_url');
    if(website&&result.website_url)website.value=result.website_url;
    if(result.logo_url&&logoField&&preview){
@@ -178,7 +182,10 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     img.onerror=()=>{logoField.value='';img.remove();};
     preview.replaceChildren(img);
    }
-  }catch(error){lastBrandSearch='';}
+  }catch(error){
+   lastBrandSearch='';
+   if(preview)preview.textContent='Website/logo kon niet worden opgehaald. Controleer de internetverbinding van de server.';
+  }
  }
  async function resolveAndSearch(){
   const url=mapsInput.value.trim();
