@@ -146,7 +146,7 @@ require dirname(__DIR__) . '/app/views/header.php';
         <form method="post" enctype="multipart/form-data" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="region_id">Regio *</label>
-            <select id="region_id" name="region_id" required onchange="this.form.dataset.regionChanged='1';this.form.submit()">
+            <select id="region_id" name="region_id" required onchange="window.location.href='/event-new.php?region_id='+encodeURIComponent(this.value)">
                 <?php foreach ($regions as $item): ?><option value="<?= (int) $item['id'] ?>" <?= $selectedRegionId === (int) $item['id'] ? 'selected' : '' ?>><?= escapeHtml($item['name']) ?></option><?php endforeach; ?>
             </select>
             <label for="title">Titel *</label>
