@@ -7,7 +7,7 @@ require_once dirname(__DIR__) . '/app/Security.php';
 $db = Database::connection();
 $regions = $db->query(
     "SELECT id, name, timezone, logo_path FROM regions
-     WHERE is_active = 1 ORDER BY name"
+     WHERE is_active = 1 ORDER BY id"
 )->fetchAll();
 
 $regionIds = array_map(static fn(array $item): int => (int) $item['id'], $regions);
