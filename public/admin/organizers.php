@@ -16,11 +16,17 @@ $sql = "SELECT id, name, phone, website, logo_path, is_active
 $params = [];
 
 if ($search !== '') {
-    $sql .= " WHERE name LIKE :search
-              OR phone LIKE :search
-              OR website LIKE :search
-              OR notes LIKE :search";
-    $params['search'] = '%' . $search . '%';
+    $sql .= " WHERE name LIKE :search_name
+              OR phone LIKE :search_phone
+              OR website LIKE :search_website
+              OR notes LIKE :search_notes";
+    $searchValue = '%' . $search . '%';
+    $params = [
+        'search_name' => $searchValue,
+        'search_phone' => $searchValue,
+        'search_website' => $searchValue,
+        'search_notes' => $searchValue,
+    ];
 }
 $sql .= " ORDER BY name";
 
@@ -52,20 +58,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <div class="message message--success">De organisator is bijgewerkt.</div>
     <?php endif; ?>
 
-    <div class="dashboard-cards">
-        <article class="dashboard-card">
-            <span>Alle organisatoren</span>
-            <strong><?= $totalCount ?></strong>
-        </article>
-        <article class="dashboard-card">
-            <span>Actief</span>
-            <strong><?= $activeCount ?></strong>
-        </article>
-        <article class="dashboard-card">
-            <span>Inactief</span>
-            <strong><?= $totalCount - $activeCount ?></strong>
-        </article>
-    </div>
+
 
     <section class="admin-section">
         <div class="section-heading">
@@ -109,7 +102,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                             <td>
                                 <?php if (!empty($organizer['logo_path'])): ?>
                                     <img class="organizer-logo"
-                                         src="/<?= escapeHtml(ltrim($organizer['logo_path'], '/')) ?>"
+                                         src="/organizer-logo.php?file=<?= rawurlencode(basename((string) $organizer['logo_path'])) ?>"
                                          alt="Logo <?= escapeHtml($organizer['name']) ?>">
                                 <?php else: ?>
                                     <span class="organizer-logo-placeholder" aria-label="Geen logo">—</span>

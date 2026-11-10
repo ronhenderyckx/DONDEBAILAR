@@ -23,11 +23,15 @@ function saveOrganizerLogo(array $file): ?string
     if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
         throw new RuntimeException('Het logo kon niet worden geüpload.');
     }
+    $temporaryFile = (string) ($file['tmp_name'] ?? '');
+    if ($temporaryFile === '' || !is_uploaded_file($temporaryFile)) {
+        throw new RuntimeException('Het geüploade logo is ongeldig.');
+    }
     if ((int) ($file['size'] ?? 0) > 2 * 1024 * 1024) {
         throw new RuntimeException('Het logo mag maximaal 2 MB groot zijn.');
     }
 
-    $imageInfo = @getimagesize($file['tmp_name']);
+    $imageInfo = @getimagesize($temporaryFile);
     $mime = $imageInfo['mime'] ?? '';
     $extensions = [
         'image/jpeg' => 'jpg',
@@ -44,7 +48,7 @@ function saveOrganizerLogo(array $file): ?string
     }
 
     $filename = bin2hex(random_bytes(16)) . '.' . $extensions[$mime];
-    if (!move_uploaded_file($file['tmp_name'], $directory . '/' . $filename)) {
+    if (!move_uploaded_file($temporaryFile, $directory . '/' . $filename)) {
         throw new RuntimeException('Het logo kon niet worden opgeslagen.');
     }
 
@@ -73,6 +77,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($errors === []) {
+        $logoPath = null;
+
         try {
             $logoPath = saveOrganizerLogo($_FILES['logo'] ?? []);
             $statement = Database::connection()->prepare(
@@ -90,6 +96,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             header('Location: /admin/organizers.php?created=1');
             exit;
         } catch (Throwable $exception) {
+            // Ruim het logo op als de database-insert mislukt.
+            if (
+                is_string($logoPath)
+                && preg_match('~\\Auploads/organizers/[a-f0-9]{32}\\.(?:jpg|png|webp)\\z~D', $logoPath) === 1
+            ) {
+                $logoFile = dirname(__DIR__, 2) . '/' . $logoPath;
+                if (is_file($logoFile)) {
+                    @unlink($logoFile);
+                }
+            }
+
             $errors[] = $exception instanceof RuntimeException
                 ? $exception->getMessage()
                 : 'De organisator kon niet worden opgeslagen.';

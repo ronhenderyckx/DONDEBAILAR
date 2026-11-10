@@ -30,47 +30,69 @@ $website = (string) ($organizer['website'] ?? '');
 $notes = (string) ($organizer['notes'] ?? '');
 $isActive = (int) $organizer['is_active'] === 1;
 
-function replaceOrganizerLogo(array $file, ?string $oldPath, bool $remove): ?string
+function isManagedOrganizerLogo(?string $path): bool
 {
-    $baseDirectory = dirname(__DIR__, 2) . '/uploads/organizers';
-    if ($remove && is_string($oldPath) && str_starts_with($oldPath, 'uploads/organizers/')) {
-        $oldFile = dirname(__DIR__, 2) . '/' . $oldPath;
-        if (is_file($oldFile)) {
-            unlink($oldFile);
-        }
-        $oldPath = null;
+    return is_string($path)
+        && preg_match('~\Auploads/organizers/[a-f0-9]{32}\.(?:jpg|png|webp)\z~D', $path) === 1;
+}
+
+function deleteManagedOrganizerLogo(?string $path): void
+{
+    if (!isManagedOrganizerLogo($path)) {
+        return;
     }
 
-    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
-        return $oldPath;
+    $file = dirname(__DIR__, 2) . '/' . $path;
+    if (is_file($file)) {
+        @unlink($file);
     }
-    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
+}
+
+function storeOrganizerLogo(array $file): ?string
+{
+    $error = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
+
+    if ($error === UPLOAD_ERR_NO_FILE) {
+        return null;
+    }
+    if ($error !== UPLOAD_ERR_OK) {
         throw new RuntimeException('Het logo kon niet worden geüpload.');
+    }
+
+    $temporaryFile = (string) ($file['tmp_name'] ?? '');
+
+    if ($temporaryFile === '' || !is_uploaded_file($temporaryFile)) {
+        throw new RuntimeException('Het geüploade logo is ongeldig.');
     }
     if ((int) ($file['size'] ?? 0) > 2 * 1024 * 1024) {
         throw new RuntimeException('Het logo mag maximaal 2 MB groot zijn.');
     }
 
-    $imageInfo = @getimagesize($file['tmp_name']);
+    $imageInfo = @getimagesize($temporaryFile);
     $mime = $imageInfo['mime'] ?? '';
-    $extensions = ['image/jpeg' => 'jpg', 'image/png' => 'png', 'image/webp' => 'webp'];
+
+    $extensions = [
+        'image/jpeg' => 'jpg',
+        'image/png' => 'png',
+        'image/webp' => 'webp',
+    ];
+
     if (!isset($extensions[$mime])) {
         throw new RuntimeException('Gebruik een JPG-, PNG- of WebP-logo.');
     }
-    if (!is_dir($baseDirectory) && !mkdir($baseDirectory, 0755, true) && !is_dir($baseDirectory)) {
+
+    $baseDirectory = dirname(__DIR__, 2) . '/uploads/organizers';
+
+    if (!is_dir($baseDirectory)
+        && !mkdir($baseDirectory, 0755, true)
+        && !is_dir($baseDirectory)) {
         throw new RuntimeException('De uploadmap kon niet worden aangemaakt.');
     }
 
     $filename = bin2hex(random_bytes(16)) . '.' . $extensions[$mime];
-    if (!move_uploaded_file($file['tmp_name'], $baseDirectory . '/' . $filename)) {
-        throw new RuntimeException('Het logo kon niet worden opgeslagen.');
-    }
 
-    if (is_string($oldPath) && str_starts_with($oldPath, 'uploads/organizers/')) {
-        $oldFile = dirname(__DIR__, 2) . '/' . $oldPath;
-        if (is_file($oldFile)) {
-            unlink($oldFile);
-        }
+    if (!move_uploaded_file($temporaryFile, $baseDirectory . '/' . $filename)) {
+        throw new RuntimeException('Het logo kon niet worden opgeslagen.');
     }
 
     return 'uploads/organizers/' . $filename;
@@ -93,23 +115,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (mb_strlen($phone) > 50) {
         $errors[] = 'Het telefoonnummer mag maximaal 50 tekens bevatten.';
     }
-    if ($website !== '' && (mb_strlen($website) > 500 || !filter_var($website, FILTER_VALIDATE_URL) || !in_array(strtolower((string) parse_url($website, PHP_URL_SCHEME)), ['http', 'https'], true))) {
+    if ($website !== '' && (
+        mb_strlen($website) > 500
+        || !filter_var($website, FILTER_VALIDATE_URL)
+        || !in_array(strtolower((string) parse_url($website, PHP_URL_SCHEME)), ['http', 'https'], true)
+    )) {
         $errors[] = 'Vul een geldige website in die begint met https:// of http://.';
     }
 
     if ($errors === []) {
+        $oldLogoPath = $organizer['logo_path'] !== null
+            ? (string) $organizer['logo_path']
+            : null;
+        $newLogoPath = null;
+
         try {
-            $logoPath = replaceOrganizerLogo(
-                $_FILES['logo'] ?? [],
-                $organizer['logo_path'] !== null ? (string) $organizer['logo_path'] : null,
-                isset($_POST['remove_logo'])
-            );
+            $logoPath = $oldLogoPath;
+
+            if (isset($_POST['remove_logo'])) {
+                $logoPath = null;
+            } else {
+                $uploadedLogoPath = storeOrganizerLogo($_FILES['logo'] ?? []);
+
+                if ($uploadedLogoPath !== null) {
+                    $newLogoPath = $uploadedLogoPath;
+                    $logoPath = $uploadedLogoPath;
+                }
+            }
+
             $update = $db->prepare(
                 "UPDATE organizers
                  SET name = :name, phone = :phone, website = :website,
                      logo_path = :logo_path, notes = :notes, is_active = :is_active
                  WHERE id = :id"
             );
+
             $update->execute([
                 'name' => $name,
                 'phone' => $phone !== '' ? $phone : null,
@@ -119,9 +159,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'is_active' => $isActive ? 1 : 0,
                 'id' => $id,
             ]);
+
+            // Pas na een geslaagde database-update het oude logo verwijderen.
+            if ($logoPath !== $oldLogoPath) {
+                deleteManagedOrganizerLogo($oldLogoPath);
+            }
+
             header('Location: /admin/organizers.php?updated=1');
             exit;
         } catch (Throwable $exception) {
+            // Bij een mislukte update blijft het oude logo behouden.
+            deleteManagedOrganizerLogo($newLogoPath);
+
             $errors[] = $exception instanceof RuntimeException
                 ? $exception->getMessage()
                 : 'De organisator kon niet worden bijgewerkt.';
@@ -164,7 +213,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 
             <?php if (!empty($organizer['logo_path'])): ?>
                 <div class="current-organizer-logo">
-                    <img src="/<?= escapeHtml(ltrim($organizer['logo_path'], '/')) ?>"
+                    <img src="/organizer-logo.php?file=<?= rawurlencode(basename((string) $organizer['logo_path'])) ?>"
                          alt="Huidig logo van <?= escapeHtml($organizer['name']) ?>">
                 </div>
                 <label class="checkbox-label">
