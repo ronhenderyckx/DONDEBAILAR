@@ -146,7 +146,6 @@ require dirname(__DIR__) . '/app/views/header.php';
                 </div>
             </div>
             <div class="agenda-selector-actions">
-                <button class="button button--primary" type="submit">Toon evenementen</button>
                 <a class="agenda-reset" href="/?region_id=<?= $regionId ?>">Wis filters</a>
             </div>
         </form>
@@ -226,11 +225,21 @@ if (agendaFilterSwitch) {
 }
 const agendaRegionSelect = document.getElementById('agenda-region');
 const agendaRegionValue = document.getElementById('agenda-region-value');
+const agendaFilterForm = document.querySelector('.agenda-selectors');
 if (agendaRegionSelect && agendaRegionValue) {
     agendaRegionSelect.addEventListener('change', function () {
         agendaRegionValue.value = agendaRegionSelect.value;
+        if (agendaFilterForm) agendaFilterForm.requestSubmit();
     });
 }
+['agenda-organizer', 'agenda-city'].forEach(function (id) {
+    const select = document.getElementById(id);
+    if (select) {
+        select.addEventListener('change', function () {
+            if (agendaFilterForm) agendaFilterForm.requestSubmit();
+        });
+    }
+});
 document.addEventListener('click', function (event) {
     const shareButton = event.target.closest('[data-share-url]');
     if (!shareButton) return;
