@@ -16,6 +16,16 @@ $canManageRegion = $regionId > 0
     && userHasRegionRole($regionId, ['region_admin', 'editor'], $headerUser);
 
 $isAdmin = isPlatformAdmin($headerUser);
+$canManageLocations = $isAdmin;
+if ($headerUser !== null && !$canManageLocations) {
+    $locationAccess = Database::connection()->prepare(
+        "SELECT 1 FROM user_region_roles
+         WHERE user_id = :user_id AND role IN ('editor', 'region_admin')
+         LIMIT 1"
+    );
+    $locationAccess->execute(['user_id' => (int) $headerUser['id']]);
+    $canManageLocations = (bool) $locationAccess->fetchColumn();
+}
 
 $brandName = $region && !empty($region['name'])
     ? (string) $region['name']
@@ -93,6 +103,10 @@ $escape = static fn ($value): string =>
 
                 <?php if ($canManageRegion || $isAdmin): ?>
                     <a href="/admin/">Beheer</a>
+                <?php endif; ?>
+
+                <?php if ($canManageLocations): ?>
+                    <a href="/admin/locations.php">Locaties beheren</a>
                 <?php endif; ?>
 
                 <?php if ($isAdmin): ?>
