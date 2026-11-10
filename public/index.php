@@ -29,33 +29,39 @@ try {
 date_default_timezone_set($timezone->getName());
 
 $now = new DateTimeImmutable('now', $timezone);
-$categoryId = filter_input(INPUT_GET, 'category_id', FILTER_VALIDATE_INT) ?: 0;
+$organizerId = filter_input(INPUT_GET, 'organizer_id', FILTER_VALIDATE_INT) ?: 0;
 $city = trim((string) ($_GET['city'] ?? ''));
-$search = trim((string) ($_GET['q'] ?? ''));
-if (mb_strlen($search) > 100) {
-    $search = mb_substr($search, 0, 100);
-}
 if (mb_strlen($city) > 120) {
     $city = mb_substr($city, 0, 120);
 }
 
-$categories = [];
+$organizers = [];
 $cities = [];
 $events = [];
 if ($regionId > 0) {
-    $categoryQuery = $db->prepare(
-        "SELECT id, name FROM categories
-         WHERE is_active = 1 AND (region_id IS NULL OR region_id = :region_id)
-         ORDER BY sort_order, name"
+    $organizerQuery = $db->prepare(
+        "SELECT DISTINCT o.id, o.name
+         FROM organizers o
+         INNER JOIN events e ON e.organizer_id = o.id
+         WHERE o.is_active = 1 AND e.region_id = :region_id
+           AND e.status = 'published' AND e.starts_at >= :now
+         ORDER BY o.name"
     );
-    $categoryQuery->execute(['region_id' => $regionId]);
-    $categories = $categoryQuery->fetchAll();
+    $organizerQuery->execute([
+        'region_id' => $regionId,
+        'now' => $now->format('Y-m-d H:i:s'),
+    ]);
+    $organizers = $organizerQuery->fetchAll();
+    $organizerIds = array_map(static fn(array $item): int => (int) $item['id'], $organizers);
+    if ($organizerId > 0 && !in_array($organizerId, $organizerIds, true)) {
+        $organizerId = 0;
+    }
 
     $cityQuery = $db->prepare(
-        "SELECT city, MIN(NULLIF(logo_path, '')) AS logo_path
+        "SELECT DISTINCT city
          FROM locations
          WHERE region_id = :region_id AND is_active = 1 AND city <> ''
-         GROUP BY city ORDER BY city"
+         ORDER BY city"
     );
     $cityQuery->execute(['region_id' => $regionId]);
     $cities = $cityQuery->fetchAll();
@@ -88,22 +94,13 @@ if ($regionId > 0) {
         'region_id' => $regionId,
         'now' => $now->format('Y-m-d H:i:s'),
     ];
-    if ($categoryId > 0 && in_array($categoryId, array_map(static fn($item) => (int) $item['id'], $categories), true)) {
-        $sql .= " AND e.category_id = :category_id";
-        $params['category_id'] = $categoryId;
-    } else {
-        $categoryId = 0;
+    if ($organizerId > 0) {
+        $sql .= " AND e.organizer_id = :organizer_id";
+        $params['organizer_id'] = $organizerId;
     }
     if ($city !== '') {
         $sql .= " AND l.city = :city";
         $params['city'] = $city;
-    }
-    if ($search !== '') {
-        $sql .= " AND (e.title LIKE :search_title OR e.description LIKE :search_description OR o.name LIKE :search_organizer)";
-        $term = '%' . $search . '%';
-        $params['search_title'] = $term;
-        $params['search_description'] = $term;
-        $params['search_organizer'] = $term;
     }
     $sql .= " ORDER BY e.starts_at ASC, e.id ASC";
     $eventQuery = $db->prepare($sql);
@@ -120,25 +117,6 @@ require dirname(__DIR__) . '/app/views/header.php';
     <?php if ($regions === []): ?>
         <section class="agenda-empty"><h2>De agenda wordt voorbereid</h2><p>Er zijn nog geen actieve regio's beschikbaar.</p></section>
     <?php else: ?>
-        <section class="agenda-region-strip" aria-label="Kies een stad">
-            <a class="agenda-city <?= $city === '' ? 'is-active' : '' ?>" href="/?<?= $escape(http_build_query(['region_id' => $regionId])) ?>">
-                <span class="agenda-city__round agenda-city__all"><span>✦</span></span>
-                <span>Alle plaatsen</span>
-            </a>
-            <?php foreach ($cities as $cityItem): ?>
-                <a class="agenda-city <?= $city === $cityItem['city'] ? 'is-active' : '' ?>" href="/?<?= $escape(http_build_query(['region_id' => $regionId, 'city' => $cityItem['city']])) ?>">
-                    <span class="agenda-city__round">
-                        <?php if (!empty($cityItem['logo_path'])): ?>
-                            <img src="<?= $escape($cityItem['logo_path']) ?>" alt="">
-                        <?php else: ?>
-                            <span><?= $escape(mb_strtoupper(mb_substr((string) $cityItem['city'], 0, 1))) ?></span>
-                        <?php endif; ?>
-                    </span>
-                    <span><?= $escape($cityItem['city']) ?></span>
-                </a>
-            <?php endforeach; ?>
-        </section>
-
         <div class="agenda-heading">
             <div>
                 <p class="eyebrow">SALSA · BACHATA · KIZOMBA</p>
@@ -147,22 +125,44 @@ require dirname(__DIR__) . '/app/views/header.php';
             </div>
         </div>
 
-        <form class="agenda-filters" method="get" action="/">
-            <input type="hidden" name="region_id" value="<?= $regionId ?>">
-            <?php if ($city !== ''): ?><input type="hidden" name="city" value="<?= $escape($city) ?>"><?php endif; ?>
-            <label>Dansstijl
-                <select name="category_id">
-                    <option value="">Alle dansstijlen</option>
-                    <?php foreach ($categories as $item): ?>
-                        <option value="<?= (int) $item['id'] ?>" <?= $categoryId === (int) $item['id'] ? 'selected' : '' ?>><?= $escape($item['name']) ?></option>
+        <form class="agenda-selectors" method="get" action="/">
+            <div class="agenda-selector-buttons" role="group" aria-label="Kies een filter">
+                <button type="button" class="agenda-selector-button is-active" data-filter-panel="region">1. Regio <span>⌄</span></button>
+                <button type="button" class="agenda-selector-button" data-filter-panel="organizer">2. Organisator <span>⌄</span></button>
+                <button type="button" class="agenda-selector-button" data-filter-panel="city">3. Stad <span>⌄</span></button>
+            </div>
+            <div class="agenda-selector-panel is-open" data-panel="region">
+                <label for="agenda-region">Welke regio?</label>
+                <select id="agenda-region" name="region_id">
+                    <?php foreach ($regions as $regionOption): ?>
+                        <option value="<?= (int) $regionOption['id'] ?>" <?= $regionId === (int) $regionOption['id'] ? 'selected' : '' ?>><?= $escape($regionOption['name']) ?></option>
                     <?php endforeach; ?>
                 </select>
-            </label>
-            <label class="agenda-search">Zoeken
-                <input type="search" name="q" value="<?= $escape($search) ?>" placeholder="Evenement of organisator">
-            </label>
-            <button class="button button--primary" type="submit">Zoeken</button>
-            <a class="agenda-reset" href="/?region_id=<?= $regionId ?>">Wis filters</a>
+            </div>
+            <div class="agenda-selector-panel" data-panel="organizer" hidden>
+                <label for="agenda-organizer">Welke organisator?</label>
+                <select id="agenda-organizer" name="organizer_id">
+                    <option value="">Alle organisatoren</option>
+                    <?php foreach ($organizers as $organizerOption): ?>
+                        <option value="<?= (int) $organizerOption['id'] ?>" <?= $organizerId === (int) $organizerOption['id'] ? 'selected' : '' ?>><?= $escape($organizerOption['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <input type="hidden" name="region_id" value="<?= $regionId ?>">
+            </div>
+            <div class="agenda-selector-panel" data-panel="city" hidden>
+                <label for="agenda-city">Welke stad?</label>
+                <select id="agenda-city" name="city">
+                    <option value="">Alle steden</option>
+                    <?php foreach ($cities as $cityOption): ?>
+                        <option value="<?= $escape($cityOption['city']) ?>" <?= $city === $cityOption['city'] ? 'selected' : '' ?>><?= $escape($cityOption['city']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+                <input type="hidden" name="region_id" value="<?= $regionId ?>">
+            </div>
+            <div class="agenda-selector-actions">
+                <button class="button button--primary" type="submit">Toon evenementen</button>
+                <a class="agenda-reset" href="/?region_id=<?= $regionId ?>">Wis filters</a>
+            </div>
         </form>
 
         <?php if ($events === []): ?>
@@ -212,15 +212,29 @@ require dirname(__DIR__) . '/app/views/header.php';
 </section>
 
 <style>
-.agenda-page{width:100%;max-width:1080px;margin:0 auto}.agenda-region-strip{display:flex;align-items:flex-start;gap:25px;overflow-x:auto;padding:2px 4px 20px;margin:-8px 0 22px;border-bottom:1px solid #dedede}.agenda-city{flex:0 0 104px;display:flex;flex-direction:column;align-items:center;gap:7px;color:#171717;font-size:14px;text-align:center}.agenda-city:hover{color:#171717}.agenda-city__round{width:92px;height:92px;padding:5px;display:grid;place-items:center;border-radius:50%;background:linear-gradient(135deg,#c32c9b,#773ad3,#ff8c27);transition:transform .18s ease}.agenda-city__round:after{content:"";position:absolute}.agenda-city__round img,.agenda-city__round>span{width:100%;height:100%;display:grid;place-items:center;border:4px solid #fff;border-radius:50%;background:#fff;object-fit:contain;color:#244c79;font-size:30px;font-weight:800}.agenda-city__all{background:linear-gradient(135deg,#c32c9b,#773ad3,#ff8c27)}.agenda-city__all>span{background:radial-gradient(circle,#fff 45%,#e7f3ff 100%)}.agenda-city.is-active .agenda-city__round,.agenda-city:hover .agenda-city__round{transform:translateY(-3px);box-shadow:0 5px 15px #0002}.agenda-city.is-active>span:last-child{font-weight:800}.agenda-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 0 20px}.agenda-heading h1{margin:0 0 4px}.agenda-heading p:not(.eyebrow){margin:0;color:var(--db-muted)}.agenda-month-select{display:flex;align-items:center;gap:9px;color:var(--db-muted);font-size:12px;font-weight:700}.agenda-month-select input{padding:9px;border:1px solid var(--db-border);border-radius:8px;background:#fff;color:var(--db-text)}.agenda-filters{display:flex;align-items:end;flex-wrap:wrap;gap:10px;margin-bottom:20px;padding:13px;background:#fff;border:1px solid var(--db-border);border-radius:10px}.agenda-filters label{display:flex;flex-direction:column;gap:4px;min-width:155px;color:var(--db-muted);font-size:11px;font-weight:700}.agenda-filters select,.agenda-filters input{height:40px;min-width:0;padding:7px 10px;border:1px solid var(--db-border);border-radius:7px;background:#fff;color:var(--db-text)}.agenda-filters .agenda-search{flex:1}.agenda-filters .agenda-search input{width:100%}.agenda-reset,.agenda-today{font-size:12px;font-weight:700;padding:9px 5px}.agenda-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:0 0 15px}.agenda-month-nav{display:flex;align-items:center;gap:9px}.agenda-month-nav h2{margin:0;min-width:140px;text-align:center;font-size:18px}.agenda-month-nav .button{min-width:36px;padding:6px;font-size:20px}.agenda-view-switch{display:flex;padding:3px;background:#eceff2;border-radius:8px}.agenda-view-switch a{padding:6px 11px;border-radius:6px;color:var(--db-muted);font-size:12px;font-weight:700}.agenda-view-switch a.is-active{background:#fff;color:var(--db-text);box-shadow:0 1px 4px #0001}.agenda-feed{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;max-width:880px;margin:0 auto}.agenda-card{overflow:hidden;border:1px solid #65c99b;border-radius:15px;background:#f78d19;box-shadow:0 4px 18px #0000000d}.agenda-card__image-link{display:block;overflow:hidden;background:#171717;aspect-ratio:4/3}.agenda-card__image{display:block;width:100%;height:100%;object-fit:contain;background:#171717}.agenda-card__placeholder{display:flex;width:100%;height:100%;min-height:230px;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:25px;text-align:center;color:#fff;background:radial-gradient(circle at 25% 20%,#f4802a 0,transparent 38%),linear-gradient(135deg,#202b38,#35475b)}.agenda-card__placeholder span{font-size:11px;letter-spacing:2px;color:#ffd36c;font-weight:800}.agenda-card__placeholder strong{font-size:clamp(20px,3vw,30px);line-height:1.15}.agenda-card__details{padding:17px 20px 20px;color:#fff}.agenda-card__quick{display:flex;align-items:center;gap:17px;margin:0 0 13px}.agenda-card__quick-date{min-width:34px;color:#fff;font-size:22px;font-weight:800}.agenda-icon-button{width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;color:#fff;font-size:31px;line-height:1;cursor:pointer}.agenda-icon-button:hover{background:#ffffff26;color:#fff}.agenda-card__details h2{margin:0 0 7px;color:#fff;font-size:22px}.agenda-card__details h2 a{color:inherit}.agenda-card__tags{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 10px;color:#fff;font-size:15px}.agenda-card__date-line{margin:0 0 7px;color:#fff;font-size:14px;font-weight:600}.agenda-card__date-line span{margin:0 8px}.agenda-card__location{margin:0 0 7px;color:#fff;font-size:13px}.agenda-card__more{display:inline-block;color:#fff;text-decoration:underline;text-underline-offset:3px;font-size:14px;font-weight:600}.agenda-card__more:hover{color:#fff}.agenda-count{margin:15px 2px;color:var(--db-muted);font-size:12px}.agenda-empty{padding:38px 24px;text-align:center;background:#fff;border:1px solid var(--db-border);border-radius:12px}.agenda-empty p{color:var(--db-muted);margin:0}.agenda-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));overflow:hidden;border:1px solid var(--db-border);border-radius:12px;background:#fff}.agenda-calendar__weekday{padding:10px;text-align:center;background:#f2f5f8;color:var(--db-muted);font-size:11px;font-weight:750;text-transform:uppercase}.agenda-calendar__day{min-height:125px;padding:8px;border-top:1px solid var(--db-border);border-right:1px solid var(--db-border);min-width:0}.agenda-calendar__day:nth-child(7n){border-right:0}.agenda-calendar__day.is-outside{background:#fafbfc;color:#aab2bd}.agenda-calendar__day.is-today{background:#fffaf0}.agenda-calendar__number{display:block;margin-bottom:5px;font-size:12px;font-weight:750}.agenda-calendar__event{display:block;margin:4px 0;padding:4px 5px;overflow:hidden;border-radius:5px;background:#eaf1fa;color:#174c83;font-size:11px;line-height:1.35;overflow-wrap:anywhere}.agenda-calendar__event time{font-weight:800;margin-right:3px}
-@media(max-width:700px){.agenda-heading{align-items:flex-start;flex-direction:column}.agenda-region-strip{gap:15px}.agenda-city{flex-basis:88px;font-size:13px}.agenda-city__round{width:78px;height:78px}.agenda-filters{align-items:stretch}.agenda-filters label{flex:1 1 100%;min-width:0}.agenda-toolbar{align-items:flex-start;flex-direction:column}.agenda-calendar__day{min-height:95px;padding:4px}.agenda-calendar__weekday{padding:7px 2px;font-size:9px}.agenda-calendar__event{font-size:9px;padding:3px}.agenda-card__image-link{aspect-ratio:4/3}.agenda-card__details{padding:15px 17px 18px}}
+.agenda-page{width:100%;max-width:1080px;margin:0 auto}.agenda-selectors{margin:0 0 22px;padding:14px;background:#fff;border:1px solid var(--db-border);border-radius:12px}.agenda-selector-buttons{display:flex;gap:9px;flex-wrap:wrap}.agenda-selector-button{flex:1 1 150px;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:13px 16px;border:1px solid var(--db-border);border-radius:9px;background:#f5f6f8;color:var(--db-text);font-weight:750;cursor:pointer}.agenda-selector-button.is-active{background:var(--db-primary);border-color:var(--db-primary);color:#fff}.agenda-selector-panel{display:flex;align-items:center;gap:14px;margin-top:13px;padding:12px;background:#f7f8fa;border-radius:8px}.agenda-selector-panel[hidden]{display:none}.agenda-selector-panel label{min-width:145px;font-size:13px;font-weight:750}.agenda-selector-panel select{flex:1;min-width:0;height:42px;padding:8px 11px;border:1px solid var(--db-border);border-radius:7px;background:#fff;color:var(--db-text)}.agenda-selector-actions{display:flex;align-items:center;gap:15px;margin-top:12px}.agenda-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;margin:0 0 20px}.agenda-heading h1{margin:0 0 4px}.agenda-heading p:not(.eyebrow){margin:0;color:var(--db-muted)}.agenda-month-select{display:flex;align-items:center;gap:9px;color:var(--db-muted);font-size:12px;font-weight:700}.agenda-month-select input{padding:9px;border:1px solid var(--db-border);border-radius:8px;background:#fff;color:var(--db-text)}.agenda-filters{display:flex;align-items:end;flex-wrap:wrap;gap:10px;margin-bottom:20px;padding:13px;background:#fff;border:1px solid var(--db-border);border-radius:10px}.agenda-filters label{display:flex;flex-direction:column;gap:4px;min-width:155px;color:var(--db-muted);font-size:11px;font-weight:700}.agenda-filters select,.agenda-filters input{height:40px;min-width:0;padding:7px 10px;border:1px solid var(--db-border);border-radius:7px;background:#fff;color:var(--db-text)}.agenda-filters .agenda-search{flex:1}.agenda-filters .agenda-search input{width:100%}.agenda-reset,.agenda-today{font-size:12px;font-weight:700;padding:9px 5px}.agenda-toolbar{display:flex;justify-content:space-between;align-items:center;gap:15px;margin:0 0 15px}.agenda-month-nav{display:flex;align-items:center;gap:9px}.agenda-month-nav h2{margin:0;min-width:140px;text-align:center;font-size:18px}.agenda-month-nav .button{min-width:36px;padding:6px;font-size:20px}.agenda-view-switch{display:flex;padding:3px;background:#eceff2;border-radius:8px}.agenda-view-switch a{padding:6px 11px;border-radius:6px;color:var(--db-muted);font-size:12px;font-weight:700}.agenda-view-switch a.is-active{background:#fff;color:var(--db-text);box-shadow:0 1px 4px #0001}.agenda-feed{display:grid;grid-template-columns:minmax(0,1fr);gap:20px;max-width:880px;margin:0 auto}.agenda-card{overflow:hidden;border:1px solid #65c99b;border-radius:15px;background:#f78d19;box-shadow:0 4px 18px #0000000d}.agenda-card__image-link{display:block;overflow:hidden;background:#171717;aspect-ratio:4/3}.agenda-card__image{display:block;width:100%;height:100%;object-fit:contain;background:#171717}.agenda-card__placeholder{display:flex;width:100%;height:100%;min-height:230px;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:25px;text-align:center;color:#fff;background:radial-gradient(circle at 25% 20%,#f4802a 0,transparent 38%),linear-gradient(135deg,#202b38,#35475b)}.agenda-card__placeholder span{font-size:11px;letter-spacing:2px;color:#ffd36c;font-weight:800}.agenda-card__placeholder strong{font-size:clamp(20px,3vw,30px);line-height:1.15}.agenda-card__details{padding:17px 20px 20px;color:#fff}.agenda-card__quick{display:flex;align-items:center;gap:17px;margin:0 0 13px}.agenda-card__quick-date{min-width:34px;color:#fff;font-size:22px;font-weight:800}.agenda-icon-button{width:40px;height:40px;display:grid;place-items:center;border:0;border-radius:50%;background:transparent;color:#fff;font-size:31px;line-height:1;cursor:pointer}.agenda-icon-button:hover{background:#ffffff26;color:#fff}.agenda-card__details h2{margin:0 0 7px;color:#fff;font-size:22px}.agenda-card__details h2 a{color:inherit}.agenda-card__tags{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 10px;color:#fff;font-size:15px}.agenda-card__date-line{margin:0 0 7px;color:#fff;font-size:14px;font-weight:600}.agenda-card__date-line span{margin:0 8px}.agenda-card__location{margin:0 0 7px;color:#fff;font-size:13px}.agenda-card__more{display:inline-block;color:#fff;text-decoration:underline;text-underline-offset:3px;font-size:14px;font-weight:600}.agenda-card__more:hover{color:#fff}.agenda-count{margin:15px 2px;color:var(--db-muted);font-size:12px}.agenda-empty{padding:38px 24px;text-align:center;background:#fff;border:1px solid var(--db-border);border-radius:12px}.agenda-empty p{color:var(--db-muted);margin:0}.agenda-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));overflow:hidden;border:1px solid var(--db-border);border-radius:12px;background:#fff}.agenda-calendar__weekday{padding:10px;text-align:center;background:#f2f5f8;color:var(--db-muted);font-size:11px;font-weight:750;text-transform:uppercase}.agenda-calendar__day{min-height:125px;padding:8px;border-top:1px solid var(--db-border);border-right:1px solid var(--db-border);min-width:0}.agenda-calendar__day:nth-child(7n){border-right:0}.agenda-calendar__day.is-outside{background:#fafbfc;color:#aab2bd}.agenda-calendar__day.is-today{background:#fffaf0}.agenda-calendar__number{display:block;margin-bottom:5px;font-size:12px;font-weight:750}.agenda-calendar__event{display:block;margin:4px 0;padding:4px 5px;overflow:hidden;border-radius:5px;background:#eaf1fa;color:#174c83;font-size:11px;line-height:1.35;overflow-wrap:anywhere}.agenda-calendar__event time{font-weight:800;margin-right:3px}
+@media(max-width:700px){.agenda-heading{align-items:flex-start;flex-direction:column}.agenda-selector-buttons{display:grid;grid-template-columns:1fr}.agenda-selector-button{width:100%}.agenda-selector-panel{align-items:stretch;flex-direction:column;gap:7px}.agenda-selector-panel label{min-width:0}.agenda-selector-actions{align-items:flex-start;flex-direction:column}.agenda-toolbar{align-items:flex-start;flex-direction:column}.agenda-calendar__day{min-height:95px;padding:4px}.agenda-calendar__weekday{padding:7px 2px;font-size:9px}.agenda-calendar__event{font-size:9px;padding:3px}.agenda-card__image-link{aspect-ratio:4/3}.agenda-card__details{padding:15px 17px 18px}}
 @media(max-width:420px){.agenda-month-nav{width:100%;gap:6px}.agenda-month-nav h2{flex:1;min-width:0;font-size:17px}.agenda-month-nav .button{min-width:34px}.agenda-calendar__day{min-height:82px}.agenda-calendar__event time{display:none}}
 </style>
 <script>
 document.addEventListener('click', function (event) {
-    const button = event.target.closest('[data-share-url]');
-    if (!button) return;
-    const text = button.dataset.shareTitle + ' — ' + button.dataset.shareUrl;
+    const filterButton = event.target.closest('[data-filter-panel]');
+    if (filterButton) {
+        const target = filterButton.dataset.filterPanel;
+        document.querySelectorAll('[data-filter-panel]').forEach(function (button) {
+            button.classList.toggle('is-active', button === filterButton);
+            button.setAttribute('aria-expanded', button === filterButton ? 'true' : 'false');
+        });
+        document.querySelectorAll('[data-panel]').forEach(function (panel) {
+            const open = panel.dataset.panel === target;
+            panel.hidden = !open;
+            panel.classList.toggle('is-open', open);
+        });
+        return;
+    }
+    const shareButton = event.target.closest('[data-share-url]');
+    if (!shareButton) return;
+    const text = shareButton.dataset.shareTitle + ' — ' + shareButton.dataset.shareUrl;
     window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener,noreferrer');
 });
 </script>
