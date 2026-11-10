@@ -272,9 +272,29 @@ try {
 
     // Ook uitvoeren wanneer de code al up-to-date is, bijvoorbeeld na een
     // eerdere update waarbij de database-aanpassing nog niet kon worden afgerond.
-    migrateDuplicateUserEmails(Database::connection());
-    migrateOrganizerRegions(Database::connection());
-    migrateAuditTracking(Database::connection());
+    $db = Database::connection();
+
+    // Eerst de kolom toevoegen die de organisatorenpagina nodig heeft.
+    // Zo wordt deze migratie ook uitgevoerd als een latere migratie problemen geeft.
+    migrateOrganizerRegions($db);
+
+    $regionColumnExists = (int) $db->query(
+        "SELECT COUNT(*) FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'organizers'
+           AND COLUMN_NAME = 'region_id'"
+    )->fetchColumn();
+
+    if ($regionColumnExists !== 1) {
+        throw new RuntimeException(
+            'Database-update onvolledig: organizers.region_id kon niet worden aangemaakt.'
+        );
+    }
+    $messages[] = 'Database: regio-koppeling voor organisatoren is gecontroleerd.';
+
+    migrateDuplicateUserEmails($db);
+    migrateAuditTracking($db);
+    $messages[] = 'Database: aanmaak- en wijzigingsregistratie is gecontroleerd voor alle tabellen.';
 
     $shortCommit = runRequiredGit(['rev-parse', '--short', 'HEAD'], $projectRoot);
     $messages[] = 'Geïnstalleerde versie: ' . $shortCommit;
