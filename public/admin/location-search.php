@@ -189,6 +189,21 @@ try {
         }
         if (mb_strlen($phone) > 50 || !preg_match('/^[+0-9][0-9\s().\/-]{5,49}$/', $phone)) $phone = '';
     }
+    // Als de website zelf geen telefoonnummer toont, zoek gericht in Google-resultaten.
+    if ($phone === '') {
+        $phoneTerms = '"' . $name . '" "' . $city . '" "' . $countryName . '" (telefono OR teléfono OR phone OR contacto)';
+        try {
+            $phoneHtml = locationSearchFetch('https://www.google.com/search?hl=es&num=10&q=' . rawurlencode($phoneTerms));
+            $phoneText = html_entity_decode(strip_tags($phoneHtml), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            if (preg_match('~(?:tel(?:éfono|efono)?|phone|contacto|call|llamar)\D{0,35}(\+?[0-9][0-9\s()./-]{6,24}[0-9])~iu', $phoneText, $phoneMatch)) {
+                $candidatePhone = trim($phoneMatch[1]);
+                $digits = preg_replace('/\D+/', '', $candidatePhone);
+                if (strlen((string) $digits) >= 7 && strlen((string) $digits) <= 15) $phone = $candidatePhone;
+            }
+        } catch (Throwable $ignored) {
+            // Telefoon zoeken mag de website- en logovondst niet blokkeren.
+        }
+    }
     // Verzamel logo-kandidaten in volgorde van betrouwbaarheid.
     $logoCandidates = [];
     if ($siteHtml !== '') {
