@@ -192,7 +192,6 @@ try {
         if ($mapsPhone === '') {
             $phonePatterns = [
                 '~"(?:phoneNumber|telephone|phone)"\s*:\s*"([^"]{7,60})"~i',
-                '~(?:phoneNumber|telephone|phone)\\?"?\s*[,=:]\s*\\?"([^"\\]{7,60})~i',
                 '~"phoneNumber"\s*,\s*"([^"]{7,60})"~i',
                 '~data-item-id=["\x27]phone:tel:([^"\x27]+)["\x27]~i',
                 '~(?:href|data-href)=["\x27]tel:([^"\x27]+)["\x27]~i',
