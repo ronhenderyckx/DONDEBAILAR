@@ -68,6 +68,32 @@ function runRequiredGit(array $arguments, string $workingDirectory): string
     return $result['output'];
 }
 
+/**
+ * Laat testaccounts hetzelfde e-mailadres delen.
+ * Verwijdert uitsluitend een enkelvoudige UNIQUE-index op users.email.
+ */
+function migrateDuplicateUserEmails(PDO $db): void
+{
+    $statement = $db->query(
+        "SELECT s.INDEX_NAME
+         FROM information_schema.STATISTICS s
+         WHERE s.TABLE_SCHEMA = DATABASE()
+           AND s.TABLE_NAME = 'users'
+           AND s.NON_UNIQUE = 0
+         GROUP BY s.INDEX_NAME
+         HAVING COUNT(*) = 1
+            AND MAX(s.COLUMN_NAME) = 'email'"
+    );
+
+    foreach ($statement->fetchAll(PDO::FETCH_COLUMN) as $indexName) {
+        if (!is_string($indexName) || !preg_match('/^[A-Za-z0-9_]+$/', $indexName)) {
+            continue;
+        }
+
+        $db->exec('ALTER TABLE users DROP INDEX `' . $indexName . '`');
+    }
+}
+
 try {
     set_time_limit(180);
 
@@ -100,6 +126,10 @@ try {
     if (!hash_equals($currentCommit, $availableCommit)) {
         runRequiredGit(['merge-base', '--is-ancestor', 'HEAD', 'FETCH_HEAD'], $projectRoot);
         runRequiredGit(['pull', '--ff-only', 'origin', 'develop'], $projectRoot);
+
+        // Database-aanpassing voor meerdere accounts met hetzelfde e-mailadres.
+        migrateDuplicateUserEmails(Database::connection());
+
         $success = true;
         $messages[] = 'DONDEBAILAR is bijgewerkt naar de nieuwste versie van develop.';
     } else {
