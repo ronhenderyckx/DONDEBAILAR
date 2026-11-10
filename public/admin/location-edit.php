@@ -205,7 +205,11 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     const el=document.getElementById(key);
     if(el&&data.location[key]!==undefined&&data.location[key]!==null&&data.location[key]!=='')el.value=data.location[key];
    }
-   showMapsStatus(data.message||'Adresgegevens ingevuld. Controleer het resultaat.');
+   let mapsMessage=data.message||'Adresgegevens ingevuld. Controleer het resultaat.';
+   if(!data.location.phone&&data.phone_debug){
+    mapsMessage+=' Telefoon niet gevonden (Maps HTTP '+data.phone_debug.http_status+', pagina '+data.phone_debug.page_bytes+' bytes).';
+   }
+   showMapsStatus(mapsMessage,!data.location.phone);
    await searchLocationBranding();
   }catch(error){
    lastUrl='';showMapsStatus('Kaartopzoeking mislukt. Controleer de link en probeer opnieuw.',true);
