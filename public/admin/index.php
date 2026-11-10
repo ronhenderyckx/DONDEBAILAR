@@ -62,6 +62,23 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     <section class="admin-section">
         <div class="section-heading">
             <div>
+                <h2>Systeemupdate</h2>
+                <p>Haal de nieuwste versie van DONDEBAILAR op vanaf GitHub.</p>
+            </div>
+            <form method="post" action="/admin/update.php"
+                  onsubmit="return confirm('Wil je DONDEBAILAR nu bijwerken?');">
+                <input type="hidden" name="csrf_token"
+                       value="<?= escapeHtml(csrfToken()) ?>">
+                <button class="button button--primary" type="submit">
+                    UPDATE
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <section class="admin-section">
+        <div class="section-heading">
+            <div>
                 <h2>Evenementen</h2>
                 <p>Bekijk en beheer evenementen binnen de regio's die je beheert.</p>
             </div>
