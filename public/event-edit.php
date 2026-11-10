@@ -128,11 +128,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!$item) continue;
                 $remove = $db->prepare("DELETE FROM event_media WHERE id = :id AND event_id = :event_id");
                 $remove->execute(['id' => $mediaId, 'event_id' => $id]);
-                deleteEventMediaFile((string) $item['file_path'], (int) $id);
+                $removedMediaPaths[] = (string) $item['file_path'];
             }
 
             storeEventMedia($db, (int) $id, (int) $user['id'], $_FILES);
             $db->commit();
+
+            // Verwijder bestanden pas nadat de databasewijzigingen definitief zijn.
+            foreach ($removedMediaPaths ?? [] as $removedPath) {
+                deleteEventMediaFile($removedPath, (int) $id);
+            }
+
             header('Location: /event-edit.php?id=' . $id . '&updated=1');
             exit;
         } catch (Throwable $exception) {
