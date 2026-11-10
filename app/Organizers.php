@@ -3,31 +3,31 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/Authorization.php';
 
-/** Regio's waarin de gebruiker organisatoren mag beheren. */
-function organizerManageableRegions(PDO $db, array $user): array
+/**
+ * Alle organisatoren zijn platformbreed.
+ * Platformbeheerders en regionale beheerders mogen alle organisatoren beheren.
+ */
+function requireOrganizerManagement(): array
 {
+    $user = requireLogin();
+
     if (isPlatformAdmin($user)) {
-        return $db->query(
-            "SELECT id, name FROM regions WHERE is_active = 1 ORDER BY name"
-        )->fetchAll();
+        return $user;
     }
 
-    $statement = $db->prepare(
-        "SELECT DISTINCT r.id, r.name
-         FROM regions r
-         INNER JOIN user_region_roles urr ON urr.region_id = r.id
-         WHERE urr.user_id = :user_id
-           AND urr.role = 'region_admin'
-           AND r.is_active = 1
-         ORDER BY r.name"
+    $statement = Database::connection()->prepare(
+        "SELECT 1
+         FROM user_region_roles
+         WHERE user_id = :user_id
+           AND role = 'region_admin'
+         LIMIT 1"
     );
     $statement->execute(['user_id' => (int) $user['id']]);
-    return $statement->fetchAll();
-}
 
-/** Alleen platformbeheerders en beheerders van de betreffende regio mogen beheren. */
-function organizerCanManageRegion(int $regionId, array $user): bool
-{
-    return isPlatformAdmin($user)
-        || ($regionId > 0 && userHasRegionRole($regionId, ['region_admin'], $user));
+    if (!$statement->fetchColumn()) {
+        http_response_code(403);
+        exit('Je hebt geen rechten om organisatoren te beheren.');
+    }
+
+    return $user;
 }
