@@ -198,9 +198,14 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
   showMapsStatus('Google Maps-link wordt opgehaald…');
   try{
    const response=await fetch('/admin/location-resolve.php',{method:'POST',headers:{'Content-Type':'application/json','X-CSRF-Token':csrf},body:JSON.stringify({url})});
-   const data=await response.json();
+   const responseText=await response.text();
+   let data=null;
+   try{data=JSON.parse(responseText);}catch(parseError){
+    const detail=responseText.replace(/<[^>]*>/g,' ').replace(/\\s+/g,' ').trim().slice(0,220);
+    throw new Error('Server gaf geen geldige JSON terug (HTTP '+response.status+'). '+(detail||'Lege serverreactie.'));
+   }
    if(thisRequest!==requestNumber)return;
-   if(!response.ok||!data.success){lastUrl='';showMapsStatus(data.message||'De kaartgegevens konden niet worden opgehaald.',true);return;}
+   if(!response.ok||!data.success){lastUrl='';showMapsStatus((data.message||'De kaartgegevens konden niet worden opgehaald.')+' (HTTP '+response.status+')',true);return;}
    for(const key of fields){
     const el=document.getElementById(key);
     if(el&&data.location[key]!==undefined&&data.location[key]!==null&&data.location[key]!=='')el.value=data.location[key];
@@ -212,7 +217,9 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
    showMapsStatus(mapsMessage,!data.location.phone);
    await searchLocationBranding();
   }catch(error){
-   lastUrl='';showMapsStatus('Kaartopzoeking mislukt. Controleer de link en probeer opnieuw.',true);
+   lastUrl='';
+   const message=error&&error.message?error.message:'Onbekende fout tijdens de aanvraag.';
+   showMapsStatus('Kaartopzoeking mislukt: '+message,true);
   }
  }
  ['name','city','country_code'].forEach(id=>{
