@@ -97,12 +97,12 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     <section class="admin-section location-form-section">
         <form method="post" enctype="multipart/form-data" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+            <label for="google_maps_url">Google Maps-link</label>
+            <input id="google_maps_url" name="google_maps_url" type="url" maxlength="700" placeholder="https://maps.google.com/?cid=..." value="<?= escapeHtml($mapsUrl) ?>">
             <label for="region_id">Regio *</label>
             <select id="region_id" name="region_id" required>
                 <?php foreach ($regions as $item): ?><option value="<?= (int) $item['id'] ?>" <?= $regionId === (int) $item['id'] ? 'selected' : '' ?>><?= escapeHtml($item['name']) ?></option><?php endforeach; ?>
             </select>
-            <label for="google_maps_url">Google Maps-link</label>
-            <input id="google_maps_url" name="google_maps_url" type="url" maxlength="700" placeholder="https://maps.google.com/?cid=..." value="<?= escapeHtml($mapsUrl) ?>">
             <label for="name">Naam locatie *</label>
             <input id="name" name="name" maxlength="190" required value="<?= escapeHtml($name) ?>">
             <div class="location-form-grid">
