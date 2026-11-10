@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
 require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
+require_once dirname(__DIR__, 2) . '/app/SmtpMailer.php';
 
 $admin = requirePlatformAdmin();
 $db = Database::connection();
@@ -76,7 +77,54 @@ function mailSettingsEncryptionKey(): string
     return $key;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_test_email'])) {
+    $testRecipient = trim((string) ($_POST['test_recipient'] ?? $admin['email'] ?? ''));
+
+    if (!verifyCsrfToken(is_string($_POST['csrf_token'] ?? null) ? $_POST['csrf_token'] : null)) {
+        $errorMessage = 'De beveiligingscontrole is verlopen. Vernieuw de pagina.';
+    } elseif (!filter_var($testRecipient, FILTER_VALIDATE_EMAIL)) {
+        $errorMessage = 'Vul een geldig e-mailadres in voor de testmail.';
+    } elseif (!$existing) {
+        $errorMessage = 'Sla eerst de SMTP-instellingen op voordat je een testmail verstuurt.';
+    } else {
+        try {
+            $smtpPassword = '';
+            $encryptedPassword = (string) ($existing['smtp_password_encrypted'] ?? '');
+            if ($encryptedPassword !== '') {
+                if (!extension_loaded('sodium')) {
+                    throw new RuntimeException('De PHP-extensie sodium is vereist om het opgeslagen SMTP-wachtwoord te ontsleutelen.');
+                }
+                $packed = base64_decode($encryptedPassword, true);
+                $nonceLength = SODIUM_CRYPTO_SECRETBOX_NONCEBYTES;
+                if (!is_string($packed) || strlen($packed) <= $nonceLength) {
+                    throw new RuntimeException('Het opgeslagen SMTP-wachtwoord is ongeldig.');
+                }
+                $smtpPassword = sodium_crypto_secretbox_open(
+                    substr($packed, $nonceLength),
+                    substr($packed, 0, $nonceLength),
+                    mailSettingsEncryptionKey()
+                );
+                if (!is_string($smtpPassword)) {
+                    throw new RuntimeException('Het SMTP-wachtwoord kon niet worden ontsleuteld. Controleer of storage/mail-settings.key nog aanwezig is.');
+                }
+            }
+
+            dondebailarSendSmtpMail(
+                $existing,
+                $smtpPassword,
+                $testRecipient,
+                'DONDEBAILAR - test e-mail',
+                "Dit is een testbericht van DONDEBAILAR.\n\nAls je dit bericht ontvangt, werken de SMTP-instellingen voor uitgaande e-mail."
+            );
+            $successMessage = 'De testmail is door de SMTP-server aanvaard voor verzending naar ' . $testRecipient . '. Controleer ook de spammap.';
+        } catch (Throwable $exception) {
+            error_log('DONDEBAILAR SMTP-test mislukt: ' . $exception->getMessage());
+            $errorMessage = 'Testmail mislukt: ' . $exception->getMessage();
+        }
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && !isset($_POST['send_test_email'])) {
     $posted = [
         'smtp_host' => trim((string) ($_POST['smtp_host'] ?? '')),
         'smtp_port' => trim((string) ($_POST['smtp_port'] ?? '')),
@@ -225,6 +273,39 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 <button type="submit" class="button button--primary">Instellingen opslaan</button>
                 <a class="button" href="/admin/">Annuleren</a>
             </div>
+        </form>
+    </section>
+
+    <section class="admin-section">
+        <div class="section-heading">
+            <div>
+                <h2>Test e-mail versturen</h2>
+                <p>Verstuur een testbericht via de opgeslagen SMTP-instellingen.</p>
+            </div>
+        </div>
+        <form method="post" action="/admin/mail-settings.php" class="auth-form">
+            <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+            <label for="test_recipient">Testmail versturen naar</label>
+            <input
+                type="email"
+                id="test_recipient"
+                name="test_recipient"
+                value="<?= escapeHtml($admin['email'] ?? '') ?>"
+                maxlength="190"
+                required
+            >
+            <div class="form-actions">
+                <button
+                    type="submit"
+                    class="button button--primary"
+                    name="send_test_email"
+                    value="1"
+                    <?= !$existing ? 'disabled' : '' ?>
+                >Testmail versturen</button>
+            </div>
+            <?php if (!$existing): ?>
+                <p>Sla eerst de SMTP-instellingen op. Daarna kun je een testmail versturen.</p>
+            <?php endif; ?>
         </form>
     </section>
 
