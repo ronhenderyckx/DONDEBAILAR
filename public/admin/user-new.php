@@ -117,12 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $db->rollBack();
             }
 
-            if ($exception instanceof PDOException && $exception->getCode() === '23000') {
-                $errorMessage = 'Dit e-mailadres bestaat al.';
-            } else {
-                error_log('DONDEBAILAR gebruiker aanmaken: ' . $exception->getMessage());
-                $errorMessage = 'De gebruiker kon niet worden aangemaakt. Controleer de serverlog.';
-            }
+            error_log('DONDEBAILAR gebruiker aanmaken: ' . $exception->getMessage());
+            $errorMessage = 'De gebruiker kon niet worden aangemaakt. Controleer de serverlog.';
         }
     }
 }
