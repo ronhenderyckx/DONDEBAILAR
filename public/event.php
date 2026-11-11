@@ -52,6 +52,14 @@ $escape = static fn($value): string => escapeHtml((string) $value);
         <p>Locatie: <?= $escape($event['location_name']) ?><?= !empty($event['location_city']) ? ' — ' . $escape($event['location_city']) : '' ?></p>
     <?php endif; ?>
     <?php if (!empty($event['description'])): ?><div class="public-event-description"><?= nl2br($escape($event['description'])) ?></div><?php endif; ?>
+    <?php
+    $eventHashtags = preg_split('/[\s,]+/u', trim((string) ($event['hashtags'] ?? '')), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+    $eventHashtags = array_values(array_filter(array_map(static function (string $tag): string {
+        $tag = ltrim($tag, '#');
+        return preg_match('/\A[\p{L}\p{N}_]+\z/u', $tag) ? '#' . $tag : '';
+    }, $eventHashtags)));
+    ?>
+    <?php if ($eventHashtags !== []): ?><p class="public-event-hashtags"><?= implode(' ', array_map($escape, $eventHashtags)) ?></p><?php endif; ?>
     <?php if ($media !== []): ?>
         <section class="admin-section">
             <h2>Foto's, video's en berichten</h2>
@@ -89,6 +97,6 @@ $escape = static fn($value): string => escapeHtml((string) $value);
     <?php endif; ?>
 </section>
 <style>
-.public-event-page{max-width:1000px;margin:0 auto}.public-event-description{margin:24px 0;line-height:1.7}.public-event-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}.public-event-media-item{min-width:0;padding:12px;border:1px solid #e7eaf0;border-radius:10px;background:#fff}.public-event-media-item img,.public-event-media-item video,.public-event-media-item iframe{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/5;border:0;border-radius:7px;background:#111;object-fit:contain}.public-event-media-item iframe{height:520px}.public-event-media-item p{overflow-wrap:anywhere}
+.public-event-page{max-width:1000px;margin:0 auto}.public-event-description{margin:24px 0;line-height:1.7}.public-event-hashtags{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 24px;color:var(--db-primary);font-weight:700;overflow-wrap:anywhere}.public-event-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}.public-event-media-item{min-width:0;padding:12px;border:1px solid #e7eaf0;border-radius:10px;background:#fff}.public-event-media-item img,.public-event-media-item video,.public-event-media-item iframe{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/5;border:0;border-radius:7px;background:#111;object-fit:contain}.public-event-media-item iframe{height:520px}.public-event-media-item p{overflow-wrap:anywhere}
 </style>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
