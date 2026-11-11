@@ -9,27 +9,38 @@ $user = requireLogin();
 $db = Database::connection();
 $userId = (int) $user['id'];
 
-// Zodra de gebruiker het meldingenoverzicht opent, zijn de meldingen bekeken.
-$markRead = $db->prepare(
-    "UPDATE user_notifications SET is_read = 1 WHERE user_id = :user_id AND is_read = 0"
+// Controleer eerst of de database-upgrade de meldingtabel heeft aangemaakt.
+$tableCheck = $db->prepare(
+    "SELECT COUNT(*) FROM information_schema.TABLES
+     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'user_notifications'"
 );
-$markRead->execute(['user_id' => $userId]);
+$tableCheck->execute();
+$notificationsTableMissing = (int) $tableCheck->fetchColumn() === 0;
+$notifications = [];
 
-$query = $db->prepare(
-    "SELECT n.id, n.event_id, n.message_id, n.created_at,
-            actor.display_name AS actor_name,
-            e.title AS event_title,
-            m.message
-     FROM user_notifications n
-     INNER JOIN users actor ON actor.id = n.actor_user_id
-     INNER JOIN events e ON e.id = n.event_id
-     INNER JOIN event_messages m ON m.id = n.message_id
-     WHERE n.user_id = :user_id
-     ORDER BY n.created_at DESC, n.id DESC
-     LIMIT 100"
-);
-$query->execute(['user_id' => $userId]);
-$notifications = $query->fetchAll();
+if (!$notificationsTableMissing) {
+    // Zodra de gebruiker het meldingenoverzicht opent, zijn de meldingen bekeken.
+    $markRead = $db->prepare(
+        "UPDATE user_notifications SET is_read = 1 WHERE user_id = :user_id AND is_read = 0"
+    );
+    $markRead->execute(['user_id' => $userId]);
+
+    $query = $db->prepare(
+        "SELECT n.id, n.event_id, n.message_id, n.created_at,
+                actor.display_name AS actor_name,
+                e.title AS event_title,
+                m.message
+         FROM user_notifications n
+         INNER JOIN users actor ON actor.id = n.actor_user_id
+         INNER JOIN events e ON e.id = n.event_id
+         INNER JOIN event_messages m ON m.id = n.message_id
+         WHERE n.user_id = :user_id
+         ORDER BY n.created_at DESC, n.id DESC
+         LIMIT 100"
+    );
+    $query->execute(['user_id' => $userId]);
+    $notifications = $query->fetchAll();
+}
 
 $pageTitle = 'Meldingen — DONDEBAILAR';
 $pageRobots = 'noindex, nofollow';
@@ -46,7 +57,9 @@ $escape = static fn($value): string => escapeHtml((string) $value);
     </div>
 
     <section class="admin-section">
-        <?php if ($notifications === []): ?>
+        <?php if ($notificationsTableMissing): ?>
+            <p>De meldingentabel ontbreekt nog in de database. Ga naar Platformbeheer en klik op UPDATE om de database bij te werken.</p>
+        <?php elseif ($notifications === []): ?>
             <p>Je hebt nog geen meldingen.</p>
         <?php else: ?>
             <div class="notification-list">
