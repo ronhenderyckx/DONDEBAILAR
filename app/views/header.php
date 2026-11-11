@@ -98,6 +98,8 @@ $themeStyle = '--db-primary:' . $primaryColor
     . ';--db-header-color:' . $colorValue('header_color', '#222222')
     . ';--db-menu-color:' . $colorValue('menu_color', '#FFFFFF')
     . ';--db-organizer-color:' . $colorValue('organizer_color', '#E23A2C')
+    . ';--db-filter-bar-color:' . $colorValue('filter_bar_color', '#FFFFFF')
+    . ';--db-filter-text-color:' . $colorValue('filter_text_color', '#222222')
     . ';--db-background:' . $colorValue('background_color', '#F7F8FA')
     . ';--db-text:' . $colorValue('text_color', '#202B38');
 $weekdayPalette = json_decode((string) ($region['weekday_colors'] ?? ''), true);
