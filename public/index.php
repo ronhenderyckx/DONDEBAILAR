@@ -376,7 +376,7 @@ require dirname(__DIR__) . '/app/views/header.php';
     <div class="agenda-message-modal" id="agenda-message-modal" hidden>
         <div class="agenda-message-modal__panel" role="dialog" aria-modal="true" aria-labelledby="agenda-message-modal-title">
             <div class="agenda-message-modal__top"><button type="button" class="agenda-message-modal__close" aria-label="Sluiten">×</button></div>
-            <iframe title="Berichten bij evenement" src="about:blank"></iframe>
+            <iframe title="Berichten bij evenement" src="about:blank" scrolling="no"></iframe>
         </div>
     </div>
 </section>
