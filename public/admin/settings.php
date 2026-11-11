@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errorMessage = 'De agenda-instelling kon niet worden opgeslagen. Controleer de schrijfrechten van storage.';
         } else {
             $agendaPageSize = $requestedPageSize;
-            $successMessage = 'Het aantal evenementen per laadbeurt is opgeslagen.';
+            $successMessage = 'Het aantal evenementen per reeks is opgeslagen.';
         }
     } elseif (isset($_POST['remove_logo'])) {
         if ($logoPath !== '') {
@@ -116,12 +116,12 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <div class="section-heading">
             <div>
                 <h2>Agendaweergave</h2>
-                <p>Bepaal hoeveel evenementen tegelijk worden getoond. Bezoekers kunnen daarna steeds verder laden.</p>
+                <p>Bepaal hoeveel evenementen in één reeks worden getoond. Bezoekers bladeren op de agenda met de pijltjes naar de vorige of volgende reeks.</p>
             </div>
         </div>
         <form method="post" action="/admin/settings.php" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
-            <label for="agenda_page_size">Evenementen per keer (1–100)</label>
+            <label for="agenda_page_size">Evenementen per reeks (1–100)</label>
             <div class="agenda-page-size-control" style="display:flex;align-items:center;gap:8px;max-width:380px">
                 <button type="button" class="button" id="agenda_page_size_down">5 terug</button>
                 <input type="number" id="agenda_page_size" name="agenda_page_size" min="1" max="100" step="1" value="<?= (int) $agendaPageSize ?>" required style="text-align:center;margin:0">
