@@ -86,11 +86,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $rawToken = bin2hex(random_bytes(32));
             $tokenInsert = $db->prepare("INSERT INTO user_email_verification_tokens (user_id, token_hash, expires_at) VALUES (:user_id, :token_hash, DATE_ADD(NOW(), INTERVAL 24 HOUR))");
             $tokenInsert->execute(['user_id' => $userId, 'token_hash' => hash('sha256', $rawToken)]);
-            $db->commit();
 
             $verifyUrl = 'https://' . $host . '/verify-email.php?token=' . rawurlencode($rawToken);
             $body = "Hallo " . $displayName . ",\n\nBedankt voor je registratie bij DONDEBAILAR.\nBevestig je e-mailadres via deze link (24 uur geldig):\n" . $verifyUrl . "\n\nNa de bevestiging word je automatisch ingelogd.\n\nHeb je dit account niet aangevraagd? Dan kun je deze e-mail negeren.\n";
             dondebailarSendSmtpMail($settings, registrationSmtpPassword($settings), $email, 'DONDEBAILAR - bevestig je e-mailadres', $body);
+            $db->commit();
             $successMessage = 'Je registratie is bijna klaar. We hebben een bevestigingsmail gestuurd. Klik op de link in die e-mail om je e-mailadres te bevestigen en automatisch in te loggen.';
             $displayName = '';
             $email = '';
