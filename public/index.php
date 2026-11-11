@@ -286,7 +286,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                                                     <img class="agenda-card__image" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" alt="<?= $escape($event['title']) ?> — foto <?= $mediaIndex + 1 ?>" loading="<?= $mediaIndex === 0 ? 'eager' : 'lazy' ?>">
                                                 </a>
                                             <?php elseif ($mediaItem['type'] === 'video' && $mediaItem['source'] === 'upload'): ?>
-                                                <video class="agenda-card__video" controls playsinline preload="metadata" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>"></video>
+                                                <video class="agenda-card__video" playsinline preload="metadata" controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>"></video>
                                             <?php elseif ($mediaItem['type'] === 'reel' && $mediaItem['source'] === 'instagram'): ?>
                                                 <div class="agenda-card__instagram">
                                                     <blockquote class="instagram-media" data-instgrm-permalink="<?= $escape($mediaItem['external_url']) ?>" data-instgrm-version="14">
@@ -311,7 +311,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                                     <img class="agenda-card__image" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" alt="<?= $escape($event['title']) ?>" loading="lazy">
                                 </a>
                             <?php elseif ($mediaItem['type'] === 'video' && $mediaItem['source'] === 'upload'): ?>
-                                <video class="agenda-card__video" controls playsinline preload="metadata" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>"></video>
+                                <video class="agenda-card__video" playsinline preload="metadata" controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>"></video>
                             <?php elseif ($mediaItem['type'] === 'reel' && $mediaItem['source'] === 'instagram'): ?>
                                 <div class="agenda-card__instagram">
                                     <blockquote class="instagram-media" data-instgrm-permalink="<?= $escape($mediaItem['external_url']) ?>" data-instgrm-version="14">
