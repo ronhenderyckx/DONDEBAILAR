@@ -11,6 +11,15 @@ $pageTitle = isset($pageTitle) && is_string($pageTitle)
 $region = isset($region) && is_array($region) ? $region : null;
 $headerUser = currentUser();
 
+$unreadNotificationCount = 0;
+if ($headerUser !== null) {
+    $notificationCountQuery = Database::connection()->prepare(
+        "SELECT COUNT(*) FROM user_notifications WHERE user_id = :user_id AND is_read = 0"
+    );
+    $notificationCountQuery->execute(['user_id' => (int) $headerUser['id']]);
+    $unreadNotificationCount = (int) $notificationCountQuery->fetchColumn();
+}
+
 $regionId = (int) ($region['id'] ?? 0);
 $canManageRegion = $regionId > 0
     && userHasRegionRole($regionId, ['region_admin', 'editor'], $headerUser);
@@ -114,7 +123,12 @@ $escape = static fn ($value): string =>
             <?php endif; ?>
         </div>
 
-
+        <?php if ($headerUser !== null): ?>
+            <a class="site-notifications" href="/notifications.php" aria-label="Meldingen<?= $unreadNotificationCount > 0 ? ': ' . $unreadNotificationCount . ' ongelezen' : '' ?>" title="Meldingen">
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg>
+                <?php if ($unreadNotificationCount > 0): ?><span><?= $unreadNotificationCount > 99 ? '99+' : $unreadNotificationCount ?></span><?php endif; ?>
+            </a>
+        <?php endif; ?>
 
         <details class="site-menu">
             <summary class="site-menu__toggle">
@@ -192,7 +206,10 @@ $escape = static fn ($value): string =>
 .site-brand__logo{display:block;max-width:170px;max-height:52px;width:auto;height:auto;object-fit:contain}
 .site-brand--region{padding-left:12px;border-left:1px solid var(--db-border)}
 .site-brand__region-name{font-size:15px;font-weight:700;color:var(--db-text);white-space:nowrap}
-.site-menu{margin-left:auto}
+.site-notifications{position:relative;display:grid;place-items:center;width:40px;height:40px;flex:none;color:var(--db-text);text-decoration:none;border-radius:10px}
+.site-notifications:hover{background:var(--db-surface,#f2f4f7)}
+.site-notifications span{position:absolute;top:0;right:-2px;display:grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#dc3545;color:#fff;font-size:10px;font-weight:800;line-height:1}
+.site-menu{margin-left:0}
 @media(max-width:600px){.site-header__inner{gap:8px}.site-brand-group{gap:7px}.site-brand--region{padding-left:7px}.site-brand__logo{max-width:112px;max-height:42px}.site-brand__region-name{font-size:12px}}
 </style>
 </header>
