@@ -24,13 +24,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
             $db = Database::connection();
-            $tableCheck = $db->query(
-                "SELECT COUNT(*) FROM information_schema.TABLES
-                 WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'password_reset_tokens'"
-            );
-            if ((int) $tableCheck->fetchColumn() !== 1) {
-                throw new RuntimeException('De database-upgrade voor wachtwoordherstel is nog niet uitgevoerd.');
-            }
+            // Zelf aanmaken zodat wachtwoordherstel ook werkt wanneer de gebruiker niet kan inloggen om UPDATE uit te voeren.
+            $db->exec("CREATE TABLE IF NOT EXISTS password_reset_tokens (
+                id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+                email VARCHAR(190) NOT NULL,
+                token_hash CHAR(64) NOT NULL,
+                expires_at DATETIME NOT NULL,
+                used_at DATETIME NULL,
+                created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                PRIMARY KEY (id),
+                UNIQUE KEY uq_password_reset_token_hash (token_hash),
+                KEY idx_password_reset_email_created (email, created_at),
+                KEY idx_password_reset_expiry (expires_at)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
             $userQuery = $db->prepare(
                 "SELECT id FROM users WHERE LOWER(email) = :email AND status = 'active' LIMIT 1"
