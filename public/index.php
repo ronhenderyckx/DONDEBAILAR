@@ -354,7 +354,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                             <?php if ($displayTags !== []): ?>
                                 <p class="agenda-card__hashtags"><?= $escape(implode(' ', $displayTags)) ?></p>
                             <?php endif; ?>
-                            <p class="agenda-card__swipe-hint">↔ Swipe om meer te zien</p>
+                            <p class="agenda-card__swipe-hint">→ Swipe rechts = meer · ← Swipe links = minder</p>
                         </div>
                     </article>
                 <?php endforeach; ?>
