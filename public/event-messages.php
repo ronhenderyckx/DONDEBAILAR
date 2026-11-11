@@ -12,6 +12,8 @@ if (!$id || $id < 1) {
     http_response_code(404);
     exit('Evenement niet gevonden.');
 }
+$popupMode = isset($_GET['popup']) && $_GET['popup'] === '1';
+$messagePageUrl = '/event-messages.php?id=' . $id . ($popupMode ? '&popup=1' : '');
 
 $statement = $db->prepare(
     "SELECT e.id, e.title, e.region_id, e.status, e.created_by, r.name AS region_name,
@@ -72,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'parent_id' => $parentId,
                     'message' => $message,
                 ]);
-                header('Location: /event-messages.php?id=' . $id . '&sent=1#messages');
+                header('Location: ' . $messagePageUrl . '&sent=1#messages');
                 exit;
             }
 
@@ -94,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      WHERE id = :id AND event_id = :event_id"
                 );
                 $update->execute(['message' => $message, 'id' => $messageId, 'event_id' => $id]);
-                header('Location: /event-messages.php?id=' . $id . '&updated=1#message-' . $messageId);
+                header('Location: ' . $messagePageUrl . '&updated=1#message-' . $messageId);
                 exit;
             }
 
@@ -116,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                      WHERE id = :id AND event_id = :event_id"
                 );
                 $delete->execute(['deleted_by' => (int) $user['id'], 'id' => $messageId, 'event_id' => $id]);
-                header('Location: /event-messages.php?id=' . $id . '&deleted=1#messages');
+                header('Location: ' . $messagePageUrl . '&deleted=1#messages');
                 exit;
             }
 
@@ -165,11 +167,11 @@ $region = [
 require dirname(__DIR__) . '/app/views/header.php';
 $escape = static fn($value): string => escapeHtml((string) $value);
 ?>
-<section class="admin-page event-messages-page" id="messages">
+<section class="admin-page event-messages-page<?= $popupMode ? ' event-messages-page--popup' : '' ?>" id="messages">
     <p class="eyebrow"><?= $escape($event['region_name']) ?></p>
     <div class="admin-heading">
         <div><h1>Berichten</h1><p><a href="/event.php?id=<?= (int) $id ?>"><?= $escape($event['title']) ?></a></p></div>
-        <a class="button" href="/event.php?id=<?= (int) $id ?>">Terug naar evenement</a>
+        <?php if (!$popupMode): ?><a class="button" href="/event.php?id=<?= (int) $id ?>">Terug naar evenement</a><?php endif; ?>
     </div>
 
     <?php foreach ($errors as $error): ?><div class="message message--error"><?= $escape($error) ?></div><?php endforeach; ?>
@@ -188,7 +190,7 @@ $escape = static fn($value): string => escapeHtml((string) $value);
                 <button class="button button--primary" type="submit">Bericht plaatsen</button>
             </form>
         <?php else: ?>
-            <p><a class="button button--primary" href="/login.php?return=<?= rawurlencode('/event-messages.php?id=' . $id) ?>">Log in om een bericht te plaatsen</a></p>
+            <p><a class="button button--primary" href="/login.php?return=<?= rawurlencode($messagePageUrl) ?>">Log in om een bericht te plaatsen</a></p>
         <?php endif; ?>
     </section>
 
@@ -287,5 +289,8 @@ $escape = static fn($value): string => escapeHtml((string) $value);
 <style>
 .event-messages-page{max-width:900px;margin:0 auto}.event-message-form{max-width:700px}.event-message-list{display:grid;gap:14px;margin-top:18px}.event-message{padding:16px;border:1px solid var(--db-border);border-radius:12px;background:#fff;color:var(--db-text)}.event-message__meta{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--db-muted);font-size:13px}.event-message__meta strong{color:var(--db-text)}.event-message__text{margin:12px 0;line-height:1.6;overflow-wrap:anywhere}.event-message__deleted,.event-message__edited{color:var(--db-muted);font-style:italic}.event-message--reply{margin:12px 0 0 22px;padding:12px;background:#f7f8fa}.event-message__tools,.event-message__reply{margin-top:10px;font-size:13px}.event-message__tools summary,.event-message__reply summary{cursor:pointer;color:var(--db-primary);font-weight:700}.event-message__tools form,.event-message__reply form{margin-top:10px;max-width:650px}.event-message__tools textarea,.event-message__reply textarea{width:100%;box-sizing:border-box}
 @media(max-width:600px){.event-message{padding:13px}.event-message--reply{margin-left:10px}.event-message__meta{align-items:flex-start;flex-direction:column;gap:3px}}
+.event-messages-page--popup{max-width:none;margin:0;padding:12px}.event-messages-page--popup .admin-heading{margin-bottom:12px}.event-messages-page--popup .admin-heading h1{font-size:22px}.event-messages-page--popup .admin-section{padding:12px;margin-bottom:12px}.event-messages-page--popup .event-message-list{margin-top:12px}
+body:has(.event-messages-page--popup){margin:0}.event-messages-page--popup~*{display:none}
+body:has(.event-messages-page--popup) .site-header,body:has(.event-messages-page--popup) footer{display:none!important}body:has(.event-messages-page--popup) .site-main{padding:0!important;margin:0!important;max-width:none!important}
 </style>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
