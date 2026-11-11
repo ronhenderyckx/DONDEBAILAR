@@ -246,7 +246,7 @@ $escape = static fn ($value): string =>
             <form class="agenda-selectors" method="get" action="/">
             <input type="hidden" name="region_id" value="<?= $regionId ?>">
             <div class="agenda-selector-line">
-                <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" aria-label="Wissel filter" title="Wissel filter"><span class="agenda-filter-icon" aria-hidden="true">👥</span></button>
+                <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" aria-label="Wissel tussen filters" title="Wissel tussen filters"><span class="agenda-filter-icon" aria-hidden="true">👥</span></button>
                 <div class="agenda-selector-panel is-open" data-panel="organizer">
                     <div class="agenda-organizer-strip" aria-label="Organisatoren met toekomstige evenementen">
                         <?php foreach ($organizers as $organizerOption): ?>
