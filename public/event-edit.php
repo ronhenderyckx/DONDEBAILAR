@@ -219,7 +219,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <label for="photos">Foto's toevoegen (JPG/PNG/WebP, max. 15 MB per foto; worden automatisch verkleind en als WebP opgeslagen)</label><input id="photos" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple>
             <label for="videos">Video's toevoegen (MP4/WebM/MOV, max. 80 MB per video)</label><input id="videos" type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime" multiple>
             <label for="reels">Reels toevoegen (MP4/WebM/MOV, max. 80 MB per reel)</label><input id="reels" type="file" name="reels[]" accept="video/mp4,video/webm,video/quicktime" multiple>
-            <p class="event-form-note">De organisator is de organisatie achter het evenement. De ingelogde gebruiker blijft geregistreerd als aanmaker.</p>
+            <p class="event-form-note">De organisator is de persoon of organisatie die het evenement organiseert. De ingelogde gebruiker blijft geregistreerd als aanmaker.</p>
             <div class="form-actions"><button class="button button--primary" type="submit">Wijzigingen opslaan</button><a class="button" href="/events.php">Terug</a></div>
         </form>
     </section>
