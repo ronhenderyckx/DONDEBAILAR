@@ -578,6 +578,7 @@ if (messageModal) {
     const closeMessageModal = function () {
         messageModal.hidden = true;
         messageFrame.src = 'about:blank';
+        document.documentElement.style.overflow = '';
         document.body.style.overflow = '';
     };
     messageModal.querySelector('.agenda-message-modal__close').addEventListener('click', closeMessageModal);
@@ -600,6 +601,7 @@ if (messageModal) {
         messageFrame.title = titleText;
         messageFrame.src = button.dataset.url + '&popup=1';
         messageModal.hidden = false;
+        document.documentElement.style.overflow = 'hidden';
         document.body.style.overflow = 'hidden';
     });
 }
