@@ -266,13 +266,11 @@ require dirname(__DIR__) . '/app/views/header.php';
         <?php if ($events === []): ?>
             <section class="agenda-empty"><h2>Geen evenementen gevonden</h2><p>Er zijn momenteel geen toekomstige gepubliceerde evenementen met deze filters.</p></section>
         <?php else: ?>
-            <?php if (count($events) > $agendaPageSize): ?>
-                <div class="agenda-page-navigation" aria-label="Navigatie tussen evenementreeksen">
+            <div class="agenda-page-navigation" aria-label="Navigatie tussen evenementreeksen">
                     <button type="button" class="agenda-page-nav-icon" id="agenda-page-previous" aria-label="Vorige reeks" title="Vorige reeks">‹</button>
                     <span id="agenda-page-range">1–<?= min($agendaPageSize, count($events)) ?> van <?= count($events) ?></span>
                     <button type="button" class="agenda-page-nav-icon" id="agenda-page-next" aria-label="Volgende reeks" title="Volgende reeks">›</button>
-                </div>
-            <?php endif; ?>
+            </div>
             <div class="agenda-feed">
                 <?php foreach ($events as $eventIndex => $event): ?>
                     <?php
@@ -430,11 +428,6 @@ require dirname(__DIR__) . '/app/views/header.php';
                     </article>
                 <?php endforeach; ?>
             </div>
-            <?php if (count($events) > $agendaPageSize): ?>
-                <div class="agenda-load-more-wrap">
-                    <button type="button" class="agenda-load-more" id="agenda-load-more">Laad volgende <?= $agendaPageSize ?> evenementen</button>
-                </div>
-            <?php endif; ?>
         <?php endif; ?>
         <p class="agenda-count" id="agenda-count" data-total="<?= count($events) ?>"><?= min($agendaPageSize, count($events)) ?> van <?= count($events) ?> evenementen getoond</p>
     <?php endif; ?>
@@ -764,7 +757,6 @@ foreach ($events as $instagramCheckEvent) {
 <script>
 const agendaPageSize = <?= (int) $agendaPageSize ?>;
 const agendaCards = Array.from(document.querySelectorAll('.agenda-feed .agenda-card'));
-const agendaLoadMore = document.getElementById('agenda-load-more');
 const agendaCount = document.getElementById('agenda-count');
 const agendaPagePrevious = document.getElementById('agenda-page-previous');
 const agendaPageNext = document.getElementById('agenda-page-next');
@@ -775,7 +767,6 @@ function updateAgendaPagination() {
     agendaCards.forEach(function (card, index) {
         card.hidden = index < agendaPageStart || index >= agendaVisibleEnd;
     });
-    const visibleOnScreen = Math.max(0, agendaVisibleEnd - agendaPageStart);
     if (agendaCount) {
         agendaCount.textContent = (agendaCards.length ? (agendaPageStart + 1) + '–' + agendaVisibleEnd : '0') + ' van ' + agendaCards.length + ' evenementen getoond';
     }
@@ -784,10 +775,6 @@ function updateAgendaPagination() {
     }
     if (agendaPagePrevious) agendaPagePrevious.disabled = agendaPageStart === 0;
     if (agendaPageNext) agendaPageNext.disabled = agendaPageStart + agendaPageSize >= agendaCards.length;
-    if (agendaLoadMore) {
-        agendaLoadMore.hidden = agendaVisibleEnd >= agendaCards.length;
-        agendaLoadMore.textContent = 'Laad volgende ' + Math.min(agendaPageSize, agendaCards.length - agendaVisibleEnd) + ' evenementen';
-    }
 }
 if (agendaCards.length) updateAgendaPagination();
 if (agendaPagePrevious) {
@@ -802,12 +789,6 @@ if (agendaPageNext) {
         if (agendaPageStart + agendaPageSize >= agendaCards.length) return;
         agendaPageStart += agendaPageSize;
         agendaVisibleEnd = Math.min(agendaPageStart + agendaPageSize, agendaCards.length);
-        updateAgendaPagination();
-    });
-}
-if (agendaLoadMore) {
-    agendaLoadMore.addEventListener('click', function () {
-        agendaVisibleEnd = Math.min(agendaVisibleEnd + agendaPageSize, agendaCards.length);
         updateAgendaPagination();
     });
 }
