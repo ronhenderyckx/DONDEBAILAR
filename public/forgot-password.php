@@ -8,19 +8,19 @@ require_once dirname(__DIR__) . '/app/SmtpMailer.php';
 $pageTitle = 'Wachtwoord vergeten - DONDEBAILAR';
 $errorMessage = '';
 $successMessage = '';
-$email = '';
+$identifier = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = strtolower(trim((string) ($_POST['email'] ?? '')));
+    $identifier = trim((string) ($_POST['identifier'] ?? ''));
     $csrf = $_POST['csrf_token'] ?? null;
 
     if (!verifyCsrfToken(is_string($csrf) ? $csrf : null)) {
         $errorMessage = 'Je sessie is verlopen. Vernieuw de pagina en probeer opnieuw.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL) || strlen($email) > 190) {
-        $errorMessage = 'Vul een geldig e-mailadres in.';
+    } elseif ($identifier === '' || strlen($identifier) > 190) {
+        $errorMessage = 'Vul je gebruikersnaam of e-mailadres in.';
     } else {
         // Dezelfde bevestiging wordt getoond, ongeacht of het adres bestaat.
-        $successMessage = 'Als er een actief account met dit e-mailadres bestaat, ontvang je een e-mail met verdere instructies. Controleer ook je spammap.';
+        $successMessage = 'Als er een actief account met deze gebruikersnaam of dit e-mailadres bestaat, ontvang je een e-mail met verdere instructies. Controleer ook je spammap.';
 
         try {
             $db = Database::connection();
@@ -39,10 +39,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
             $userQuery = $db->prepare(
-                "SELECT id FROM users WHERE LOWER(email) = :email AND status = 'active' LIMIT 1"
+                "SELECT DISTINCT email FROM users
+                 WHERE status = 'active'
+                   AND (LOWER(email) = :identifier OR LOWER(display_name) = :identifier)
+                 LIMIT 2"
             );
-            $userQuery->execute(['email' => $email]);
-            $userExists = (bool) $userQuery->fetchColumn();
+            $userQuery->execute(['identifier' => strtolower($identifier)]);
+            $matchedEmails = $userQuery->fetchAll(PDO::FETCH_COLUMN);
+            // Een gebruikersnaam moet naar precies één e-mailadres verwijzen.
+            // Meerdere accounts met dezelfde gebruikersnaam en hetzelfde e-mailadres blijven bruikbaar.
+            $email = count($matchedEmails) === 1 ? strtolower((string) $matchedEmails[0]) : '';
+            $userExists = $email !== '';
 
             if ($userExists) {
                 // Beperk herhaalde aanvragen en maak oudere links ongeldig.
@@ -132,7 +139,7 @@ require dirname(__DIR__) . '/app/views/header.php';
 
 <section class="auth-card">
     <h1>Wachtwoord vergeten?</h1>
-    <p>Vul het e-mailadres van je DONDEBAILAR-account in. We sturen je een link om een nieuw wachtwoord in te stellen.</p>
+    <p>Vul je gebruikersnaam of e-mailadres van je DONDEBAILAR-account in. We sturen een link naar het e-mailadres dat bij je account hoort.</p>
 
     <?php if ($errorMessage !== ''): ?>
         <div class="message message--error" role="alert"><?= escapeHtml($errorMessage) ?></div>
@@ -143,9 +150,9 @@ require dirname(__DIR__) . '/app/views/header.php';
 
     <form method="post" action="/forgot-password.php" class="auth-form">
         <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
-        <label for="email">E-mailadres</label>
-        <input type="email" id="email" name="email" value="<?= escapeHtml($email) ?>"
-               autocomplete="email" maxlength="190" required>
+        <label for="identifier">Gebruikersnaam of e-mailadres</label>
+        <input type="text" id="identifier" name="identifier" value="<?= escapeHtml($identifier) ?>"
+               autocomplete="username" maxlength="190" required>
         <button type="submit" class="button button--primary">Herstellink versturen</button>
     </form>
 
