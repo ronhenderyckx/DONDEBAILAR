@@ -95,7 +95,8 @@ $themeStyle = '--db-primary:' . $primaryColor
     . ';--db-accent:' . $colorValue('accent_color', '#00AFC5')
     . ';--db-secondary:' . $colorValue('secondary_color', '#1FA898')
     . ';--db-tertiary:' . $colorValue('tertiary_color', '#F4802A')
-    . ';--db-header-color:' . $colorValue('header_color', '#FFFFFF')
+    . ';--db-header-color:' . $colorValue('header_color', '#222222')
+    . ';--db-menu-color:' . $colorValue('menu_color', '#FFFFFF')
     . ';--db-background:' . $colorValue('background_color', '#F7F8FA')
     . ';--db-text:' . $colorValue('text_color', '#202B38');
 $weekdayPalette = json_decode((string) ($region['weekday_colors'] ?? ''), true);
