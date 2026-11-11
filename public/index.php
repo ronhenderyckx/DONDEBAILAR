@@ -484,6 +484,14 @@ require dirname(__DIR__) . '/app/views/header.php';
 .agenda-card__media-wrap{border-radius:14px 14px 0 0}
 .agenda-card__details{border-radius:0 0 14px 14px}
 .agenda-card__quick{position:sticky;top:0;z-index:8;padding:5px 0;background:#f78d19;box-shadow:0 4px 8px -8px #0009}
+/* Houd de organisator- en stedenfilters beschikbaar tijdens het scrollen. */
+.agenda-selectors{
+    position:sticky;
+    top:0;
+    z-index:950;
+    background:#fff;
+    box-shadow:0 5px 14px rgba(25,40,60,.08);
+}
 </style>
 <?php
 $hasInstagramReels = false;
