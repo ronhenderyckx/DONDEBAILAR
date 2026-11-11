@@ -7,6 +7,27 @@ require_once dirname(__DIR__) . '/app/Authorization.php';
 
 $db = Database::connection();
 $currentUser = currentUser();
+$savedAgendaPreferences = null;
+if ($currentUser !== null) {
+    try {
+        $preferencesTableExists = (int) $db->query(
+            "SELECT COUNT(*) FROM information_schema.TABLES
+             WHERE TABLE_SCHEMA = DATABASE()
+               AND TABLE_NAME = 'user_agenda_preferences'
+               AND TABLE_TYPE = 'BASE TABLE'"
+        )->fetchColumn() > 0;
+        if ($preferencesTableExists) {
+            $preferenceQuery = $db->prepare(
+                "SELECT region_id, active_filter, organizer_id, city, sound_muted
+                 FROM user_agenda_preferences WHERE user_id = :user_id"
+            );
+            $preferenceQuery->execute(['user_id' => (int) $currentUser['id']]);
+            $savedAgendaPreferences = $preferenceQuery->fetch() ?: null;
+        }
+    } catch (Throwable $exception) {
+        $savedAgendaPreferences = null;
+    }
+}
 $visitorToken = '';
 if ($currentUser === null) {
     $visitorToken = (string) ($_COOKIE['dondebailar_visitor'] ?? '');
@@ -35,6 +56,9 @@ $regions = $db->query(
 
 $regionIds = array_map(static fn(array $item): int => (int) $item['id'], $regions);
 $requestedRegion = filter_input(INPUT_GET, 'region_id', FILTER_VALIDATE_INT);
+if (!$requestedRegion && !array_key_exists('region_id', $_GET) && !empty($savedAgendaPreferences['region_id'])) {
+    $requestedRegion = (int) $savedAgendaPreferences['region_id'];
+}
 $regionId = $requestedRegion && in_array((int) $requestedRegion, $regionIds, true)
     ? (int) $requestedRegion
     : (int) ($regionIds[0] ?? 0);
@@ -52,9 +76,16 @@ try {
 date_default_timezone_set($timezone->getName());
 
 $now = new DateTimeImmutable('now', $timezone);
-$organizerId = filter_input(INPUT_GET, 'organizer_id', FILTER_VALIDATE_INT) ?: 0;
-$city = trim((string) ($_GET['city'] ?? ''));
-$activeFilter = (($_GET['filter'] ?? '') === 'city') ? 'city' : 'organizer';
+$organizerId = array_key_exists('organizer_id', $_GET)
+    ? (filter_input(INPUT_GET, 'organizer_id', FILTER_VALIDATE_INT) ?: 0)
+    : (int) ($savedAgendaPreferences['organizer_id'] ?? 0);
+$city = array_key_exists('city', $_GET)
+    ? trim((string) ($_GET['city'] ?? ''))
+    : trim((string) ($savedAgendaPreferences['city'] ?? ''));
+$activeFilter = array_key_exists('filter', $_GET)
+    ? ((($_GET['filter'] ?? '') === 'city') ? 'city' : 'organizer')
+    : ((($savedAgendaPreferences['active_filter'] ?? '') === 'city') ? 'city' : 'organizer');
+$savedSoundMuted = !empty($savedAgendaPreferences['sound_muted']);
 if (mb_strlen($city) > 120) {
     $city = mb_substr($city, 0, 120);
 }
@@ -887,7 +918,7 @@ document.addEventListener('pointerup', function (event) {
 }, {passive:true});
 document.addEventListener('pointercancel', function () { eventInfoPointerStart = null; }, {passive:true});
 
-let agendaVideosMuted = false;
+let agendaVideosMuted = <?= $savedSoundMuted ? 'true' : 'false' ?>;
 document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
     const track = gallery.querySelector('[data-gallery-track]');
     const counter = gallery.querySelector('[data-gallery-count]');
@@ -1101,6 +1132,43 @@ document.addEventListener('click', function (event) {
     event.preventDefault();
     agendaVideosMuted = !agendaVideosMuted;
     applyAgendaVideoSound(soundButton);
+});
+
+
+// Bewaar de huidige regio, filter en geluidskeuze bij het ingelogde account.
+document.addEventListener('click', function (event) {
+    const saveButton = event.target.closest('#agenda-save-preferences');
+    if (!saveButton) return;
+    event.preventDefault();
+    if (saveButton.dataset.busy === '1') return;
+    saveButton.dataset.busy = '1';
+    saveButton.setAttribute('aria-busy', 'true');
+    const params = new URLSearchParams(window.location.search);
+    const payload = {
+        csrf_token: '<?= $escape(csrfToken()) ?>',
+        region_id: Number(params.get('region_id') || '<?= $regionId ?>'),
+        filter: params.get('filter') === 'city' ? 'city' : 'organizer',
+        organizer_id: Number(params.get('organizer_id') || 0),
+        city: params.get('city') || '',
+        sound_muted: agendaVideosMuted
+    };
+    fetch('/save-agenda-preferences.php', {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(payload)
+    }).then(async function (response) {
+        const data = await response.json();
+        if (!response.ok || !data.ok) throw new Error(data.message || 'Opslaan is niet gelukt.');
+        saveButton.classList.add('is-saved');
+        saveButton.setAttribute('title', 'Instellingen bewaard');
+        saveButton.setAttribute('aria-label', 'Instellingen bewaard');
+    }).catch(function (error) {
+        window.alert(error.message || 'Je instellingen konden niet worden bewaard.');
+    }).finally(function () {
+        saveButton.dataset.busy = '0';
+        saveButton.removeAttribute('aria-busy');
+    });
 });
 
 document.addEventListener('click', function (event) {
