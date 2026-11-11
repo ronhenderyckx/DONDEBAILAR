@@ -814,6 +814,14 @@ foreach ($events as $instagramCheckEvent) {
 ?>
 <?php if ($hasInstagramReels): ?><script async src="https://www.instagram.com/embed.js"></script><?php endif; ?>
 <script>
+// agenda_change is een eenmalige opdracht om een bewuste filterkeuze te tonen.
+// Verwijder de vlag uit de adresbalk zodat ze na uitloggen/inloggen
+// niet opnieuw de opgeslagen persoonlijke voorkeuren uitschakelt.
+const agendaCurrentUrl = new URL(window.location.href);
+if (agendaCurrentUrl.searchParams.get('agenda_change') === '1') {
+    agendaCurrentUrl.searchParams.delete('agenda_change');
+    window.history.replaceState({}, '', agendaCurrentUrl.pathname + agendaCurrentUrl.search + agendaCurrentUrl.hash);
+}
 const agendaPageSize = <?= (int) $agendaPageSize ?>;
 const agendaCards = Array.from(document.querySelectorAll('.agenda-feed .agenda-card'));
 const agendaPagePrevious = document.getElementById('agenda-page-previous');
