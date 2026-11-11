@@ -501,46 +501,77 @@ attendanceDialog.addEventListener('click', function (event) {
 function escapeAttendanceText(value) {
     return String(value).replace(/[&<>"']/g, char => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char]));
 }
-document.querySelectorAll('.agenda-attendance').forEach(function (button) {
-    let longPressTimer = null;
-    let longPressTriggered = false;
-    const eventId = button.dataset.eventId;
-    button.addEventListener('pointerdown', function () {
-        longPressTriggered = false;
-        clearTimeout(longPressTimer);
-        longPressTimer = setTimeout(function () {
-            longPressTriggered = true;
-            fetch('/event-attendance.php?action=names&event_id=' + encodeURIComponent(eventId), {credentials:'same-origin'})
-                .then(response => response.json()).then(data => {
-                    if (!data.ok) throw new Error();
-                    const content = attendanceDialog.querySelector('.agenda-attendance-list__content');
-                    const names = Array.isArray(data.names) ? data.names : [];
-                    content.innerHTML = names.length ? '<ul>' + names.map(name => '<li>' + escapeAttendanceText(name) + '</li>').join('') + '</ul>' : '<p>Er zijn nog geen ingelogde deelnemers.</p>';
-                    if (data.guests > 0) content.innerHTML += '<p>' + data.guests + ' anonieme deelnemer' + (data.guests === 1 ? '' : 's') + '</p>';
-                    attendanceDialog.hidden = false;
-                }).catch(() => {
-                    attendanceDialog.querySelector('.agenda-attendance-list__content').textContent = 'De deelnemerslijst kon niet worden geladen.';
-                    attendanceDialog.hidden = false;
-                });
-        }, 650);
-    });
-    function cancelLongPress(){ clearTimeout(longPressTimer); }
-    ['pointerup','pointerleave','pointercancel'].forEach(type => button.addEventListener(type, cancelLongPress));
-    button.addEventListener('contextmenu', event => event.preventDefault());
-    button.addEventListener('click', function () {
-        if (longPressTriggered) { longPressTriggered = false; return; }
-        fetch('/event-attendance.php', {
-            method:'POST', credentials:'same-origin',
-            headers:{'Content-Type':'application/json','X-CSRF-Token':'<?= $escape(csrfToken()) ?>'},
-            body:JSON.stringify({event_id:Number(eventId)})
-        }).then(response => response.json()).then(data => {
-            if (!data.ok) throw new Error();
-            button.querySelector('b').textContent = String(data.count);
-            button.classList.toggle('is-attending', data.attending);
-            button.setAttribute('aria-pressed', data.attending ? 'true' : 'false');
-        }).catch(() => window.alert('Je keuze kon niet worden opgeslagen. Probeer opnieuw.'));
-    });
+let attendanceLongPressTimer = null;
+let attendanceLongPressTriggered = false;
+let attendancePointerButton = null;
+
+document.addEventListener('pointerdown', function (event) {
+    const button = event.target.closest('.agenda-attendance');
+    if (!button) return;
+    attendancePointerButton = button;
+    attendanceLongPressTriggered = false;
+    clearTimeout(attendanceLongPressTimer);
+    attendanceLongPressTimer = window.setTimeout(function () {
+        attendanceLongPressTriggered = true;
+        const eventId = button.dataset.eventId;
+        fetch('/event-attendance.php?action=names&event_id=' + encodeURIComponent(eventId), {credentials:'same-origin'})
+            .then(response => response.json()).then(data => {
+                if (!data.ok) throw new Error(data.message || 'De deelnemerslijst kon niet worden geladen.');
+                const content = attendanceDialog.querySelector('.agenda-attendance-list__content');
+                const names = Array.isArray(data.names) ? data.names : [];
+                content.innerHTML = names.length ? '<ul>' + names.map(name => '<li>' + escapeAttendanceText(name) + '</li>').join('') + '</ul>' : '<p>Er zijn nog geen ingelogde deelnemers.</p>';
+                if (data.guests > 0) content.innerHTML += '<p>' + data.guests + ' anonieme deelnemer' + (data.guests === 1 ? '' : 's') + '</p>';
+                attendanceDialog.hidden = false;
+            }).catch(error => {
+                attendanceDialog.querySelector('.agenda-attendance-list__content').textContent = error.message || 'De deelnemerslijst kon niet worden geladen.';
+                attendanceDialog.hidden = false;
+            });
+    }, 650);
+});
+
+function cancelAttendanceLongPress() {
+    clearTimeout(attendanceLongPressTimer);
+    attendanceLongPressTimer = null;
+    attendancePointerButton = null;
 }
+['pointerup','pointercancel','pointerleave'].forEach(type => {
+    document.addEventListener(type, function (event) {
+        if (attendancePointerButton && (event.target === attendancePointerButton || attendancePointerButton.contains(event.target))) {
+            cancelAttendanceLongPress();
+        }
+    }, true);
+});
+document.addEventListener('contextmenu', function (event) {
+    if (event.target.closest('.agenda-attendance')) event.preventDefault();
+});
+
+document.addEventListener('click', function (event) {
+    const button = event.target.closest('.agenda-attendance');
+    if (!button) return;
+    event.preventDefault();
+    if (attendanceLongPressTriggered) {
+        attendanceLongPressTriggered = false;
+        return;
+    }
+    if (button.dataset.busy === '1') return;
+    button.dataset.busy = '1';
+    const eventId = button.dataset.eventId;
+    fetch('/event-attendance.php', {
+        method:'POST', credentials:'same-origin',
+        headers:{'Content-Type':'application/json','X-CSRF-Token':'<?= $escape(csrfToken()) ?>'},
+        body:JSON.stringify({event_id:Number(eventId)})
+    }).then(async response => {
+        const data = await response.json();
+        if (!response.ok || !data.ok) throw new Error(data.message || 'Je keuze kon niet worden opgeslagen.');
+        button.querySelector('b').textContent = String(data.count);
+        button.classList.toggle('is-attending', data.attending);
+        button.setAttribute('aria-pressed', data.attending ? 'true' : 'false');
+    }).catch(error => {
+        window.alert(error.message || 'Je keuze kon niet worden opgeslagen. Probeer opnieuw.');
+    }).finally(() => {
+        button.dataset.busy = '0';
+    });
+});
 
 document.addEventListener('click', function (event) {
     const shareButton = event.target.closest('[data-share-url]');
