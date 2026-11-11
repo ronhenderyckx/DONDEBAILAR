@@ -2,17 +2,7 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once di<section class="admin-section">
-        <div class="section-heading"><div><h2>Agendaweergave</h2><p>Bepaal hoeveel evenementen tegelijk worden getoond. Bezoekers kunnen daarna steeds verder laden.</p></div></div>
-        <form method="post" action="/admin/settings.php" class="auth-form">
-            <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
-            <label for="agenda_page_size">Evenementen per keer (1–100)</label>
-            <input type="number" id="agenda_page_size" name="agenda_page_size" min="1" max="100" step="1" value="<?= (int) $agendaPageSize ?>" required>
-            <div class="form-actions"><button type="submit" class="button button--primary" name="save_agenda_settings" value="1">Agenda-instelling opslaan</button></div>
-        </form>
-    </section>
-
-    rname(__DIR__, 2) . '/app/Authorization.php';
+require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
 require_once dirname(__DIR__, 2) . '/app/ImageOptimization.php';
 
@@ -30,7 +20,9 @@ $agendaPageSizeFile = $projectRoot . '/storage/agenda-page-size.txt';
 $agendaPageSize = 20;
 if (is_file($agendaPageSizeFile)) {
     $storedPageSize = (int) trim((string) file_get_contents($agendaPageSizeFile));
-    if ($storedPageSize >= 1 && $storedPageSize <= 100) $agendaPageSize = $storedPageSize;
+    if ($storedPageSize >= 1 && $storedPageSize <= 100) {
+        $agendaPageSize = $storedPageSize;
+    }
 }
 
 if ($logoPath !== '' && !preg_match('#^/uploads/platform/[a-zA-Z0-9._-]+$#', $logoPath)) {
@@ -77,12 +69,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $newLogoPath = '/' . substr($newRelativePath, strlen('public/'));
                 if (file_put_contents($logoSettingFile, $newLogoPath . PHP_EOL, LOCK_EX) === false) {
                     $newFile = $projectRoot . '/' . $newRelativePath;
-                    if (is_file($newFile)) @unlink($newFile);
+                    if (is_file($newFile)) {
+                        @unlink($newFile);
+                    }
                     $errorMessage = 'Het logo is geoptimaliseerd, maar de instelling kon niet worden bijgewerkt. Controleer de schrijfrechten van storage.';
                 } else {
                     if ($logoPath !== '') {
                         $oldFile = $projectRoot . '/public' . $logoPath;
-                        if (is_file($oldFile)) @unlink($oldFile);
+                        if (is_file($oldFile)) {
+                            @unlink($oldFile);
+                        }
                     }
                     $logoPath = $newLogoPath;
                     $successMessage = 'Het DONDEBAILAR-logo is bijgewerkt en geoptimaliseerd.';
@@ -109,6 +105,30 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <a class="button" href="/admin/">Terug naar platformbeheer</a>
     </div>
 
+    <?php if ($errorMessage !== ''): ?>
+        <div class="message message--error" role="alert"><?= escapeHtml($errorMessage) ?></div>
+    <?php endif; ?>
+    <?php if ($successMessage !== ''): ?>
+        <div class="message message--success" role="status"><?= escapeHtml($successMessage) ?></div>
+    <?php endif; ?>
+
+    <section class="admin-section">
+        <div class="section-heading">
+            <div>
+                <h2>Agendaweergave</h2>
+                <p>Bepaal hoeveel evenementen tegelijk worden getoond. Bezoekers kunnen daarna steeds verder laden.</p>
+            </div>
+        </div>
+        <form method="post" action="/admin/settings.php" class="auth-form">
+            <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+            <label for="agenda_page_size">Evenementen per keer (1–100)</label>
+            <input type="number" id="agenda_page_size" name="agenda_page_size" min="1" max="100" step="1" value="<?= (int) $agendaPageSize ?>" required>
+            <div class="form-actions">
+                <button type="submit" class="button button--primary" name="save_agenda_settings" value="1">Agenda-instelling opslaan</button>
+            </div>
+        </form>
+    </section>
+
     <section class="admin-section">
         <div class="section-heading">
             <div>
@@ -116,13 +136,6 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 <p>Dit logo wordt gebruikt als standaardlogo wanneer er geen regiologo is ingesteld.</p>
             </div>
         </div>
-
-        <?php if ($errorMessage !== ''): ?>
-            <div class="message message--error" role="alert"><?= escapeHtml($errorMessage) ?></div>
-        <?php endif; ?>
-        <?php if ($successMessage !== ''): ?>
-            <div class="message message--success" role="status"><?= escapeHtml($successMessage) ?></div>
-        <?php endif; ?>
 
         <?php if ($logoPath !== ''): ?>
             <p><img src="<?= escapeHtml($logoPath) ?>" alt="DONDEBAILAR-logo" style="max-width:280px;max-height:140px;object-fit:contain"></p>
