@@ -233,7 +233,7 @@ img {
     gap: 3px;
     border: 1px solid var(--db-border);
     border-radius: 12px;
-    background: #FFFFFF;
+    background: var(--db-menu-color, #FFFFFF);
     box-shadow: 0 15px 45px rgba(20, 35, 55, .13);
 }
 
@@ -246,7 +246,7 @@ img {
 }
 
 .site-menu__panel > a:hover {
-    background: #F3F6F9;
+    background: color-mix(in srgb, var(--db-menu-color, #FFFFFF) 88%, var(--db-text));
     color: var(--db-primary);
 }
 
