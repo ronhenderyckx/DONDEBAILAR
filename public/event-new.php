@@ -44,6 +44,7 @@ if ($region !== null) {
 
 $title = trim((string) ($_POST['title'] ?? ''));
 $description = trim((string) ($_POST['description'] ?? ''));
+$hashtags = trim((string) ($_POST['hashtags'] ?? ''));
 $eventLanguage = (string) ($_POST['event_language'] ?? ($region['default_language'] ?? 'es'));
 $organizerId = (int) ($_POST['organizer_id'] ?? 0);
 $locationId = (int) ($_POST['location_id'] ?? 0);
@@ -60,6 +61,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     if ($title === '' || mb_strlen($title) > 220) {
         $errors[] = 'Vul een titel in van maximaal 220 tekens.';
+    }
+    if (mb_strlen($hashtags) > 500) {
+        $errors[] = 'Gebruik maximaal 500 tekens voor de hashtags.';
     }
     if (!in_array($eventLanguage, ['nl', 'en', 'es', 'fr'], true)) {
         $errors[] = 'Kies een geldige inhoudstaal.';
@@ -92,10 +96,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $insert = $db->prepare(
                 "INSERT INTO events
-                    (region_id, organizer_id, location_id, category_id, title, description,
+                    (region_id, organizer_id, location_id, category_id, title, description, hashtags,
                      event_language, starts_at, ends_at, timezone, status, created_by, updated_by)
                  VALUES
-                    (:region_id, :organizer_id, :location_id, :category_id, :title, :description,
+                    (:region_id, :organizer_id, :location_id, :category_id, :title, :description, :hashtags,
                      :event_language, :starts_at, :ends_at, :timezone, 'draft', :created_by, :updated_by)"
             );
             $insert->execute([
@@ -105,6 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'category_id' => $categoryId > 0 ? $categoryId : null,
                 'title' => $title,
                 'description' => $description !== '' ? $description : null,
+                'hashtags' => $hashtags !== '' ? $hashtags : null,
                 'event_language' => $eventLanguage,
                 'starts_at' => $start->format('Y-m-d H:i:s'),
                 'ends_at' => $end?->format('Y-m-d H:i:s'),
@@ -174,6 +179,9 @@ require dirname(__DIR__) . '/app/views/header.php';
             <input id="ends_at" type="datetime-local" name="ends_at" value="<?= escapeHtml($endsAt) ?>">
             <label for="description">Beschrijving</label>
             <textarea id="description" name="description" rows="8"><?= escapeHtml($description) ?></textarea>
+            <label for="hashtags">Hashtags</label>
+            <input id="hashtags" name="hashtags" maxlength="500" value="<?= escapeHtml($hashtags) ?>" placeholder="#salsa #bachata #kizomba">
+            <p class="event-form-note">Zet de hashtags apart van de beschrijving, gescheiden door spaties of komma's.</p>
             <h2>Media bij dit evenement</h2>
             <label for="photos">Foto's (meerdere mogelijk, JPG/PNG/WebP, max. 15 MB per foto)</label>
             <input id="photos" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple>
