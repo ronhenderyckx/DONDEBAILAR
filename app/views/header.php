@@ -98,6 +98,15 @@ $themeStyle = '--db-primary:' . $primaryColor
     . ';--db-header-color:' . $colorValue('header_color', '#FFFFFF')
     . ';--db-background:' . $colorValue('background_color', '#F7F8FA')
     . ';--db-text:' . $colorValue('text_color', '#202B38');
+$weekdayPalette = json_decode((string) ($region['weekday_colors'] ?? ''), true);
+$weekdayDefaults = ['#F6D84A', '#4A90D9', '#55A96B', '#A78BDA', '#E78AAE', '#F49A45', '#999999'];
+foreach ($weekdayDefaults as $index => $fallback) {
+    $candidate = is_array($weekdayPalette) ? (string) ($weekdayPalette[$index] ?? $fallback) : $fallback;
+    if (!preg_match('/^#[0-9a-fA-F]{6}$/', $candidate)) {
+        $candidate = $fallback;
+    }
+    $themeStyle .= ';--db-weekday-' . ($index + 1) . ':' . strtoupper($candidate);
+}
 
 $escape = static fn ($value): string =>
     htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
