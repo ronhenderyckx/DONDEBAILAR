@@ -162,6 +162,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             $eventId = 0;
+            $eventIds = [];
             foreach ($occurrences as $index => $occurrenceStart) {
                 $occurrenceEnd = $end !== null
                     ? $occurrenceStart->modify('+' . ($end->getTimestamp() - $start->getTimestamp()) . ' seconds')
@@ -183,12 +184,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'recurrence_series_id' => $seriesId,
                     'recurrence_number' => $index + 1,
                 ]);
+                $createdEventId = (int) $db->lastInsertId();
+                $eventIds[$index] = $createdEventId;
                 if ($index === 0) {
-                    $eventId = (int) $db->lastInsertId();
+                    $eventId = $createdEventId;
                 }
             }
 
             storeEventMedia($db, $eventId, (int) $user['id'], $_FILES);
+
+            // Geef iedere editie eigen mediabestanden en eigen event_media-records.
+            if (count($occurrences) > 1) {
+                $mediaQuery = $db->prepare(
+                    "SELECT media_type, file_path, media_source, external_url, caption, uploaded_by
+                     FROM event_media WHERE event_id = :event_id AND media_context = 'event'
+                     ORDER BY sort_order, id"
+                );
+                $mediaQuery->execute(['event_id' => $eventId]);
+                $mediaItems = $mediaQuery->fetchAll(PDO::FETCH_ASSOC);
+                foreach (array_slice($occurrences, 1) as $occurrenceIndex => $unusedOccurrence) {
+                    $targetEventId = $eventIds[$occurrenceIndex + 1] ?? 0;
+                    if ($targetEventId < 1) {
+                        continue;
+                    }
+                    $targetDirectory = dirname(__DIR__) . '/uploads/events/' . $targetEventId;
+                    if (!is_dir($targetDirectory) && !mkdir($targetDirectory, 0755, true) && !is_dir($targetDirectory)) {
+                        throw new RuntimeException('De mediamap voor een herhaling kon niet worden aangemaakt.');
+                    }
+                    foreach ($mediaItems as $mediaItem) {
+                        $targetPath = null;
+                        $sourcePath = (string) ($mediaItem['file_path'] ?? '');
+                        if ($sourcePath !== '') {
+                            $sourceAbsolute = dirname(__DIR__) . '/' . $sourcePath;
+                            $extension = strtolower(pathinfo($sourcePath, PATHINFO_EXTENSION));
+                            if (!is_file($sourceAbsolute) || !in_array($extension, ['jpg', 'png', 'webp', 'mp4', 'webm', 'mov'], true)) {
+                                throw new RuntimeException('Een mediabestand voor een herhaling kon niet worden gekopieerd.');
+                            }
+                            $filename = bin2hex(random_bytes(16)) . '.' . $extension;
+                            if (!copy($sourceAbsolute, $targetDirectory . '/' . $filename)) {
+                                throw new RuntimeException('Een mediabestand voor een herhaling kon niet worden gekopieerd.');
+                            }
+                            $targetPath = 'uploads/events/' . $targetEventId . '/' . $filename;
+                        }
+                        $mediaInsert = $db->prepare(
+                            "INSERT INTO event_media
+                                (event_id, media_context, media_type, file_path, media_source, external_url, caption, uploaded_by)
+                             VALUES (:event_id, 'event', :media_type, :file_path, :media_source, :external_url, :caption, :uploaded_by)"
+                        );
+                        $mediaInsert->execute([
+                            'event_id' => $targetEventId,
+                            'media_type' => $mediaItem['media_type'],
+                            'file_path' => $targetPath,
+                            'media_source' => $mediaItem['media_source'],
+                            'external_url' => $mediaItem['external_url'],
+                            'caption' => $mediaItem['caption'],
+                            'uploaded_by' => $mediaItem['uploaded_by'],
+                        ]);
+                    }
+                }
+            }
             $db->commit();
             header('Location: /event-edit.php?id=' . $eventId . '&created=1');
             exit;
