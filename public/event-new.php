@@ -325,7 +325,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <input id="videos" type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime" multiple>
             <label for="reels">Reels (meerdere mogelijk, MP4/WebM/MOV, max. 80 MB per reel)</label>
             <input id="reels" type="file" name="reels[]" accept="video/mp4,video/webm,video/quicktime" multiple>
-            <p class="event-form-note">De gebruiker die dit formulier opslaat, wordt geregistreerd als aanmaker. De organisator is een afzonderlijke organisatie.</p>
+            <p class="event-form-note">De gebruiker die dit formulier opslaat, wordt geregistreerd als aanmaker. De organisator is de persoon of organisatie die het evenement organiseert.</p>
             <div class="form-actions"><button class="button button--primary" type="submit">Evenement opslaan als concept</button><a class="button" href="/events.php">Annuleren</a></div>
         </form>
     </section>
