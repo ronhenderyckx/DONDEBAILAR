@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once dirname(__DIR__) . '/app/bootstrap.php';
 require_once dirname(__DIR__) . '/app/Security.php';
+require_once dirname(__DIR__) . '/app/Authorization.php';
 
 $user = requireLogin();
 $db = Database::connection();
