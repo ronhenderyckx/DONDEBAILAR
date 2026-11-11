@@ -996,8 +996,8 @@ function applyAgendaVideoSound(button) {
         video.muted = agendaVideosMuted;
     });
     button.setAttribute('aria-pressed', agendaVideosMuted ? 'true' : 'false');
-    button.setAttribute('aria-label', agendaVideosMuted ? 'Geluid van videos aanzetten' : 'Geluid van videos uitzetten');
-    button.setAttribute('title', agendaVideosMuted ? 'Geluid van videos aanzetten' : 'Geluid van videos uitzetten');
+    button.setAttribute('aria-label', agendaVideosMuted ? 'Geluid van video's inschakelen' : 'Geluid van video's uitschakelen');
+    button.setAttribute('title', agendaVideosMuted ? 'Geluid van video's inschakelen' : 'Geluid van video's uitschakelen');
     button.innerHTML = agendaVideosMuted
         ? '<svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"></path><path d="m3 3 18 18"></path></svg>'
         : '<svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M19 5a10 10 0 0 1 0 14"></path></svg>';
