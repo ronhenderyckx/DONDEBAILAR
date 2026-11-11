@@ -164,8 +164,7 @@ $escape = static fn ($value): string =>
         <?php endif; ?>
 
         <details class="site-menu">
-            <summary class="site-menu__toggle">
-                <span>Menu</span>
+            <summary class="site-menu__toggle" aria-label="Menu">
                 <span class="site-menu__icon" aria-hidden="true">
                     <span></span>
                     <span></span>
