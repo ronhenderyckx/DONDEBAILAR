@@ -192,6 +192,9 @@ $escape = static fn ($value): string =>
                 <?php elseif ($canManageRegion || $canManageLocations): ?>
                     <details class="site-menu__admin">
                         <summary>Regiobeheer</summary>
+                        <?php if ($regionId > 0 && userHasRegionRole($regionId, ['region_admin'], $headerUser)): ?>
+                            <a href="/admin/region-colors.php?region_id=<?= $regionId ?>">Kleuren en logo</a>
+                        <?php endif; ?>
                         <?php if ($canManageLocations): ?>
                             <a href="/admin/locations.php">Locaties</a>
                         <?php endif; ?>
