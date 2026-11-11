@@ -350,16 +350,6 @@ require dirname(__DIR__) . '/app/views/header.php';
                                     <div class="agenda-card__description-inner"><?= nl2br($escape(trim((string) $event['description']))) ?></div>
                                 </div>
                             <?php endif; ?>
-                            <?php
-                            $eventHashtags = preg_split('/[\s,]+/u', trim((string) ($event['hashtags'] ?? '')), -1, PREG_SPLIT_NO_EMPTY) ?: [];
-                            $eventHashtags = array_values(array_filter(array_map(static function (string $tag): string {
-                                $tag = ltrim($tag, '#');
-                                return preg_match('/\A[\p{L}\p{N}_]+\z/u', $tag) ? '#' . $tag : '';
-                            }, $eventHashtags)));
-                            ?>
-                            <?php if ($eventHashtags !== []): ?>
-                                <p class="agenda-card__hashtags"><?= implode(' ', array_map($escape, $eventHashtags)) ?></p>
-                            <?php endif; ?>
                         </div>
                     </article>
                 <?php endforeach; ?>
