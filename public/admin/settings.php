@@ -2,7 +2,17 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
+require_once di<section class="admin-section">
+        <div class="section-heading"><div><h2>Agendaweergave</h2><p>Bepaal hoeveel evenementen tegelijk worden getoond. Bezoekers kunnen daarna steeds verder laden.</p></div></div>
+        <form method="post" action="/admin/settings.php" class="auth-form">
+            <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+            <label for="agenda_page_size">Evenementen per keer (1–100)</label>
+            <input type="number" id="agenda_page_size" name="agenda_page_size" min="1" max="100" step="1" value="<?= (int) $agendaPageSize ?>" required>
+            <div class="form-actions"><button type="submit" class="button button--primary" name="save_agenda_settings" value="1">Agenda-instelling opslaan</button></div>
+        </form>
+    </section>
+
+    rname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
 require_once dirname(__DIR__, 2) . '/app/ImageOptimization.php';
 
@@ -16,6 +26,13 @@ $projectRoot = dirname(__DIR__, 2);
 $logoSettingFile = $projectRoot . '/storage/platform-logo-path.txt';
 $logoPath = is_file($logoSettingFile) ? trim((string) file_get_contents($logoSettingFile)) : '';
 
+$agendaPageSizeFile = $projectRoot . '/storage/agenda-page-size.txt';
+$agendaPageSize = 20;
+if (is_file($agendaPageSizeFile)) {
+    $storedPageSize = (int) trim((string) file_get_contents($agendaPageSizeFile));
+    if ($storedPageSize >= 1 && $storedPageSize <= 100) $agendaPageSize = $storedPageSize;
+}
+
 if ($logoPath !== '' && !preg_match('#^/uploads/platform/[a-zA-Z0-9._-]+$#', $logoPath)) {
     $logoPath = '';
 }
@@ -25,6 +42,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!verifyCsrfToken(is_string($csrf) ? $csrf : null)) {
         $errorMessage = 'De beveiligingscontrole is verlopen. Vernieuw de pagina.';
+    } elseif (isset($_POST['save_agenda_settings'])) {
+        $requestedPageSize = filter_var($_POST['agenda_page_size'] ?? null, FILTER_VALIDATE_INT);
+        if ($requestedPageSize === false || $requestedPageSize < 1 || $requestedPageSize > 100) {
+            $errorMessage = 'Kies een aantal tussen 1 en 100.';
+        } elseif (file_put_contents($agendaPageSizeFile, (string) $requestedPageSize . PHP_EOL, LOCK_EX) === false) {
+            $errorMessage = 'De agenda-instelling kon niet worden opgeslagen. Controleer de schrijfrechten van storage.';
+        } else {
+            $agendaPageSize = $requestedPageSize;
+            $successMessage = 'Het aantal evenementen per laadbeurt is opgeslagen.';
+        }
     } elseif (isset($_POST['remove_logo'])) {
         if ($logoPath !== '') {
             $oldFile = $projectRoot . '/public' . $logoPath;
