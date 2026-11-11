@@ -303,6 +303,7 @@ function migrateRegionAppearance(PDO $db): void
         'organizer_color' => "CHAR(7) NOT NULL DEFAULT '#E23A2C'",
         'filter_bar_color' => "CHAR(7) NOT NULL DEFAULT '#FFFFFF'",
         'filter_text_color' => "CHAR(7) NOT NULL DEFAULT '#222222'",
+        'footer_color' => "CHAR(7) NOT NULL DEFAULT '#FFFFFF'",
         'background_color' => "CHAR(7) NOT NULL DEFAULT '#FFFFFF'",
         'text_color' => "CHAR(7) NOT NULL DEFAULT '#222222'",
         'weekday_colors' => "TEXT NULL",
