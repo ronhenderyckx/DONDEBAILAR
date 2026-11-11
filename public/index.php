@@ -844,6 +844,19 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
 .agenda-page-nav-icon:hover:not(:disabled){filter:brightness(.9);transform:scale(1.06)}
 .agenda-page-nav-icon:disabled{opacity:.35;cursor:default}
 .agenda-page-nav-icon:focus-visible,.agenda-load-more:focus-visible{outline:3px solid var(--db-accent,#F6B22E);outline-offset:3px}
+
+/* Geselecteerde organisator: markering op het logo zelf, onafhankelijk van hover, focus en scrollen. */
+.agenda-organizer-item--organizer.is-selected img.agenda-organizer-logo,
+.agenda-organizer-item--organizer.is-selected .agenda-organizer-fallback{
+    border:3px solid var(--db-organizer-color,#E23A2C) !important;
+    background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 16%,#FFFFFF) !important;
+    box-shadow:0 0 0 3px var(--db-filter-bar-color,#FFFFFF),0 0 0 5px var(--db-organizer-color,#E23A2C) !important;
+    transform:none !important;
+}
+.agenda-organizer-item--organizer.is-selected .agenda-organizer-name{
+    color:var(--db-organizer-color,#E23A2C) !important;
+    font-weight:900 !important;
+}
 </style>
 <?php
 $hasInstagramReels = false;
@@ -1343,16 +1356,3 @@ document.addEventListener('click', function (event) {
 });
 </script>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
-
-/* Geselecteerde organisator: markering op het logo zelf, onafhankelijk van hover, focus en scrollen. */
-.agenda-organizer-item--organizer.is-selected img.agenda-organizer-logo,
-.agenda-organizer-item--organizer.is-selected .agenda-organizer-fallback{
-    border:3px solid var(--db-organizer-color,#E23A2C) !important;
-    background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 16%,#FFFFFF) !important;
-    box-shadow:0 0 0 3px var(--db-filter-bar-color,#FFFFFF),0 0 0 5px var(--db-organizer-color,#E23A2C) !important;
-    transform:none !important;
-}
-.agenda-organizer-item--organizer.is-selected .agenda-organizer-name{
-    color:var(--db-organizer-color,#E23A2C) !important;
-    font-weight:900 !important;
-}
