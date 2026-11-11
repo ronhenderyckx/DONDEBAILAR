@@ -171,7 +171,7 @@ img {
     list-style: none;
     border: 1px solid var(--db-border);
     border-radius: 9px;
-    background: #FFFFFF;
+    background: var(--db-menu-color, #FFFFFF);
     color: var(--db-text);
     font-size: 14px;
     font-weight: 600;
@@ -190,7 +190,7 @@ img {
 .site-menu__toggle:hover,
 .site-menu[open] .site-menu__toggle {
     border-color: #C8D6E8;
-    background: #F8FAFC;
+    background: color-mix(in srgb, var(--db-menu-color, #FFFFFF) 88%, var(--db-text));
 }
 
 .site-menu__icon {
