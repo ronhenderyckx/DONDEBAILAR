@@ -342,7 +342,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                                 <button type="button" class="agenda-attendance<?= !empty($event['is_attending']) ? ' is-attending' : '' ?>" data-event-id="<?= (int) $event['id'] ?>" aria-label="Ik kom dansen" aria-pressed="<?= !empty($event['is_attending']) ? 'true' : 'false' ?>" title="Tik: Ik kom dansen · Lang indrukken: deelnemers"><span aria-hidden="true">👠</span><b><?= (int) ($event['attendance_count'] ?? 0) ?></b></button>
                                 <button type="button" class="agenda-icon-button agenda-share" data-share-title="<?= $escape($event['title']) ?>" data-share-url="<?= $escape($shareUrl) ?>" aria-label="Deel evenement" title="Deel evenement"><svg aria-hidden="true" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"></path></svg></button>
                                 <?php if ($mapUrl !== ''): ?><a class="agenda-icon-button agenda-location" href="<?= $escape($mapUrl) ?>" target="_blank" rel="noopener noreferrer" aria-label="Toon locatie op kaart" title="Toon locatie op kaart"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg></a><?php endif; ?>
-                                <a class="agenda-icon-button agenda-messages" href="/event-messages.php?id=<?= (int) $event['id'] ?>" aria-label="Berichten bij dit evenement" title="Berichten bij dit evenement"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"></path></svg><b class="agenda-message-count"><?= (int) ($event['message_count'] ?? 0) ?></b></a>
+                                <button type="button" class="agenda-icon-button agenda-messages" data-event-messages data-url="/event-messages.php?id=<?= (int) $event['id'] ?>" aria-label="Berichten bij dit evenement" title="Berichten bij dit evenement"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"></path></svg><b class="agenda-message-count"><?= (int) ($event['message_count'] ?? 0) ?></b></button>
                             </div>
                             <h2><a href="<?= $eventUrl ?>"><?= $escape($event['title']) ?></a></h2>
                             <?php
@@ -373,6 +373,12 @@ require dirname(__DIR__) . '/app/views/header.php';
         <?php endif; ?>
         <p class="agenda-count"><?= count($events) ?> evenement<?= count($events) === 1 ? '' : 'en' ?> gevonden</p>
     <?php endif; ?>
+    <div class="agenda-message-modal" id="agenda-message-modal" hidden>
+        <div class="agenda-message-modal__panel" role="dialog" aria-modal="true" aria-labelledby="agenda-message-modal-title">
+            <div class="agenda-message-modal__top"><strong id="agenda-message-modal-title">Berichten bij dit evenement</strong><button type="button" class="agenda-message-modal__close" aria-label="Sluiten">×</button></div>
+            <iframe title="Berichten bij evenement" src="about:blank"></iframe>
+        </div>
+    </div>
 </section>
 
 <style>
@@ -449,6 +455,7 @@ require dirname(__DIR__) . '/app/views/header.php';
     }
 }
 
+.agenda-message-modal{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:14px;background:#0009}.agenda-message-modal[hidden]{display:none}.agenda-message-modal__panel{display:flex;flex-direction:column;width:min(100%,680px);height:min(82vh,820px);overflow:hidden;border-radius:18px;background:#fff;box-shadow:0 18px 60px #0005}.agenda-message-modal__top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px;background:var(--db-primary);color:#fff}.agenda-message-modal__close{display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%;background:#ffffff24;color:#fff;font-size:27px;line-height:1;cursor:pointer}.agenda-message-modal__panel iframe{display:block;flex:1;width:100%;min-height:0;border:0;background:#fff}.agenda-messages{border:0}.agenda-messages:focus-visible,.agenda-message-modal__close:focus-visible{outline:3px solid #ffd36c;outline-offset:2px}@media(max-width:600px){.agenda-message-modal{padding:8px}.agenda-message-modal__panel{width:100%;height:88vh;border-radius:14px}}
 </style>
 <?php
 $hasInstagramReels = false;
@@ -565,6 +572,30 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
     window.addEventListener('resize', updateCounter);
     updateCounter();
 });
+const messageModal = document.getElementById('agenda-message-modal');
+if (messageModal) {
+    const messageFrame = messageModal.querySelector('iframe');
+    const closeMessageModal = function () {
+        messageModal.hidden = true;
+        messageFrame.src = 'about:blank';
+        document.body.style.overflow = '';
+    };
+    messageModal.querySelector('.agenda-message-modal__close').addEventListener('click', closeMessageModal);
+    messageModal.addEventListener('click', function (event) {
+        if (event.target === messageModal) closeMessageModal();
+    });
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !messageModal.hidden) closeMessageModal();
+    });
+    document.addEventListener('click', function (event) {
+        const button = event.target.closest('[data-event-messages]');
+        if (!button) return;
+        event.preventDefault();
+        messageFrame.src = button.dataset.url + '&popup=1';
+        messageModal.hidden = false;
+        document.body.style.overflow = 'hidden';
+    });
+}
 const attendanceDialog = document.createElement('div');
 attendanceDialog.className = 'agenda-attendance-list';
 attendanceDialog.hidden = true;
