@@ -331,6 +331,8 @@ function migrateRegionAppearance(PDO $db): void
 
 function migrateUserAgendaPreferences(PDO $db): void
 {
+    // Gebruik bewust geen foreign keys: de ID-kolommen van bestaande
+    // installaties kunnen verschillende integergroottes hebben.
     $db->exec("CREATE TABLE IF NOT EXISTS user_agenda_preferences (
         user_id BIGINT UNSIGNED NOT NULL,
         region_id BIGINT UNSIGNED NULL,
@@ -340,11 +342,7 @@ function migrateUserAgendaPreferences(PDO $db): void
         sound_muted TINYINT(1) NOT NULL DEFAULT 1,
         updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         PRIMARY KEY (user_id),
-        KEY idx_user_agenda_preferences_region (region_id),
-        CONSTRAINT fk_user_agenda_preferences_user FOREIGN KEY (user_id)
-            REFERENCES users(id) ON DELETE CASCADE,
-        CONSTRAINT fk_user_agenda_preferences_region FOREIGN KEY (region_id)
-            REFERENCES regions(id) ON DELETE SET NULL
+        KEY idx_user_agenda_preferences_region (region_id)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
 
