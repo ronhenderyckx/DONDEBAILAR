@@ -38,7 +38,7 @@ if (!$event) {
 $user = currentUser();
 $canModerate = $user !== null && eventCanEdit($db, $event, $user);
 $mentionUsersQuery = $db->query(
-    "SELECT id, display_name FROM users WHERE status = 'active' AND display_name IS NOT NULL AND display_name <> '' ORDER BY display_name"
+    "SELECT id, display_name, email FROM users WHERE status = 'active' AND ((display_name IS NOT NULL AND display_name <> '') OR (email IS NOT NULL AND email <> '')) ORDER BY display_name"
 );
 $mentionUsers = $mentionUsersQuery->fetchAll();
 $errors = [];
@@ -87,26 +87,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ]);
                 $newMessageId = (int) $db->lastInsertId();
 
-                // Maak één melding per genoemde gebruiker; vermeldingen van jezelf tellen niet.
+                // Maak één melding per genoemde gebruiker. Herken zowel de weergavenaam
+                // als de accountnaam (het deel van het e-mailadres vóór @).
                 $notificationInsert = $db->prepare(
                     "INSERT IGNORE INTO user_notifications
                         (user_id, actor_user_id, event_id, message_id, notification_type)
                      VALUES (:user_id, :actor_user_id, :event_id, :message_id, 'mention')"
                 );
                 foreach ($mentionUsers as $mentionedUser) {
-                    $mentionedName = trim((string) $mentionedUser['display_name']);
                     $mentionedUserId = (int) $mentionedUser['id'];
-                    if ($mentionedUserId === (int) $user['id'] || $mentionedName === '') {
-                        continue;
+                    $aliases = [trim((string) ($mentionedUser['display_name'] ?? ''))];
+                    $email = trim((string) ($mentionedUser['email'] ?? ''));
+                    if ($email !== '' && str_contains($email, '@')) {
+                        $aliases[] = trim((string) strstr($email, '@', true));
                     }
-                    $mentionPattern = '/(?<![\\p{L}\\p{N}_])@' . preg_quote($mentionedName, '/') . '(?![\\p{L}\\p{N}_])/iu';
-                    if (preg_match($mentionPattern, $message) === 1) {
-                        $notificationInsert->execute([
-                            'user_id' => $mentionedUserId,
-                            'actor_user_id' => (int) $user['id'],
-                            'event_id' => $id,
-                            'message_id' => $newMessageId,
-                        ]);
+                    $aliases = array_values(array_unique(array_filter($aliases, static fn(string $alias): bool => $alias !== '')));
+                    foreach ($aliases as $alias) {
+                        $mentionPattern = '/(?<![\\p{L}\\p{N}_])@' . preg_quote($alias, '/') . '(?![\\p{L}\\p{N}_])/iu';
+                        if (preg_match($mentionPattern, $message) === 1) {
+                            $notificationInsert->execute([
+                                'user_id' => $mentionedUserId,
+                                'actor_user_id' => (int) $user['id'],
+                                'event_id' => $id,
+                                'message_id' => $newMessageId,
+                            ]);
+                            break;
+                        }
                     }
                 }
                 header('Location: ' . $messagePageUrl . '&sent=1#messages');
@@ -195,10 +201,21 @@ $region = [
 ];
 require dirname(__DIR__) . '/app/views/header.php';
 $escape = static fn($value): string => escapeHtml((string) $value);
-$mentionNames = array_values(array_unique(array_filter(array_map(
-    static fn($mentionUser): string => trim((string) $mentionUser['display_name']),
-    $mentionUsers
-))));
+$mentionNames = [];
+foreach ($mentionUsers as $mentionUser) {
+    $displayName = trim((string) ($mentionUser['display_name'] ?? ''));
+    if ($displayName !== '') {
+        $mentionNames[] = $displayName;
+    }
+    $email = trim((string) ($mentionUser['email'] ?? ''));
+    if ($email !== '' && str_contains($email, '@')) {
+        $accountName = trim((string) strstr($email, '@', true));
+        if ($accountName !== '') {
+            $mentionNames[] = $accountName;
+        }
+    }
+}
+$mentionNames = array_values(array_unique($mentionNames));
 usort($mentionNames, static fn(string $a, string $b): int => mb_strlen($b) <=> mb_strlen($a));
 $renderMessage = static function (string $message) use ($mentionNames, $escape): string {
     $html = $escape($message);
@@ -306,8 +323,8 @@ $renderMessage = static function (string $message) use ($mentionNames, $escape):
     </div>
 
     <datalist id="event-chat-mention-users">
-        <?php foreach ($mentionUsers as $mentionUser): ?>
-            <option value="@<?= $escape($mentionUser['display_name']) ?>"></option>
+        <?php foreach ($mentionNames as $mentionName): ?>
+            <option value="@<?= $escape($mentionName) ?>"></option>
         <?php endforeach; ?>
     </datalist>
     <div class="event-chat__composer">
