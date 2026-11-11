@@ -352,7 +352,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                             $locationPostalCity = trim($locationPostalCode . ' ' . $locationLabel);
                             $locationPhone = trim((string) ($event['location_phone'] ?? ''));
                             $locationLogo = basename((string) ($event['location_logo_path'] ?? ''));
-                            $hasLocationLogo = preg_match('/\\A[a-f0-9]{32}\\.(jpg|png|webp)\\z/', $locationLogo) === 1;
+                            $hasLocationLogo = preg_match('/\A[a-f0-9]{32}\.(jpg|png|webp)\z/', $locationLogo) === 1;
                             $hasMoreInfo = $eventDescription !== '' || $locationName !== '' || $locationAddressLine !== '' || $locationPhone !== '';
                             ?>
                             <?php if ($hasMoreInfo): ?>
