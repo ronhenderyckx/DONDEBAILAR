@@ -51,6 +51,10 @@ $activeFilter = (($_GET['filter'] ?? '') === 'city') ? 'city' : 'organizer';
 if (mb_strlen($city) > 120) {
     $city = mb_substr($city, 0, 120);
 }
+$agendaSearch = trim((string) ($_GET['q'] ?? ''));
+if (mb_strlen($agendaSearch) > 120) {
+    $agendaSearch = mb_substr($agendaSearch, 0, 120);
+}
 
 $organizers = [];
 $cities = [];
@@ -125,6 +129,25 @@ if ($regionId > 0) {
     if ($city !== '') {
         $sql .= " AND l.city = :city";
         $params['city'] = $city;
+    }
+    if ($agendaSearch !== '') {
+        $sql .= " AND (
+            e.title LIKE :search_title
+            OR e.description LIKE :search_description
+            OR e.hashtags LIKE :search_hashtags
+            OR o.name LIKE :search_organizer
+            OR l.name LIKE :search_location
+            OR l.city LIKE :search_city
+            OR c.name LIKE :search_category
+        )";
+        $searchTerm = '%' . $agendaSearch . '%';
+        $params['search_title'] = $searchTerm;
+        $params['search_description'] = $searchTerm;
+        $params['search_hashtags'] = $searchTerm;
+        $params['search_organizer'] = $searchTerm;
+        $params['search_location'] = $searchTerm;
+        $params['search_city'] = $searchTerm;
+        $params['search_category'] = $searchTerm;
     }
     $sql .= " ORDER BY e.starts_at ASC, e.id ASC";
     $eventQuery = $db->prepare($sql);
@@ -214,6 +237,7 @@ if ($regionId > 0) {
 }
 
 $escape = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+$isAgendaPage = true;
 $pageTitle = 'Agenda' . ($region ? ' — ' . $region['name'] : '') . ' — DONDEBAILAR';
 $pageRobots = 'index, follow';
 require dirname(__DIR__) . '/app/views/header.php';
@@ -456,6 +480,10 @@ require dirname(__DIR__) . '/app/views/header.php';
 }
 
 .agenda-message-modal{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:14px;background:#0009}.agenda-message-modal[hidden]{display:none}.agenda-message-modal__panel{position:relative;display:flex;flex-direction:column;width:min(100%,680px);height:min(82vh,820px);overflow:hidden;border-radius:18px;background:#fff;box-shadow:0 18px 60px #0005}.agenda-message-modal__top{position:absolute;top:5px;right:5px;z-index:2;display:flex;align-items:center;justify-content:flex-end;padding:0;background:transparent;pointer-events:none}.agenda-message-modal__close{display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:0;background:transparent;color:#222;font-size:30px;font-weight:400;line-height:1;cursor:pointer;pointer-events:auto;box-shadow:none}.agenda-message-modal__panel iframe{display:block;flex:1 0 auto;width:calc(100% + 28px);max-width:none;min-height:0;margin-right:-28px;border:0;background:#fff}.agenda-messages{border:0}.agenda-messages:focus-visible,.agenda-message-modal__close:focus-visible{outline:3px solid #ffd36c;outline-offset:2px}@media(max-width:600px){.agenda-message-modal{padding:8px}.agenda-message-modal__panel{width:100%;height:88vh;border-radius:14px}}
+.agenda-card{overflow:visible}
+.agenda-card__media-wrap{border-radius:14px 14px 0 0}
+.agenda-card__details{border-radius:0 0 14px 14px}
+.agenda-card__quick{position:sticky;top:0;z-index:8;padding:5px 0;background:#f78d19;box-shadow:0 4px 8px -8px #0009}
 </style>
 <?php
 $hasInstagramReels = false;
