@@ -274,7 +274,7 @@ function migrateUserNotifications(PDO $db): void
 function migrateRegionAppearance(PDO $db): void
 {
     $db->exec("CREATE TABLE IF NOT EXISTS region_appearance (
-        region_id INT UNSIGNED NOT NULL,
+        region_id BIGINT UNSIGNED NOT NULL,
         primary_color CHAR(7) NOT NULL DEFAULT '#E23A2C',
         primary_dark CHAR(7) NOT NULL DEFAULT '#8F211B',
         accent_color CHAR(7) NOT NULL DEFAULT '#F6B22E',
