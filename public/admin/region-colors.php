@@ -14,7 +14,7 @@ if (!$regionId || $regionId < 1) {
 
 requireRegionRole($regionId, ['region_admin']);
 
-$regionQuery = $db->prepare("SELECT id, name FROM regions WHERE id = :id LIMIT 1");
+$regionQuery = $db->prepare("SELECT id, name, logo_path FROM regions WHERE id = :id LIMIT 1");
 $regionQuery->execute(['id' => $regionId]);
 $region = $regionQuery->fetch();
 if (!$region) {
@@ -52,7 +52,9 @@ if (!empty($saved['weekday_colors'])) {
         }
     }
 }
-$logoPath = (string) ($saved['logo_path'] ?? '');
+$logoPath = $saved !== []
+    ? (string) ($saved['logo_path'] ?? '')
+    : (string) ($region['logo_path'] ?? '');
 $errorMessage = '';
 $successMessage = '';
 
