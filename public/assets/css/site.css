@@ -659,7 +659,7 @@ p {
 
 .site-footer {
     width: 100%;
-    border-top: 1px solid var(--db-border);
+    border: 0;
     background: var(--db-footer-color, #FFFFFF);
 }
 
@@ -686,8 +686,8 @@ body.has-agenda-footer .site-footer--agenda{
     bottom:0;
     left:0;
     z-index:900;
-    border-top:1px solid var(--db-border);
-    box-shadow:0 -5px 18px rgba(25,40,60,.10);
+    border:0 !important;
+    box-shadow:none !important;
 }
 .site-footer__inner--agenda{
     min-height:54px;
