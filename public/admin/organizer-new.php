@@ -5,6 +5,7 @@ require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
 require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
 require_once dirname(__DIR__, 2) . '/app/Organizers.php';
+require_once dirname(__DIR__, 2) . '/app/ImageOptimization.php';
 
 $user = requireOrganizerManagement();
 $db = Database::connection();
@@ -19,42 +20,7 @@ $isActive = true;
 
 function saveOrganizerLogo(array $file): ?string
 {
-    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) {
-        return null;
-    }
-    if (($file['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_OK) {
-        throw new RuntimeException('Het logo kon niet worden geüpload.');
-    }
-    $temporaryFile = (string) ($file['tmp_name'] ?? '');
-    if ($temporaryFile === '' || !is_uploaded_file($temporaryFile)) {
-        throw new RuntimeException('Het geüploade logo is ongeldig.');
-    }
-    if ((int) ($file['size'] ?? 0) > 2 * 1024 * 1024) {
-        throw new RuntimeException('Het logo mag maximaal 2 MB groot zijn.');
-    }
-
-    $imageInfo = @getimagesize($temporaryFile);
-    $mime = $imageInfo['mime'] ?? '';
-    $extensions = [
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
-        'image/webp' => 'webp',
-    ];
-    if (!isset($extensions[$mime])) {
-        throw new RuntimeException('Gebruik een JPG-, PNG- of WebP-logo.');
-    }
-
-    $directory = dirname(__DIR__, 2) . '/uploads/organizers';
-    if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) {
-        throw new RuntimeException('De uploadmap kon niet worden aangemaakt.');
-    }
-
-    $filename = bin2hex(random_bytes(16)) . '.' . $extensions[$mime];
-    if (!move_uploaded_file($temporaryFile, $directory . '/' . $filename)) {
-        throw new RuntimeException('Het logo kon niet worden opgeslagen.');
-    }
-
-    return 'uploads/organizers/' . $filename;
+    return storeOptimizedLogoUpload($file, 'uploads/organizers', 256, 2 * 1024 * 1024);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -101,7 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Ruim het logo op als de database-insert mislukt.
             if (
                 is_string($logoPath)
-                && preg_match('~\\Auploads/organizers/[a-f0-9]{32}\\.(?:jpg|png|webp)\\z~D', $logoPath) === 1
+                && preg_match('~\\Auploads/organizers/[a-f0-9]{32}\\.webp\\z~D', $logoPath) === 1
             ) {
                 $logoFile = dirname(__DIR__, 2) . '/' . $logoPath;
                 if (is_file($logoFile)) {
@@ -150,7 +116,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                    placeholder="https://www.voorbeeld.eu"
                    value="<?= escapeHtml($website) ?>">
 
-            <label for="logo">Logo (JPG, PNG of WebP — maximaal 2 MB)</label>
+            <label for="logo">Logo (JPG, PNG of WebP — maximaal 2 MB; wordt automatisch geoptimaliseerd)</label>
             <input id="logo" name="logo" type="file" accept="image/jpeg,image/png,image/webp">
 
             <label for="notes">Informatie / opmerkingen</label>
