@@ -572,11 +572,40 @@ document.addEventListener('click', function (event) {
     });
 });
 
-document.addEventListener('click', function (event) {
+document.addEventListener('click', async function (event) {
     const shareButton = event.target.closest('[data-share-url]');
     if (!shareButton) return;
-    const text = shareButton.dataset.shareTitle + ' — ' + shareButton.dataset.shareUrl;
-    window.open('https://wa.me/?text=' + encodeURIComponent(text), '_blank', 'noopener,noreferrer');
+
+    event.preventDefault();
+    const title = shareButton.dataset.shareTitle || 'Evenement';
+    const url = shareButton.dataset.shareUrl || window.location.href;
+    const shareData = {
+        title: title,
+        text: title,
+        url: url
+    };
+
+    if (navigator.share && (!navigator.canShare || navigator.canShare(shareData))) {
+        try {
+            await navigator.share(shareData);
+        } catch (error) {
+            if (error.name !== 'AbortError') {
+                window.alert('Delen is niet gelukt. Probeer de link te kopiëren.');
+            }
+        }
+        return;
+    }
+
+    try {
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(url);
+            window.alert('De link naar het evenement is gekopieerd. Je kunt hem nu in elke app delen.');
+        } else {
+            window.prompt('Kopieer deze link om het evenement te delen:', url);
+        }
+    } catch (error) {
+        window.prompt('Kopieer deze link om het evenement te delen:', url);
+    }
 });
 </script>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
