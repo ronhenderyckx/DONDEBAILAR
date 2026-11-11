@@ -976,3 +976,15 @@ body.has-agenda-footer .site-footer--agenda{
 .agenda-calendar__day:nth-child(7n+5){background:color-mix(in srgb,var(--db-weekday-5,#E78AAE) 10%,white)}
 .agenda-calendar__day:nth-child(7n+6){background:color-mix(in srgb,var(--db-weekday-6,#F49A45) 10%,white)}
 .agenda-calendar__day:nth-child(7n){background:color-mix(in srgb,var(--db-weekday-7,#999999) 10%,white)}
+
+
+/* Zorg dat het volledige uitklapmenu op pc zichtbaar en bereikbaar blijft. */
+.site-menu{position:relative;z-index:2000}
+.site-menu__panel{
+    z-index:2001;
+    max-width:calc(100vw - 24px);
+    max-height:calc(100vh - 24px);
+    overflow-x:hidden;
+    overflow-y:auto;
+    overscroll-behavior:contain;
+}
