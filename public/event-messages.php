@@ -167,36 +167,25 @@ $region = [
 require dirname(__DIR__) . '/app/views/header.php';
 $escape = static fn($value): string => escapeHtml((string) $value);
 ?>
-<section class="admin-page event-messages-page<?= $popupMode ? ' event-messages-page--popup' : '' ?>" id="messages">
-    <p class="eyebrow"><?= $escape($event['region_name']) ?></p>
-    <div class="admin-heading">
-        <div><h1>Berichten</h1><p><a href="/event.php?id=<?= (int) $id ?>"><?= $escape($event['title']) ?></a></p></div>
-        <?php if (!$popupMode): ?><a class="button" href="/event.php?id=<?= (int) $id ?>">Terug naar evenement</a><?php endif; ?>
+<section class="event-chat<?= $popupMode ? ' event-chat--popup' : '' ?>" id="messages">
+    <div class="event-chat__heading">
+        <strong><?= $escape($event['title']) ?></strong>
+        <span><?= $messageCount ?> <?= $messageCount === 1 ? 'bericht' : 'berichten' ?></span>
     </div>
 
-    <?php foreach ($errors as $error): ?><div class="message message--error"><?= $escape($error) ?></div><?php endforeach; ?>
-    <?php if (isset($_GET['sent'])): ?><div class="message message--success">Je bericht is geplaatst.</div><?php endif; ?>
-    <?php if (isset($_GET['updated'])): ?><div class="message message--success">Je bericht is aangepast.</div><?php endif; ?>
-    <?php if (isset($_GET['deleted'])): ?><div class="message message--success">Het bericht is verwijderd.</div><?php endif; ?>
+    <?php if ($errors !== []): ?>
+        <div class="event-chat__notice event-chat__notice--error"><?php foreach ($errors as $error): ?><?= $escape($error) ?><?php endforeach; ?></div>
+    <?php elseif (isset($_GET['sent'])): ?>
+        <div class="event-chat__notice">Bericht geplaatst</div>
+    <?php elseif (isset($_GET['updated'])): ?>
+        <div class="event-chat__notice">Bericht aangepast</div>
+    <?php elseif (isset($_GET['deleted'])): ?>
+        <div class="event-chat__notice">Bericht verwijderd</div>
+    <?php endif; ?>
 
-    <section class="admin-section">
-        <h2><?= $messageCount ?> <?= $messageCount === 1 ? 'bericht' : 'berichten' ?></h2>
-        <?php if ($user !== null): ?>
-            <form method="post" class="auth-form event-message-form">
-                <input type="hidden" name="csrf_token" value="<?= $escape(csrfToken()) ?>">
-                <input type="hidden" name="action" value="post">
-                <label for="new-message">Plaats een bericht</label>
-                <textarea id="new-message" name="message" rows="4" maxlength="2000" required placeholder="Schrijf een bericht over dit evenement..."></textarea>
-                <button class="button button--primary" type="submit">Bericht plaatsen</button>
-            </form>
-        <?php else: ?>
-            <p><a class="button button--primary" href="/login.php?return=<?= rawurlencode($messagePageUrl) ?>">Log in om een bericht te plaatsen</a></p>
-        <?php endif; ?>
-    </section>
-
-    <section class="event-message-list">
+    <div class="event-chat__messages">
         <?php if ($topLevel === []): ?>
-            <div class="admin-section"><p>Nog geen berichten. Plaats als eerste een bericht.</p></div>
+            <p class="event-chat__empty">Nog geen berichten. Begin het gesprek!</p>
         <?php endif; ?>
         <?php foreach ($topLevel as $item): ?>
             <?php
@@ -204,93 +193,76 @@ $escape = static fn($value): string => escapeHtml((string) $value);
             $isOwner = $user !== null && (int) $item['user_id'] === (int) $user['id'];
             $canChange = $user !== null && ($isOwner || $canModerate);
             ?>
-            <article class="event-message" id="message-<?= $messageId ?>">
-                <div class="event-message__meta">
-                    <strong><?= $escape($item['display_name'] ?: 'Gebruiker') ?></strong>
-                    <time datetime="<?= $escape(date(DATE_ATOM, strtotime((string) $item['created_at']))) ?>"><?= $escape(date('d-m-Y H:i', strtotime((string) $item['created_at']))) ?></time>
-                </div>
-                <?php if ((int) $item['is_deleted'] === 1): ?>
-                    <p class="event-message__deleted">Dit bericht is verwijderd.</p>
-                <?php else: ?>
-                    <p class="event-message__text"><?= nl2br($escape($item['message'])) ?></p>
-                    <?php if (!empty($item['updated_at']) && $item['updated_at'] !== $item['created_at']): ?><small class="event-message__edited">bewerkt</small><?php endif; ?>
-                    <?php if ($canChange): ?>
-                        <details class="event-message__tools">
-                            <summary>Beheren</summary>
-                            <form method="post" class="auth-form">
-                                <input type="hidden" name="csrf_token" value="<?= $escape(csrfToken()) ?>">
-                                <input type="hidden" name="action" value="edit">
-                                <input type="hidden" name="message_id" value="<?= $messageId ?>">
-                                <textarea name="message" rows="3" maxlength="2000" required><?= $escape($item['message']) ?></textarea>
-                                <button class="button" type="submit">Wijzig bericht</button>
-                            </form>
-                            <form method="post" onsubmit="return confirm('Dit bericht verwijderen?')">
-                                <input type="hidden" name="csrf_token" value="<?= $escape(csrfToken()) ?>">
-                                <input type="hidden" name="action" value="delete">
-                                <input type="hidden" name="message_id" value="<?= $messageId ?>">
-                                <button class="button" type="submit">Verwijderen</button>
-                            </form>
-                        </details>
-                    <?php endif; ?>
-                    <?php if ($user !== null): ?>
-                        <details class="event-message__reply">
-                            <summary>Reageren</summary>
-                            <form method="post" class="auth-form">
-                                <input type="hidden" name="csrf_token" value="<?= $escape(csrfToken()) ?>">
-                                <input type="hidden" name="action" value="reply">
-                                <input type="hidden" name="parent_id" value="<?= $messageId ?>">
-                                <textarea name="message" rows="2" maxlength="2000" required placeholder="Schrijf een reactie..."></textarea>
-                                <button class="button" type="submit">Reactie plaatsen</button>
-                            </form>
-                        </details>
-                    <?php endif; ?>
-                <?php endif; ?>
-
-                <?php foreach ($replies[$messageId] ?? [] as $reply): ?>
-                    <?php
-                    $replyId = (int) $reply['id'];
-                    $replyOwner = $user !== null && (int) $reply['user_id'] === (int) $user['id'];
-                    $replyCanChange = $user !== null && ($replyOwner || $canModerate);
-                    ?>
-                    <div class="event-message event-message--reply" id="message-<?= $replyId ?>">
-                        <div class="event-message__meta">
-                            <strong><?= $escape($reply['display_name'] ?: 'Gebruiker') ?></strong>
-                            <time><?= $escape(date('d-m-Y H:i', strtotime((string) $reply['created_at']))) ?></time>
-                        </div>
-                        <?php if ((int) $reply['is_deleted'] === 1): ?>
-                            <p class="event-message__deleted">Deze reactie is verwijderd.</p>
-                        <?php else: ?>
-                            <p class="event-message__text"><?= nl2br($escape($reply['message'])) ?></p>
-                            <?php if ($replyCanChange): ?>
-                                <details class="event-message__tools">
-                                    <summary>Beheren</summary>
-                                    <form method="post" class="auth-form">
-                                        <input type="hidden" name="csrf_token" value="<?= $escape(csrfToken()) ?>">
-                                        <input type="hidden" name="action" value="edit">
-                                        <input type="hidden" name="message_id" value="<?= $replyId ?>">
-                                        <textarea name="message" rows="3" maxlength="2000" required><?= $escape($reply['message']) ?></textarea>
-                                        <button class="button" type="submit">Wijzig reactie</button>
-                                    </form>
-                                    <form method="post" onsubmit="return confirm('Deze reactie verwijderen?')">
-                                        <input type="hidden" name="csrf_token" value="<?= $escape(csrfToken()) ?>">
-                                        <input type="hidden" name="action" value="delete">
-                                        <input type="hidden" name="message_id" value="<?= $replyId ?>">
-                                        <button class="button" type="submit">Verwijderen</button>
-                                    </form>
-                                </details>
-                            <?php endif; ?>
+            <article class="chat-message" id="message-<?= $messageId ?>">
+                <div class="chat-message__bubble">
+                    <div class="chat-message__meta"><strong><?= $escape($item['display_name'] ?: 'Gebruiker') ?></strong><time><?= $escape(date('d-m H:i', strtotime((string) $item['created_at']))) ?></time></div>
+                    <?php if ((int) $item['is_deleted'] === 1): ?>
+                        <p class="chat-message__deleted">Bericht verwijderd</p>
+                    <?php else: ?>
+                        <p><?= nl2br($escape($item['message'])) ?></p>
+                        <?php if (!empty($item['updated_at']) && $item['updated_at'] !== $item['created_at']): ?><small>bewerkt</small><?php endif; ?>
+                        <?php if ($canChange): ?>
+                            <details class="chat-message__manage"><summary>⋯</summary>
+                                <form method="post">
+                                    <input type="hidden" name="csrf_token" value="<?= $escape(csrfToken()) ?>">
+                                    <input type="hidden" name="action" value="edit">
+                                    <input type="hidden" name="message_id" value="<?= $messageId ?>">
+                                    <textarea name="message" rows="2" maxlength="2000" required><?= $escape($item['message']) ?></textarea>
+                                    <button type="submit">Opslaan</button>
+                                </form>
+                                <form method="post" onsubmit="return confirm('Bericht verwijderen?')">
+                                    <input type="hidden" name="csrf_token" value="<?= $escape(csrfToken()) ?>">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="message_id" value="<?= $messageId ?>">
+                                    <button type="submit">Verwijderen</button>
+                                </form>
+                            </details>
                         <?php endif; ?>
+                    <?php endif; ?>
+                </div>
+                <?php foreach ($replies[$messageId] ?? [] as $reply): ?>
+                    <div class="chat-message__reply">
+                        <strong><?= $escape($reply['display_name'] ?: 'Gebruiker') ?></strong>
+                        <span><?= (int) $reply['is_deleted'] === 1 ? 'Reactie verwijderd' : nl2br($escape($reply['message'])) ?></span>
+                        <time><?= $escape(date('d-m H:i', strtotime((string) $reply['created_at']))) ?></time>
                     </div>
                 <?php endforeach; ?>
             </article>
         <?php endforeach; ?>
-    </section>
+    </div>
+
+    <div class="event-chat__composer">
+        <?php if ($user !== null): ?>
+            <form method="post">
+                <input type="hidden" name="csrf_token" value="<?= $escape(csrfToken()) ?>">
+                <input type="hidden" name="action" value="post">
+                <textarea name="message" rows="2" maxlength="2000" required placeholder="Schrijf een bericht..."></textarea>
+                <button type="submit" aria-label="Bericht versturen" title="Versturen">➤</button>
+            </form>
+        <?php else: ?>
+            <a href="/login.php?return=<?= rawurlencode($messagePageUrl) ?>">Log in om een bericht te schrijven</a>
+        <?php endif; ?>
+    </div>
 </section>
 <style>
-.event-messages-page{max-width:900px;margin:0 auto}.event-message-form{max-width:700px}.event-message-list{display:grid;gap:14px;margin-top:18px}.event-message{padding:16px;border:1px solid var(--db-border);border-radius:12px;background:#fff;color:var(--db-text)}.event-message__meta{display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--db-muted);font-size:13px}.event-message__meta strong{color:var(--db-text)}.event-message__text{margin:12px 0;line-height:1.6;overflow-wrap:anywhere}.event-message__deleted,.event-message__edited{color:var(--db-muted);font-style:italic}.event-message--reply{margin:12px 0 0 22px;padding:12px;background:#f7f8fa}.event-message__tools,.event-message__reply{margin-top:10px;font-size:13px}.event-message__tools summary,.event-message__reply summary{cursor:pointer;color:var(--db-primary);font-weight:700}.event-message__tools form,.event-message__reply form{margin-top:10px;max-width:650px}.event-message__tools textarea,.event-message__reply textarea{width:100%;box-sizing:border-box}
-@media(max-width:600px){.event-message{padding:13px}.event-message--reply{margin-left:10px}.event-message__meta{align-items:flex-start;flex-direction:column;gap:3px}}
-.event-messages-page--popup{max-width:none;margin:0;padding:12px}.event-messages-page--popup .admin-heading{margin-bottom:12px}.event-messages-page--popup .admin-heading h1{font-size:22px}.event-messages-page--popup .admin-section{padding:12px;margin-bottom:12px}.event-messages-page--popup .event-message-list{margin-top:12px}
-body:has(.event-messages-page--popup){margin:0}.event-messages-page--popup~*{display:none}
-body:has(.event-messages-page--popup) .site-header,body:has(.event-messages-page--popup) footer{display:none!important}body:has(.event-messages-page--popup) .site-main{padding:0!important;margin:0!important;max-width:none!important}
-</style>
+html,body{height:100%;margin:0!important;padding:0!important;overflow:hidden!important}
+body:has(.event-chat--popup) .site-header,body:has(.event-chat--popup) footer{display:none!important}
+body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;margin:0!important;padding:0!important;overflow:hidden}
+.event-chat{height:100%;min-height:0;display:flex;flex-direction:column;background:#fff;color:#222;font:14px/1.45 system-ui,sans-serif}
+.event-chat__heading{flex:none;display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 14px;border-bottom:1px solid #e8e8e8;background:#fafafa}
+.event-chat__heading strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}.event-chat__heading span{flex:none;color:#777;font-size:12px}
+.event-chat__messages{flex:1;min-height:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}
+.event-chat__empty{margin:auto;color:#888;text-align:center}
+.chat-message{max-width:88%;align-self:flex-start}.chat-message__bubble{position:relative;padding:9px 12px;border-radius:14px 14px 14px 4px;background:#f0f2f5;overflow-wrap:anywhere}
+.chat-message__meta{display:flex;gap:10px;align-items:center;margin-bottom:4px;font-size:11px;color:#777}.chat-message__meta strong{color:#444;font-size:12px}.chat-message__meta time{white-space:nowrap}
+.chat-message__bubble p{margin:0;white-space:normal}.chat-message__bubble small{display:block;color:#888;font-size:10px}
+.chat-message__deleted{color:#888;font-style:italic}
+.chat-message__reply{margin:5px 0 0 16px;padding:7px 10px;border-left:2px solid #ddd;color:#555;font-size:12px;overflow-wrap:anywhere}
+.chat-message__reply strong{margin-right:6px}.chat-message__reply time{display:block;color:#999;font-size:10px}
+.chat-message__manage{margin-top:4px;font-size:11px}.chat-message__manage summary{cursor:pointer;color:#777}.chat-message__manage form{display:flex;gap:5px;margin-top:5px}.chat-message__manage textarea{min-width:0;width:100%;font:inherit}.chat-message__manage button{border:0;border-radius:6px;padding:5px 8px;background:#eee;cursor:pointer;white-space:nowrap}
+.event-chat__composer{flex:none;padding:9px 10px;padding-bottom:max(9px,env(safe-area-inset-bottom));border-top:1px solid #e5e5e5;background:#fff}
+.event-chat__composer form{display:flex;align-items:flex-end;gap:8px}.event-chat__composer textarea{flex:1;min-width:0;resize:none;max-height:100px;border:1px solid #ddd;border-radius:18px;padding:10px 13px;font:14px/1.4 system-ui,sans-serif;outline:none}.event-chat__composer textarea:focus{border-color:var(--db-primary,#2878c8)}
+.event-chat__composer button{flex:none;width:40px;height:40px;border:0;border-radius:50%;background:var(--db-primary,#2878c8);color:#fff;font-size:19px;cursor:pointer}
+.event-chat__composer>a{display:block;text-align:center;padding:8px;color:var(--db-primary,#2878c8);font-weight:600;text-decoration:none}
+.event-chat__notice{flex:none;padding:5px 12px;background:#e8f6ed;color:#246b3c;font-size:12px}.event-chat__notice--error{background:#fff0f0;color:#a22}
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
