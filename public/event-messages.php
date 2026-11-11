@@ -23,9 +23,16 @@ $messageCount = (int) $countQuery->fetchColumn();
 
 
 $statement = $db->prepare(
-    "SELECT e.id, e.title, e.region_id, e.status, e.created_by, r.name AS region_name,
-            r.logo_path, r.timezone
-     FROM events e INNER JOIN regions r ON r.id = e.region_id
+    "SELECT e.id, e.title, e.region_id, e.status, e.created_by, e.starts_at,
+            r.name AS region_name, r.logo_path, r.timezone,
+            a.primary_color, a.primary_dark, a.accent_color, a.secondary_color,
+            a.tertiary_color, a.header_color, a.menu_color, a.organizer_color,
+            a.filter_bar_color, a.filter_text_color, a.search_button_color,
+            a.back_top_color, a.search_field_color, a.search_text_color,
+            a.footer_color, a.background_color, a.text_color, a.weekday_colors
+     FROM events e
+     INNER JOIN regions r ON r.id = e.region_id
+     LEFT JOIN region_appearance a ON a.region_id = r.id
      WHERE e.id = :id AND e.status = 'published' LIMIT 1"
 );
 $statement->execute(['id' => $id]);
@@ -198,7 +205,28 @@ $region = [
     'id' => (int) $event['region_id'],
     'name' => (string) $event['region_name'],
     'logo_path' => $event['logo_path'],
+    'primary_color' => $event['primary_color'],
+    'primary_dark' => $event['primary_dark'],
+    'accent_color' => $event['accent_color'],
+    'secondary_color' => $event['secondary_color'],
+    'tertiary_color' => $event['tertiary_color'],
+    'header_color' => $event['header_color'],
+    'menu_color' => $event['menu_color'],
+    'organizer_color' => $event['organizer_color'],
+    'filter_bar_color' => $event['filter_bar_color'],
+    'filter_text_color' => $event['filter_text_color'],
+    'search_button_color' => $event['search_button_color'],
+    'back_top_color' => $event['back_top_color'],
+    'search_field_color' => $event['search_field_color'],
+    'search_text_color' => $event['search_text_color'],
+    'footer_color' => $event['footer_color'],
+    'background_color' => $event['background_color'],
+    'text_color' => $event['text_color'],
+    'weekday_colors' => $event['weekday_colors'],
 ];
+$eventTimezone = new DateTimeZone((string) ($event['timezone'] ?: 'Europe/Madrid'));
+$eventStart = new DateTimeImmutable((string) $event['starts_at'], $eventTimezone);
+$eventWeekday = (int) $eventStart->format('N');
 require dirname(__DIR__) . '/app/views/header.php';
 $escape = static fn($value): string => escapeHtml((string) $value);
 $mentionNames = [];
@@ -229,7 +257,7 @@ $renderMessage = static function (string $message) use ($mentionNames, $escape):
     return nl2br($html);
 };
 ?>
-<section class="event-chat<?= $popupMode ? ' event-chat--popup' : '' ?>" id="messages">
+<section class="event-chat<?= $popupMode ? ' event-chat--popup' : '' ?>" id="messages" style="--db-chat-day-color:var(--db-weekday-<?= $eventWeekday ?>,var(--db-primary))">
     <div class="event-chat__heading" style="display:block!important;width:100%;height:70px;min-height:70px;box-sizing:border-box;overflow:hidden;padding:0 12px;background:var(--db-chat-day-color,var(--db-primary,#1456a0));color:#fff">
         <strong style="display:block!important;margin:0;padding:0;line-height:70px;color:#fff;font-size:16px;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis">
             <svg aria-hidden="true" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:8px;color:#fff"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"></path></svg><?= $escape($event['title']) ?> <span style="display:inline;font-size:14px;font-weight:600;white-space:nowrap">· <?= $messageCount ?> <?= $messageCount === 1 ? 'bericht' : 'berichten' ?></span>
