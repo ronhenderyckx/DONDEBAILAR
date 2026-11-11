@@ -403,12 +403,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <iframe title="Berichten bij evenement" src="about:blank" scrolling="no"></iframe>
         </div>
     </div>
-    <button type="button" class="agenda-back-to-top" id="agenda-back-to-top" aria-label="Terug naar boven" title="Terug naar boven">
-        <svg aria-hidden="true" viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-            <path d="m5 14 7-7 7 7"></path>
-            <path d="M12 7v13"></path>
-        </svg>
-    </button>
+
 </section>
 
 <style>
@@ -499,27 +494,38 @@ require dirname(__DIR__) . '/app/views/header.php';
     box-shadow:0 5px 14px rgba(25,40,60,.08);
 }
 
-.agenda-back-to-top{
-    position:fixed;
-    right:max(18px,calc((100vw - 1180px)/2));
-    bottom:96px;
-    z-index:980;
-    display:grid;
-    place-items:center;
-    width:46px;
-    height:46px;
-    padding:0;
-    border:1px solid #ffffffb8;
-    border-radius:50%;
-    background:var(--db-primary);
-    color:#fff;
-    box-shadow:0 3px 14px #17203338;
-    cursor:pointer;
+
+/* Compactere organisator- en stadskeuzes. */
+.agenda-organizer-strip{gap:10px}
+.agenda-organizer-item{
+    flex-basis:76px;
+    padding:3px 2px;
+    border-radius:7px;
 }
-.agenda-back-to-top:hover{background:var(--db-primary-dark);transform:translateY(-2px)}
-.agenda-back-to-top:focus-visible{outline:3px solid #ffd36c;outline-offset:3px}
-@media(max-width:760px){
-    .agenda-back-to-top{right:14px;bottom:104px;width:44px;height:44px}
+.agenda-organizer-item img,.agenda-organizer-fallback,.agenda-organizer-all{
+    width:58px;
+    height:58px;
+    flex-basis:58px;
+}
+.agenda-organizer-item img.agenda-organizer-logo{
+    width:58px;
+    height:58px;
+    flex-basis:58px;
+    padding:4px;
+    border-radius:10px;
+    box-shadow:0 2px 6px #17203315, inset 0 1px 0 #ffffff;
+}
+.agenda-organizer-item .agenda-organizer-fallback{
+    width:58px;
+    height:58px;
+    flex-basis:58px;
+    border-radius:10px;
+    box-shadow:0 2px 6px #17203315, inset 0 1px 0 #ffffff;
+}
+.agenda-selector-button{border-radius:10px}
+@media(max-width:700px){
+    .agenda-organizer-item{flex-basis:70px}
+    .agenda-organizer-strip{gap:8px}
 }
 </style>
 <?php
@@ -753,13 +759,13 @@ document.addEventListener('click', function (event) {
     });
 });
 
-const backToTopButton = document.getElementById('agenda-back-to-top');
-if (backToTopButton) {
-    backToTopButton.addEventListener('click', function () {
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        window.scrollTo({top:0, behavior:reduceMotion ? 'auto' : 'smooth'});
-    });
-}
+document.addEventListener('click', function (event) {
+    const backToTopButton = event.target.closest('#agenda-back-to-top');
+    if (!backToTopButton) return;
+    event.preventDefault();
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    window.scrollTo({top:0, behavior:reduceMotion ? 'auto' : 'smooth'});
+});
 
 document.addEventListener('click', async function (event) {
     const shareButton = event.target.closest('[data-share-url]');
