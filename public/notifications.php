@@ -96,6 +96,17 @@ $escape = static fn($value): string => escapeHtml((string) $value);
 </section>
 
 <style>
+/* Zelfde compacte chat-pop-up als op de agenda; deze stijlen staan niet globaal in site.css. */
+.agenda-message-modal{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:14px;background:#0009}
+.agenda-message-modal[hidden]{display:none}
+.agenda-message-modal__panel{position:relative;display:flex;flex-direction:column;width:min(100%,680px);height:min(82vh,820px);overflow:hidden;border-radius:18px;background:#fff;box-shadow:0 18px 60px #0005}
+.agenda-message-modal__top{position:absolute;top:5px;right:5px;z-index:2;display:flex;align-items:center;justify-content:flex-end;padding:0;background:transparent;pointer-events:none}
+.agenda-message-modal__close{display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:0;background:transparent;color:#222;font-size:30px;font-weight:400;line-height:1;cursor:pointer;pointer-events:auto;box-shadow:none}
+.agenda-message-modal__panel iframe{display:block;flex:1 0 auto;width:calc(100% + 28px);max-width:none;min-height:0;margin-right:-28px;border:0;background:#fff}
+@media(max-width:600px){.agenda-message-modal{padding:8px}.agenda-message-modal__panel{width:100%;height:88vh;border-radius:14px}}
+.notification-chat-modal .agenda-message-modal__top{left:12px;right:8px;justify-content:space-between;align-items:center;min-height:38px}
+.notification-chat-modal__title{max-width:calc(100% - 48px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:700;color:var(--db-text,#222)}
+.notification-chat-modal .agenda-message-modal__panel iframe{padding-top:0}
 .notification-chat-modal .agenda-message-modal__top{left:12px;right:8px;justify-content:space-between;align-items:center;min-height:38px}
 .notification-chat-modal__title{max-width:calc(100% - 48px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:700;color:var(--db-text,#222)}
 .notification-chat-modal .agenda-message-modal__panel iframe{padding-top:0}
