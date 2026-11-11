@@ -505,9 +505,9 @@ require dirname(__DIR__) . '/app/views/header.php';
     box-shadow:none;
 }
 
-/* Breng de filterknoppen dichter bij de siteheader. */
-.agenda-page{margin-top:-34px}
-@media(max-width:700px){.agenda-page{margin-top:-26px}}
+/* Laat de filterbalk direct aansluiten op de header. */
+.agenda-page{margin-top:-42px}
+@media(max-width:700px){.agenda-page{margin-top:-28px}}
 
 
 /* Compactere organisator- en stadskeuzes. */
