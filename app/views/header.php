@@ -139,7 +139,7 @@ $escape = static fn ($value): string =>
     <div class="site-header__inner">
 
         <div class="site-brand-group">
-            <a class="site-brand site-brand--platform" href="/" aria-label="DONDEBAILAR agenda">
+            <a class="site-brand site-brand--platform" href="/?region_id=<?= $regionId ?>&amp;agenda_change=1&amp;filter=organizer" aria-label="DONDEBAILAR agenda — filters wissen">
                 <?php if ($platformLogoPath !== ''): ?>
                     <img src="<?= $escape($platformLogoPath) ?>" alt="DONDEBAILAR" class="site-brand__logo">
                 <?php else: ?>
