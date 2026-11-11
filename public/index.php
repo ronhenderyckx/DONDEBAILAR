@@ -266,6 +266,13 @@ require dirname(__DIR__) . '/app/views/header.php';
         <?php if ($events === []): ?>
             <section class="agenda-empty"><h2>Geen evenementen gevonden</h2><p>Er zijn momenteel geen toekomstige gepubliceerde evenementen met deze filters.</p></section>
         <?php else: ?>
+            <?php if (count($events) > $agendaPageSize): ?>
+                <div class="agenda-page-navigation" aria-label="Navigatie tussen evenementreeksen">
+                    <button type="button" class="agenda-page-nav-icon" id="agenda-page-previous" aria-label="Vorige reeks" title="Vorige reeks">‹</button>
+                    <span id="agenda-page-range">1–<?= min($agendaPageSize, count($events)) ?> van <?= count($events) ?></span>
+                    <button type="button" class="agenda-page-nav-icon" id="agenda-page-next" aria-label="Volgende reeks" title="Volgende reeks">›</button>
+                </div>
+            <?php endif; ?>
             <div class="agenda-feed">
                 <?php foreach ($events as $eventIndex => $event): ?>
                     <?php
@@ -425,7 +432,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             </div>
             <?php if (count($events) > $agendaPageSize): ?>
                 <div class="agenda-load-more-wrap">
-                    <button type="button" class="agenda-load-more" id="agenda-load-more">Meer evenementen laden</button>
+                    <button type="button" class="agenda-load-more" id="agenda-load-more">Laad volgende <?= $agendaPageSize ?> evenementen</button>
                 </div>
             <?php endif; ?>
         <?php endif; ?>
@@ -737,6 +744,10 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
 .agenda-share-dialog__status{min-height:18px;margin:13px 0 0;color:#4c5968;font-size:12px;line-height:1.4;overflow-wrap:anywhere}
 .agenda-share-option:focus-visible,.agenda-share-dialog__close:focus-visible{outline:3px solid var(--db-primary,#E23A2C);outline-offset:2px}
 @media(max-width:420px){.agenda-share-dialog{padding:12px}.agenda-share-dialog__panel{padding:22px 16px 15px}}
+.agenda-page-navigation{display:flex;align-items:center;justify-content:center;gap:18px;margin:14px 0 18px;color:var(--db-muted);font-size:13px;font-weight:700}
+.agenda-page-nav-icon{display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:50%;background:var(--db-primary,#E23A2C);color:#fff;font-size:30px;line-height:1;cursor:pointer}
+.agenda-page-nav-icon:disabled{opacity:.35;cursor:default}
+.agenda-page-nav-icon:focus-visible,.agenda-load-more:focus-visible{outline:3px solid var(--db-accent,#F6B22E);outline-offset:3px}
 </style>
 <?php
 $hasInstagramReels = false;
@@ -755,23 +766,48 @@ const agendaPageSize = <?= (int) $agendaPageSize ?>;
 const agendaCards = Array.from(document.querySelectorAll('.agenda-feed .agenda-card'));
 const agendaLoadMore = document.getElementById('agenda-load-more');
 const agendaCount = document.getElementById('agenda-count');
-let agendaVisibleCount = Math.min(agendaPageSize, agendaCards.length);
+const agendaPagePrevious = document.getElementById('agenda-page-previous');
+const agendaPageNext = document.getElementById('agenda-page-next');
+const agendaPageRange = document.getElementById('agenda-page-range');
+let agendaPageStart = 0;
+let agendaVisibleEnd = Math.min(agendaPageSize, agendaCards.length);
 function updateAgendaPagination() {
     agendaCards.forEach(function (card, index) {
-        card.hidden = index >= agendaVisibleCount;
+        card.hidden = index < agendaPageStart || index >= agendaVisibleEnd;
     });
+    const visibleOnScreen = Math.max(0, agendaVisibleEnd - agendaPageStart);
     if (agendaCount) {
-        agendaCount.textContent = agendaVisibleCount + ' van ' + agendaCards.length + ' evenementen getoond';
+        agendaCount.textContent = (agendaCards.length ? (agendaPageStart + 1) + '–' + agendaVisibleEnd : '0') + ' van ' + agendaCards.length + ' evenementen getoond';
     }
+    if (agendaPageRange) {
+        agendaPageRange.textContent = (agendaPageStart + 1) + '–' + agendaVisibleEnd + ' van ' + agendaCards.length;
+    }
+    if (agendaPagePrevious) agendaPagePrevious.disabled = agendaPageStart === 0;
+    if (agendaPageNext) agendaPageNext.disabled = agendaPageStart + agendaPageSize >= agendaCards.length;
     if (agendaLoadMore) {
-        agendaLoadMore.hidden = agendaVisibleCount >= agendaCards.length;
-        agendaLoadMore.textContent = 'Meer evenementen laden (' + Math.min(agendaPageSize, agendaCards.length - agendaVisibleCount) + ')';
+        agendaLoadMore.hidden = agendaVisibleEnd >= agendaCards.length;
+        agendaLoadMore.textContent = 'Laad volgende ' + Math.min(agendaPageSize, agendaCards.length - agendaVisibleEnd) + ' evenementen';
     }
 }
 if (agendaCards.length) updateAgendaPagination();
+if (agendaPagePrevious) {
+    agendaPagePrevious.addEventListener('click', function () {
+        agendaPageStart = Math.max(0, agendaPageStart - agendaPageSize);
+        agendaVisibleEnd = Math.min(agendaPageStart + agendaPageSize, agendaCards.length);
+        updateAgendaPagination();
+    });
+}
+if (agendaPageNext) {
+    agendaPageNext.addEventListener('click', function () {
+        if (agendaPageStart + agendaPageSize >= agendaCards.length) return;
+        agendaPageStart += agendaPageSize;
+        agendaVisibleEnd = Math.min(agendaPageStart + agendaPageSize, agendaCards.length);
+        updateAgendaPagination();
+    });
+}
 if (agendaLoadMore) {
     agendaLoadMore.addEventListener('click', function () {
-        agendaVisibleCount = Math.min(agendaVisibleCount + agendaPageSize, agendaCards.length);
+        agendaVisibleEnd = Math.min(agendaVisibleEnd + agendaPageSize, agendaCards.length);
         updateAgendaPagination();
     });
 }
