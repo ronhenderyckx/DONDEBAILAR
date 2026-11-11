@@ -490,6 +490,7 @@ require dirname(__DIR__) . '/app/views/header.php';
     position:sticky;
     top:0;
     z-index:950;
+    margin-bottom:2px;
     padding:0;
     border:0;
     border-radius:0;
