@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
 require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
+require_once dirname(__DIR__, 2) . '/app/ImageOptimization.php';
 
 $db = Database::connection();
 $regionId = filter_input(INPUT_GET, 'region_id', FILTER_VALIDATE_INT);
@@ -91,42 +92,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         if ($errorMessage === '') {
+            $oldLogoPath = $logoPath;
             $newLogoPath = $logoPath;
+
             if (!empty($_POST['delete_logo'])) {
-                if ($logoPath !== '' && str_starts_with($logoPath, 'uploads/regions/')) {
-                    $oldFile = dirname(__DIR__) . '/' . $logoPath;
-                    if (is_file($oldFile)) @unlink($oldFile);
-                }
                 $newLogoPath = '';
             }
 
             if (isset($_FILES['region_logo']) && ($_FILES['region_logo']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
-                $file = $_FILES['region_logo'];
-                if (($file['error'] ?? UPLOAD_ERR_OK) !== UPLOAD_ERR_OK || (int) ($file['size'] ?? 0) > 5 * 1024 * 1024) {
-                    $errorMessage = 'Logo upload mislukt of het bestand is groter dan 5 MB.';
-                } else {
-                    $imageInfo = @getimagesize((string) $file['tmp_name']);
-                    $mime = (string) ($imageInfo['mime'] ?? '');
-                    $extensions = ['image/png' => 'png', 'image/jpeg' => 'jpg', 'image/webp' => 'webp'];
-                    if (!$imageInfo || !isset($extensions[$mime]) || (int) $imageInfo[0] > 6000 || (int) $imageInfo[1] > 6000) {
-                        $errorMessage = 'Gebruik een PNG-, JPG- of WEBP-afbeelding van maximaal 6000 × 6000 pixels.';
-                    } else {
-                        $directory = dirname(__DIR__) . '/uploads/regions';
-                        if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) {
-                            $errorMessage = 'De map voor regiologo’s kon niet worden aangemaakt.';
-                        } else {
-                            $filename = 'region-' . $regionId . '-' . bin2hex(random_bytes(8)) . '.' . $extensions[$mime];
-                            if (!move_uploaded_file((string) $file['tmp_name'], $directory . '/' . $filename)) {
-                                $errorMessage = 'Het regiologo kon niet worden opgeslagen.';
-                            } else {
-                                if ($logoPath !== '' && str_starts_with($logoPath, 'uploads/regions/')) {
-                                    $oldFile = dirname(__DIR__) . '/' . $logoPath;
-                                    if (is_file($oldFile)) @unlink($oldFile);
-                                }
-                                $newLogoPath = 'uploads/regions/' . $filename;
-                            }
-                        }
+                try {
+                    $uploadedRegionLogo = storeOptimizedLogoUpload(
+                        $_FILES['region_logo'],
+                        'uploads/regions',
+                        800,
+                        5 * 1024 * 1024,
+                        'region-' . $regionId . '-'
+                    );
+                    if ($uploadedRegionLogo !== null) {
+                        $newLogoPath = $uploadedRegionLogo;
                     }
+                } catch (RuntimeException $exception) {
+                    $errorMessage = $exception->getMessage();
                 }
             }
 
@@ -172,6 +158,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'logo_path' => $newLogoPath,
                 ]);
                 $logoPath = $newLogoPath;
+                if ($oldLogoPath !== '' && $oldLogoPath !== $newLogoPath
+                    && str_starts_with($oldLogoPath, 'uploads/regions/')) {
+                    $oldFile = dirname(__DIR__, 2) . '/' . $oldLogoPath;
+                    if (is_file($oldFile)) @unlink($oldFile);
+                }
                 $successMessage = 'De kleuren en het logo zijn opgeslagen.';
             }
         }
