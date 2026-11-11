@@ -535,6 +535,26 @@ require dirname(__DIR__) . '/app/views/header.php';
     .agenda-organizer-item{flex-basis:70px}
     .agenda-organizer-strip{gap:8px}
 }
+
+/* Compacte achtergrond rond elke organisator- en stadsknop. */
+.agenda-organizer-item{
+    box-sizing:border-box;
+    flex-basis:66px;
+    padding:3px;
+    border:1px solid #d8dee8;
+    border-radius:9px;
+    background:linear-gradient(145deg,#fff 0%,#f3f5f8 100%);
+    box-shadow:0 2px 5px #17203312;
+}
+.agenda-organizer-item.is-selected{
+    border-color:var(--db-primary);
+    background:color-mix(in srgb,var(--db-primary) 9%,white);
+    box-shadow:0 2px 6px #1720331c;
+}
+.agenda-organizer-name{font-size:10px}
+@media(max-width:700px){
+    .agenda-organizer-item{flex-basis:66px}
+}
 </style>
 <?php
 $hasInstagramReels = false;
