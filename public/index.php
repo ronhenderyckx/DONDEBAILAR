@@ -247,10 +247,10 @@ if ($regionId > 0) {
 }
 
 $agendaPageSizeFile = dirname(__DIR__) . '/storage/agenda-page-size.txt';
-$agendaArrowBackgroundFile = dirname(__DIR__) . '/storage/agenda-arrow-background.txt';
-$agendaArrowTextFile = dirname(__DIR__) . '/storage/agenda-arrow-text.txt';
-$agendaArrowBackground = is_file($agendaArrowBackgroundFile) ? trim((string) file_get_contents($agendaArrowBackgroundFile)) : '#F6B22E';
-$agendaArrowText = is_file($agendaArrowTextFile) ? trim((string) file_get_contents($agendaArrowTextFile)) : '#222222';
+$regionAppearanceSettings = json_decode((string) ($region['weekday_colors'] ?? ''), true);
+if (!is_array($regionAppearanceSettings)) $regionAppearanceSettings = [];
+$agendaArrowBackground = (string) ($regionAppearanceSettings['agenda_arrow_background'] ?? '#F6B22E');
+$agendaArrowText = (string) ($regionAppearanceSettings['agenda_arrow_text'] ?? '#222222');
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowBackground)) $agendaArrowBackground = '#F6B22E';
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowText)) $agendaArrowText = '#222222';
 $agendaPageSize = 20;
