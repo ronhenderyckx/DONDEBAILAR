@@ -188,7 +188,7 @@ function storeEventSocialMedia(PDO $db, int $eventId, int $userId, array $input)
         throw new RuntimeException('Kies Facebook of Instagram voor de gekoppelde link.');
     }
     if (!in_array($kind, ['reel', 'social_post'], true)) {
-        throw new RuntimeException('Kies een geldige soort social media.');
+        throw new RuntimeException('Kies een geldige soort bericht op sociale media.');
     }
     if (strlen($url) > 1000 || filter_var($url, FILTER_VALIDATE_URL) === false) {
         throw new RuntimeException('Vul een geldige openbare Facebook- of Instagram-link in.');
