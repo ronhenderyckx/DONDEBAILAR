@@ -68,7 +68,7 @@ $escape = static fn($value): string => escapeHtml((string) $value);
                     $messageText = trim((string) $notification['message']);
                     $messageText = mb_strimwidth($messageText, 0, 180, '…', 'UTF-8');
                     $target = '/event-messages.php?id=' . (int) $notification['event_id']
-                        . '#message-' . (int) $notification['message_id'];
+                        . '&popup=1#message-' . (int) $notification['message_id'];
                     ?>
                     <a class="notification-item" href="<?= $escape($target) ?>">
                         <span class="notification-item__icon" aria-hidden="true">＠</span>
