@@ -900,26 +900,6 @@ const agendaFilterIcons = ['👥', '🗺️'];
 const agendaFilterLabels = ['Organisator', 'Stad'];
 let agendaFilterIndex = <?= $activeFilter === 'city' ? '1' : '0' ?>;
 const agendaFilterSwitch = document.getElementById('agenda-filter-switch');
-const agendaFilterStateKey = 'dondebailar-agenda-filter';
-try {
-    const savedFilterIndex = window.sessionStorage.getItem(agendaFilterStateKey);
-    if (savedFilterIndex === '0' || savedFilterIndex === '1') {
-        agendaFilterIndex = Number(savedFilterIndex);
-    }
-} catch (error) {
-    // De agenda blijft bruikbaar als sessieopslag niet beschikbaar is.
-}
-document.querySelectorAll('.agenda-selector-panel[data-panel] .agenda-organizer-item').forEach(function (item) {
-    item.addEventListener('click', function () {
-        const panel = item.closest('.agenda-selector-panel');
-        const selectedIndex = panel && panel.dataset.panel === 'city' ? 1 : 0;
-        try {
-            window.sessionStorage.setItem(agendaFilterStateKey, String(selectedIndex));
-        } catch (error) {
-            // Geen actie nodig; de URL bepaalt dan de actieve filterstand.
-        }
-    });
-});
 function updateAgendaStripIndicators() {
     document.querySelectorAll('.agenda-selector-panel').forEach(function (panel) {
         const strip = panel.querySelector('.agenda-organizer-strip');
@@ -940,11 +920,6 @@ document.querySelectorAll('.agenda-organizer-strip').forEach(function (strip) {
 window.addEventListener('resize', updateAgendaStripIndicators);
 function showAgendaFilter(index) {
     agendaFilterIndex = index % agendaFilterIcons.length;
-    try {
-        window.sessionStorage.setItem(agendaFilterStateKey, String(agendaFilterIndex));
-    } catch (error) {
-        // De filterwissel blijft werken zonder sessieopslag.
-    }
     if (!agendaFilterSwitch) return;
     agendaFilterSwitch.innerHTML = '<span class="agenda-filter-icon" aria-hidden="true">' + agendaFilterIcons[agendaFilterIndex] + '</span>';
     agendaFilterSwitch.setAttribute('aria-label', 'Filter: ' + agendaFilterLabels[agendaFilterIndex] + '. Klik om te wisselen');
