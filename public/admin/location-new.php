@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($street !== '' && mb_strlen($street) > 190) $errors[] = 'De straatnaam is te lang.';
     if ($houseNumber !== '' && mb_strlen($houseNumber) > 40) $errors[] = 'Het huisnummer is te lang.';
     if ($postalCode !== '' && mb_strlen($postalCode) > 30) $errors[] = 'De postcode is te lang.';
-    if ($city === '' || mb_strlen($city) > 120) $errors[] = 'Vul een gemeente in van maximaal 120 tekens.';
+    if ($city === '' || mb_strlen($city) > 120) $errors[] = 'Vul een stad in van maximaal 120 tekens.';
     if (!preg_match('/\A[A-Z]{2}\z/', $countryCode)) $errors[] = 'Gebruik een landcode van twee letters, bijvoorbeeld ES.';
     if ($mapsUrl !== '' && !isGoogleMapsUrl($mapsUrl)) $errors[] = 'Vul een geldige Google Maps-deellink in.';
     if ($phone !== '' && mb_strlen($phone) > 50) $errors[] = 'Het telefoonnummer is te lang.';
@@ -110,7 +110,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 <div><label for="street">Straat</label><input id="street" name="street" maxlength="190" value="<?= escapeHtml($street) ?>"></div>
                 <div><label for="house_number">Huisnummer</label><input id="house_number" name="house_number" maxlength="40" value="<?= escapeHtml($houseNumber) ?>"></div>
                 <div><label for="postal_code">Postcode</label><input id="postal_code" name="postal_code" maxlength="30" value="<?= escapeHtml($postalCode) ?>"></div>
-                <div><label for="city">Gemeente / stad *</label><input id="city" name="city" maxlength="120" required value="<?= escapeHtml($city) ?>"></div>
+                <div><label for="city">Stad *</label><input id="city" name="city" maxlength="120" required value="<?= escapeHtml($city) ?>"></div>
                 <div><label for="country_code">Landcode *</label><input id="country_code" name="country_code" maxlength="2" minlength="2" required value="<?= escapeHtml($countryCode) ?>" placeholder="ES"></div>
                 <div><label for="phone">Telefoon</label><input id="phone" name="phone" type="tel" maxlength="50" value="<?= escapeHtml($phone) ?>"></div>
                 <div><label for="latitude">Breedtegraad</label><input id="latitude" name="latitude" type="number" step="any" min="-90" max="90" value="<?= escapeHtml($latitude) ?>"></div>
@@ -186,7 +186,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
    showMapsStatus(data.message||'Adresgegevens ingevuld. Controleer het resultaat.');
    await searchLocationBranding();
   }catch(error){
-   lastUrl='';showMapsStatus('Kaartopzoeking mislukt. Controleer de link en probeer opnieuw.',true);
+   lastUrl='';showMapsStatus('Adres ophalen mislukt. Controleer de link en probeer opnieuw.',true);
   }
  }
  ['name','city','country_code'].forEach(id=>{
