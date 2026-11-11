@@ -103,7 +103,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <form method="post" enctype="multipart/form-data" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
 
-            <label for="name">Naam organisator *</label>
+            <label for="name">Naam van de organisator *</label>
             <input id="name" name="name" type="text" maxlength="190"
                    value="<?= escapeHtml($name) ?>" required>
 
