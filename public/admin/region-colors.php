@@ -103,13 +103,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 try {
                     $uploadedRegionLogo = storeOptimizedLogoUpload(
                         $_FILES['region_logo'],
-                        'uploads/regions',
+                        'public/uploads/regions',
                         800,
                         5 * 1024 * 1024,
                         'region-' . $regionId . '-'
                     );
                     if ($uploadedRegionLogo !== null) {
-                        $newLogoPath = $uploadedRegionLogo;
+                        $newLogoPath = substr($uploadedRegionLogo, strlen('public/'));
                     }
                 } catch (RuntimeException $exception) {
                     $errorMessage = $exception->getMessage();
@@ -160,7 +160,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $logoPath = $newLogoPath;
                 if ($oldLogoPath !== '' && $oldLogoPath !== $newLogoPath
                     && str_starts_with($oldLogoPath, 'uploads/regions/')) {
-                    $oldFile = dirname(__DIR__, 2) . '/' . $oldLogoPath;
+                    $oldFile = dirname(__DIR__) . '/' . $oldLogoPath;
                     if (is_file($oldFile)) @unlink($oldFile);
                 }
                 $successMessage = 'De kleuren en het logo zijn opgeslagen.';
