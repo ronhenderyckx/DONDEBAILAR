@@ -124,6 +124,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             Inloggen
         </button>
         <p><a href="/forgot-password.php">Wachtwoord vergeten?</a></p>
+        <p>Nog geen account? <a href="/register.php">Registreer je hier</a>.</p>
     </form>
 </section>
 
