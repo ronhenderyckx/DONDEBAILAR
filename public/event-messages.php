@@ -265,4 +265,19 @@ body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;mar
 .event-chat__composer button{flex:none;width:40px;height:40px;border:0;border-radius:50%;background:var(--db-primary,#2878c8);color:#fff;font-size:19px;cursor:pointer}
 .event-chat__composer>a{display:block;text-align:center;padding:8px;color:var(--db-primary,#2878c8);font-weight:600;text-decoration:none}
 .event-chat__notice{flex:none;padding:5px 12px;background:#e8f6ed;color:#246b3c;font-size:12px}.event-chat__notice--error{background:#fff0f0;color:#a22}
+<script>
+(() => {
+    const list = document.querySelector('.event-chat__messages');
+    if (list) list.scrollTop = list.scrollHeight;
+    const input = document.querySelector('.event-chat__composer textarea');
+    if (input) {
+        input.addEventListener('keydown', event => {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                input.form.requestSubmit();
+            }
+        });
+    }
+})();
+</script>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
