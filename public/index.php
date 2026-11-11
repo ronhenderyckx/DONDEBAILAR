@@ -1158,10 +1158,15 @@ document.addEventListener('click', function (event) {
 
 
 // Bewaar de huidige regio, filter en geluidskeuze bij het ingelogde account.
+// SAVE krijgt voorrang op alle andere klikacties: deze klik mag geen
+// filter-, navigatie- of reset-handler van de agenda activeren.
 document.addEventListener('click', function (event) {
-    const saveButton = event.target.closest('#agenda-save-preferences');
+    const target = event.target instanceof Element ? event.target : null;
+    const saveButton = target ? target.closest('#agenda-save-preferences') : null;
     if (!saveButton) return;
     event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
     if (saveButton.dataset.busy === '1') return;
     saveButton.dataset.busy = '1';
     saveButton.setAttribute('aria-busy', 'true');
