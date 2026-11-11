@@ -26,7 +26,8 @@ $regions = $db->query(
             CASE WHEN a.region_id IS NOT NULL THEN a.logo_path ELSE r.logo_path END AS logo_path,
             a.primary_color, a.primary_dark, a.accent_color,
             a.secondary_color, a.tertiary_color, a.header_color, a.menu_color, a.organizer_color,
-            a.filter_bar_color, a.filter_text_color, a.footer_color, a.background_color, a.text_color, a.weekday_colors
+            a.filter_bar_color, a.filter_text_color, a.search_button_color, a.back_top_color,
+             a.search_field_color, a.search_text_color, a.footer_color, a.background_color, a.text_color, a.weekday_colors
      FROM regions r
      LEFT JOIN region_appearance a ON a.region_id = r.id
      WHERE r.is_active = 1 ORDER BY r.id"
@@ -586,6 +587,12 @@ require dirname(__DIR__) . '/app/views/header.php';
 .agenda-organizer-item--organizer.is-selected{background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 24%,var(--db-filter-bar-color,#FFFFFF)) !important}
 .agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer){background:color-mix(in srgb,var(--db-primary) 9%,var(--db-filter-bar-color,#FFFFFF)) !important}
 .agenda-organizer-item .agenda-organizer-fallback{border:0 !important;box-shadow:none !important;background:transparent !important}
+
+/* Agenda: geen decoratieve witte lijnen of kaders rond de onderdelen. */
+.agenda-card,.agenda-calendar,.agenda-filters,.agenda-empty{border:0!important;}
+.agenda-calendar__day{border:0!important;}
+.agenda-selector-button,.agenda-selector-panel select,.agenda-organizer-item img.agenda-organizer-logo{border:0!important;box-shadow:none!important;}
+.agenda-organizer-item img.agenda-organizer-logo{background:transparent!important;}
 </style>
 <?php
 $hasInstagramReels = false;
