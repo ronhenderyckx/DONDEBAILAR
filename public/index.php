@@ -7,7 +7,11 @@ require_once dirname(__DIR__) . '/app/Authorization.php';
 
 $db = Database::connection();
 $currentUser = currentUser();
-$savedAgendaPreferences = null;
+// De sessie is een directe fallback; de database blijft de permanente opslag.
+$savedAgendaPreferences = $currentUser !== null
+    && is_array($_SESSION['agenda_preferences'] ?? null)
+    ? $_SESSION['agenda_preferences']
+    : null;
 if ($currentUser !== null) {
     try {
         $preferencesTableExists = (int) $db->query(
@@ -22,7 +26,11 @@ if ($currentUser !== null) {
                  FROM user_agenda_preferences WHERE user_id = :user_id"
             );
             $preferenceQuery->execute(['user_id' => (int) $currentUser['id']]);
-            $savedAgendaPreferences = $preferenceQuery->fetch() ?: null;
+            $databaseAgendaPreferences = $preferenceQuery->fetch() ?: null;
+            if ($databaseAgendaPreferences !== null) {
+                $savedAgendaPreferences = $databaseAgendaPreferences;
+                $_SESSION['agenda_preferences'] = $databaseAgendaPreferences;
+            }
         }
     } catch (Throwable $exception) {
         $savedAgendaPreferences = null;
