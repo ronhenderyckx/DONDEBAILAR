@@ -266,11 +266,6 @@ require dirname(__DIR__) . '/app/views/header.php';
         <?php if ($events === []): ?>
             <section class="agenda-empty"><h2>Geen evenementen gevonden</h2><p>Er zijn momenteel geen toekomstige gepubliceerde evenementen met deze filters.</p></section>
         <?php else: ?>
-            <div class="agenda-page-navigation" aria-label="Navigatie tussen evenementreeksen">
-                    <button type="button" class="agenda-page-nav-icon" id="agenda-page-previous" aria-label="Vorige reeks" title="Vorige reeks">‹</button>
-                    <span id="agenda-page-range">1–<?= min($agendaPageSize, count($events)) ?> van <?= count($events) ?></span>
-                    <button type="button" class="agenda-page-nav-icon" id="agenda-page-next" aria-label="Volgende reeks" title="Volgende reeks">›</button>
-            </div>
             <div class="agenda-feed">
                 <?php foreach ($events as $eventIndex => $event): ?>
                     <?php
@@ -427,6 +422,11 @@ require dirname(__DIR__) . '/app/views/header.php';
                         </div>
                     </article>
                 <?php endforeach; ?>
+            </div>
+            <div class="agenda-page-navigation" aria-label="Navigatie tussen evenementreeksen">
+                    <button type="button" class="agenda-page-nav-icon" id="agenda-page-previous" aria-label="Vorige reeks" title="Vorige reeks">‹</button>
+                    <span id="agenda-page-range">1–<?= min($agendaPageSize, count($events)) ?> van <?= count($events) ?></span>
+                    <button type="button" class="agenda-page-nav-icon" id="agenda-page-next" aria-label="Volgende reeks" title="Volgende reeks">›</button>
             </div>
         <?php endif; ?>
         <p class="agenda-count" id="agenda-count" data-total="<?= count($events) ?>"><?= min($agendaPageSize, count($events)) ?> van <?= count($events) ?> evenementen getoond</p>
@@ -782,6 +782,7 @@ if (agendaPagePrevious) {
         agendaPageStart = Math.max(0, agendaPageStart - agendaPageSize);
         agendaVisibleEnd = Math.min(agendaPageStart + agendaPageSize, agendaCards.length);
         updateAgendaPagination();
+        document.querySelector('.agenda-feed').scrollIntoView({behavior: 'smooth', block: 'start'});
     });
 }
 if (agendaPageNext) {
@@ -790,6 +791,7 @@ if (agendaPageNext) {
         agendaPageStart += agendaPageSize;
         agendaVisibleEnd = Math.min(agendaPageStart + agendaPageSize, agendaCards.length);
         updateAgendaPagination();
+        document.querySelector('.agenda-feed').scrollIntoView({behavior: 'smooth', block: 'start'});
     });
 }
 const agendaFilterIcons = ['👥', '🗺️'];
