@@ -857,6 +857,25 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     color:var(--db-organizer-color,#E23A2C) !important;
     font-weight:900 !important;
 }
+
+/* Houd ook de gekozen stad duidelijk geselecteerd na automatisch scrollen naar boven. */
+.agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer){
+    background:color-mix(in srgb,var(--db-primary,#E23A2C) 30%,var(--db-filter-bar-color,#FFFFFF)) !important;
+    outline:2px solid var(--db-primary,#E23A2C) !important;
+    outline-offset:1px;
+    box-shadow:0 0 0 3px var(--db-filter-bar-color,#FFFFFF),0 2px 7px #17203330 !important;
+    border-radius:10px !important;
+}
+.agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) .agenda-organizer-fallback{
+    border:3px solid var(--db-primary,#E23A2C) !important;
+    background:color-mix(in srgb,var(--db-primary,#E23A2C) 16%,#FFFFFF) !important;
+    box-shadow:0 0 0 3px var(--db-filter-bar-color,#FFFFFF),0 0 0 5px var(--db-primary,#E23A2C) !important;
+    transform:none !important;
+}
+.agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) .agenda-organizer-name{
+    color:var(--db-primary,#E23A2C) !important;
+    font-weight:900 !important;
+}
 </style>
 <?php
 $hasInstagramReels = false;
