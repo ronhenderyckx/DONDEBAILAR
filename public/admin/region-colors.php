@@ -31,6 +31,8 @@ $defaults = [
     'header_color' => '#222222',
     'menu_color' => '#FFFFFF',
     'organizer_color' => '#E23A2C',
+    'filter_bar_color' => '#FFFFFF',
+    'filter_text_color' => '#222222',
     'background_color' => '#FFFFFF',
     'text_color' => '#222222',
 ];
@@ -126,14 +128,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($errorMessage === '') {
                 $upsert = $db->prepare("INSERT INTO region_appearance
                     (region_id, primary_color, primary_dark, accent_color, secondary_color,
-                     tertiary_color, header_color, menu_color, organizer_color, background_color, text_color, weekday_colors, logo_path)
+                     tertiary_color, header_color, menu_color, organizer_color, filter_bar_color, filter_text_color, background_color, text_color, weekday_colors, logo_path)
                     VALUES (:region_id, :primary_color, :primary_dark, :accent_color, :secondary_color,
-                     :tertiary_color, :header_color, :menu_color, :organizer_color, :background_color, :text_color, :weekday_colors, :logo_path)
+                     :tertiary_color, :header_color, :menu_color, :organizer_color, :filter_bar_color, :filter_text_color, :background_color, :text_color, :weekday_colors, :logo_path)
                     ON DUPLICATE KEY UPDATE primary_color=VALUES(primary_color),
                      primary_dark=VALUES(primary_dark), accent_color=VALUES(accent_color),
                      secondary_color=VALUES(secondary_color), tertiary_color=VALUES(tertiary_color),
                      header_color=VALUES(header_color), menu_color=VALUES(menu_color),
                      organizer_color=VALUES(organizer_color),
+                     filter_bar_color=VALUES(filter_bar_color), filter_text_color=VALUES(filter_text_color),
                      background_color=VALUES(background_color),
                      text_color=VALUES(text_color), weekday_colors=VALUES(weekday_colors),
                      logo_path=VALUES(logo_path)");
@@ -147,6 +150,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'header_color' => $colors['header_color'],
                     'menu_color' => $colors['menu_color'],
                     'organizer_color' => $colors['organizer_color'],
+                    'filter_bar_color' => $colors['filter_bar_color'],
+                    'filter_text_color' => $colors['filter_text_color'],
                     'background_color' => $colors['background_color'],
                     'text_color' => $colors['text_color'],
                     'weekday_colors' => json_encode($weekdayColors, JSON_THROW_ON_ERROR),
@@ -186,7 +191,9 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 'tertiary_color' => 'Tertiaire kleur',
                 'header_color' => 'Headerkleur',
                 'menu_color' => 'Menukleur',
-                'organizer_color' => 'Organisatorenkleur',
+                'organizer_color' => 'Achtergrondkleur organisatorknoppen',
+                'filter_bar_color' => 'Achtergrondkleur filterbalk',
+                'filter_text_color' => 'Tekstkleur filterknoppen',
                 'background_color' => 'Achtergrondkleur',
                 'text_color' => 'Tekstkleur',
             ] as $key => $label): ?>
