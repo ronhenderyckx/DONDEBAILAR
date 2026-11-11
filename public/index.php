@@ -578,6 +578,14 @@ require dirname(__DIR__) . '/app/views/header.php';
 @media(max-width:700px){
     .agenda-organizer-item{flex-basis:66px}
 }
+
+/* Regio-instellingen blijven leidend voor de volledige filterbalk. */
+.agenda-selector-line{background:var(--db-filter-bar-color,#FFFFFF) !important}
+.agenda-organizer-item{border:0 !important;box-shadow:none !important;background:transparent !important}
+.agenda-organizer-item--organizer{background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 13%,var(--db-filter-bar-color,#FFFFFF)) !important}
+.agenda-organizer-item--organizer.is-selected{background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 24%,var(--db-filter-bar-color,#FFFFFF)) !important}
+.agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer){background:color-mix(in srgb,var(--db-primary) 9%,var(--db-filter-bar-color,#FFFFFF)) !important}
+.agenda-organizer-item .agenda-organizer-fallback{border:0 !important;box-shadow:none !important;background:transparent !important}
 </style>
 <?php
 $hasInstagramReels = false;
