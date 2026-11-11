@@ -280,7 +280,7 @@ body:has(.event-chat--popup) .site-header,body:has(.event-chat--popup) footer{di
 body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;margin:0!important;padding:0!important;overflow:hidden}
 .event-chat{height:100%;min-height:0;display:flex;flex-direction:column;background:#fff;color:#222;font:14px/1.45 system-ui,sans-serif}
 .event-chat__heading{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;gap:8px;}
-.event-chat__messages{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;padding:12px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}.event-chat__messages::-webkit-scrollbar{display:none;width:0;height:0}
+*{scrollbar-width:none;-ms-overflow-style:none}*::-webkit-scrollbar{display:none;width:0;height:0}.event-chat__messages{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;padding:12px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}.event-chat__messages::-webkit-scrollbar{display:none;width:0;height:0}
 .event-chat__empty{margin:auto;color:#888;text-align:center}
 .chat-message{max-width:88%;align-self:flex-start}.chat-message__bubble{position:relative;padding:9px 12px;border-radius:14px 14px 14px 4px;background:#f0f2f5;overflow-wrap:anywhere}
 .chat-message__meta{display:flex;gap:10px;align-items:center;margin-bottom:4px;font-size:11px;color:#777}.chat-message__meta strong{color:#444;font-size:12px}.chat-message__meta time{white-space:nowrap}
