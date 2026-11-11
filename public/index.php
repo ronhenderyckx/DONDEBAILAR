@@ -481,7 +481,7 @@ if (agendaFilterSwitch) {
     });
     showAgendaFilter(agendaFilterIndex);
 }
-// Verticale veeg toont/verbergt uitleg. touch-action:pan-x laat horizontale fotonavigatie intact.
+// Verticale veeg toont/verbergt uitleg; horizontale veeg blijft voor de fotogalerij.
 function toggleEventDescription(article, show) {
     const panel = article ? article.querySelector('[data-event-description]') : null;
     if (!panel) return;
@@ -489,6 +489,7 @@ function toggleEventDescription(article, show) {
     panel.setAttribute('aria-hidden', show ? 'false' : 'true');
 }
 let eventDescriptionPointer = null;
+let suppressEventMediaClickUntil = 0;
 document.addEventListener('pointerdown', function (event) {
     const article = event.target.closest('.agenda-card');
     if (!article || !event.target.closest('.agenda-card__media-wrap, [data-event-description]')) return;
@@ -506,11 +507,21 @@ document.addEventListener('pointerup', function (event) {
     const deltaX = event.clientX - swipe.x;
     const deltaY = event.clientY - swipe.y;
     if (Math.abs(deltaY) < 40 || Math.abs(deltaY) < Math.abs(deltaX) * 1.15) return;
+    suppressEventMediaClickUntil = Date.now() + 700;
     toggleEventDescription(swipe.article, deltaY < 0);
 }, {passive:true});
 document.addEventListener('pointercancel', function () {
     eventDescriptionPointer = null;
 }, {passive:true});
+// Voorkom dat de klik op de foto na een verticale veeg alsnog de eventpagina opent.
+document.addEventListener('click', function (event) {
+    if (Date.now() > suppressEventMediaClickUntil) return;
+    if (!event.target.closest('.agenda-card__media-wrap')) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+    suppressEventMediaClickUntil = 0;
+}, true);
 
 document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
     const track = gallery.querySelector('[data-gallery-track]');
