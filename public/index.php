@@ -393,7 +393,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                                         <?php endif; ?>
                                         <?php if ($organizerName !== '' || $organizerPhone !== ''): ?>
                                             <div class="agenda-card__info-block agenda-card__info-block--organizer">
-                                                <h3 class="agenda-card__section-label">ORGANISER</h3>
+                                                <h3 class="agenda-card__section-label">ORGANISATOR</h3>
                                                 <div class="agenda-card__organizer">
                                                     <?php if ($hasOrganizerLogo): ?>
                                                         <img class="agenda-card__organizer-logo" src="/organizer-logo.php?file=<?= rawurlencode($organizerLogo) ?>" alt="<?= $escape($organizerName) ?>" loading="lazy">
