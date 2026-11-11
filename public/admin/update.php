@@ -269,6 +269,26 @@ function migrateUserNotifications(PDO $db): void
 
 
 /**
+ * Eenmalige, tijdelijke tokens voor wachtwoordherstel.
+ */
+function migratePasswordResetTokens(PDO $db): void
+{
+    $db->exec("CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        email VARCHAR(190) NOT NULL,
+        token_hash CHAR(64) NOT NULL,
+        expires_at DATETIME NOT NULL,
+        used_at DATETIME NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_password_reset_token_hash (token_hash),
+        KEY idx_password_reset_email_created (email, created_at),
+        KEY idx_password_reset_expiry (expires_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+
+/**
  * Universele registratie van aanmaak en laatste wijziging.
  * Alle applicatietabellen krijgen dezelfde vier auditvelden. Database-triggers
  * vullen ze automatisch, zodat ook bestaande formulieren en API-acties gevolgd worden.
@@ -418,6 +438,9 @@ try {
 
     migrateUserNotifications($db);
     $messages[] = 'Database: meldingen bij @vermeldingen zijn gecontroleerd.';
+
+    migratePasswordResetTokens($db);
+    $messages[] = 'Database: wachtwoordherstel is gecontroleerd.';
 
     migrateDuplicateUserEmails($db);
     migrateAuditTracking($db);
