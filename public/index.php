@@ -375,7 +375,7 @@ require dirname(__DIR__) . '/app/views/header.php';
     <?php endif; ?>
     <div class="agenda-message-modal" id="agenda-message-modal" hidden>
         <div class="agenda-message-modal__panel" role="dialog" aria-modal="true" aria-labelledby="agenda-message-modal-title">
-            <div class="agenda-message-modal__top"><strong id="agenda-message-modal-title">Berichten van evenement</strong><button type="button" class="agenda-message-modal__close" aria-label="Sluiten">×</button></div>
+            <div class="agenda-message-modal__top"><button type="button" class="agenda-message-modal__close" aria-label="Sluiten">×</button></div>
             <iframe title="Berichten bij evenement" src="about:blank"></iframe>
         </div>
     </div>
@@ -455,7 +455,7 @@ require dirname(__DIR__) . '/app/views/header.php';
     }
 }
 
-.agenda-message-modal{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:14px;background:#0009}.agenda-message-modal[hidden]{display:none}.agenda-message-modal__panel{display:flex;flex-direction:column;width:min(100%,680px);height:min(82vh,820px);overflow:hidden;border-radius:18px;background:#fff;box-shadow:0 18px 60px #0005}.agenda-message-modal__top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 16px;background:var(--db-primary);color:#fff}.agenda-message-modal__close{display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%;background:#ffffff24;color:#fff;font-size:27px;line-height:1;cursor:pointer}.agenda-message-modal__panel iframe{display:block;flex:1;width:100%;min-height:0;border:0;background:#fff}.agenda-messages{border:0}.agenda-messages:focus-visible,.agenda-message-modal__close:focus-visible{outline:3px solid #ffd36c;outline-offset:2px}@media(max-width:600px){.agenda-message-modal{padding:8px}.agenda-message-modal__panel{width:100%;height:88vh;border-radius:14px}}
+.agenda-message-modal{position:fixed;inset:0;z-index:11000;display:flex;align-items:center;justify-content:center;padding:14px;background:#0009}.agenda-message-modal[hidden]{display:none}.agenda-message-modal__panel{position:relative;display:flex;flex-direction:column;width:min(100%,680px);height:min(82vh,820px);overflow:hidden;border-radius:18px;background:#fff;box-shadow:0 18px 60px #0005}.agenda-message-modal__top{position:absolute;top:5px;right:5px;z-index:2;display:flex;align-items:center;justify-content:flex-end;padding:0;background:transparent;pointer-events:none}.agenda-message-modal__close{display:grid;place-items:center;width:36px;height:36px;border:0;border-radius:50%;background:#ffffff24;color:#fff;font-size:27px;line-height:1;cursor:pointer;pointer-events:auto}.agenda-message-modal__panel iframe{display:block;flex:1;width:100%;min-height:0;border:0;background:#fff}.agenda-messages{border:0}.agenda-messages:focus-visible,.agenda-message-modal__close:focus-visible{outline:3px solid #ffd36c;outline-offset:2px}@media(max-width:600px){.agenda-message-modal{padding:8px}.agenda-message-modal__panel{width:100%;height:88vh;border-radius:14px}}
 </style>
 <?php
 $hasInstagramReels = false;
