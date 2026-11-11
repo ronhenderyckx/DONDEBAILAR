@@ -33,7 +33,7 @@ $isActive = (int) $organizer['is_active'] === 1;
 function isManagedOrganizerLogo(?string $path): bool
 {
     return is_string($path)
-        && preg_match('~\Auploads/organizers/[a-f0-9]{32}\.webp\z~D', $path) === 1;
+        && preg_match('~\Auploads/organizers/[a-f0-9]{32}\.(?:jpg|png|webp)\z~D', $path) === 1;
 }
 
 function deleteManagedOrganizerLogo(?string $path): void
