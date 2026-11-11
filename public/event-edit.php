@@ -178,7 +178,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <p class="event-form-note">Zet de hashtags apart van de beschrijving, gescheiden door spaties of komma's.</p>
             <?php if ($canPublish): ?>
                 <label for="status">Status</label><select id="status" name="status"><?php foreach (['draft'=>'Concept','published'=>'Gepubliceerd','unpublished'=>'Niet gepubliceerd','cancelled'=>'Geannuleerd'] as $code=>$label): ?><option value="<?= $code ?>" <?= $status === $code ? 'selected' : '' ?>><?= $label ?></option><?php endforeach; ?></select>
-            <?php else: ?><p>Dit evenement blijft een concept totdat een regio-editor of regio-beheerder het publiceert.</p><?php endif; ?>
+            <?php else: ?><p>Dit evenement blijft een concept totdat een regioredacteur of regiobeheerder het publiceert.</p><?php endif; ?>
 
             <h2>Media bij dit evenement</h2>
             <?php if ($media !== []): ?>
@@ -195,7 +195,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                         <?php else: ?>
                             <video src="/event-media.php?id=<?= (int) $item['id'] ?>" controls preload="metadata"></video>
                         <?php endif; ?>
-                        <span><?= escapeHtml($item['media_type'] === 'reel' ? 'Reel' : ($item['media_type'] === 'video' ? 'Video' : ($item['media_type'] === 'social_post' ? 'Social bericht' : 'Foto'))) ?></span>
+                        <span><?= escapeHtml($item['media_type'] === 'reel' ? 'Reel' : ($item['media_type'] === 'video' ? 'Video' : ($item['media_type'] === 'social_post' ? 'Bericht op sociale media' : 'Foto'))) ?></span>
                         <span><input type="checkbox" name="delete_media[]" value="<?= (int) $item['id'] ?>"> Verwijderen</span>
                     </label>
                 <?php endforeach; ?>
@@ -211,7 +211,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <label for="social_kind">Soort</label>
             <select id="social_kind" name="social_kind">
                 <option value="reel">Reel</option>
-                <option value="social_post">Bericht / post</option>
+                <option value="social_post">Bericht</option>
             </select>
             <label for="social_url">Link naar het openbare bericht</label>
             <input id="social_url" type="url" name="social_url" maxlength="1000" placeholder="https://www.instagram.com/reel/...">
