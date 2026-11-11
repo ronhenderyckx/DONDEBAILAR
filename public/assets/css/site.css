@@ -660,6 +660,115 @@ p {
     font-size: 12px;
 }
 
+/* Vaste agendafooter met een afzonderlijk zoekveld. */
+body.has-agenda-footer .site-main{
+    padding-bottom:132px;
+}
+body.has-agenda-footer .site-footer--agenda{
+    position:fixed;
+    right:0;
+    bottom:0;
+    left:0;
+    z-index:900;
+    border-top:1px solid var(--db-border);
+    box-shadow:0 -5px 18px rgba(25,40,60,.10);
+}
+.site-footer__inner--agenda{
+    min-height:76px;
+    padding:10px 0;
+    display:grid;
+    grid-template-columns:minmax(180px,1fr) minmax(260px,540px);
+    align-items:center;
+    gap:18px;
+}
+.site-footer__agenda-brand{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:4px 12px;
+    color:var(--db-muted);
+    font-size:11px;
+}
+.agenda-footer-search{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    width:100%;
+    min-width:0;
+    margin:0;
+}
+.agenda-footer-search input[type="search"]{
+    flex:1;
+    width:100%;
+    min-width:0;
+    height:42px;
+    padding:8px 12px;
+    border:1px solid var(--db-border);
+    border-radius:10px;
+    background:#fff;
+    color:var(--db-text);
+}
+.agenda-footer-search button{
+    display:grid;
+    place-items:center;
+    flex:0 0 42px;
+    width:42px;
+    height:42px;
+    padding:0;
+    border:0;
+    border-radius:10px;
+    background:var(--db-primary);
+    color:#fff;
+    cursor:pointer;
+}
+.agenda-footer-search button:hover{
+    background:var(--db-primary-dark);
+}
+.agenda-footer-search__clear{
+    display:grid;
+    place-items:center;
+    flex:0 0 30px;
+    width:30px;
+    height:30px;
+    border-radius:50%;
+    color:var(--db-muted);
+    font-size:23px;
+    line-height:1;
+}
+.agenda-footer-search__clear:hover{
+    background:var(--db-background);
+    color:var(--db-text);
+}
+@media(max-width:760px){
+    body.has-agenda-footer .site-main{
+        padding-bottom:150px;
+    }
+    .site-footer__inner--agenda{
+        grid-template-columns:1fr;
+        gap:5px;
+        padding:7px 0 9px;
+    }
+    .site-footer__agenda-brand{
+        font-size:10px;
+    }
+}
+@media(max-width:360px){
+    body.has-agenda-footer .site-main{
+        padding-bottom:158px;
+    }
+    .agenda-footer-search input[type="search"]{
+        height:40px;
+        padding:7px 9px;
+        font-size:13px;
+    }
+    .agenda-footer-search button{
+        flex-basis:40px;
+        width:40px;
+        height:40px;
+    }
+}
+
 /* Toegankelijkheid */
 
 :focus-visible {
