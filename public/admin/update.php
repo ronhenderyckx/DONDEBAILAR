@@ -152,6 +152,25 @@ function removeOrganizerRegionColumn(PDO $db): void
 
 
 /**
+ * Voeg het aparte hashtagveld aan evenementen toe.
+ * De controle maakt de migratie veilig om bij iedere UPDATE uit te voeren.
+ */
+function migrateEventHashtags(PDO $db): void
+{
+    $column = $db->prepare(
+        "SELECT COUNT(*) FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'events'
+           AND COLUMN_NAME = 'hashtags'"
+    );
+    $column->execute();
+    if ((int) $column->fetchColumn() === 0) {
+        $db->exec("ALTER TABLE events ADD COLUMN hashtags VARCHAR(500) NULL AFTER description");
+    }
+}
+
+
+/**
  * Universele registratie van aanmaak en laatste wijziging.
  * Alle applicatietabellen krijgen dezelfde vier auditvelden. Database-triggers
  * vullen ze automatisch, zodat ook bestaande formulieren en API-acties gevolgd worden.
@@ -289,6 +308,9 @@ try {
         CONSTRAINT fk_event_guest_attendance_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     $messages[] = 'Database: anonieme dans-aanmeldingen zijn gecontroleerd.';
+
+    migrateEventHashtags($db);
+    $messages[] = 'Database: apart hashtagveld voor evenementen is gecontroleerd.';
 
     migrateDuplicateUserEmails($db);
     migrateAuditTracking($db);
