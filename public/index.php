@@ -262,7 +262,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                     <?php
                     $start = new DateTimeImmutable((string) $event['starts_at'], $timezone);
                     $eventUrl = '/event.php?id=' . (int) $event['id'];
-                    $locationLabel = trim((string) ($event['location_name'] ?? '') . (!empty($event['location_city']) ? ', ' . $event['location_city'] : ''));
+                    $locationLabel = trim((string) ($event['location_city'] ?? ''));
                     $mapUrl = (string) ($event['google_maps_url'] ?? '');
                     if ($mapUrl === '' && $event['latitude'] !== null && $event['longitude'] !== null) {
                         $mapUrl = 'https://www.google.com/maps?q=' . rawurlencode((string) $event['latitude'] . ',' . (string) $event['longitude']);
@@ -340,6 +340,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                             ), static fn(string $tag): bool => preg_match('/^[\\p{L}\\p{N}_]+$/u', $tag) === 1));
                             ?>
                             <p class="agenda-card__date-line"><?= $escape(strtoupper($start->format('l, d M Y'))) ?> <span>◷</span> <?= $escape($start->format('H:i')) ?><?php if (!empty($event['ends_at'])): ?> – <?= $escape((new DateTimeImmutable((string) $event['ends_at'], $timezone))->format('H:i')) ?><?php endif; ?></p>
+                            <p class="agenda-card__swipe-hint">↔ Swipe om meer te zien</p>
                             <?php if (trim((string) ($event['description'] ?? '')) !== ''): ?>
                                 <div class="agenda-card__description" data-event-description aria-hidden="true">
                                     <div class="agenda-card__description-inner"><?= nl2br($escape(trim((string) $event['description']))) ?></div>
