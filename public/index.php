@@ -541,14 +541,17 @@ require dirname(__DIR__) . '/app/views/header.php';
     .agenda-selectors{top:67px}
 }
 
-/* Lichte achtergrond over de volledige breedte van de filterrij. */
+/* Lage, rechte achtergrond over de volledige breedte van de filterrij. */
 .agenda-selector-line{
     box-sizing:border-box;
     width:100%;
-    padding:2px 5px;
-    border-radius:10px;
+    padding:0 5px;
+    border-radius:0;
     background:linear-gradient(90deg,#f3f5f8 0%,#fafbfc 100%);
 }
+.agenda-selector-button{margin-top:2px}
+.agenda-organizer-strip{padding-top:0;padding-bottom:3px}
+.agenda-organizer-item{padding-top:1px;padding-bottom:1px;gap:3px}
 
 /* Compacte achtergrond rond elke organisator- en stadsknop. */
 .agenda-organizer-item{
