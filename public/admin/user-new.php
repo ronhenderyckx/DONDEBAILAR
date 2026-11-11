@@ -157,7 +157,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <label for="password">Tijdelijk wachtwoord</label>
             <input type="password" id="password" name="password"
                    minlength="12" autocomplete="new-password" required>
-            <p>Minimaal 12 tekens. De gebruiker kan later zelf een nieuw wachtwoord instellen zodra wachtwoordherstel beschikbaar is.</p>
+            <p>Minimaal 12 tekens. De gebruiker kan later zelf een nieuw wachtwoord instellen via ‘Wachtwoord vergeten’.</p>
 
             <label for="preferred_language">Voorkeurstaal</label>
             <select id="preferred_language" name="preferred_language">
@@ -192,7 +192,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                     <select name="regions[<?= $rid ?>]">
                         <option value="">Geen toegang</option>
                         <option value="user" <?= ($regionRoles[$rid] ?? '') === 'user' ? 'selected' : '' ?>>Gewone gebruiker</option>
-                        <option value="editor" <?= ($regionRoles[$rid] ?? '') === 'editor' ? 'selected' : '' ?>>Editor</option>
+                        <option value="editor" <?= ($regionRoles[$rid] ?? '') === 'editor' ? 'selected' : '' ?>>Regioredacteur</option>
                         <option value="region_admin" <?= ($regionRoles[$rid] ?? '') === 'region_admin' ? 'selected' : '' ?>>Regionale beheerder</option>
                     </select>
                 </div>
