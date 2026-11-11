@@ -171,6 +171,32 @@ function migrateEventHashtags(PDO $db): void
 
 
 /**
+ * Maak de berichtenfunctie per evenement aan.
+ * De controle maakt deze database-upgrade veilig om bij iedere UPDATE uit te voeren.
+ */
+function migrateEventMessages(PDO $db): void
+{
+    $db->exec("CREATE TABLE IF NOT EXISTS event_messages (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        event_id BIGINT UNSIGNED NOT NULL,
+        user_id INT UNSIGNED NOT NULL,
+        parent_id BIGINT UNSIGNED NULL,
+        message TEXT NOT NULL,
+        is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+        deleted_by INT UNSIGNED NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME NULL,
+        PRIMARY KEY (id),
+        KEY idx_event_messages_event (event_id, created_at),
+        KEY idx_event_messages_parent (parent_id),
+        KEY idx_event_messages_user (user_id),
+        CONSTRAINT fk_event_messages_event FOREIGN KEY (event_id)
+            REFERENCES events(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+
+/**
  * Universele registratie van aanmaak en laatste wijziging.
  * Alle applicatietabellen krijgen dezelfde vier auditvelden. Database-triggers
  * vullen ze automatisch, zodat ook bestaande formulieren en API-acties gevolgd worden.
@@ -311,6 +337,9 @@ try {
 
     migrateEventHashtags($db);
     $messages[] = 'Database: apart hashtagveld voor evenementen is gecontroleerd.';
+
+    migrateEventMessages($db);
+    $messages[] = 'Database: berichten per evenement zijn gecontroleerd.';
 
     migrateDuplicateUserEmails($db);
     migrateAuditTracking($db);
