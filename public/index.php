@@ -810,6 +810,7 @@ document.addEventListener('pointerup', function (event) {
 }, {passive:true});
 document.addEventListener('pointercancel', function () { eventInfoPointerStart = null; }, {passive:true});
 
+let agendaVideosMuted = false;
 document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
     const track = gallery.querySelector('[data-gallery-track]');
     const counter = gallery.querySelector('[data-gallery-count]');
@@ -823,9 +824,25 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
 
         // Stop video's zodra een andere foto, video of Reel actief wordt.
         slides.forEach(function (slide, index) {
-            if (index === currentIndex - 1) return;
+            const isActive = index === currentIndex - 1;
             slide.querySelectorAll('video.agenda-card__video').forEach(function (video) {
-                video.pause();
+                if (!isActive) {
+                    video.pause();
+                    return;
+                }
+
+                // Hervat de video wanneer deze galerij-slide weer zichtbaar is.
+                const rect = video.getBoundingClientRect();
+                const inViewport = rect.width > 0 && rect.height > 0
+                    && rect.bottom > 0 && rect.right > 0
+                    && rect.top < window.innerHeight && rect.left < window.innerWidth;
+                if (inViewport) {
+                    video.muted = true;
+                    const playPromise = video.play();
+                    if (playPromise && typeof playPromise.catch === 'function') {
+                        playPromise.catch(function () {});
+                    }
+                }
             });
         });
     };
@@ -974,7 +991,6 @@ document.querySelectorAll('.agenda-card__video').forEach(function (video) {
 
 // Geluid van geüploade video's centraal aan- en uitzetten.
 // De footer wordt pas na dit script geladen; daarom gebruiken we event delegation.
-let agendaVideosMuted = false;
 function applyAgendaVideoSound(button) {
     document.querySelectorAll('.agenda-card__video').forEach(function (video) {
         video.muted = agendaVideosMuted;
