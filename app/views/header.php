@@ -268,7 +268,7 @@ $escape = static fn ($value): string =>
                                 ? '/?region_id=' . $regionId . '&agenda_change=1&filter=organizer'
                                 : '/?region_id=' . $regionId . '&agenda_change=1&filter=organizer&organizer_id=' . (int) $organizerOption['id'];
                             ?>
-                            <a class="agenda-organizer-item agenda-organizer-item--organizer<?= $organizerSelected ? ' is-selected' : '' ?>" href="<?= $escape($organizerHref) ?>" title="<?= $escape($organizerOption['name']) ?>" aria-label="<?= $organizerSelected ? 'Verwijder filter voor ' : 'Toon evenementen van ' ?><?= $escape($organizerOption['name']) ?>">
+                            <a class="agenda-organizer-item agenda-organizer-item--organizer<?= $organizerSelected ? ' is-selected' : '' ?>" data-organizer-id="<?= (int) $organizerOption['id'] ?>" href="<?= $escape($organizerHref) ?>" title="<?= $escape($organizerOption['name']) ?>" aria-label="<?= $organizerSelected ? 'Verwijder filter voor ' : 'Toon evenementen van ' ?><?= $escape($organizerOption['name']) ?>">
                                 <?php if ($hasOrganizerLogo): ?>
                                     <img class="agenda-organizer-logo" src="/organizer-logo.php?file=<?= rawurlencode($logoFilename) ?>" alt="" loading="lazy">
                                 <?php else: ?>
@@ -289,7 +289,7 @@ $escape = static fn ($value): string =>
                                 ? '/?region_id=' . $regionId . '&agenda_change=1&filter=city'
                                 : '/?region_id=' . $regionId . '&agenda_change=1&filter=city&city=' . rawurlencode($cityName);
                             ?>
-                            <a class="agenda-organizer-item<?= $citySelected ? ' is-selected' : '' ?>" href="<?= $escape($cityHref) ?>" title="<?= $escape($cityName) ?>" aria-label="<?= $citySelected ? 'Verwijder stadsfilter ' : 'Toon evenementen in ' ?><?= $escape($cityName) ?>">
+                            <a class="agenda-organizer-item<?= $citySelected ? ' is-selected' : '' ?>" data-city="<?= $escape($cityName) ?>" href="<?= $escape($cityHref) ?>" title="<?= $escape($cityName) ?>" aria-label="<?= $citySelected ? 'Verwijder stadsfilter ' : 'Toon evenementen in ' ?><?= $escape($cityName) ?>">
                                 <span class="agenda-organizer-fallback" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr($cityName, 0, 1))) ?></span>
                                 <span class="agenda-organizer-name"><?= $escape($cityName) ?></span>
                             </a>
