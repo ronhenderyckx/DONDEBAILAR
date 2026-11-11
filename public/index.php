@@ -874,6 +874,15 @@ if (messageModal) {
         const eventTitle = eventCard?.querySelector('.agenda-card__details h2 a')?.textContent.trim() || 'Evenement';
         const count = Number(button.querySelector('.agenda-message-count')?.textContent || 0);
         const titleText = eventTitle + ' · ' + count + ' ' + (count === 1 ? 'bericht' : 'berichten');
+        const dayColor = eventCard ? getComputedStyle(eventCard).getPropertyValue('--db-event-day-color').trim() : '';
+        messageModal.querySelector('.agenda-message-modal__panel').style.setProperty('--db-chat-day-color', dayColor || 'var(--db-primary,#E23A2C)');
+        messageFrame.addEventListener('load', function applyChatDayColor() {
+            try {
+                const chatDocument = messageFrame.contentDocument;
+                if (!chatDocument) return;
+                chatDocument.documentElement.style.setProperty('--db-chat-day-color', dayColor || 'var(--db-primary,#E23A2C)');
+            } catch (error) {}
+        }, {once:true});
         const modalTitle = document.getElementById('agenda-message-modal-title');
         if (modalTitle) modalTitle.textContent = titleText;
         messageFrame.title = titleText;
