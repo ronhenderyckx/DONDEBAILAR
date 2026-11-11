@@ -76,6 +76,15 @@ try {
         'sound_muted' => $soundMuted,
     ]);
 
+    // Direct beschikbaar bij het herladen in dezelfde aangemelde sessie.
+    $_SESSION['agenda_preferences'] = [
+        'region_id' => $regionId,
+        'active_filter' => $filter,
+        'organizer_id' => $organizerId > 0 ? $organizerId : null,
+        'city' => $city !== '' ? $city : null,
+        'sound_muted' => $soundMuted,
+    ];
+
     echo json_encode(['ok' => true, 'message' => 'Je agenda-instellingen zijn bewaard.']);
 } catch (Throwable $exception) {
     http_response_code(500);
