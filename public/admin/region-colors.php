@@ -211,7 +211,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 'search_button_color' => 'Achtergrondkleur zoekknop',
                 'back_top_color' => 'Achtergrondkleur naar-bovenknop',
                 'search_field_color' => 'Achtergrondkleur zoekveld',
-                'search_text_color' => 'Tekstkleur zoekveld',
+                'search_text_color' => 'Tekstkleur zoekfunctie (invoer en placeholder)',
                 'footer_color' => 'Achtergrondkleur footer',
                 'background_color' => 'Achtergrondkleur',
                 'text_color' => 'Tekstkleur',
