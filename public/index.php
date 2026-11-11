@@ -1147,7 +1147,7 @@ document.addEventListener('click', function (event) {
     const payload = {
         csrf_token: '<?= $escape(csrfToken()) ?>',
         region_id: Number(params.get('region_id') || '<?= $regionId ?>'),
-        filter: params.get('filter') === 'city' ? 'city' : 'organizer',
+        filter: agendaFilterIndex === 1 ? 'city' : 'organizer',
         organizer_id: Number(params.get('organizer_id') || 0),
         city: params.get('city') || '',
         sound_muted: agendaVideosMuted
