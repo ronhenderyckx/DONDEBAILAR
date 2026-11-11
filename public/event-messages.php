@@ -37,6 +37,10 @@ if (!$event) {
 
 $user = currentUser();
 $canModerate = $user !== null && eventCanEdit($db, $event, $user);
+$mentionUsersQuery = $db->query(
+    "SELECT id, display_name FROM users WHERE status = 'active' AND display_name IS NOT NULL AND display_name <> '' ORDER BY display_name"
+);
+$mentionUsers = $mentionUsersQuery->fetchAll();
 $errors = [];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -167,6 +171,22 @@ $region = [
 ];
 require dirname(__DIR__) . '/app/views/header.php';
 $escape = static fn($value): string => escapeHtml((string) $value);
+$mentionNames = array_values(array_unique(array_filter(array_map(
+    static fn($mentionUser): string => trim((string) $mentionUser['display_name']),
+    $mentionUsers
+))));
+usort($mentionNames, static fn(string $a, string $b): int => mb_strlen($b) <=> mb_strlen($a));
+$renderMessage = static function (string $message) use ($mentionNames, $escape): string {
+    $html = $escape($message);
+    if ($mentionNames !== []) {
+        $patterns = array_map(static fn(string $name): string => preg_quote($name, '/'), $mentionNames);
+        $pattern = '/(?<![\\p{L}\\p{N}_])@(' . implode('|', $patterns) . ')(?![\\p{L}\\p{N}_])/iu';
+        $html = preg_replace_callback($pattern, static function (array $match) use ($escape): string {
+            return '<span class="chat-mention">@' . $escape($match[1]) . '</span>';
+        }, $html) ?? $html;
+    }
+    return nl2br($html);
+};
 ?>
 <section class="event-chat<?= $popupMode ? ' event-chat--popup' : '' ?>" id="messages">
     <div class="event-chat__heading" style="display:block!important;width:100%;height:70px;min-height:70px;box-sizing:border-box;overflow:hidden;padding:0 12px;background:var(--db-primary,#1456a0);color:#fff">
@@ -201,7 +221,7 @@ $escape = static fn($value): string => escapeHtml((string) $value);
                     <?php if ((int) $item['is_deleted'] === 1): ?>
                         <p class="chat-message__deleted">Bericht verwijderd</p>
                     <?php else: ?>
-                        <p><?= nl2br($escape($item['message'])) ?></p>
+                        <p><?= $renderMessage((string) $item['message']) ?></p>
                         <?php if (!empty($item['updated_at']) && $item['updated_at'] !== $item['created_at']): ?><small>bewerkt</small><?php endif; ?>
                         <?php if ($user !== null): ?>
                             <button type="button" class="chat-message__reply-button" data-reply-toggle aria-expanded="false">Reageren</button>
@@ -236,7 +256,7 @@ $escape = static fn($value): string => escapeHtml((string) $value);
                     <?php $replyId = (int) $reply['id']; ?>
                     <div class="chat-message__reply" id="message-<?= $replyId ?>">
                         <div><strong><?= $escape($reply['display_name'] ?: 'Gebruiker') ?></strong>
-                        <span><?= (int) $reply['is_deleted'] === 1 ? 'Reactie verwijderd' : nl2br($escape($reply['message'])) ?></span></div>
+                        <span><?= (int) $reply['is_deleted'] === 1 ? 'Reactie verwijderd' : $renderMessage((string) $reply['message']) ?></span></div>
                         <time><?= $escape(date('d-m H:i', strtotime((string) $reply['created_at']))) ?></time>
                         <?php if ($user !== null && (int) $reply['is_deleted'] !== 1): ?>
                             <button type="button" class="chat-message__reply-button" data-reply-toggle aria-expanded="false">Reageren</button>
@@ -251,7 +271,7 @@ $escape = static fn($value): string => escapeHtml((string) $value);
                         <?php foreach ($replies[$replyId] ?? [] as $nestedReply): ?>
                             <div class="chat-message__nested-reply">
                                 <strong><?= $escape($nestedReply['display_name'] ?: 'Gebruiker') ?></strong>
-                                <span><?= (int) $nestedReply['is_deleted'] === 1 ? 'Reactie verwijderd' : nl2br($escape($nestedReply['message'])) ?></span>
+                                <span><?= (int) $nestedReply['is_deleted'] === 1 ? 'Reactie verwijderd' : $renderMessage((string) $nestedReply['message']) ?></span>
                                 <time><?= $escape(date('d-m H:i', strtotime((string) $nestedReply['created_at']))) ?></time>
                             </div>
                         <?php endforeach; ?>
@@ -261,6 +281,11 @@ $escape = static fn($value): string => escapeHtml((string) $value);
         <?php endforeach; ?>
     </div>
 
+    <datalist id="event-chat-mention-users">
+        <?php foreach ($mentionUsers as $mentionUser): ?>
+            <option value="@<?= $escape($mentionUser['display_name']) ?>"></option>
+        <?php endforeach; ?>
+    </datalist>
     <div class="event-chat__composer">
         <?php if ($user !== null): ?>
             <form method="post">
@@ -285,9 +310,9 @@ body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;mar
 .chat-message{max-width:88%;align-self:flex-start}.chat-message__bubble{position:relative;padding:9px 12px;border-radius:14px 14px 14px 4px;background:#f0f2f5;overflow-wrap:anywhere}
 .chat-message__meta{display:flex;gap:10px;align-items:center;margin-bottom:4px;font-size:11px;color:#777}.chat-message__meta strong{color:#444;font-size:12px}.chat-message__meta time{white-space:nowrap}
 .chat-message__bubble p{margin:0;white-space:normal}.chat-message__bubble small{display:block;color:#888;font-size:10px}
-.chat-message__deleted{color:#888;font-style:italic}
+.chat-message__deleted{color:#888;font-style:italic}.chat-mention{color:var(--db-primary,#2878c8);font-weight:700;background:rgba(40,120,200,.09);border-radius:4px;padding:0 2px}
 .chat-message__reply-button{display:inline-block;margin-top:6px;padding:0;border:0;background:none;color:var(--db-primary,#2878c8);font:600 11px system-ui,sans-serif;cursor:pointer}
-.chat-message__reply-form{display:flex;gap:6px;align-items:flex-end;margin-top:7px}
+.chat-message__reply-form{display:flex;gap:6px;align-items:flex-end;margin-top:7px}.chat-mention-suggestions{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0;padding:5px;background:#fff;border:1px solid #ddd;border-radius:9px;box-shadow:0 3px 12px #00000012}.chat-mention-suggestions button{border:0;border-radius:6px;padding:5px 8px;background:#eef4fb;color:#245b91;font:12px system-ui,sans-serif;cursor:pointer}
 .chat-message__reply-form[hidden]{display:none}
 .chat-message__reply-form textarea{flex:1;min-width:0;resize:vertical;border:1px solid #ddd;border-radius:10px;padding:7px 9px;font:12px/1.4 system-ui,sans-serif}
 .chat-message__reply-form button{border:0;border-radius:9px;padding:8px 10px;background:var(--db-primary,#2878c8);color:#fff;font-size:11px;font-weight:600;cursor:pointer}
@@ -316,6 +341,56 @@ body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;mar
         button.setAttribute('aria-expanded', opening ? 'true' : 'false');
         button.textContent = opening ? 'Annuleren' : 'Reageren';
         if (opening) form.querySelector('textarea')?.focus();
+    });
+    const mentionUsers = [];
+    const mentionList = document.getElementById('event-chat-mention-users');
+    const allNames = mentionList ? Array.from(mentionList.options).map(option => option.value.slice(1)) : mentionUsers;
+    document.querySelectorAll('.event-chat textarea').forEach(textarea => {
+        textarea.addEventListener('input', () => {
+            const before = textarea.value.slice(0, textarea.selectionStart);
+            const match = before.match(/(?:^|\\s)@([^@\\n]*)$/u);
+            let popup = textarea.parentElement.querySelector('.chat-mention-suggestions');
+            if (!match || !match[1]) {
+                if (popup) popup.remove();
+                return;
+            }
+            const query = match[1].toLocaleLowerCase();
+            const matches = allNames.filter(name => name.toLocaleLowerCase().startsWith(query)).slice(0, 7);
+            if (!matches.length) {
+                if (popup) popup.remove();
+                return;
+            }
+            if (!popup) {
+                popup = document.createElement('div');
+                popup.className = 'chat-mention-suggestions';
+                textarea.insertAdjacentElement('beforebegin', popup);
+            }
+            popup.replaceChildren();
+            matches.forEach(name => {
+                const option = document.createElement('button');
+                option.type = 'button';
+                option.textContent = '@' + name;
+                option.addEventListener('click', () => {
+                    const start = textarea.selectionStart;
+                    const end = textarea.selectionEnd;
+                    const left = textarea.value.slice(0, start);
+                    const token = left.match(/(?:^|\\s)@([^@\\n]*)$/u);
+                    if (!token) return;
+                    const tokenStart = start - token[0].length + (token[0].startsWith(' ') ? 1 : 0);
+                    textarea.value = textarea.value.slice(0, tokenStart) + '@' + name + ' ' + textarea.value.slice(end);
+                    textarea.focus();
+                    const cursor = tokenStart + name.length + 2;
+                    textarea.setSelectionRange(cursor, cursor);
+                    popup.remove();
+                });
+                popup.append(option);
+            });
+        });
+        textarea.addEventListener('keydown', event => {
+            if (event.key === 'Escape') {
+                textarea.parentElement.querySelector('.chat-mention-suggestions')?.remove();
+            }
+        });
     });
     const input = document.querySelector('.event-chat__composer textarea');
     if (input) {
