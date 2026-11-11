@@ -820,6 +820,14 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
         const slideWidth = track.clientWidth || 1;
         const currentIndex = Math.min(slides.length, Math.max(1, Math.round(track.scrollLeft / slideWidth) + 1));
         counter.textContent = currentIndex + ' / ' + slides.length;
+
+        // Stop video's zodra een andere foto, video of Reel actief wordt.
+        slides.forEach(function (slide, index) {
+            if (index === currentIndex - 1) return;
+            slide.querySelectorAll('video.agenda-card__video').forEach(function (video) {
+                video.pause();
+            });
+        });
     };
     track.addEventListener('scroll', updateCounter, { passive: true });
     window.addEventListener('resize', updateCounter);
