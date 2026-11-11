@@ -253,52 +253,7 @@ require dirname(__DIR__) . '/app/views/header.php';
     <?php if ($regions === []): ?>
         <section class="agenda-empty"><h2>De agenda wordt voorbereid</h2><p>Er zijn nog geen actieve regio's beschikbaar.</p></section>
     <?php else: ?>
-        <form class="agenda-selectors" method="get" action="/">
-            <input type="hidden" name="region_id" value="<?= $regionId ?>">
-            <div class="agenda-selector-line">
-                <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" aria-label="Wissel filter" title="Wissel filter"><span class="agenda-filter-icon" aria-hidden="true">👥</span></button>
-                <div class="agenda-selector-panel is-open" data-panel="organizer">
-                    <div class="agenda-organizer-strip" aria-label="Organisatoren met toekomstige evenementen">
-                        <?php foreach ($organizers as $organizerOption): ?>
-                            <?php
-                            $logoFilename = basename((string) ($organizerOption['logo_path'] ?? ''));
-                            $hasOrganizerLogo = preg_match('/\\A[a-f0-9]{32}\\.(jpg|png|webp)\\z/', $logoFilename) === 1;
-                            $organizerSelected = $organizerId === (int) $organizerOption['id'];
-                            $organizerHref = $organizerSelected
-                                ? '/?region_id=' . $regionId . '&filter=organizer'
-                                : '/?region_id=' . $regionId . '&filter=organizer&organizer_id=' . (int) $organizerOption['id'];
-                            ?>
-                            <a class="agenda-organizer-item agenda-organizer-item--organizer<?= $organizerSelected ? ' is-selected' : '' ?>" href="<?= $escape($organizerHref) ?>" title="<?= $escape($organizerOption['name']) ?>" aria-label="<?= $organizerSelected ? 'Verwijder filter voor ' : 'Toon evenementen van ' ?><?= $escape($organizerOption['name']) ?>">
-                                <?php if ($hasOrganizerLogo): ?>
-                                    <img class="agenda-organizer-logo" src="/organizer-logo.php?file=<?= rawurlencode($logoFilename) ?>" alt="" loading="lazy">
-                                <?php else: ?>
-                                    <span class="agenda-organizer-fallback" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr((string) $organizerOption['name'], 0, 1))) ?></span>
-                                <?php endif; ?>
-                                <span class="agenda-organizer-name"><?= $escape($organizerOption['name']) ?></span>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-                <div class="agenda-selector-panel" data-panel="city" hidden>
-                    <div class="agenda-organizer-strip" aria-label="Steden met toekomstige evenementen">
-                        <?php foreach ($cities as $cityOption): ?>
-                            <?php
-                            $cityName = (string) $cityOption['city'];
-                            $citySelected = $city === $cityName;
-                            $cityHref = $citySelected
-                                ? '/?region_id=' . $regionId . '&filter=city'
-                                : '/?region_id=' . $regionId . '&filter=city&city=' . rawurlencode($cityName);
-                            ?>
-                            <a class="agenda-organizer-item<?= $citySelected ? ' is-selected' : '' ?>" href="<?= $escape($cityHref) ?>" title="<?= $escape($cityName) ?>" aria-label="<?= $citySelected ? 'Verwijder stadsfilter ' : 'Toon evenementen in ' ?><?= $escape($cityName) ?>">
-                                <span class="agenda-organizer-fallback" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr($cityName, 0, 1))) ?></span>
-                                <span class="agenda-organizer-name"><?= $escape($cityName) ?></span>
-                            </a>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            </div>
-        </form>
-
+        
         <?php if ($events === []): ?>
             <section class="agenda-empty"><h2>Geen evenementen gevonden</h2><p>Er zijn momenteel geen toekomstige gepubliceerde evenementen met deze filters.</p></section>
         <?php else: ?>
@@ -600,8 +555,7 @@ body.has-agenda-footer .site-main{padding-top:0!important;margin-top:0!important
 body.has-agenda-footer .site-main > .agenda-page{margin-top:0!important;padding-top:0!important}
 body.has-agenda-footer .agenda-selectors{margin-top:0!important}
 
-/* Smartphone: trek de filterbalk iets verder tegen de header aan. */
-@media(max-width:760px){body.has-agenda-footer .site-header{margin-bottom:-18px!important}}
+
 
 /* Eventinformatie gebruikt de ingestelde kleur van de betreffende weekdag. */
 .agenda-card{background:var(--db-event-day-color,var(--db-primary))!important;border:0!important}
@@ -628,6 +582,19 @@ body.has-agenda-footer .agenda-selectors{margin-top:0!important}
 }
 .agenda-card__more{text-decoration-color:var(--db-text)!important}
 .agenda-card__quick{box-shadow:none!important}
+
+
+/* De filterbalk maakt nu deel uit van de header, ook op smartphones. */
+.site-header__agenda-filters{width:min(100% - 40px,1180px);margin:0 auto;padding:0}
+.site-header__agenda-filters .agenda-selectors{position:static!important;top:auto!important;margin:0!important;padding:0!important}
+body.has-agenda-footer .site-header{margin:0!important;padding:0!important}
+body.has-agenda-footer .site-main{padding-top:0!important;margin-top:0!important}
+body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding-top:0!important}
+@media(max-width:760px){
+ .site-header__agenda-filters{width:100%;padding:0 10px}
+ .site-header__agenda-filters .agenda-selector-line{margin:0}
+ .site-header__agenda-filters .agenda-organizer-strip{padding-bottom:2px}
+}
 </style>
 <?php
 $hasInstagramReels = false;
