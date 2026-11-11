@@ -169,6 +169,11 @@ $escape = static fn ($value): string =>
 
         <?php if ($headerUser !== null): ?>
             <span class="site-welcome">Welkom<?= $headerDisplayName !== '' ? ' ' . $escape($headerDisplayName) : '' ?></span>
+            <?php if (!empty($isAgendaPage)): ?>
+                <button type="button" class="site-save-preferences" id="agenda-save-preferences" aria-label="Bewaar mijn agenda-instellingen" title="Bewaar mijn agenda-instellingen">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3h12l4 4v14H3V3z"></path><path d="M7 3v6h10V3"></path><path d="M7 21v-8h10v8"></path></svg>
+                </button>
+            <?php endif; ?>
             <a class="site-notifications" href="/notifications.php" aria-label="Meldingen<?= $unreadNotificationCount > 0 ? ': ' . $unreadNotificationCount . ' ongelezen' : '' ?>" title="Meldingen">
                 <svg aria-hidden="true" viewBox="0 0 24 24" width="23" height="23" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"></path><path d="M10 21h4"></path></svg>
                 <?php if ($unreadNotificationCount > 0): ?><span><?= $unreadNotificationCount > 99 ? '99+' : $unreadNotificationCount ?></span><?php endif; ?>
@@ -305,6 +310,9 @@ $escape = static fn ($value): string =>
 .site-brand--region{padding-left:12px;border-left:1px solid var(--db-border)}
 .site-brand__region-name{font-size:15px;font-weight:700;color:var(--db-text);white-space:nowrap}
 .site-notifications{position:relative;display:grid;place-items:center;width:40px;height:40px;flex:none;color:var(--db-text);text-decoration:none;border-radius:10px}
+.site-save-preferences{display:grid;place-items:center;width:40px;height:40px;flex:none;padding:0;border:0;border-radius:10px;background:transparent;color:var(--db-text);cursor:pointer}
+.site-save-preferences:hover,.site-save-preferences.is-saved{background:var(--db-surface,#f2f4f7);color:var(--db-primary)}
+.site-save-preferences[aria-busy="true"]{opacity:.55;cursor:wait}
 .site-notifications:hover{background:var(--db-surface,#f2f4f7)}
 .site-notifications span{position:absolute;top:0;right:-2px;display:grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#dc3545;color:#fff;font-size:10px;font-weight:800;line-height:1}
 .site-menu{margin-left:0}
