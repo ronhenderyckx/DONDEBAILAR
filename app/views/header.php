@@ -100,6 +100,10 @@ $themeStyle = '--db-primary:' . $primaryColor
     . ';--db-organizer-color:' . $colorValue('organizer_color', '#E23A2C')
     . ';--db-filter-bar-color:' . $colorValue('filter_bar_color', '#FFFFFF')
     . ';--db-filter-text-color:' . $colorValue('filter_text_color', '#222222')
+    . ';--db-search-button-color:' . $colorValue('search_button_color', '#E23A2C')
+    . ';--db-back-top-color:' . $colorValue('back_top_color', '#E23A2C')
+    . ';--db-search-field-color:' . $colorValue('search_field_color', '#FFFFFF')
+    . ';--db-search-text-color:' . $colorValue('search_text_color', '#222222')
     . ';--db-footer-color:' . $colorValue('footer_color', '#FFFFFF')
     . ';--db-background:' . $colorValue('background_color', '#F7F8FA')
     . ';--db-text:' . $colorValue('text_color', '#202B38');
