@@ -201,6 +201,16 @@ $escape = static fn($value): string => escapeHtml((string) $value);
                     <?php else: ?>
                         <p><?= nl2br($escape($item['message'])) ?></p>
                         <?php if (!empty($item['updated_at']) && $item['updated_at'] !== $item['created_at']): ?><small>bewerkt</small><?php endif; ?>
+                        <?php if ($user !== null): ?>
+                            <button type="button" class="chat-message__reply-button" data-reply-toggle aria-expanded="false">Reageren</button>
+                            <form method="post" class="chat-message__reply-form" hidden>
+                                <input type="hidden" name="csrf_token" value="<?= $escape(csrfToken()) ?>">
+                                <input type="hidden" name="action" value="reply">
+                                <input type="hidden" name="parent_id" value="<?= $messageId ?>">
+                                <textarea name="message" rows="2" maxlength="2000" required placeholder="Schrijf een reactie..."></textarea>
+                                <button type="submit">Versturen</button>
+                            </form>
+                        <?php endif; ?>
                         <?php if ($canChange): ?>
                             <details class="chat-message__manage"><summary>⋯</summary>
                                 <form method="post">
@@ -257,6 +267,11 @@ body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;mar
 .chat-message__meta{display:flex;gap:10px;align-items:center;margin-bottom:4px;font-size:11px;color:#777}.chat-message__meta strong{color:#444;font-size:12px}.chat-message__meta time{white-space:nowrap}
 .chat-message__bubble p{margin:0;white-space:normal}.chat-message__bubble small{display:block;color:#888;font-size:10px}
 .chat-message__deleted{color:#888;font-style:italic}
+.chat-message__reply-button{display:inline-block;margin-top:6px;padding:0;border:0;background:none;color:var(--db-primary,#2878c8);font:600 11px system-ui,sans-serif;cursor:pointer}
+.chat-message__reply-form{display:flex;gap:6px;align-items:flex-end;margin-top:7px}
+.chat-message__reply-form[hidden]{display:none}
+.chat-message__reply-form textarea{flex:1;min-width:0;resize:vertical;border:1px solid #ddd;border-radius:10px;padding:7px 9px;font:12px/1.4 system-ui,sans-serif}
+.chat-message__reply-form button{border:0;border-radius:9px;padding:8px 10px;background:var(--db-primary,#2878c8);color:#fff;font-size:11px;font-weight:600;cursor:pointer}
 .chat-message__reply{margin:5px 0 0 16px;padding:7px 10px;border-left:2px solid #ddd;color:#555;font-size:12px;overflow-wrap:anywhere}
 .chat-message__reply strong{margin-right:6px}.chat-message__reply time{display:block;color:#999;font-size:10px}
 .chat-message__manage{margin-top:4px;font-size:11px}.chat-message__manage summary{cursor:pointer;color:#777}.chat-message__manage form{display:flex;gap:5px;margin-top:5px}.chat-message__manage textarea{min-width:0;width:100%;font:inherit}.chat-message__manage button{border:0;border-radius:6px;padding:5px 8px;background:#eee;cursor:pointer;white-space:nowrap}
@@ -269,6 +284,17 @@ body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;mar
 (() => {
     const list = document.querySelector('.event-chat__messages');
     if (list) list.scrollTop = list.scrollHeight;
+    document.addEventListener('click', event => {
+        const button = event.target.closest('[data-reply-toggle]');
+        if (!button) return;
+        const form = button.nextElementSibling;
+        if (!form || !form.classList.contains('chat-message__reply-form')) return;
+        const opening = form.hidden;
+        form.hidden = !opening;
+        button.setAttribute('aria-expanded', opening ? 'true' : 'false');
+        button.textContent = opening ? 'Annuleren' : 'Reageren';
+        if (opening) form.querySelector('textarea')?.focus();
+    });
     const input = document.querySelector('.event-chat__composer textarea');
     if (input) {
         input.addEventListener('keydown', event => {
