@@ -329,9 +329,19 @@ require dirname(__DIR__) . '/app/views/header.php';
                                 <?php if ($mapUrl !== ''): ?><a class="agenda-icon-button agenda-location" href="<?= $escape($mapUrl) ?>" target="_blank" rel="noopener noreferrer" aria-label="Toon locatie op kaart" title="Toon locatie op kaart"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg></a><?php endif; ?>
                             </div>
                             <h2><a href="<?= $eventUrl ?>"><?= $escape($event['title']) ?></a></h2>
+                            <?php
+                            $hashtagText = trim((string) ($event['hashtags'] ?? ''));
+                            $hashtagItems = preg_split('/[\\s,]+/u', $hashtagText, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+                            $hashtagItems = array_values(array_filter(array_map(
+                                static fn(string $tag): string => ltrim($tag, '#'),
+                                $hashtagItems
+                            ), static fn(string $tag): bool => preg_match('/^[\\p{L}\\p{N}_]+$/u', $tag) === 1));
+                            ?>
+                            <?php if ($hashtagItems !== []): ?>
+                                <p class="agenda-card__hashtags"><?= $escape(implode(' ', array_map(static fn(string $tag): string => '#' . $tag, $hashtagItems))) ?></p>
+                            <?php endif; ?>
                             <p class="agenda-card__tags">
                                 <?php if (!empty($event['category_name'])): ?><span># <?= $escape($event['category_name']) ?></span><?php endif; ?>
-                                <?php if (!empty($event['location_city'])): ?><span># <?= $escape($event['location_city']) ?></span><?php endif; ?>
                             </p>
                             <p class="agenda-card__date-line"><?= $escape(strtoupper($start->format('l, d M Y'))) ?> <span>◷</span> <?= $escape($start->format('H:i')) ?><?php if (!empty($event['ends_at'])): ?> – <?= $escape((new DateTimeImmutable((string) $event['ends_at'], $timezone))->format('H:i')) ?><?php endif; ?></p>
                             <?php if ($locationLabel !== ''): ?><p class="agenda-card__location"><?= $escape($locationLabel) ?></p><?php endif; ?>
