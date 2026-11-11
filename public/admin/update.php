@@ -248,6 +248,30 @@ function migrateEventMessages(PDO $db): void
 
 
 /**
+ * Meldingen voor gebruikers die in evenementberichten worden genoemd.
+ */
+function migrateUserNotifications(PDO $db): void
+{
+    $db->exec("CREATE TABLE IF NOT EXISTS user_notifications (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id INT UNSIGNED NOT NULL,
+        actor_user_id INT UNSIGNED NOT NULL,
+        event_id BIGINT UNSIGNED NOT NULL,
+        message_id BIGINT UNSIGNED NOT NULL,
+        notification_type VARCHAR(40) NOT NULL DEFAULT 'mention',
+        is_read TINYINT(1) NOT NULL DEFAULT 0,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_user_notification_message (user_id, message_id),
+        KEY idx_user_notifications_unread (user_id, is_read, created_at),
+        CONSTRAINT fk_user_notifications_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+        CONSTRAINT fk_user_notifications_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
+        CONSTRAINT fk_user_notifications_message FOREIGN KEY (message_id) REFERENCES event_messages(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+
+/**
  * Universele registratie van aanmaak en laatste wijziging.
  * Alle applicatietabellen krijgen dezelfde vier auditvelden. Database-triggers
  * vullen ze automatisch, zodat ook bestaande formulieren en API-acties gevolgd worden.
@@ -394,6 +418,9 @@ try {
 
     migrateEventRecurrence($db);
     $messages[] = 'Database: wekelijkse en maandelijkse evenementreeksen zijn gecontroleerd.';
+
+    migrateUserNotifications($db);
+    $messages[] = 'Database: meldingen bij @vermeldingen zijn gecontroleerd.';
 
     migrateDuplicateUserEmails($db);
     migrateAuditTracking($db);
