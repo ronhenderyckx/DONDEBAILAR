@@ -49,6 +49,7 @@ $canPublish = isPlatformAdmin($user)
 $errors = [];
 $title = (string) $event['title'];
 $description = (string) ($event['description'] ?? '');
+$hashtags = (string) ($event['hashtags'] ?? '');
 $eventLanguage = (string) $event['event_language'];
 $organizerId = (int) $event['organizer_id'];
 $locationId = (int) ($event['location_id'] ?? 0);
@@ -63,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $title = trim((string) ($_POST['title'] ?? ''));
     $description = trim((string) ($_POST['description'] ?? ''));
+    $hashtags = trim((string) ($_POST['hashtags'] ?? ''));
     $eventLanguage = (string) ($_POST['event_language'] ?? 'es');
     $organizerId = (int) ($_POST['organizer_id'] ?? 0);
     $locationId = (int) ($_POST['location_id'] ?? 0);
@@ -74,6 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($title === '' || mb_strlen($title) > 220) $errors[] = 'Vul een titel in van maximaal 220 tekens.';
+    if (mb_strlen($hashtags) > 500) $errors[] = 'Gebruik maximaal 500 tekens voor de hashtags.';
     if (!in_array($eventLanguage, ['nl','en','es','fr'], true)) $errors[] = 'Kies een geldige inhoudstaal.';
     $organizerIds = array_map(static fn($o) => (int) $o['id'], $organizers);
     if (!in_array($organizerId, $organizerIds, true)) $errors[] = 'Kies een geldige organisator.';
@@ -98,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $update = $db->prepare(
                 "UPDATE events SET organizer_id = :organizer_id, location_id = :location_id,
                     category_id = :category_id, title = :title, description = :description,
-                    event_language = :event_language, starts_at = :starts_at, ends_at = :ends_at,
+                    hashtags = :hashtags, event_language = :event_language, starts_at = :starts_at, ends_at = :ends_at,
                     status = :status, updated_by = :updated_by,
                     published_at = CASE WHEN :published_check = 'published' AND published_at IS NULL
                                         THEN CURRENT_TIMESTAMP ELSE published_at END
@@ -110,6 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'category_id' => $categoryId > 0 ? $categoryId : null,
                 'title' => $title,
                 'description' => $description !== '' ? $description : null,
+                'hashtags' => $hashtags !== '' ? $hashtags : null,
                 'event_language' => $eventLanguage,
                 'starts_at' => $start->format('Y-m-d H:i:s'),
                 'ends_at' => $end?->format('Y-m-d H:i:s'),
@@ -170,6 +174,8 @@ require dirname(__DIR__) . '/app/views/header.php';
             <label for="starts_at">Begint op *</label><input id="starts_at" type="datetime-local" name="starts_at" required value="<?= escapeHtml($startsAt) ?>">
             <label for="ends_at">Eindigt op</label><input id="ends_at" type="datetime-local" name="ends_at" value="<?= escapeHtml($endsAt) ?>">
             <label for="description">Beschrijving</label><textarea id="description" name="description" rows="8"><?= escapeHtml($description) ?></textarea>
+            <label for="hashtags">Hashtags</label><input id="hashtags" name="hashtags" maxlength="500" value="<?= escapeHtml($hashtags) ?>" placeholder="#salsa #bachata #kizomba">
+            <p class="event-form-note">Zet de hashtags apart van de beschrijving, gescheiden door spaties of komma's.</p>
             <?php if ($canPublish): ?>
                 <label for="status">Status</label><select id="status" name="status"><?php foreach (['draft'=>'Concept','published'=>'Gepubliceerd','unpublished'=>'Niet gepubliceerd','cancelled'=>'Geannuleerd'] as $code=>$label): ?><option value="<?= $code ?>" <?= $status === $code ? 'selected' : '' ?>><?= $label ?></option><?php endforeach; ?></select>
             <?php else: ?><p>Dit evenement blijft een concept totdat een regio-editor of regio-beheerder het publiceert.</p><?php endif; ?>
