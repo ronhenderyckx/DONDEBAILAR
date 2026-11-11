@@ -8,10 +8,6 @@ declare(strict_types=1);
     <?php $footerSearchEscape = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'); ?>
     <footer class="site-footer site-footer--agenda">
         <div class="site-footer__inner site-footer__inner--agenda">
-            <div class="site-footer__agenda-brand">
-                <span>&copy; <?= date('Y') ?> DONDEBAILAR</span>
-                <span>Salsa · Bachata · Kizomba</span>
-            </div>
             <div class="agenda-footer-tools">
                 <form class="agenda-footer-search" method="get" action="/" role="search">
                     <?php if ($footerRegionId > 0): ?>
@@ -46,8 +42,6 @@ declare(strict_types=1);
 <?php else: ?>
     <footer class="site-footer">
         <div class="site-footer__inner">
-            <span>&copy; <?= date('Y') ?> DONDEBAILAR</span>
-            <span>Salsa · Bachata · Kizomba</span>
         </div>
     </footer>
 <?php endif; ?>
