@@ -490,10 +490,11 @@ require dirname(__DIR__) . '/app/views/header.php';
     position:sticky;
     top:0;
     z-index:950;
-    padding:6px 8px;
-    border-radius:8px;
-    background:#fff;
-    box-shadow:0 3px 9px rgba(25,40,60,.07);
+    padding:0;
+    border:0;
+    border-radius:0;
+    background:transparent;
+    box-shadow:none;
 }
 
 
