@@ -216,7 +216,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <label for="social_url">Link naar het openbare bericht</label>
             <input id="social_url" type="url" name="social_url" maxlength="1000" placeholder="https://www.instagram.com/reel/...">
             <p class="event-form-note">Je kunt per keer één link toevoegen. Sla de wijzigingen op om deze aan het evenement te koppelen.</p>
-            <label for="photos">Foto's toevoegen (JPG/PNG/WebP, max. 15 MB per foto)</label><input id="photos" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple>
+            <label for="photos">Foto's toevoegen (JPG/PNG/WebP, max. 15 MB per foto; worden automatisch verkleind en als WebP opgeslagen)</label><input id="photos" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple>
             <label for="videos">Video's toevoegen (MP4/WebM/MOV, max. 80 MB per video)</label><input id="videos" type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime" multiple>
             <label for="reels">Reels toevoegen (MP4/WebM/MOV, max. 80 MB per reel)</label><input id="reels" type="file" name="reels[]" accept="video/mp4,video/webm,video/quicktime" multiple>
             <p class="event-form-note">De organisator is de organisatie achter het evenement. De ingelogde gebruiker blijft geregistreerd als aanmaker.</p>
