@@ -594,10 +594,11 @@ require dirname(__DIR__) . '/app/views/header.php';
 .agenda-selector-button,.agenda-selector-panel select,.agenda-organizer-item img.agenda-organizer-logo{border:0!important;box-shadow:none!important;}
 .agenda-organizer-item img.agenda-organizer-logo{background:transparent!important;}
 
-/* Geen tussenruimte tussen de header en de filterbalk. */
+/* Filterbalk sluit zonder opening direct aan op de header. */
+body.has-agenda-footer .site-header{margin-bottom:-10px!important;padding-bottom:0!important}
 body.has-agenda-footer .site-main{padding-top:0!important;margin-top:0!important}
-.agenda-page{margin-top:-3px!important}
-.agenda-selectors{margin-top:0!important}
+body.has-agenda-footer .site-main > .agenda-page{margin-top:0!important;padding-top:0!important}
+body.has-agenda-footer .agenda-selectors{margin-top:0!important}
 
 /* Eventinformatie gebruikt de ingestelde kleur van de betreffende weekdag. */
 .agenda-card{background:var(--db-event-day-color,var(--db-primary))!important;border:0!important}
