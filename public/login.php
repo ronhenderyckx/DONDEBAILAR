@@ -123,6 +123,7 @@ require dirname(__DIR__) . '/app/views/header.php';
         <button type="submit" class="button button--primary">
             Inloggen
         </button>
+        <p><a href="/forgot-password.php">Wachtwoord vergeten?</a></p>
     </form>
 </section>
 
