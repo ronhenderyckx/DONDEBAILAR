@@ -241,6 +241,57 @@ $escape = static fn ($value): string =>
 
     </div>
 
+    <?php if (!empty($isAgendaPage) && !empty($regions)): ?>
+        <div class="site-header__agenda-filters">
+            <form class="agenda-selectors" method="get" action="/">
+            <input type="hidden" name="region_id" value="<?= $regionId ?>">
+            <div class="agenda-selector-line">
+                <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" aria-label="Wissel filter" title="Wissel filter"><span class="agenda-filter-icon" aria-hidden="true">👥</span></button>
+                <div class="agenda-selector-panel is-open" data-panel="organizer">
+                    <div class="agenda-organizer-strip" aria-label="Organisatoren met toekomstige evenementen">
+                        <?php foreach ($organizers as $organizerOption): ?>
+                            <?php
+                            $logoFilename = basename((string) ($organizerOption['logo_path'] ?? ''));
+                            $hasOrganizerLogo = preg_match('/\\A[a-f0-9]{32}\\.(jpg|png|webp)\\z/', $logoFilename) === 1;
+                            $organizerSelected = $organizerId === (int) $organizerOption['id'];
+                            $organizerHref = $organizerSelected
+                                ? '/?region_id=' . $regionId . '&filter=organizer'
+                                : '/?region_id=' . $regionId . '&filter=organizer&organizer_id=' . (int) $organizerOption['id'];
+                            ?>
+                            <a class="agenda-organizer-item agenda-organizer-item--organizer<?= $organizerSelected ? ' is-selected' : '' ?>" href="<?= $escape($organizerHref) ?>" title="<?= $escape($organizerOption['name']) ?>" aria-label="<?= $organizerSelected ? 'Verwijder filter voor ' : 'Toon evenementen van ' ?><?= $escape($organizerOption['name']) ?>">
+                                <?php if ($hasOrganizerLogo): ?>
+                                    <img class="agenda-organizer-logo" src="/organizer-logo.php?file=<?= rawurlencode($logoFilename) ?>" alt="" loading="lazy">
+                                <?php else: ?>
+                                    <span class="agenda-organizer-fallback" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr((string) $organizerOption['name'], 0, 1))) ?></span>
+                                <?php endif; ?>
+                                <span class="agenda-organizer-name"><?= $escape($organizerOption['name']) ?></span>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <div class="agenda-selector-panel" data-panel="city" hidden>
+                    <div class="agenda-organizer-strip" aria-label="Steden met toekomstige evenementen">
+                        <?php foreach ($cities as $cityOption): ?>
+                            <?php
+                            $cityName = (string) $cityOption['city'];
+                            $citySelected = $city === $cityName;
+                            $cityHref = $citySelected
+                                ? '/?region_id=' . $regionId . '&filter=city'
+                                : '/?region_id=' . $regionId . '&filter=city&city=' . rawurlencode($cityName);
+                            ?>
+                            <a class="agenda-organizer-item<?= $citySelected ? ' is-selected' : '' ?>" href="<?= $escape($cityHref) ?>" title="<?= $escape($cityName) ?>" aria-label="<?= $citySelected ? 'Verwijder stadsfilter ' : 'Toon evenementen in ' ?><?= $escape($cityName) ?>">
+                                <span class="agenda-organizer-fallback" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr($cityName, 0, 1))) ?></span>
+                                <span class="agenda-organizer-name"><?= $escape($cityName) ?></span>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        </div>
+    <?php endif; ?>
+
 <style>
 .site-header__inner{display:flex;align-items:center;gap:16px}
 .site-brand-group{display:flex;align-items:center;gap:12px;min-width:0}
