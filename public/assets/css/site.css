@@ -644,7 +644,7 @@ p {
 .site-footer {
     width: 100%;
     border-top: 1px solid var(--db-border);
-    background: #FFFFFF;
+    background: var(--db-footer-color, #FFFFFF);
 }
 
 .site-footer__inner {
@@ -662,7 +662,7 @@ p {
 
 /* Vaste agendafooter met een afzonderlijk zoekveld. */
 body.has-agenda-footer .site-main{
-    padding-bottom:132px;
+    padding-bottom:92px;
 }
 body.has-agenda-footer .site-footer--agenda{
     position:fixed;
@@ -674,8 +674,8 @@ body.has-agenda-footer .site-footer--agenda{
     box-shadow:0 -5px 18px rgba(25,40,60,.10);
 }
 .site-footer__inner--agenda{
-    min-height:76px;
-    padding:10px 0;
+    min-height:54px;
+    padding:5px 0;
     display:grid;
     grid-template-columns:minmax(180px,1fr) minmax(260px,540px);
     align-items:center;
@@ -701,9 +701,9 @@ body.has-agenda-footer .site-footer--agenda{
     position:static;
     display:grid;
     place-items:center;
-    flex:0 0 42px;
-    width:42px;
-    height:42px;
+    flex:0 0 36px;
+    width:36px;
+    height:36px;
     padding:0;
     border:1px solid var(--db-primary);
     border-radius:10px;
@@ -733,8 +733,8 @@ body.has-agenda-footer .site-footer--agenda{
     flex:1;
     width:100%;
     min-width:0;
-    height:42px;
-    padding:8px 12px;
+    height:36px;
+    padding:6px 10px;
     border:1px solid var(--db-border);
     border-radius:10px;
     background:#fff;
@@ -743,9 +743,9 @@ body.has-agenda-footer .site-footer--agenda{
 .agenda-footer-search button{
     display:grid;
     place-items:center;
-    flex:0 0 42px;
-    width:42px;
-    height:42px;
+    flex:0 0 36px;
+    width:36px;
+    height:36px;
     padding:0;
     border:0;
     border-radius:10px;
@@ -779,22 +779,25 @@ body.has-agenda-footer .site-footer--agenda{
         z-index:1200;
     }
     body.has-agenda-footer .site-main{
-        padding-bottom:150px;
+        padding-bottom:105px;
     }
     .site-footer__inner--agenda{
+        min-height:48px;
         grid-template-columns:1fr;
-        gap:5px;
-        padding:7px 0 9px;
+        gap:0;
+        padding:5px 0;
     }
-    .agenda-footer-tools{gap:7px}
-    .agenda-back-to-top{flex-basis:40px;width:40px;height:40px}
+    .agenda-footer-tools{gap:6px}
+    .agenda-footer-search input[type="search"]{height:36px}
+    .agenda-footer-search button{flex-basis:36px;width:36px;height:36px}
+    .agenda-back-to-top{flex-basis:36px;width:36px;height:36px}
     .site-footer__agenda-brand{
         font-size:10px;
     }
 }
 @media(max-width:360px){
     body.has-agenda-footer .site-main{
-        padding-bottom:158px;
+        padding-bottom:98px;
     }
     .agenda-footer-search input[type="search"]{
         height:40px;
