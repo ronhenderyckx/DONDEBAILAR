@@ -85,6 +85,14 @@ $city = array_key_exists('city', $_GET)
 $activeFilter = array_key_exists('filter', $_GET)
     ? ((($_GET['filter'] ?? '') === 'city') ? 'city' : 'organizer')
     : ((($savedAgendaPreferences['active_filter'] ?? '') === 'city') ? 'city' : 'organizer');
+
+// Alleen het filtertype dat actief is mag de agenda beperken.
+// Zo kan een eerder gekozen organisator geen stadsfilter blokkeren, en omgekeerd.
+if ($activeFilter === 'city') {
+    $organizerId = 0;
+} else {
+    $city = '';
+}
 $savedSoundMuted = !empty($savedAgendaPreferences['sound_muted']);
 if (mb_strlen($city) > 120) {
     $city = mb_substr($city, 0, 120);
