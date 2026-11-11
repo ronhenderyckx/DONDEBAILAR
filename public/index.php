@@ -429,7 +429,6 @@ require dirname(__DIR__) . '/app/views/header.php';
                     <button type="button" class="agenda-page-nav-icon" id="agenda-page-next" aria-label="Volgende reeks" title="Volgende reeks">›</button>
             </div>
         <?php endif; ?>
-        <p class="agenda-count" id="agenda-count" data-total="<?= count($events) ?>"><?= min($agendaPageSize, count($events)) ?> van <?= count($events) ?> evenementen getoond</p>
     <?php endif; ?>
     <div class="agenda-message-modal" id="agenda-message-modal" hidden>
         <div class="agenda-message-modal__panel" role="dialog" aria-modal="true" aria-labelledby="agenda-message-modal-title">
@@ -757,7 +756,6 @@ foreach ($events as $instagramCheckEvent) {
 <script>
 const agendaPageSize = <?= (int) $agendaPageSize ?>;
 const agendaCards = Array.from(document.querySelectorAll('.agenda-feed .agenda-card'));
-const agendaCount = document.getElementById('agenda-count');
 const agendaPagePrevious = document.getElementById('agenda-page-previous');
 const agendaPageNext = document.getElementById('agenda-page-next');
 const agendaPageRange = document.getElementById('agenda-page-range');
@@ -767,9 +765,6 @@ function updateAgendaPagination() {
     agendaCards.forEach(function (card, index) {
         card.hidden = index < agendaPageStart || index >= agendaVisibleEnd;
     });
-    if (agendaCount) {
-        agendaCount.textContent = (agendaCards.length ? (agendaPageStart + 1) + '–' + agendaVisibleEnd : '0') + ' van ' + agendaCards.length + ' evenementen getoond';
-    }
     if (agendaPageRange) {
         agendaPageRange.textContent = (agendaPageStart + 1) + '–' + agendaVisibleEnd + ' van ' + agendaCards.length;
     }
