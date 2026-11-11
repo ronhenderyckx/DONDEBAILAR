@@ -854,7 +854,8 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
                     && rect.bottom > 0 && rect.right > 0
                     && rect.top < window.innerHeight && rect.left < window.innerWidth;
                 if (inViewport) {
-                    video.muted = true;
+                    // Behoud de geluidskeuze van de centrale geluidsknop bij terugkeren naar deze video.
+                    video.muted = agendaVideosMuted;
                     const playPromise = video.play();
                     if (playPromise && typeof playPromise.catch === 'function') {
                         playPromise.catch(function () {});
@@ -1003,7 +1004,8 @@ const agendaVideoObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
         const video = entry.target;
         if (entry.isIntersecting && entry.intersectionRatio > 0) {
-            video.muted = true;
+            // Hervatten na scrollen mag de gekozen geluidsinstelling niet overschrijven.
+            video.muted = agendaVideosMuted;
             const playPromise = video.play();
             if (playPromise && typeof playPromise.catch === 'function') {
                 playPromise.catch(function () {});
