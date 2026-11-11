@@ -17,12 +17,6 @@ $logoSettingFile = $projectRoot . '/storage/platform-logo-path.txt';
 $logoPath = is_file($logoSettingFile) ? trim((string) file_get_contents($logoSettingFile)) : '';
 
 $agendaPageSizeFile = $projectRoot . '/storage/agenda-page-size.txt';
-$agendaArrowBackgroundFile = $projectRoot . '/storage/agenda-arrow-background.txt';
-$agendaArrowTextFile = $projectRoot . '/storage/agenda-arrow-text.txt';
-$agendaArrowBackground = is_file($agendaArrowBackgroundFile) ? trim((string) file_get_contents($agendaArrowBackgroundFile)) : '#F6B22E';
-$agendaArrowText = is_file($agendaArrowTextFile) ? trim((string) file_get_contents($agendaArrowTextFile)) : '#222222';
-if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowBackground)) $agendaArrowBackground = '#F6B22E';
-if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowText)) $agendaArrowText = '#222222';
 $agendaPageSize = 20;
 if (is_file($agendaPageSizeFile)) {
     $storedPageSize = (int) trim((string) file_get_contents($agendaPageSizeFile));
@@ -42,20 +36,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errorMessage = 'De beveiligingscontrole is verlopen. Vernieuw de pagina.';
     } elseif (isset($_POST['save_agenda_settings'])) {
         $requestedPageSize = filter_var($_POST['agenda_page_size'] ?? null, FILTER_VALIDATE_INT);
-        $requestedArrowBackground = (string) ($_POST['agenda_arrow_background'] ?? '');
-        $requestedArrowText = (string) ($_POST['agenda_arrow_text'] ?? '');
         if ($requestedPageSize === false || $requestedPageSize < 1 || $requestedPageSize > 100) {
             $errorMessage = 'Kies een aantal tussen 1 en 100.';
-        } elseif (!preg_match('/^#[0-9a-fA-F]{6}$/', $requestedArrowBackground) || !preg_match('/^#[0-9a-fA-F]{6}$/', $requestedArrowText)) {
-            $errorMessage = 'Kies geldige kleuren voor de pijlen.';
         } elseif (file_put_contents($agendaPageSizeFile, (string) $requestedPageSize . PHP_EOL, LOCK_EX) === false
-            || file_put_contents($agendaArrowBackgroundFile, $requestedArrowBackground . PHP_EOL, LOCK_EX) === false
-            || file_put_contents($agendaArrowTextFile, $requestedArrowText . PHP_EOL, LOCK_EX) === false) {
+) {
             $errorMessage = 'De agenda-instellingen konden niet worden opgeslagen. Controleer de schrijfrechten van storage.';
         } else {
             $agendaPageSize = $requestedPageSize;
-            $agendaArrowBackground = $requestedArrowBackground;
-            $agendaArrowText = $requestedArrowText;
             $successMessage = 'De agenda-instellingen zijn opgeslagen.';
         }
     } elseif (isset($_POST['remove_logo'])) {
@@ -136,10 +123,6 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <form method="post" action="/admin/settings.php" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="agenda_page_size">Evenementen per reeks (1–100)</label>
-            <div style="display:flex;flex-wrap:wrap;gap:18px;margin-top:16px">
-                <div><label for="agenda_arrow_background">Achtergrondkleur pijlen</label><input type="color" id="agenda_arrow_background" name="agenda_arrow_background" value="<?= escapeHtml($agendaArrowBackground) ?>" style="width:72px;height:42px;padding:3px"></div>
-                <div><label for="agenda_arrow_text">Kleur pijlsymbool</label><input type="color" id="agenda_arrow_text" name="agenda_arrow_text" value="<?= escapeHtml($agendaArrowText) ?>" style="width:72px;height:42px;padding:3px"></div>
-            </div>
             <div class="agenda-page-size-control" style="display:flex;align-items:center;gap:8px;max-width:380px">
                 <button type="button" class="button" id="agenda_page_size_down">5 terug</button>
                 <input type="number" id="agenda_page_size" name="agenda_page_size" min="1" max="100" step="1" value="<?= (int) $agendaPageSize ?>" required style="text-align:center;margin:0">
