@@ -5,13 +5,14 @@ require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
 require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
 
-requirePlatformAdmin();
 $db = Database::connection();
 $regionId = filter_input(INPUT_GET, 'region_id', FILTER_VALIDATE_INT);
 if (!$regionId || $regionId < 1) {
     http_response_code(400);
     exit('Ongeldig regionummer.');
 }
+
+requireRegionRole($regionId, ['region_admin']);
 
 $regionQuery = $db->prepare("SELECT id, name FROM regions WHERE id = :id LIMIT 1");
 $regionQuery->execute(['id' => $regionId]);
