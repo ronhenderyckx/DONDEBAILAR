@@ -1157,12 +1157,18 @@ function applyAgendaVideoSound(button) {
         : '<svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"></path><path d="M15.5 8.5a5 5 0 0 1 0 7"></path><path d="M19 5a10 10 0 0 1 0 14"></path></svg>';
 }
 document.addEventListener('click', function (event) {
-    const soundButton = event.target.closest('#agenda-toggle-sound');
+    const target = event.target instanceof Element ? event.target : null;
+    const soundButton = target ? target.closest('#agenda-toggle-sound') : null;
     if (!soundButton) return;
+
+    // De geluidsknop mag nooit een filter-, navigatie- of andere klikactie activeren.
     event.preventDefault();
+    event.stopPropagation();
+    event.stopImmediatePropagation();
+
     agendaVideosMuted = !agendaVideosMuted;
     applyAgendaVideoSound(soundButton);
-});
+}, true);
 
 
 // Bewaar de huidige regio, filter en geluidskeuze bij het ingelogde account.
