@@ -536,6 +536,15 @@ require dirname(__DIR__) . '/app/views/header.php';
     .agenda-organizer-strip{gap:8px}
 }
 
+/* Lichte achtergrond over de volledige breedte van de filterrij. */
+.agenda-selector-line{
+    box-sizing:border-box;
+    width:100%;
+    padding:2px 5px;
+    border-radius:10px;
+    background:linear-gradient(90deg,#f3f5f8 0%,#fafbfc 100%);
+}
+
 /* Compacte achtergrond rond elke organisator- en stadsknop. */
 .agenda-organizer-item{
     box-sizing:border-box;
