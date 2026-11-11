@@ -41,10 +41,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $userQuery = $db->prepare(
                 "SELECT DISTINCT email FROM users
                  WHERE status = 'active'
-                   AND (LOWER(email) = :identifier OR LOWER(display_name) = :identifier)
+                   AND (LOWER(email) = :email_identifier OR LOWER(display_name) = :username_identifier)
                  LIMIT 2"
             );
-            $userQuery->execute(['identifier' => strtolower($identifier)]);
+            $normalizedIdentifier = strtolower($identifier);
+            $userQuery->execute([
+                'email_identifier' => $normalizedIdentifier,
+                'username_identifier' => $normalizedIdentifier,
+            ]);
             $matchedEmails = $userQuery->fetchAll(PDO::FETCH_COLUMN);
             // Een gebruikersnaam moet naar precies één e-mailadres verwijzen.
             // Meerdere accounts met dezelfde gebruikersnaam en hetzelfde e-mailadres blijven bruikbaar.
