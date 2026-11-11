@@ -536,6 +536,11 @@ require dirname(__DIR__) . '/app/views/header.php';
     .agenda-organizer-strip{gap:8px}
 }
 
+/* Laat de sticky filterrij op mobiel onder de vaste header staan. */
+@media(max-width:760px){
+    .agenda-selectors{top:67px}
+}
+
 /* Lichte achtergrond over de volledige breedte van de filterrij. */
 .agenda-selector-line{
     box-sizing:border-box;
