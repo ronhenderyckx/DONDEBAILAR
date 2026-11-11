@@ -263,10 +263,7 @@ function migrateUserNotifications(PDO $db): void
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         UNIQUE KEY uq_user_notification_message (user_id, message_id),
-        KEY idx_user_notifications_unread (user_id, is_read, created_at),
-        CONSTRAINT fk_user_notifications_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
-        CONSTRAINT fk_user_notifications_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE,
-        CONSTRAINT fk_user_notifications_message FOREIGN KEY (message_id) REFERENCES event_messages(id) ON DELETE CASCADE
+        KEY idx_user_notifications_unread (user_id, is_read, created_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 }
 
