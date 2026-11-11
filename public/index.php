@@ -314,7 +314,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                     }
                     $shareUrl = 'https://' . ($_SERVER['HTTP_HOST'] ?? '') . $eventUrl;
                     ?>
-                    <article class="agenda-card">
+                    <article class="agenda-card" style="--db-event-day-color:var(--db-weekday-<?= (int) $start->format('N') ?>,var(--db-primary))">
                         <div class="agenda-card__media-wrap">
                         <?php $eventMediaItems = $event['media_items'] ?? []; ?>
                         <?php if (count($eventMediaItems) > 1): ?>
@@ -595,14 +595,15 @@ require dirname(__DIR__) . '/app/views/header.php';
 .agenda-organizer-item img.agenda-organizer-logo{background:transparent!important;}
 
 /* Geen tussenruimte tussen de header en de filterbalk. */
-body.has-agenda-footer .site-main{padding-top:0!important}
-.agenda-page{margin-top:0!important}
+body.has-agenda-footer .site-main{padding-top:0!important;margin-top:0!important}
+.agenda-page{margin-top:-3px!important}
+.agenda-selectors{margin-top:0!important}
 
-/* Eventinformatie gebruikt de ingestelde regiokleuren. */
-.agenda-card{background:var(--db-primary)!important;border:0!important}
+/* Eventinformatie gebruikt de ingestelde kleur van de betreffende weekdag. */
+.agenda-card{background:var(--db-event-day-color,var(--db-primary))!important;border:0!important}
 .agenda-card__details,
 .agenda-card__quick{
-    background:var(--db-primary)!important;
+    background:var(--db-event-day-color,var(--db-primary))!important;
     color:var(--db-text)!important;
 }
 .agenda-card__details,
