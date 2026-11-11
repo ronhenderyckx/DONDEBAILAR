@@ -150,7 +150,7 @@ $escape = static fn ($value): string =>
 
             <?php if ($region !== null): ?>
                 <?php if ($nextRegionId > 0): ?>
-                    <a class="site-brand site-brand--region" href="/?region_id=<?= $nextRegionId ?>" aria-label="Volgende regio: <?= $escape($brandName) ?>" title="Klik voor de volgende regio">
+                    <a class="site-brand site-brand--region" href="/?region_id=<?= $nextRegionId ?>&amp;agenda_change=1" aria-label="Volgende regio: <?= $escape($brandName) ?>" title="Klik voor de volgende regio">
                 <?php else: ?>
                     <span class="site-brand site-brand--region">
                 <?php endif; ?>
@@ -254,6 +254,7 @@ $escape = static fn ($value): string =>
         <div class="site-header__agenda-filters">
             <form class="agenda-selectors" method="get" action="/">
             <input type="hidden" name="region_id" value="<?= $regionId ?>">
+            <input type="hidden" name="agenda_change" value="1">
             <div class="agenda-selector-line">
                 <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" aria-label="Wissel tussen filters" title="Wissel tussen filters"><span class="agenda-filter-icon" aria-hidden="true">👥</span></button>
                 <div class="agenda-selector-panel is-open" data-panel="organizer">
@@ -264,8 +265,8 @@ $escape = static fn ($value): string =>
                             $hasOrganizerLogo = preg_match('/\\A[a-f0-9]{32}\\.(jpg|png|webp)\\z/', $logoFilename) === 1;
                             $organizerSelected = $organizerId === (int) $organizerOption['id'];
                             $organizerHref = $organizerSelected
-                                ? '/?region_id=' . $regionId . '&filter=organizer'
-                                : '/?region_id=' . $regionId . '&filter=organizer&organizer_id=' . (int) $organizerOption['id'];
+                                ? '/?region_id=' . $regionId . '&agenda_change=1&filter=organizer'
+                                : '/?region_id=' . $regionId . '&agenda_change=1&filter=organizer&organizer_id=' . (int) $organizerOption['id'];
                             ?>
                             <a class="agenda-organizer-item agenda-organizer-item--organizer<?= $organizerSelected ? ' is-selected' : '' ?>" href="<?= $escape($organizerHref) ?>" title="<?= $escape($organizerOption['name']) ?>" aria-label="<?= $organizerSelected ? 'Verwijder filter voor ' : 'Toon evenementen van ' ?><?= $escape($organizerOption['name']) ?>">
                                 <?php if ($hasOrganizerLogo): ?>
@@ -285,8 +286,8 @@ $escape = static fn ($value): string =>
                             $cityName = (string) $cityOption['city'];
                             $citySelected = $city === $cityName;
                             $cityHref = $citySelected
-                                ? '/?region_id=' . $regionId . '&filter=city'
-                                : '/?region_id=' . $regionId . '&filter=city&city=' . rawurlencode($cityName);
+                                ? '/?region_id=' . $regionId . '&agenda_change=1&filter=city'
+                                : '/?region_id=' . $regionId . '&agenda_change=1&filter=city&city=' . rawurlencode($cityName);
                             ?>
                             <a class="agenda-organizer-item<?= $citySelected ? ' is-selected' : '' ?>" href="<?= $escape($cityHref) ?>" title="<?= $escape($cityName) ?>" aria-label="<?= $citySelected ? 'Verwijder stadsfilter ' : 'Toon evenementen in ' ?><?= $escape($cityName) ?>">
                                 <span class="agenda-organizer-fallback" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr($cityName, 0, 1))) ?></span>
