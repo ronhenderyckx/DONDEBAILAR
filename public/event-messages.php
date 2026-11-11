@@ -271,7 +271,7 @@ html,body{height:100%;margin:0!important;padding:0!important;overflow:hidden!imp
 body:has(.event-chat--popup) .site-header,body:has(.event-chat--popup) footer{display:none!important}
 body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;margin:0!important;padding:0!important;overflow:hidden}
 .event-chat{height:100%;min-height:0;display:flex;flex-direction:column;background:#fff;color:#222;font:14px/1.45 system-ui,sans-serif}
-.event-chat__heading{flex:none;display:flex;align-items:center;gap:6px;padding:10px 14px;border-bottom:1px solid #e8e8e8;background:#fafafa;min-width:0}
+.event-chat__heading{flex:none;display:flex;align-items:center;gap:6px;padding:10px 14px;background:#fafafa;min-width:0}
 .event-chat__heading svg{flex:none;color:var(--db-primary,#2878c8)}.event-chat__heading strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
 .event-chat__messages{flex:1;min-height:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}
 .event-chat__empty{margin:auto;color:#888;text-align:center}
