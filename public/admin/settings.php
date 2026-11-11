@@ -4,6 +4,7 @@ declare(strict_types=1);
 require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
 require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
+require_once dirname(__DIR__, 2) . '/app/ImageOptimization.php';
 
 requirePlatformAdmin();
 
@@ -37,55 +38,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $logoPath = '';
         $successMessage = 'Het platformlogo is verwijderd.';
     } elseif (isset($_FILES['platform_logo']) && (int) ($_FILES['platform_logo']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
-        $upload = $_FILES['platform_logo'];
-        if ((int) $upload['error'] !== UPLOAD_ERR_OK) {
-            $errorMessage = 'Het uploaden is mislukt. Probeer het opnieuw.';
-        } elseif ((int) $upload['size'] > 5 * 1024 * 1024) {
-            $errorMessage = 'Het logo mag maximaal 5 MB groot zijn.';
-        } elseif (!is_uploaded_file($upload['tmp_name'])) {
-            $errorMessage = 'Ongeldig uploadbestand.';
-        } else {
-            $imageInfo = @getimagesize($upload['tmp_name']);
-            $finfo = new finfo(FILEINFO_MIME_TYPE);
-            $mime = $finfo->file($upload['tmp_name']);
-            $extensions = [
-                'image/png' => 'png',
-                'image/jpeg' => 'jpg',
-                'image/webp' => 'webp',
-            ];
-
-            if (!$imageInfo || !isset($extensions[$mime])) {
-                $errorMessage = 'Gebruik een PNG-, JPG- of WEBP-afbeelding.';
-            } elseif ($imageInfo[0] > 6000 || $imageInfo[1] > 6000) {
-                $errorMessage = 'Het logo mag maximaal 6000 × 6000 pixels zijn.';
-            } else {
-                $uploadDirectory = $projectRoot . '/public/uploads/platform';
-                if (!is_dir($uploadDirectory) && !mkdir($uploadDirectory, 0755, true) && !is_dir($uploadDirectory)) {
-                    $errorMessage = 'De uploadmap kon niet worden aangemaakt.';
+        try {
+            $newRelativePath = storeOptimizedLogoUpload(
+                $_FILES['platform_logo'],
+                'public/uploads/platform',
+                800,
+                5 * 1024 * 1024,
+                'logo-'
+            );
+            if ($newRelativePath !== null) {
+                $newLogoPath = '/' . substr($newRelativePath, strlen('public/'));
+                if (file_put_contents($logoSettingFile, $newLogoPath . PHP_EOL, LOCK_EX) === false) {
+                    $newFile = $projectRoot . '/' . $newRelativePath;
+                    if (is_file($newFile)) @unlink($newFile);
+                    $errorMessage = 'Het logo is geoptimaliseerd, maar de instelling kon niet worden bijgewerkt. Controleer de schrijfrechten van storage.';
                 } else {
-                    $filename = 'logo-' . bin2hex(random_bytes(12)) . '.' . $extensions[$mime];
-                    $destination = $uploadDirectory . '/' . $filename;
-
-                    if (!move_uploaded_file($upload['tmp_name'], $destination)) {
-                        $errorMessage = 'Het logo kon niet worden opgeslagen.';
-                    } else {
-                        if ($logoPath !== '') {
-                            $oldFile = $projectRoot . '/public' . $logoPath;
-                            if (is_file($oldFile)) {
-                                @unlink($oldFile);
-                            }
-                        }
-                        $logoPath = '/uploads/platform/' . $filename;
-                        if (file_put_contents($logoSettingFile, $logoPath . PHP_EOL, LOCK_EX) === false) {
-                            @unlink($destination);
-                            $logoPath = '';
-                            $errorMessage = 'Het logo is opgeslagen, maar de instelling kon niet worden bijgewerkt. Controleer de schrijfrechten van storage.';
-                        } else {
-                            $successMessage = 'Het DONDEBAILAR-logo is bijgewerkt.';
-                        }
+                    if ($logoPath !== '') {
+                        $oldFile = $projectRoot . '/public' . $logoPath;
+                        if (is_file($oldFile)) @unlink($oldFile);
                     }
+                    $logoPath = $newLogoPath;
+                    $successMessage = 'Het DONDEBAILAR-logo is bijgewerkt en geoptimaliseerd.';
                 }
             }
+        } catch (RuntimeException $exception) {
+            $errorMessage = $exception->getMessage();
         }
     } else {
         $errorMessage = 'Kies eerst een logo om te uploaden.';
