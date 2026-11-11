@@ -312,7 +312,7 @@ body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;mar
 .chat-message__bubble p{margin:0;white-space:normal}.chat-message__bubble small{display:block;color:#888;font-size:10px}
 .chat-message__deleted{color:#888;font-style:italic}.chat-mention{color:var(--db-primary,#2878c8);font-weight:700;background:rgba(40,120,200,.09);border-radius:4px;padding:0 2px}
 .chat-message__reply-button{display:inline-block;margin-top:6px;padding:0;border:0;background:none;color:var(--db-primary,#2878c8);font:600 11px system-ui,sans-serif;cursor:pointer}
-.chat-message__reply-form{display:flex;gap:6px;align-items:flex-end;margin-top:7px}.chat-mention-suggestions{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0;padding:5px;background:#fff;border:1px solid #ddd;border-radius:9px;box-shadow:0 3px 12px #00000012}.chat-mention-suggestions button{border:0;border-radius:6px;padding:5px 8px;background:#eef4fb;color:#245b91;font:12px system-ui,sans-serif;cursor:pointer}
+.chat-message__reply-form{display:flex;gap:6px;align-items:flex-end;margin-top:7px}.event-chat form{position:relative}.chat-mention-suggestions{position:absolute;left:0;bottom:calc(100% + 4px);z-index:20;display:flex;flex-wrap:wrap;gap:4px;max-width:100%;padding:5px;background:#fff;border:1px solid #ddd;border-radius:9px;box-shadow:0 3px 12px #00000012}.chat-mention-suggestions button{border:0;border-radius:6px;padding:5px 8px;background:#eef4fb;color:#245b91;font:12px system-ui,sans-serif;cursor:pointer}
 .chat-message__reply-form[hidden]{display:none}
 .chat-message__reply-form textarea{flex:1;min-width:0;resize:vertical;border:1px solid #ddd;border-radius:10px;padding:7px 9px;font:12px/1.4 system-ui,sans-serif}
 .chat-message__reply-form button{border:0;border-radius:9px;padding:8px 10px;background:var(--db-primary,#2878c8);color:#fff;font-size:11px;font-weight:600;cursor:pointer}
@@ -342,13 +342,12 @@ body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;mar
         button.textContent = opening ? 'Annuleren' : 'Reageren';
         if (opening) form.querySelector('textarea')?.focus();
     });
-    const mentionUsers = [];
     const mentionList = document.getElementById('event-chat-mention-users');
-    const allNames = mentionList ? Array.from(mentionList.options).map(option => option.value.slice(1)) : mentionUsers;
+    const allNames = mentionList ? Array.from(mentionList.options).map(option => option.value.slice(1)) : [];
     document.querySelectorAll('.event-chat textarea').forEach(textarea => {
         textarea.addEventListener('input', () => {
             const before = textarea.value.slice(0, textarea.selectionStart);
-            const match = before.match(/(?:^|\\s)@([^@\\n]*)$/u);
+            const match = before.match(/(?:^|\s)@([^@\n]*)$/u);
             let popup = textarea.parentElement.querySelector('.chat-mention-suggestions');
             if (!match || !match[1]) {
                 if (popup) popup.remove();
@@ -374,7 +373,7 @@ body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;mar
                     const start = textarea.selectionStart;
                     const end = textarea.selectionEnd;
                     const left = textarea.value.slice(0, start);
-                    const token = left.match(/(?:^|\\s)@([^@\\n]*)$/u);
+                    const token = left.match(/(?:^|\s)@([^@\n]*)$/u);
                     if (!token) return;
                     const tokenStart = start - token[0].length + (token[0].startsWith(' ') ? 1 : 0);
                     textarea.value = textarea.value.slice(0, tokenStart) + '@' + name + ' ' + textarea.value.slice(end);
