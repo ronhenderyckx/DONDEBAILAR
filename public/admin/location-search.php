@@ -25,7 +25,7 @@ $city = trim((string) ($input['city'] ?? ''));
 $countryCode = strtoupper(trim((string) ($input['country_code'] ?? '')));
 if ($name === '' || mb_strlen($name) > 190 || mb_strlen($city) > 120 || !preg_match('/\\A[A-Z]{2}\\z/', $countryCode)) {
     http_response_code(422);
-    echo json_encode(['success' => false, 'message' => 'Vul eerst de naam van de locatie in en eventueel de gemeente.']);
+    echo json_encode(['success' => false, 'message' => 'Vul eerst de naam van de locatie in en eventueel de stad.']);
     exit;
 }
 if (!function_exists('curl_init')) {
@@ -171,7 +171,7 @@ try {
         if ($website !== '') $socialType = 'Instagram';
     }
     if ($website === '') {
-        throw new RuntimeException('Google vond geen betrouwbare website voor ' . $name . ' in ' . $city . ', ' . $countryName . '. Controleer de naam en gemeente.');
+        throw new RuntimeException('Google vond geen betrouwbare website voor ' . $name . ' in ' . $city . ', ' . $countryName . '. Controleer de naam en stad.');
     }
 
     $siteHtml = '';
