@@ -94,7 +94,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <div>
             <p class="eyebrow">BEHEER</p>
             <h1>Organisatoren</h1>
-            <p>Alle beheerders met beheerdersrechten kunnen alle organisatoren beheren.</p>
+            <p>Platformbeheerders kunnen alle organisatoren beheren.</p>
         </div>
         <a class="button" href="/admin/">Terug naar dashboard</a>
     </div>
@@ -129,7 +129,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                        placeholder="Naam, telefoon of website">
                 <button class="button" type="submit">Zoeken</button>
                 <?php if ($search !== ''): ?>
-                    <a class="button" href="/admin/organizers.php">Wissen</a>
+                    <a class="button" href="/admin/organizers.php">Zoekopdracht wissen</a>
                 <?php endif; ?>
             </div>
         </form>
