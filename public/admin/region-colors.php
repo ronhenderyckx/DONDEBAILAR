@@ -33,6 +33,10 @@ $defaults = [
     'organizer_color' => '#E23A2C',
     'filter_bar_color' => '#FFFFFF',
     'filter_text_color' => '#222222',
+    'search_button_color' => '#E23A2C',
+    'back_top_color' => '#E23A2C',
+    'search_field_color' => '#FFFFFF',
+    'search_text_color' => '#222222',
     'footer_color' => '#FFFFFF',
     'background_color' => '#FFFFFF',
     'text_color' => '#222222',
@@ -129,15 +133,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($errorMessage === '') {
                 $upsert = $db->prepare("INSERT INTO region_appearance
                     (region_id, primary_color, primary_dark, accent_color, secondary_color,
-                     tertiary_color, header_color, menu_color, organizer_color, filter_bar_color, filter_text_color, footer_color, background_color, text_color, weekday_colors, logo_path)
+                     tertiary_color, header_color, menu_color, organizer_color, filter_bar_color, filter_text_color,
+                     search_button_color, back_top_color, search_field_color, search_text_color, footer_color, background_color, text_color, weekday_colors, logo_path)
                     VALUES (:region_id, :primary_color, :primary_dark, :accent_color, :secondary_color,
-                     :tertiary_color, :header_color, :menu_color, :organizer_color, :filter_bar_color, :filter_text_color, :footer_color, :background_color, :text_color, :weekday_colors, :logo_path)
+                     :tertiary_color, :header_color, :menu_color, :organizer_color, :filter_bar_color, :filter_text_color,
+                     :search_button_color, :back_top_color, :search_field_color, :search_text_color, :footer_color, :background_color, :text_color, :weekday_colors, :logo_path)
                     ON DUPLICATE KEY UPDATE primary_color=VALUES(primary_color),
                      primary_dark=VALUES(primary_dark), accent_color=VALUES(accent_color),
                      secondary_color=VALUES(secondary_color), tertiary_color=VALUES(tertiary_color),
                      header_color=VALUES(header_color), menu_color=VALUES(menu_color),
                      organizer_color=VALUES(organizer_color),
                      filter_bar_color=VALUES(filter_bar_color), filter_text_color=VALUES(filter_text_color),
+                     search_button_color=VALUES(search_button_color), back_top_color=VALUES(back_top_color),
+                     search_field_color=VALUES(search_field_color), search_text_color=VALUES(search_text_color),
                      footer_color=VALUES(footer_color), background_color=VALUES(background_color),
                      text_color=VALUES(text_color), weekday_colors=VALUES(weekday_colors),
                      logo_path=VALUES(logo_path)");
@@ -153,6 +161,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'organizer_color' => $colors['organizer_color'],
                     'filter_bar_color' => $colors['filter_bar_color'],
                     'filter_text_color' => $colors['filter_text_color'],
+                    'search_button_color' => $colors['search_button_color'],
+                    'back_top_color' => $colors['back_top_color'],
+                    'search_field_color' => $colors['search_field_color'],
+                    'search_text_color' => $colors['search_text_color'],
                     'footer_color' => $colors['footer_color'],
                     'background_color' => $colors['background_color'],
                     'text_color' => $colors['text_color'],
@@ -196,6 +208,10 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 'organizer_color' => 'Achtergrondkleur organisatorknoppen',
                 'filter_bar_color' => 'Achtergrondkleur filterbalk',
                 'filter_text_color' => 'Tekstkleur filterknoppen',
+                'search_button_color' => 'Achtergrondkleur zoekknop',
+                'back_top_color' => 'Achtergrondkleur naar-bovenknop',
+                'search_field_color' => 'Achtergrondkleur zoekveld',
+                'search_text_color' => 'Tekstkleur zoekveld',
                 'footer_color' => 'Achtergrondkleur footer',
                 'background_color' => 'Achtergrondkleur',
                 'text_color' => 'Tekstkleur',
