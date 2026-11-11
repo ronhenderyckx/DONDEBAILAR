@@ -946,7 +946,7 @@ document.addEventListener('click', function (event) {
 const agendaVideoObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
         const video = entry.target;
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.15) {
+        if (entry.isIntersecting && entry.intersectionRatio > 0) {
             video.muted = true;
             const playPromise = video.play();
             if (playPromise && typeof playPromise.catch === 'function') {
@@ -956,7 +956,7 @@ const agendaVideoObserver = new IntersectionObserver(function (entries) {
             video.pause();
         }
     });
-}, {threshold:[0, 0.15], rootMargin:'0px 0px -8% 0px'});
+}, {threshold:0});
 document.querySelectorAll('.agenda-card__video').forEach(function (video) {
     video.muted = true;
     video.setAttribute('autoplay', '');
