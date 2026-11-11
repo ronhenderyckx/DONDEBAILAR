@@ -22,8 +22,13 @@ if ($currentUser === null) {
 }
 $visitorHash = $visitorToken !== '' ? hash('sha256', $visitorToken) : '';
 $regions = $db->query(
-    "SELECT id, name, timezone, logo_path FROM regions
-     WHERE is_active = 1 ORDER BY id"
+    "SELECT r.id, r.name, r.timezone, r.logo_path,
+            a.primary_color, a.primary_dark, a.accent_color,
+            a.secondary_color, a.tertiary_color, a.header_color,
+            a.background_color, a.text_color, a.weekday_colors
+     FROM regions r
+     LEFT JOIN region_appearance a ON a.region_id = r.id
+     WHERE r.is_active = 1 ORDER BY r.id"
 )->fetchAll();
 
 $regionIds = array_map(static fn(array $item): int => (int) $item['id'], $regions);
