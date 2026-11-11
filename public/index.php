@@ -733,6 +733,20 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
  .site-header__agenda-filters .agenda-organizer-strip{padding-bottom:2px}
 }
 
+/* Houd de gekozen organisator ook visueel duidelijk geselecteerd. */
+.agenda-organizer-item--organizer.is-selected{
+    background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 38%,var(--db-filter-bar-color,#FFFFFF)) !important;
+    outline:2px solid var(--db-organizer-color,#E23A2C) !important;
+    outline-offset:1px;
+    box-shadow:0 0 0 2px var(--db-filter-bar-color,#FFFFFF),0 2px 7px #17203330 !important;
+    border-radius:10px !important;
+}
+.agenda-organizer-item--organizer.is-selected img,
+.agenda-organizer-item--organizer.is-selected .agenda-organizer-fallback{
+    outline:2px solid var(--db-organizer-color,#E23A2C);
+    outline-offset:1px;
+}
+ 
 /* Houd de filterbalk exact even hoog bij wisselen tussen organisator en stad. */
 .agenda-selector-line{
     height:86px;
