@@ -70,7 +70,7 @@ $escape = static fn($value): string => escapeHtml((string) $value);
                     $target = '/event-messages.php?id=' . (int) $notification['event_id']
                         . '&popup=1#message-' . (int) $notification['message_id'];
                     ?>
-                    <a class="notification-item" href="<?= $escape($target) ?>">
+                    <a class="notification-item" href="<?= $escape($target) ?>" data-notification-chat="<?= $escape('/event-messages.php?id=' . (int) $notification['event_id'] . '&popup=1#message-' . (int) $notification['message_id']) ?>" data-event-title="<?= $escape($notification['event_title']) ?>">
                         <span class="notification-item__icon" aria-hidden="true">＠</span>
                         <span class="notification-item__body">
                             <strong><?= $escape($notification['actor_name'] ?: 'Een gebruiker') ?> heeft je genoemd</strong>
@@ -84,9 +84,21 @@ $escape = static fn($value): string => escapeHtml((string) $value);
             </div>
         <?php endif; ?>
     </section>
+    <div class="agenda-message-modal notification-chat-modal" id="notification-chat-modal" hidden>
+        <div class="agenda-message-modal__panel" role="dialog" aria-modal="true" aria-labelledby="notification-chat-modal-title">
+            <div class="agenda-message-modal__top">
+                <span id="notification-chat-modal-title" class="notification-chat-modal__title">Berichten bij evenement</span>
+                <button type="button" class="agenda-message-modal__close" aria-label="Sluiten">×</button>
+            </div>
+            <iframe title="Berichten bij evenement" src="about:blank" scrolling="no"></iframe>
+        </div>
+    </div>
 </section>
 
 <style>
+.notification-chat-modal .agenda-message-modal__top{left:12px;right:8px;justify-content:space-between;align-items:center;min-height:38px}
+.notification-chat-modal__title{max-width:calc(100% - 48px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:700;color:var(--db-text,#222)}
+.notification-chat-modal .agenda-message-modal__panel iframe{padding-top:0}
 .notifications-page .notification-list{display:flex;flex-direction:column;gap:0}
 .notifications-page .notification-item{display:flex;align-items:center;gap:13px;padding:14px 4px;border-bottom:1px solid var(--db-border);color:var(--db-text);text-decoration:none}
 .notifications-page .notification-item:first-child{border-top:1px solid var(--db-border)}
@@ -99,5 +111,38 @@ $escape = static fn($value): string => escapeHtml((string) $value);
 .notification-item__body time{font-size:11px;color:var(--db-muted)}
 .notification-item__arrow{font-size:25px;color:var(--db-muted)}
 </style>
+
+<script>
+(function () {
+    const modal = document.getElementById('notification-chat-modal');
+    if (!modal) return;
+    const frame = modal.querySelector('iframe');
+    const title = document.getElementById('notification-chat-modal-title');
+    function closeModal() {
+        modal.hidden = true;
+        frame.src = 'about:blank';
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+    }
+    modal.querySelector('.agenda-message-modal__close').addEventListener('click', closeModal);
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) closeModal();
+    });
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && !modal.hidden) closeModal();
+    });
+    document.addEventListener('click', function (event) {
+        const link = event.target.closest('[data-notification-chat]');
+        if (!link) return;
+        event.preventDefault();
+        title.textContent = link.dataset.eventTitle || 'Berichten bij evenement';
+        frame.title = title.textContent;
+        frame.src = link.dataset.notificationChat;
+        modal.hidden = false;
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+    });
+})();
+</script>
 
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
