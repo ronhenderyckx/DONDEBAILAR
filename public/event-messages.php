@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $parent = $db->prepare(
                         "SELECT id FROM event_messages
                          WHERE id = :id AND event_id = :event_id
-                           AND parent_id IS NULL AND is_deleted = 0 LIMIT 1"
+                           AND is_deleted = 0 LIMIT 1"
                     );
                     $parent->execute(['id' => $parentId, 'event_id' => $id]);
                     if (!$parent->fetchColumn()) {
@@ -231,10 +231,28 @@ $escape = static fn($value): string => escapeHtml((string) $value);
                     <?php endif; ?>
                 </div>
                 <?php foreach ($replies[$messageId] ?? [] as $reply): ?>
-                    <div class="chat-message__reply">
-                        <strong><?= $escape($reply['display_name'] ?: 'Gebruiker') ?></strong>
-                        <span><?= (int) $reply['is_deleted'] === 1 ? 'Reactie verwijderd' : nl2br($escape($reply['message'])) ?></span>
+                    <?php $replyId = (int) $reply['id']; ?>
+                    <div class="chat-message__reply" id="message-<?= $replyId ?>">
+                        <div><strong><?= $escape($reply['display_name'] ?: 'Gebruiker') ?></strong>
+                        <span><?= (int) $reply['is_deleted'] === 1 ? 'Reactie verwijderd' : nl2br($escape($reply['message'])) ?></span></div>
                         <time><?= $escape(date('d-m H:i', strtotime((string) $reply['created_at']))) ?></time>
+                        <?php if ($user !== null && (int) $reply['is_deleted'] !== 1): ?>
+                            <button type="button" class="chat-message__reply-button" data-reply-toggle aria-expanded="false">Reageren</button>
+                            <form method="post" class="chat-message__reply-form" hidden>
+                                <input type="hidden" name="csrf_token" value="<?= $escape(csrfToken()) ?>">
+                                <input type="hidden" name="action" value="reply">
+                                <input type="hidden" name="parent_id" value="<?= $replyId ?>">
+                                <textarea name="message" rows="2" maxlength="2000" required placeholder="Reageer op deze reactie..."></textarea>
+                                <button type="submit">Versturen</button>
+                            </form>
+                        <?php endif; ?>
+                        <?php foreach ($replies[$replyId] ?? [] as $nestedReply): ?>
+                            <div class="chat-message__nested-reply">
+                                <strong><?= $escape($nestedReply['display_name'] ?: 'Gebruiker') ?></strong>
+                                <span><?= (int) $nestedReply['is_deleted'] === 1 ? 'Reactie verwijderd' : nl2br($escape($nestedReply['message'])) ?></span>
+                                <time><?= $escape(date('d-m H:i', strtotime((string) $nestedReply['created_at']))) ?></time>
+                            </div>
+                        <?php endforeach; ?>
                     </div>
                 <?php endforeach; ?>
             </article>
@@ -274,12 +292,15 @@ body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;mar
 .chat-message__reply-form button{border:0;border-radius:9px;padding:8px 10px;background:var(--db-primary,#2878c8);color:#fff;font-size:11px;font-weight:600;cursor:pointer}
 .chat-message__reply{margin:5px 0 0 16px;padding:7px 10px;border-left:2px solid #ddd;color:#555;font-size:12px;overflow-wrap:anywhere}
 .chat-message__reply strong{margin-right:6px}.chat-message__reply time{display:block;color:#999;font-size:10px}
+.chat-message__nested-reply{margin:6px 0 0 14px;padding:6px 9px;border-left:2px solid #c9d3df;background:#f8f9fb;color:#555;font-size:11px;overflow-wrap:anywhere}
+.chat-message__nested-reply strong{margin-right:5px}.chat-message__nested-reply time{display:block;color:#999;font-size:10px}
 .chat-message__manage{margin-top:4px;font-size:11px}.chat-message__manage summary{cursor:pointer;color:#777}.chat-message__manage form{display:flex;gap:5px;margin-top:5px}.chat-message__manage textarea{min-width:0;width:100%;font:inherit}.chat-message__manage button{border:0;border-radius:6px;padding:5px 8px;background:#eee;cursor:pointer;white-space:nowrap}
 .event-chat__composer{flex:none;padding:9px 10px;padding-bottom:max(9px,env(safe-area-inset-bottom));border-top:1px solid #e5e5e5;background:#fff}
 .event-chat__composer form{display:flex;align-items:flex-end;gap:8px}.event-chat__composer textarea{flex:1;min-width:0;resize:none;max-height:100px;border:1px solid #ddd;border-radius:18px;padding:10px 13px;font:14px/1.4 system-ui,sans-serif;outline:none}.event-chat__composer textarea:focus{border-color:var(--db-primary,#2878c8)}
 .event-chat__composer button{flex:none;width:40px;height:40px;border:0;border-radius:50%;background:var(--db-primary,#2878c8);color:#fff;font-size:19px;cursor:pointer}
 .event-chat__composer>a{display:block;text-align:center;padding:8px;color:var(--db-primary,#2878c8);font-weight:600;text-decoration:none}
 .event-chat__notice{flex:none;padding:5px 12px;background:#e8f6ed;color:#246b3c;font-size:12px}.event-chat__notice--error{background:#fff0f0;color:#a22}
+</style>
 <script>
 (() => {
     const list = document.querySelector('.event-chat__messages');
