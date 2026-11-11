@@ -60,6 +60,12 @@ $escape = static fn($value): string => escapeHtml((string) $value);
     }, $eventHashtags)));
     ?>
     <?php if ($eventHashtags !== []): ?><p class="public-event-hashtags"><?= implode(' ', array_map($escape, $eventHashtags)) ?></p><?php endif; ?>
+    <?php
+    $messageCountQuery = $db->prepare("SELECT COUNT(*) FROM event_messages WHERE event_id = :event_id AND is_deleted = 0");
+    $messageCountQuery->execute(['event_id' => $id]);
+    $messageCount = (int) $messageCountQuery->fetchColumn();
+    ?>
+    <p class="public-event-message-link"><a class="button button--primary" href="/event-messages.php?id=<?= (int) $id ?>">Berichten (<?= $messageCount ?>)</a></p>
     <?php if ($media !== []): ?>
         <section class="admin-section">
             <h2>Foto's, video's en berichten</h2>
@@ -97,6 +103,6 @@ $escape = static fn($value): string => escapeHtml((string) $value);
     <?php endif; ?>
 </section>
 <style>
-.public-event-page{max-width:1000px;margin:0 auto}.public-event-description{margin:24px 0;line-height:1.7}.public-event-hashtags{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 24px;color:var(--db-primary);font-weight:700;overflow-wrap:anywhere}.public-event-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}.public-event-media-item{min-width:0;padding:12px;border:1px solid #e7eaf0;border-radius:10px;background:#fff}.public-event-media-item img,.public-event-media-item video,.public-event-media-item iframe{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/5;border:0;border-radius:7px;background:#111;object-fit:contain}.public-event-media-item iframe{height:520px}.public-event-media-item p{overflow-wrap:anywhere}
+.public-event-page{max-width:1000px;margin:0 auto}.public-event-message-link{margin:18px 0 24px}.public-event-description{margin:24px 0;line-height:1.7}.public-event-hashtags{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 24px;color:var(--db-primary);font-weight:700;overflow-wrap:anywhere}.public-event-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}.public-event-media-item{min-width:0;padding:12px;border:1px solid #e7eaf0;border-radius:10px;background:#fff}.public-event-media-item img,.public-event-media-item video,.public-event-media-item iframe{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/5;border:0;border-radius:7px;background:#111;object-fit:contain}.public-event-media-item iframe{height:520px}.public-event-media-item p{overflow-wrap:anywhere}
 </style>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
