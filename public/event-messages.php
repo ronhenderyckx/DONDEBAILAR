@@ -15,6 +15,13 @@ if (!$id || $id < 1) {
 $popupMode = isset($_GET['popup']) && $_GET['popup'] === '1';
 $messagePageUrl = '/event-messages.php?id=' . $id . ($popupMode ? '&popup=1' : '');
 
+$countQuery = $db->prepare(
+    "SELECT COUNT(*) FROM event_messages WHERE event_id = :event_id AND is_deleted = 0"
+);
+$countQuery->execute(['event_id' => $id]);
+$messageCount = (int) $countQuery->fetchColumn();
+
+
 $statement = $db->prepare(
     "SELECT e.id, e.title, e.region_id, e.status, e.created_by, r.name AS region_name,
             r.logo_path, r.timezone
@@ -163,8 +170,9 @@ $escape = static fn($value): string => escapeHtml((string) $value);
 ?>
 <section class="event-chat<?= $popupMode ? ' event-chat--popup' : '' ?>" id="messages">
     <div class="event-chat__heading">
-        <svg aria-hidden="true" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"></path></svg>
+        <span class="event-chat__heading-icon"><svg aria-hidden="true" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"></path></svg></span>
         <strong><?= $escape($event['title']) ?></strong>
+        <span class="event-chat__heading-count">· <?= $messageCount ?> <?= $messageCount === 1 ? 'bericht' : 'berichten' ?></span>
     </div>
 
     <?php if ($errors !== []): ?>
@@ -271,8 +279,8 @@ html,body{height:100%;margin:0!important;padding:0!important;overflow:hidden!imp
 body:has(.event-chat--popup) .site-header,body:has(.event-chat--popup) footer{display:none!important}
 body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;margin:0!important;padding:0!important;overflow:hidden}
 .event-chat{height:100%;min-height:0;display:flex;flex-direction:column;background:#fff;color:#222;font:14px/1.45 system-ui,sans-serif}
-.event-chat__heading{flex:none;display:flex;align-items:center;gap:6px;padding:10px 14px;background:#fafafa;min-width:0}
-.event-chat__heading svg{flex:none;color:var(--db-primary,#2878c8)}.event-chat__heading strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:14px}
+.event-chat__heading{flex:none;display:flex;align-items:center;gap:7px;padding:8px 12px;background:var(--db-primary,#1456a0);color:#fff;min-width:0;min-height:54px}
+.event-chat__heading-icon{flex:none;display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:5px;background:#fff;color:var(--db-primary,#1456a0)}.event-chat__heading strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:16px;color:#fff}.event-chat__heading-count{flex:none;color:#fff;font-size:14px;font-weight:600;white-space:nowrap}
 .event-chat__messages{flex:1;min-height:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}
 .event-chat__empty{margin:auto;color:#888;text-align:center}
 .chat-message{max-width:88%;align-self:flex-start}.chat-message__bubble{position:relative;padding:9px 12px;border-radius:14px 14px 14px 4px;background:#f0f2f5;overflow-wrap:anywhere}
