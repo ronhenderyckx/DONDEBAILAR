@@ -591,6 +591,13 @@ if (messageModal) {
         const button = event.target.closest('[data-event-messages]');
         if (!button) return;
         event.preventDefault();
+        const eventCard = button.closest('.agenda-card');
+        const eventTitle = eventCard?.querySelector('.agenda-card__details h2 a')?.textContent.trim() || 'Evenement';
+        const count = Number(button.querySelector('.agenda-message-count')?.textContent || 0);
+        const titleText = eventTitle + ' · ' + count + ' ' + (count === 1 ? 'bericht' : 'berichten');
+        const modalTitle = document.getElementById('agenda-message-modal-title');
+        if (modalTitle) modalTitle.textContent = titleText;
+        messageFrame.title = titleText;
         messageFrame.src = button.dataset.url + '&popup=1';
         messageModal.hidden = false;
         document.body.style.overflow = 'hidden';
