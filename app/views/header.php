@@ -244,7 +244,6 @@ $escape = static fn ($value): string =>
                     </form>
                 <?php else: ?>
                     <a href="/login.php">Inloggen</a>
-                    <a href="/register.php">Registreren</a>
                 <?php endif; ?>
             </nav>
         </details>
