@@ -772,6 +772,12 @@ body.has-agenda-footer .site-footer--agenda{
     color:var(--db-text);
 }
 @media(max-width:760px){
+    /* Houd de mobiele navigatie zichtbaar tijdens het scrollen. */
+    .site-header{
+        position:sticky;
+        top:0;
+        z-index:1200;
+    }
     body.has-agenda-footer .site-main{
         padding-bottom:150px;
     }
