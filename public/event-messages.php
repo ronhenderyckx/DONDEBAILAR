@@ -85,6 +85,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'parent_id' => $parentId,
                     'message' => $message,
                 ]);
+                $newMessageId = (int) $db->lastInsertId();
+
+                // Maak één melding per genoemde gebruiker; vermeldingen van jezelf tellen niet.
+                $notificationInsert = $db->prepare(
+                    "INSERT IGNORE INTO user_notifications
+                        (user_id, actor_user_id, event_id, message_id, notification_type)
+                     VALUES (:user_id, :actor_user_id, :event_id, :message_id, 'mention')"
+                );
+                foreach ($mentionUsers as $mentionedUser) {
+                    $mentionedName = trim((string) $mentionedUser['display_name']);
+                    $mentionedUserId = (int) $mentionedUser['id'];
+                    if ($mentionedUserId === (int) $user['id'] || $mentionedName === '') {
+                        continue;
+                    }
+                    $mentionPattern = '/(?<![\\p{L}\\p{N}_])@' . preg_quote($mentionedName, '/') . '(?![\\p{L}\\p{N}_])/iu';
+                    if (preg_match($mentionPattern, $message) === 1) {
+                        $notificationInsert->execute([
+                            'user_id' => $mentionedUserId,
+                            'actor_user_id' => (int) $user['id'],
+                            'event_id' => $id,
+                            'message_id' => $newMessageId,
+                        ]);
+                    }
+                }
                 header('Location: ' . $messagePageUrl . '&sent=1#messages');
                 exit;
             }
