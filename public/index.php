@@ -1143,13 +1143,17 @@ document.addEventListener('click', function (event) {
     if (saveButton.dataset.busy === '1') return;
     saveButton.dataset.busy = '1';
     saveButton.setAttribute('aria-busy', 'true');
-    const params = new URLSearchParams(window.location.search);
+    const activeFilter = agendaFilterIndex === 1 ? 'city' : 'organizer';
+    const activePanel = document.querySelector('[data-panel="' + activeFilter + '"]');
+    const selectedItem = activePanel ? activePanel.querySelector('.agenda-organizer-item.is-selected') : null;
+    const selectedUrl = selectedItem ? new URL(selectedItem.href, window.location.origin) : null;
     const payload = {
         csrf_token: '<?= $escape(csrfToken()) ?>',
-        region_id: Number(params.get('region_id') || '<?= $regionId ?>'),
-        filter: agendaFilterIndex === 1 ? 'city' : 'organizer',
-        organizer_id: Number(params.get('organizer_id') || 0),
-        city: params.get('city') || '',
+        region_id: <?= (int) $regionId ?>,
+        filter: activeFilter,
+        organizer_id: activeFilter === 'organizer' && selectedUrl
+            ? Number(selectedUrl.searchParams.get('organizer_id') || 0) : 0,
+        city: activeFilter === 'city' && selectedItem ? selectedItem.getAttribute('title') || '' : '',
         sound_muted: agendaVideosMuted
     };
     fetch('/save-agenda-preferences.php', {
