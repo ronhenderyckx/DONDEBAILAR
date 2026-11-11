@@ -479,7 +479,7 @@ if (agendaFilterSwitch) {
     });
     showAgendaFilter(agendaFilterIndex);
 }
-// Toon de evenementuitleg met een verticale veeg over de media.
+// Toon de evenementuitleg met een horizontale veeg over de media.
 let eventDescriptionSwipe = null;
 document.addEventListener('pointerdown', function (event) {
     const article = event.target.closest('.agenda-card');
@@ -494,13 +494,13 @@ document.addEventListener('pointerup', function (event) {
     eventDescriptionSwipe = null;
     const deltaX = event.clientX - swipe.x;
     const deltaY = event.clientY - swipe.y;
-    if (Math.abs(deltaY) < 55 || Math.abs(deltaY) < Math.abs(deltaX) * 1.25) return;
+    if (Math.abs(deltaX) < 55 || Math.abs(deltaX) < Math.abs(deltaY) * 1.25) return;
     const panel = swipe.article.querySelector('[data-event-description]');
     if (!panel) return;
-    if (deltaY < 0) {
+    if (deltaX > 0) {
         panel.hidden = false;
         panel.classList.add('is-open');
-    } else if (deltaY > 0 && !panel.hidden) {
+    } else if (deltaX < 0 && !panel.hidden) {
         panel.hidden = true;
         panel.classList.remove('is-open');
     }
