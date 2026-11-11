@@ -196,7 +196,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 'tertiary_color' => 'Tertiaire kleur',
                 'header_color' => 'Headerkleur',
                 'menu_color' => 'Menukleur',
-                'organizer_color' => 'Achtergrondkleur organisatorknoppen',
+                'organizer_color' => 'Achtergrondkleur van de filterknoppen',
                 'filter_bar_color' => 'Achtergrondkleur filterbalk',
                 'filter_text_color' => 'Tekstkleur filterknoppen',
                 'search_button_color' => 'Achtergrondkleur zoekknop',
