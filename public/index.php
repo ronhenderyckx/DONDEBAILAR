@@ -247,6 +247,12 @@ if ($regionId > 0) {
 }
 
 $agendaPageSizeFile = dirname(__DIR__) . '/storage/agenda-page-size.txt';
+$agendaArrowBackgroundFile = dirname(__DIR__) . '/storage/agenda-arrow-background.txt';
+$agendaArrowTextFile = dirname(__DIR__) . '/storage/agenda-arrow-text.txt';
+$agendaArrowBackground = is_file($agendaArrowBackgroundFile) ? trim((string) file_get_contents($agendaArrowBackgroundFile)) : '#F6B22E';
+$agendaArrowText = is_file($agendaArrowTextFile) ? trim((string) file_get_contents($agendaArrowTextFile)) : '#222222';
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowBackground)) $agendaArrowBackground = '#F6B22E';
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowText)) $agendaArrowText = '#222222';
 $agendaPageSize = 20;
 if (is_file($agendaPageSizeFile)) {
     $storedPageSize = (int) trim((string) file_get_contents($agendaPageSizeFile));
@@ -737,8 +743,8 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
 .agenda-share-option:focus-visible,.agenda-share-dialog__close:focus-visible{outline:3px solid var(--db-primary,#E23A2C);outline-offset:2px}
 @media(max-width:420px){.agenda-share-dialog{padding:12px}.agenda-share-dialog__panel{padding:22px 16px 15px}}
 .agenda-page-navigation{display:flex;align-items:center;justify-content:center;gap:18px;margin:14px 0 18px;color:var(--db-muted);font-size:13px;font-weight:700}
-.agenda-page-nav-icon{display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:50%;background:var(--db-accent,#F6B22E);color:var(--db-header,#222222);font-size:30px;line-height:1;cursor:pointer;transition:background .2s ease,transform .2s ease}
-.agenda-page-nav-icon:hover:not(:disabled){background:var(--db-primary,#E23A2C);color:#fff;transform:scale(1.06)}
+.agenda-page-nav-icon{display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:50%;background:<?= $escape($agendaArrowBackground) ?>;color:<?= $escape($agendaArrowText) ?>;font-size:30px;line-height:1;cursor:pointer;transition:filter .2s ease,transform .2s ease}
+.agenda-page-nav-icon:hover:not(:disabled){filter:brightness(.9);transform:scale(1.06)}
 .agenda-page-nav-icon:disabled{opacity:.35;cursor:default}
 .agenda-page-nav-icon:focus-visible,.agenda-load-more:focus-visible{outline:3px solid var(--db-accent,#F6B22E);outline-offset:3px}
 </style>
