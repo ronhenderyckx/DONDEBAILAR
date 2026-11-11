@@ -171,6 +171,57 @@ function migrateEventHashtags(PDO $db): void
 
 
 /**
+ * Bewaar herhalingen als een reeks met afzonderlijke evenementrecords.
+ * De migratie is idempotent en wordt door de website-UPDATE uitgevoerd.
+ */
+function migrateEventRecurrence(PDO $db): void
+{
+    $db->exec("CREATE TABLE IF NOT EXISTS event_recurrence_series (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        frequency ENUM('weekly','monthly') NOT NULL,
+        ends_on DATE NOT NULL,
+        created_by INT UNSIGNED NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_event_recurrence_created_by (created_by)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    $columns = $db->query(
+        "SELECT COLUMN_NAME FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'events'"
+    )->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('recurrence_series_id', $columns, true)) {
+        $db->exec("ALTER TABLE events ADD COLUMN recurrence_series_id BIGINT UNSIGNED NULL");
+    }
+    if (!in_array('recurrence_number', $columns, true)) {
+        $db->exec("ALTER TABLE events ADD COLUMN recurrence_number INT UNSIGNED NULL");
+    }
+
+    $index = $db->query(
+        "SELECT COUNT(*) FROM information_schema.STATISTICS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'events'
+           AND INDEX_NAME = 'idx_events_recurrence_series'"
+    )->fetchColumn();
+    if ((int) $index === 0) {
+        $db->exec("CREATE INDEX idx_events_recurrence_series ON events (recurrence_series_id, recurrence_number)");
+    }
+
+    $constraint = $db->query(
+        "SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
+         WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'events'
+           AND CONSTRAINT_NAME = 'fk_events_recurrence_series'
+           AND CONSTRAINT_TYPE = 'FOREIGN KEY'"
+    )->fetchColumn();
+    if ((int) $constraint === 0) {
+        $db->exec("ALTER TABLE events
+            ADD CONSTRAINT fk_events_recurrence_series
+            FOREIGN KEY (recurrence_series_id) REFERENCES event_recurrence_series(id)
+            ON DELETE SET NULL");
+    }
+}
+
+
+/**
  * Maak de berichtenfunctie per evenement aan.
  * De controle maakt deze database-upgrade veilig om bij iedere UPDATE uit te voeren.
  */
@@ -340,6 +391,9 @@ try {
 
     migrateEventMessages($db);
     $messages[] = 'Database: berichten per evenement zijn gecontroleerd.';
+
+    migrateEventRecurrence($db);
+    $messages[] = 'Database: wekelijkse en maandelijkse evenementreeksen zijn gecontroleerd.';
 
     migrateDuplicateUserEmails($db);
     migrateAuditTracking($db);
