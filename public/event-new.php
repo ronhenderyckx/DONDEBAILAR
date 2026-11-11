@@ -319,7 +319,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <input id="hashtags" name="hashtags" maxlength="500" value="<?= escapeHtml($hashtags) ?>" placeholder="#salsa #bachata #kizomba">
             <p class="event-form-note">Zet de hashtags apart van de beschrijving, gescheiden door spaties of komma's.</p>
             <h2>Media bij dit evenement</h2>
-            <label for="photos">Foto's (meerdere mogelijk, JPG/PNG/WebP, max. 15 MB per foto)</label>
+            <label for="photos">Foto's (meerdere mogelijk, JPG/PNG/WebP, max. 15 MB per foto; worden automatisch verkleind en als WebP opgeslagen)</label>
             <input id="photos" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple>
             <label for="videos">Video's (meerdere mogelijk, MP4/WebM/MOV, max. 80 MB per video)</label>
             <input id="videos" type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime" multiple>
