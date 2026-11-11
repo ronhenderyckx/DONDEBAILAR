@@ -278,6 +278,18 @@ try {
     removeOrganizerRegionColumn($db);
     $messages[] = 'Database: organisatoren zijn platformbreed; foutieve regio-koppeling verwijderd indien aanwezig.';
 
+    $db->exec("CREATE TABLE IF NOT EXISTS event_guest_attendances (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        event_id BIGINT UNSIGNED NOT NULL,
+        visitor_hash CHAR(64) NOT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_event_guest_attendance (event_id, visitor_hash),
+        KEY idx_event_guest_attendance_event (event_id),
+        CONSTRAINT fk_event_guest_attendance_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    $messages[] = 'Database: anonieme dans-aanmeldingen zijn gecontroleerd.';
+
     migrateDuplicateUserEmails($db);
     migrateAuditTracking($db);
     $messages[] = 'Database: aanmaak- en wijzigingsregistratie is gecontroleerd voor alle tabellen.';
