@@ -489,16 +489,35 @@ function toggleEventDescription(article, show) {
     panel.classList.toggle('is-visible', show);
     panel.setAttribute('aria-hidden', show ? 'false' : 'true');
 }
+// Touchbediening apart afhandelen: de browser mag een horizontale veeg niet overnemen.
+document.querySelectorAll('[data-event-info]').forEach(function (info) {
+    if (!info.querySelector('[data-event-description]')) return;
+    let touchStart = null;
+    info.addEventListener('touchstart', function (event) {
+        if (!event.changedTouches.length) return;
+        const touch = event.changedTouches[0];
+        touchStart = {x: touch.clientX, y: touch.clientY};
+    }, {passive:true});
+    info.addEventListener('touchend', function (event) {
+        if (!touchStart || !event.changedTouches.length) return;
+        const touch = event.changedTouches[0];
+        const deltaX = touch.clientX - touchStart.x;
+        const deltaY = touch.clientY - touchStart.y;
+        touchStart = null;
+        if (Math.abs(deltaX) < 40 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
+        toggleEventDescription(info.closest('.agenda-card'), deltaX > 0);
+    }, {passive:true});
+    info.addEventListener('touchcancel', function () {
+        touchStart = null;
+    }, {passive:true});
+});
+// Muisbediening voor desktop.
 let eventInfoPointer = null;
 document.addEventListener('pointerdown', function (event) {
+    if (event.pointerType === 'touch') return;
     const info = event.target.closest('[data-event-info]');
     if (!info || !info.querySelector('[data-event-description]')) return;
-    eventInfoPointer = {
-        info: info,
-        pointerId: event.pointerId,
-        x: event.clientX,
-        y: event.clientY
-    };
+    eventInfoPointer = {info:info, pointerId:event.pointerId, x:event.clientX, y:event.clientY};
 }, {passive:true});
 document.addEventListener('pointerup', function (event) {
     if (!eventInfoPointer || event.pointerId !== eventInfoPointer.pointerId) return;
@@ -506,7 +525,7 @@ document.addEventListener('pointerup', function (event) {
     eventInfoPointer = null;
     const deltaX = event.clientX - swipe.x;
     const deltaY = event.clientY - swipe.y;
-    if (Math.abs(deltaX) < 45 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
+    if (Math.abs(deltaX) < 40 || Math.abs(deltaX) < Math.abs(deltaY) * 1.2) return;
     toggleEventDescription(swipe.info.closest('.agenda-card'), deltaX > 0);
 }, {passive:true});
 document.addEventListener('pointercancel', function () {
