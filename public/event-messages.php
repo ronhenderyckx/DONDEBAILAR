@@ -157,7 +157,7 @@ foreach ($allMessages as $item) {
     }
 }
 
-$pageTitle = 'Berichten — ' . (string) $event['title'] . ' — DONDEBAILAR';
+$pageTitle = 'Berichten van evenement — ' . (string) $event['title'] . ' — DONDEBAILAR';
 $pageRobots = 'noindex, nofollow';
 $region = [
     'id' => (int) $event['region_id'],
@@ -169,7 +169,7 @@ $escape = static fn($value): string => escapeHtml((string) $value);
 ?>
 <section class="event-chat<?= $popupMode ? ' event-chat--popup' : '' ?>" id="messages">
     <div class="event-chat__heading">
-        <strong><?= $escape($event['title']) ?></strong>
+        <strong>Berichten van evenement</strong>
         <span>· <?= $messageCount ?> <?= $messageCount === 1 ? 'bericht' : 'berichten' ?></span>
     </div>
 
