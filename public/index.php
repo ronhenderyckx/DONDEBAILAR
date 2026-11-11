@@ -596,6 +596,41 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
  .site-header__agenda-filters .agenda-selector-line{margin:0}
  .site-header__agenda-filters .agenda-organizer-strip{padding-bottom:2px}
 }
+
+/* Compacte evenementinformatie: titel, categorie en locatie, datum, hint en hashtags. */
+.agenda-card__tags-location{
+    display:flex;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:6px 16px;
+    margin:0 0 7px;
+}
+.agenda-card__tags-location .agenda-card__tags{
+    display:inline-flex;
+    margin:0;
+    font-size:13px;
+    font-weight:700;
+}
+.agenda-card__tags-location .agenda-card__location{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    margin:0;
+    font-size:13px;
+}
+.agenda-card__location-icon{font-size:13px;line-height:1}
+.agenda-card__date-line{margin:0 0 5px!important}
+.agenda-card__swipe-hint{
+    margin:2px 0 5px;
+    font-size:11px;
+    font-weight:600;
+    opacity:.78;
+}
+.agenda-card__hashtags{
+    margin:5px 0 0!important;
+    font-size:12px!important;
+    font-weight:650!important;
+}
 </style>
 <?php
 $hasInstagramReels = false;
