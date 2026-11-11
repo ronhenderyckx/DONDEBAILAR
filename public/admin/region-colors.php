@@ -41,6 +41,8 @@ $defaults = [
     'footer_color' => '#FFFFFF',
     'background_color' => '#FFFFFF',
     'text_color' => '#222222',
+    'agenda_arrow_background' => '#F6B22E',
+    'agenda_arrow_text' => '#222222',
 ];
 $weekdayDefaults = ['#F6D84A', '#4A90D9', '#55A96B', '#A78BDA', '#E78AAE', '#F49A45', '#999999'];
 $select = $db->prepare("SELECT * FROM region_appearance WHERE region_id = :id LIMIT 1");
@@ -55,6 +57,10 @@ $weekdayColors = $weekdayDefaults;
 if (!empty($saved['weekday_colors'])) {
     $decoded = json_decode((string) $saved['weekday_colors'], true);
     if (is_array($decoded)) {
+        foreach (['agenda_arrow_background', 'agenda_arrow_text'] as $arrowKey) {
+            $candidate = (string) ($decoded[$arrowKey] ?? $defaults[$arrowKey]);
+            $colors[$arrowKey] = preg_match('/^#[0-9a-fA-F]{6}$/', $candidate) ? strtoupper($candidate) : $defaults[$arrowKey];
+        }
         foreach ($weekdayDefaults as $i => $value) {
             if (isset($decoded[$i]) && preg_match('/^#[0-9a-fA-F]{6}$/', (string) $decoded[$i])) {
                 $weekdayColors[$i] = strtoupper((string) $decoded[$i]);
@@ -79,6 +85,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
             $colors[$key] = $value;
+        }
+        foreach (['agenda_arrow_background', 'agenda_arrow_text'] as $arrowKey) {
+            $value = strtoupper(trim((string) ($_POST[$arrowKey] ?? $defaults[$arrowKey])));
+            if (!preg_match('/^#[0-9A-F]{6}$/', $value)) {
+                $errorMessage = 'Een of meer kleuren van de agendapijlen zijn ongeldig.';
+                break;
+            }
+            $colors[$arrowKey] = $value;
         }
         $weekdayInput = $_POST['weekday_colors'] ?? [];
         if (!is_array($weekdayInput)) $weekdayInput = [];
@@ -154,7 +168,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'footer_color' => $colors['footer_color'],
                     'background_color' => $colors['background_color'],
                     'text_color' => $colors['text_color'],
-                    'weekday_colors' => json_encode($weekdayColors, JSON_THROW_ON_ERROR),
+                    'weekday_colors' => json_encode($weekdayColors + [
+                        'agenda_arrow_background' => $colors['agenda_arrow_background'],
+                        'agenda_arrow_text' => $colors['agenda_arrow_text'],
+                    ], JSON_THROW_ON_ERROR),
                     'logo_path' => $newLogoPath,
                 ]);
                 $logoPath = $newLogoPath;
@@ -223,6 +240,11 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                     <code><?= escapeHtml($weekdayColors[$i]) ?></code>
                 </label>
             <?php endforeach; ?>
+            </div>
+            <h2>Kleuren van de agendapijlen</h2>
+            <div class="region-color-grid">
+                <label class="region-color-field" for="agenda_arrow_background"><span>Achtergrondkleur pijlen</span><input type="color" id="agenda_arrow_background" name="agenda_arrow_background" value="<?= escapeHtml($colors['agenda_arrow_background']) ?>"><code><?= escapeHtml($colors['agenda_arrow_background']) ?></code></label>
+                <label class="region-color-field" for="agenda_arrow_text"><span>Kleur pijlsymbool</span><input type="color" id="agenda_arrow_text" name="agenda_arrow_text" value="<?= escapeHtml($colors['agenda_arrow_text']) ?>"><code><?= escapeHtml($colors['agenda_arrow_text']) ?></code></label>
             </div>
             <h2>Regiologo</h2>
             <?php if ($logoPath !== ''): ?>
