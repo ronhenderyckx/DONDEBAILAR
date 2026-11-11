@@ -9,7 +9,7 @@ $pageTitle = 'Inloggen - DONDEBAILAR';
 $errorMessage = '';
 $login = '';
 
-$returnTo = $_GET['return'] ?? $_POST['return'] ?? '/admin/';
+$returnTo = $_GET['return'] ?? $_POST['return'] ?? '/';
 
 if (
     !is_string($returnTo)
@@ -17,7 +17,7 @@ if (
     || str_starts_with($returnTo, '//')
     || preg_match('/[\r\n]/', $returnTo)
 ) {
-    $returnTo = '/admin/';
+    $returnTo = '/';
 }
 
 if (currentUser() !== null) {
