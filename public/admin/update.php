@@ -271,6 +271,26 @@ function migrateUserNotifications(PDO $db): void
 /**
  * Eenmalige, tijdelijke tokens voor wachtwoordherstel.
  */
+function migrateRegionAppearance(PDO $db): void
+{
+    $db->exec("CREATE TABLE IF NOT EXISTS region_appearance (
+        region_id INT UNSIGNED NOT NULL,
+        primary_color CHAR(7) NOT NULL DEFAULT '#E23A2C',
+        primary_dark CHAR(7) NOT NULL DEFAULT '#8F211B',
+        accent_color CHAR(7) NOT NULL DEFAULT '#F6B22E',
+        secondary_color CHAR(7) NOT NULL DEFAULT '#1FA898',
+        tertiary_color CHAR(7) NOT NULL DEFAULT '#F4802A',
+        header_color CHAR(7) NOT NULL DEFAULT '#222222',
+        background_color CHAR(7) NOT NULL DEFAULT '#FFFFFF',
+        text_color CHAR(7) NOT NULL DEFAULT '#222222',
+        weekday_colors TEXT NULL,
+        logo_path VARCHAR(255) NULL,
+        PRIMARY KEY (region_id),
+        CONSTRAINT fk_region_appearance_region FOREIGN KEY (region_id)
+            REFERENCES regions(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
 function migratePasswordResetTokens(PDO $db): void
 {
     $db->exec("CREATE TABLE IF NOT EXISTS password_reset_tokens (
@@ -441,6 +461,9 @@ try {
 
     migratePasswordResetTokens($db);
     $messages[] = 'Database: wachtwoordherstel is gecontroleerd.';
+
+    migrateRegionAppearance($db);
+    $messages[] = 'Database: kleuren en logo per regio zijn gecontroleerd.';
 
     migrateDuplicateUserEmails($db);
     migrateAuditTracking($db);
