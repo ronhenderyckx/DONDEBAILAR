@@ -13,11 +13,22 @@ $headerUser = currentUser();
 
 $unreadNotificationCount = 0;
 if ($headerUser !== null) {
-    $notificationCountQuery = Database::connection()->prepare(
-        "SELECT COUNT(*) FROM user_notifications WHERE user_id = :user_id AND is_read = 0"
-    );
-    $notificationCountQuery->execute(['user_id' => (int) $headerUser['id']]);
-    $unreadNotificationCount = (int) $notificationCountQuery->fetchColumn();
+    // De tabel kan ontbreken wanneer een database-update eerder is afgebroken.
+    // Laat in dat geval de UPDATE-pagina zelf de migratiefout tonen.
+    $notificationTableExists = Database::connection()->query(
+        "SELECT COUNT(*) FROM information_schema.TABLES
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'user_notifications'
+           AND TABLE_TYPE = 'BASE TABLE'"
+    )->fetchColumn();
+
+    if ((int) $notificationTableExists > 0) {
+        $notificationCountQuery = Database::connection()->prepare(
+            "SELECT COUNT(*) FROM user_notifications WHERE user_id = :user_id AND is_read = 0"
+        );
+        $notificationCountQuery->execute(['user_id' => (int) $headerUser['id']]);
+        $unreadNotificationCount = (int) $notificationCountQuery->fetchColumn();
+    }
 }
 
 $regionId = (int) ($region['id'] ?? 0);
