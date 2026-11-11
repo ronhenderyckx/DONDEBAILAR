@@ -100,7 +100,7 @@ $escape = static fn ($value): string =>
     <title><?= $escape($pageTitle) ?></title>
     <link rel="stylesheet" href="/assets/css/site.css">
 </head>
-<body>
+<body<?= !empty($isAgendaPage) ? ' class="has-agenda-footer"' : '' ?>>
 
 <header class="site-header">
     <div class="site-header__inner">
