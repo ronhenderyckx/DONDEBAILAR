@@ -344,6 +344,15 @@ require dirname(__DIR__) . '/app/views/header.php';
                             ?>
                             <p class="agenda-card__date-line"><?= $escape(strtoupper($start->format('l, d M Y'))) ?> <span>◷</span> <?= $escape($start->format('H:i')) ?><?php if (!empty($event['ends_at'])): ?> – <?= $escape((new DateTimeImmutable((string) $event['ends_at'], $timezone))->format('H:i')) ?><?php endif; ?></p>
                             <?php
+                            $displayTags = array_map(static fn(string $tag): string => '#' . $tag, $hashtagItems);
+                            if ($locationLabel !== '') {
+                                $displayTags[] = '#' . $locationLabel;
+                            }
+                            ?>
+                            <?php if ($displayTags !== []): ?>
+                                <p class="agenda-card__hashtags"><?= $escape(implode(' ', $displayTags)) ?></p>
+                            <?php endif; ?>
+                            <?php
                             $eventDescription = trim((string) ($event['description'] ?? ''));
                             $locationName = trim((string) ($event['location_name'] ?? ''));
                             $locationStreet = trim((string) ($event['location_street'] ?? ''));
@@ -401,15 +410,6 @@ require dirname(__DIR__) . '/app/views/header.php';
                                         <?php endif; ?>
                                     </div>
                                 </div>
-                            <?php endif; ?>
-                            <?php
-                            $displayTags = array_map(static fn(string $tag): string => '#' . $tag, $hashtagItems);
-                            if ($locationLabel !== '') {
-                                $displayTags[] = '#' . $locationLabel;
-                            }
-                            ?>
-                            <?php if ($displayTags !== []): ?>
-                                <p class="agenda-card__hashtags"><?= $escape(implode(' ', $displayTags)) ?></p>
                             <?php endif; ?>
                             <p class="agenda-card__swipe-hint" data-swipe-hint>→ Swipe voor meer info</p>
                         </div>
