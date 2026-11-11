@@ -55,10 +55,16 @@ $regions = $db->query(
 )->fetchAll();
 
 $regionIds = array_map(static fn(array $item): int => (int) $item['id'], $regions);
-$requestedRegion = filter_input(INPUT_GET, 'region_id', FILTER_VALIDATE_INT);
-if (!$requestedRegion && !array_key_exists('region_id', $_GET) && !empty($savedAgendaPreferences['region_id'])) {
-    $requestedRegion = (int) $savedAgendaPreferences['region_id'];
-}
+
+// Na het opslaan worden de persoonlijke voorkeuren standaard hersteld.
+// Alleen links/formulieren met agenda_change=1 mogen bewust een andere keuze maken.
+$restoreSavedAgendaPreferences = $currentUser !== null
+    && $savedAgendaPreferences !== null
+    && (($_GET['agenda_change'] ?? '') !== '1');
+
+$requestedRegion = $restoreSavedAgendaPreferences
+    ? (int) ($savedAgendaPreferences['region_id'] ?? 0)
+    : (filter_input(INPUT_GET, 'region_id', FILTER_VALIDATE_INT) ?: 0);
 $regionId = $requestedRegion && in_array((int) $requestedRegion, $regionIds, true)
     ? (int) $requestedRegion
     : (int) ($regionIds[0] ?? 0);
@@ -76,15 +82,15 @@ try {
 date_default_timezone_set($timezone->getName());
 
 $now = new DateTimeImmutable('now', $timezone);
-$organizerId = array_key_exists('organizer_id', $_GET)
-    ? (filter_input(INPUT_GET, 'organizer_id', FILTER_VALIDATE_INT) ?: 0)
-    : (int) ($savedAgendaPreferences['organizer_id'] ?? 0);
-$city = array_key_exists('city', $_GET)
-    ? trim((string) ($_GET['city'] ?? ''))
-    : trim((string) ($savedAgendaPreferences['city'] ?? ''));
-$activeFilter = array_key_exists('filter', $_GET)
-    ? ((($_GET['filter'] ?? '') === 'city') ? 'city' : 'organizer')
-    : ((($savedAgendaPreferences['active_filter'] ?? '') === 'city') ? 'city' : 'organizer');
+$organizerId = $restoreSavedAgendaPreferences
+    ? (int) ($savedAgendaPreferences['organizer_id'] ?? 0)
+    : (filter_input(INPUT_GET, 'organizer_id', FILTER_VALIDATE_INT) ?: 0);
+$city = $restoreSavedAgendaPreferences
+    ? trim((string) ($savedAgendaPreferences['city'] ?? ''))
+    : trim((string) ($_GET['city'] ?? ''));
+$activeFilter = $restoreSavedAgendaPreferences
+    ? ((($savedAgendaPreferences['active_filter'] ?? '') === 'city') ? 'city' : 'organizer')
+    : ((($_GET['filter'] ?? '') === 'city') ? 'city' : 'organizer');
 
 // Alleen het filtertype dat actief is mag de agenda beperken.
 // Zo kan een eerder gekozen organisator geen stadsfilter blokkeren, en omgekeerd.
