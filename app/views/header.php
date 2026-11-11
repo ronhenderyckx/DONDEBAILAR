@@ -85,7 +85,19 @@ if (isset($regions) && is_array($regions) && count($regions) > 1 && $regionId > 
         $nextRegionId = (int) $nextRegion['id'];
     }
 }
-$primaryColor = $region['primary_color'] ?? '#0A4D9F';
+$colorValue = static function (string $key, string $fallback) use ($region): string {
+    $value = (string) ($region[$key] ?? $fallback);
+    return preg_match('/^#[0-9a-fA-F]{6}$/', $value) ? strtoupper($value) : $fallback;
+};
+$primaryColor = $colorValue('primary_color', '#0A4D9F');
+$themeStyle = '--db-primary:' . $primaryColor
+    . ';--db-primary-dark:' . $colorValue('primary_dark', '#083B79')
+    . ';--db-accent:' . $colorValue('accent_color', '#00AFC5')
+    . ';--db-secondary:' . $colorValue('secondary_color', '#1FA898')
+    . ';--db-tertiary:' . $colorValue('tertiary_color', '#F4802A')
+    . ';--db-header-color:' . $colorValue('header_color', '#FFFFFF')
+    . ';--db-background:' . $colorValue('background_color', '#F7F8FA')
+    . ';--db-text:' . $colorValue('text_color', '#202B38');
 
 $escape = static fn ($value): string =>
     htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
@@ -100,7 +112,7 @@ $escape = static fn ($value): string =>
     <title><?= $escape($pageTitle) ?></title>
     <link rel="stylesheet" href="/assets/css/site.css">
 </head>
-<body<?= !empty($isAgendaPage) ? ' class="has-agenda-footer"' : '' ?>>
+<body<?= !empty($isAgendaPage) ? ' class="has-agenda-footer"' : '' ?> style="<?= $escape($themeStyle) ?>">
 
 <header class="site-header">
     <div class="site-header__inner">
