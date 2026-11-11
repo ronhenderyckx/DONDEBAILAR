@@ -64,11 +64,16 @@ $regions = $db->query(
 
 $regionIds = array_map(static fn(array $item): int => (int) $item['id'], $regions);
 
-// Na het opslaan worden de persoonlijke voorkeuren standaard hersteld.
-// Alleen links/formulieren met agenda_change=1 mogen bewust een andere keuze maken.
+// Herstel persoonlijke voorkeuren alleen wanneer de URL geen expliciete
+// regio- of filterkeuze bevat. Zo blijft een gekozen organisator ook na
+// scrollen, verversen of terugkeren naar de pagina geselecteerd.
+$hasExplicitAgendaChoice = array_key_exists('region_id', $_GET)
+    || array_key_exists('filter', $_GET)
+    || array_key_exists('organizer_id', $_GET)
+    || array_key_exists('city', $_GET);
 $restoreSavedAgendaPreferences = $currentUser !== null
     && $savedAgendaPreferences !== null
-    && (($_GET['agenda_change'] ?? '') !== '1');
+    && !$hasExplicitAgendaChoice;
 
 $requestedRegion = $restoreSavedAgendaPreferences
     ? (int) ($savedAgendaPreferences['region_id'] ?? 0)
@@ -1231,9 +1236,9 @@ document.addEventListener('click', function (event) {
         csrf_token: '<?= $escape(csrfToken()) ?>',
         region_id: <?= (int) $regionId ?>,
         filter: activeFilter,
-        organizer_id: activeFilter === 'organizer' && selectedUrl
-            ? Number(selectedUrl.searchParams.get('organizer_id') || 0) : 0,
-        city: activeFilter === 'city' && selectedItem ? selectedItem.getAttribute('title') || '' : '',
+        organizer_id: activeFilter === 'organizer' && selectedItem
+            ? Number(selectedItem.dataset.organizerId || 0) : 0,
+        city: activeFilter === 'city' && selectedItem ? selectedItem.dataset.city || '' : '',
         sound_muted: agendaVideosMuted
     };
     fetch('/save-agenda-preferences.php', {
