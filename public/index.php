@@ -737,7 +737,8 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
 .agenda-share-option:focus-visible,.agenda-share-dialog__close:focus-visible{outline:3px solid var(--db-primary,#E23A2C);outline-offset:2px}
 @media(max-width:420px){.agenda-share-dialog{padding:12px}.agenda-share-dialog__panel{padding:22px 16px 15px}}
 .agenda-page-navigation{display:flex;align-items:center;justify-content:center;gap:18px;margin:14px 0 18px;color:var(--db-muted);font-size:13px;font-weight:700}
-.agenda-page-nav-icon{display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:50%;background:var(--db-primary,#E23A2C);color:#fff;font-size:30px;line-height:1;cursor:pointer}
+.agenda-page-nav-icon{display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:50%;background:var(--db-accent,#F6B22E);color:var(--db-header,#222222);font-size:30px;line-height:1;cursor:pointer;transition:background .2s ease,transform .2s ease}
+.agenda-page-nav-icon:hover:not(:disabled){background:var(--db-primary,#E23A2C);color:#fff;transform:scale(1.06)}
 .agenda-page-nav-icon:disabled{opacity:.35;cursor:default}
 .agenda-page-nav-icon:focus-visible,.agenda-load-more:focus-visible{outline:3px solid var(--db-accent,#F6B22E);outline-offset:3px}
 </style>
