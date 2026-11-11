@@ -39,9 +39,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
 
             $userQuery = $db->prepare(
-                "SELECT DISTINCT email FROM users
+                "SELECT email, GROUP_CONCAT(DISTINCT display_name ORDER BY display_name SEPARATOR ', ') AS usernames
+                 FROM users
                  WHERE status = 'active'
                    AND (LOWER(email) = :email_identifier OR LOWER(display_name) = :username_identifier)
+                 GROUP BY email
                  LIMIT 2"
             );
             $normalizedIdentifier = strtolower($identifier);
@@ -49,10 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'email_identifier' => $normalizedIdentifier,
                 'username_identifier' => $normalizedIdentifier,
             ]);
-            $matchedEmails = $userQuery->fetchAll(PDO::FETCH_COLUMN);
-            // Een gebruikersnaam moet naar precies één e-mailadres verwijzen.
-            // Meerdere accounts met dezelfde gebruikersnaam en hetzelfde e-mailadres blijven bruikbaar.
-            $email = count($matchedEmails) === 1 ? strtolower((string) $matchedEmails[0]) : '';
+            $matchedUsers = $userQuery->fetchAll(PDO::FETCH_ASSOC);
+            // De invoer moet naar precies één e-mailadres verwijzen.
+            // Bij meerdere accounts op hetzelfde adres vermelden we de bijbehorende gebruikersnamen.
+            $matchedUser = count($matchedUsers) === 1 ? $matchedUsers[0] : null;
+            $email = $matchedUser ? strtolower((string) $matchedUser['email']) : '';
+            $username = $matchedUser ? trim((string) ($matchedUser['usernames'] ?? '')) : '';
             $userExists = $email !== '';
 
             if ($userExists) {
@@ -120,6 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $resetUrl = 'https://' . $requestHost . '/reset-password.php?token=' . rawurlencode($rawToken);
 
                     $body = "Je hebt gevraagd om het wachtwoord van je DONDEBAILAR-account opnieuw in te stellen.\n\n"
+                        . "Gebruikersnaam: " . ($username !== '' ? $username : '(niet beschikbaar)') . "\n\n"
                         . "Open deze beveiligde link om een nieuw wachtwoord te kiezen (geldig gedurende 60 minuten en eenmalig te gebruiken):\n"
                         . $resetUrl . "\n\n"
                         . "Heb je deze aanvraag niet gedaan? Dan kun je deze e-mail negeren. Je huidige wachtwoord blijft ongewijzigd.\n";
