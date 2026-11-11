@@ -593,6 +593,36 @@ require dirname(__DIR__) . '/app/views/header.php';
 .agenda-calendar__day{border:0!important;}
 .agenda-selector-button,.agenda-selector-panel select,.agenda-organizer-item img.agenda-organizer-logo{border:0!important;box-shadow:none!important;}
 .agenda-organizer-item img.agenda-organizer-logo{background:transparent!important;}
+
+/* Geen tussenruimte tussen de header en de filterbalk. */
+body.has-agenda-footer .site-main{padding-top:0!important}
+.agenda-page{margin-top:0!important}
+
+/* Eventinformatie gebruikt de ingestelde regiokleuren. */
+.agenda-card{background:var(--db-primary)!important;border:0!important}
+.agenda-card__details,
+.agenda-card__quick{
+    background:var(--db-primary)!important;
+    color:var(--db-text)!important;
+}
+.agenda-card__details,
+.agenda-card__details *{
+    color:var(--db-text)!important;
+}
+.agenda-card__details h2,
+.agenda-card__details h2 a,
+.agenda-card__tags,
+.agenda-card__date-line,
+.agenda-card__location,
+.agenda-card__more,
+.agenda-card__quick-date,
+.agenda-attendance,
+.agenda-icon-button,
+.agenda-message-count{
+    color:var(--db-text)!important;
+}
+.agenda-card__more{text-decoration-color:var(--db-text)!important}
+.agenda-card__quick{box-shadow:none!important}
 </style>
 <?php
 $hasInstagramReels = false;
