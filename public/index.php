@@ -294,9 +294,9 @@ require dirname(__DIR__) . '/app/views/header.php';
                                     <?php foreach ($eventMediaItems as $mediaIndex => $mediaItem): ?>
                                         <div class="agenda-card__media-slide<?= $mediaItem['type'] === 'reel' && $mediaItem['source'] === 'instagram' ? ' agenda-card__media-slide--instagram' : '' ?>">
                                             <?php if ($mediaItem['type'] === 'image' && $mediaItem['source'] === 'upload'): ?>
-                                                <a class="agenda-card__image-link" href="<?= $eventUrl ?>" aria-label="Bekijk <?= $escape($event['title']) ?>">
+                                                <div class="agenda-card__image-link">
                                                     <img class="agenda-card__image" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" alt="<?= $escape($event['title']) ?> — foto <?= $mediaIndex + 1 ?>" loading="<?= $mediaIndex === 0 ? 'eager' : 'lazy' ?>">
-                                                </a>
+                                                </div>
                                             <?php elseif ($mediaItem['type'] === 'video' && $mediaItem['source'] === 'upload'): ?>
                                                 <video class="agenda-card__video" playsinline preload="metadata" controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>"></video>
                                             <?php elseif ($mediaItem['type'] === 'reel' && $mediaItem['source'] === 'instagram'): ?>
@@ -319,9 +319,9 @@ require dirname(__DIR__) . '/app/views/header.php';
                         <?php elseif (count($eventMediaItems) === 1): ?>
                             <?php $mediaItem = $eventMediaItems[0]; ?>
                             <?php if ($mediaItem['type'] === 'image' && $mediaItem['source'] === 'upload'): ?>
-                                <a class="agenda-card__image-link" href="<?= $eventUrl ?>" aria-label="Bekijk <?= $escape($event['title']) ?>">
+                                <div class="agenda-card__image-link">
                                     <img class="agenda-card__image" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" alt="<?= $escape($event['title']) ?>" loading="lazy">
-                                </a>
+                                </div>
                             <?php elseif ($mediaItem['type'] === 'video' && $mediaItem['source'] === 'upload'): ?>
                                 <video class="agenda-card__video" playsinline preload="metadata" controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>"></video>
                             <?php elseif ($mediaItem['type'] === 'reel' && $mediaItem['source'] === 'instagram'): ?>
