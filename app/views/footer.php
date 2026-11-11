@@ -30,7 +30,7 @@ declare(strict_types=1);
                         <a class="agenda-footer-search__clear" href="/?region_id=<?= $footerRegionId ?>" aria-label="Wis zoekopdracht" title="Wis zoekopdracht">×</a>
                     <?php endif; ?>
                 </form>
-                <button type="button" class="agenda-back-to-top agenda-toggle-sound" id="agenda-toggle-sound" aria-label="Geluid van videos uitzetten" aria-pressed="false" title="Geluid van videos uitzetten">
+                <button type="button" class="agenda-back-to-top agenda-toggle-sound" id="agenda-toggle-sound" aria-label="Geluid van video's uitschakelen" aria-pressed="false" title="Geluid van video's uitschakelen">
                     <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M11 5 6 9H2v6h4l5 4z"></path>
                         <path d="M15.5 8.5a5 5 0 0 1 0 7"></path>
