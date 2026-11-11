@@ -12,7 +12,7 @@ $db = Database::connection();
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id || $id < 1) {
     http_response_code(400);
-    exit('Ongeldig organisat nummer.');
+    exit('Ongeldig organisatienummer.');
 }
 
 $statement = $db->prepare("SELECT * FROM organizers WHERE id = :id LIMIT 1");
