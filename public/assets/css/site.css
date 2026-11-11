@@ -705,16 +705,15 @@ body.has-agenda-footer .site-footer--agenda{
     width:36px;
     height:36px;
     padding:0;
-    border:1px solid var(--db-primary);
+    border:0;
     border-radius:10px;
-    background:var(--db-primary);
+    background:var(--db-back-top-color,var(--db-primary));
     color:#fff;
-    box-shadow:0 2px 7px rgba(25,40,60,.18);
+    box-shadow:none;
     cursor:pointer;
 }
 .agenda-back-to-top:hover{
-    background:var(--db-primary-dark);
-    border-color:var(--db-primary-dark);
+    background:var(--db-back-top-color,var(--db-primary));
 }
 .agenda-back-to-top:focus-visible{
     outline:3px solid rgba(10,77,159,.35);
@@ -735,10 +734,12 @@ body.has-agenda-footer .site-footer--agenda{
     min-width:0;
     height:36px;
     padding:6px 10px;
-    border:1px solid var(--db-border);
+    border:0;
     border-radius:10px;
-    background:#fff;
-    color:var(--db-text);
+    outline:0;
+    background:var(--db-search-field-color,#FFFFFF);
+    color:var(--db-search-text-color,var(--db-text));
+    box-shadow:none;
 }
 .agenda-footer-search button{
     display:grid;
@@ -749,13 +750,16 @@ body.has-agenda-footer .site-footer--agenda{
     padding:0;
     border:0;
     border-radius:10px;
-    background:var(--db-primary);
+    background:var(--db-search-button-color,var(--db-primary));
     color:#fff;
+    box-shadow:none;
     cursor:pointer;
 }
 .agenda-footer-search button:hover{
-    background:var(--db-primary-dark);
+    background:var(--db-search-button-color,var(--db-primary));
 }
+.agenda-footer-search input[type="search"]:focus{outline:0;box-shadow:none;border:0;}
+.agenda-footer-search button:focus-visible,.agenda-back-to-top:focus-visible{outline:0;}
 .agenda-footer-search__clear{
     display:grid;
     place-items:center;
