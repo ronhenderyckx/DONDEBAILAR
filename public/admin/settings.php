@@ -122,7 +122,27 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <form method="post" action="/admin/settings.php" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="agenda_page_size">Evenementen per keer (1–100)</label>
-            <input type="number" id="agenda_page_size" name="agenda_page_size" min="1" max="100" step="1" value="<?= (int) $agendaPageSize ?>" required>
+            <div class="agenda-page-size-control" style="display:flex;align-items:center;gap:8px;max-width:260px">
+                <button type="button" class="button" id="agenda_page_size_down" aria-label="Aantal evenementen verlagen">−</button>
+                <input type="number" id="agenda_page_size" name="agenda_page_size" min="1" max="100" step="1" value="<?= (int) $agendaPageSize ?>" required style="text-align:center;margin:0">
+                <button type="button" class="button" id="agenda_page_size_up" aria-label="Aantal evenementen verhogen">+</button>
+            </div>
+            <script>
+            (function () {
+                const field = document.getElementById('agenda_page_size');
+                const down = document.getElementById('agenda_page_size_down');
+                const up = document.getElementById('agenda_page_size_up');
+                if (!field || !down || !up) return;
+                down.addEventListener('click', function () {
+                    field.value = Math.max(1, (parseInt(field.value, 10) || 1) - 1);
+                    field.dispatchEvent(new Event('change', {bubbles:true}));
+                });
+                up.addEventListener('click', function () {
+                    field.value = Math.min(100, (parseInt(field.value, 10) || 0) + 1);
+                    field.dispatchEvent(new Event('change', {bubbles:true}));
+                });
+            })();
+            </script>
             <div class="form-actions">
                 <button type="submit" class="button button--primary" name="save_agenda_settings" value="1">Agenda-instelling opslaan</button>
             </div>
