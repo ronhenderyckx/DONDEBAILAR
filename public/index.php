@@ -270,7 +270,8 @@ require dirname(__DIR__) . '/app/views/header.php';
                     if ($mapUrl === '' && $event['latitude'] !== null && $event['longitude'] !== null) {
                         $mapUrl = 'https://www.google.com/maps?q=' . rawurlencode((string) $event['latitude'] . ',' . (string) $event['longitude']);
                     }
-                    $shareUrl = 'https://' . ($_SERVER['HTTP_HOST'] ?? '') . $eventUrl;
+                    $shareScheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+                    $shareUrl = $shareScheme . ($_SERVER['HTTP_HOST'] ?? '') . $eventUrl;
                     ?>
                     <article class="agenda-card" style="--db-event-day-color:var(--db-weekday-<?= (int) $start->format('N') ?>,var(--db-primary))">
                         <div class="agenda-card__media-wrap">
@@ -705,6 +706,22 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     line-height:1.4;
     opacity:1!important;
 }
+
+/* Gebruiksvriendelijk deelvenster voor agenda-evenementen. */
+.agenda-share-dialog{position:fixed;inset:0;z-index:12000;display:flex;align-items:center;justify-content:center;padding:18px;background:#0009}
+.agenda-share-dialog[hidden],.agenda-share-option[hidden]{display:none}
+.agenda-share-dialog__panel{position:relative;width:min(100%,390px);padding:24px 20px 18px;border-radius:16px;background:#fff;color:#20242b;box-shadow:0 16px 50px #0005}
+.agenda-share-dialog__panel h3{margin:0 34px 6px 0;color:#20242b;font-size:20px}
+.agenda-share-dialog__event{margin:0 0 18px;color:#626b76;font-size:14px;line-height:1.4;overflow-wrap:anywhere}
+.agenda-share-dialog__close{position:absolute;top:10px;right:12px;width:36px;height:36px;border:0;border-radius:50%;background:#f0f2f5;color:#303640;font-size:25px;line-height:1;cursor:pointer}
+.agenda-share-dialog__actions{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.agenda-share-option{display:flex;align-items:center;justify-content:center;gap:9px;min-height:48px;padding:10px;border:0;border-radius:9px;background:#edf0f4;color:#20242b;text-decoration:none;font:inherit;font-size:14px;font-weight:750;cursor:pointer}
+.agenda-share-option span{font-size:19px;font-weight:800}
+.agenda-share-option--whatsapp{background:#e5f7eb;color:#126b36}
+.agenda-share-option--facebook{background:#e8efff;color:#2054a6}
+.agenda-share-dialog__status{min-height:18px;margin:13px 0 0;color:#4c5968;font-size:12px;line-height:1.4;overflow-wrap:anywhere}
+.agenda-share-option:focus-visible,.agenda-share-dialog__close:focus-visible{outline:3px solid var(--db-primary,#E23A2C);outline-offset:2px}
+@media(max-width:420px){.agenda-share-dialog{padding:12px}.agenda-share-dialog__panel{padding:22px 16px 15px}}
 </style>
 <?php
 $hasInstagramReels = false;
@@ -1032,40 +1049,78 @@ document.addEventListener('click', function (event) {
     window.scrollTo({top:0, behavior:reduceMotion ? 'auto' : 'smooth'});
 });
 
-document.addEventListener('click', async function (event) {
+// Deelvenster voor evenementen: WhatsApp, Facebook, kopiëren en de native deeloptie.
+const eventShareDialog = document.createElement('div');
+eventShareDialog.className = 'agenda-share-dialog';
+eventShareDialog.hidden = true;
+eventShareDialog.innerHTML = '<div class="agenda-share-dialog__panel" role="dialog" aria-modal="true" aria-labelledby="agenda-share-title"><button type="button" class="agenda-share-dialog__close" aria-label="Sluiten">×</button><h3 id="agenda-share-title">Deel dit evenement</h3><p class="agenda-share-dialog__event"></p><div class="agenda-share-dialog__actions"><a class="agenda-share-option agenda-share-option--whatsapp" data-share-whatsapp target="_blank" rel="noopener noreferrer"><span aria-hidden="true">◉</span> WhatsApp</a><a class="agenda-share-option agenda-share-option--facebook" data-share-facebook target="_blank" rel="noopener noreferrer"><span aria-hidden="true">f</span> Facebook</a><button type="button" class="agenda-share-option" data-share-copy><span aria-hidden="true">▢</span> Link kopiëren</button><button type="button" class="agenda-share-option" data-share-native><span aria-hidden="true">↗</span> Andere apps</button></div><p class="agenda-share-dialog__status" role="status" aria-live="polite"></p></div>';
+document.body.appendChild(eventShareDialog);
+let activeShareData = null;
+function closeEventShareDialog() {
+    eventShareDialog.hidden = true;
+    activeShareData = null;
+}
+async function copyEventShareLink() {
+    if (!activeShareData) return;
+    const status = eventShareDialog.querySelector('.agenda-share-dialog__status');
+    try {
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(activeShareData.url);
+        } else {
+            const temporaryInput = document.createElement('textarea');
+            temporaryInput.value = activeShareData.url;
+            temporaryInput.setAttribute('readonly', '');
+            temporaryInput.style.position = 'fixed';
+            temporaryInput.style.opacity = '0';
+            document.body.appendChild(temporaryInput);
+            temporaryInput.select();
+            const copied = document.execCommand('copy');
+            temporaryInput.remove();
+            if (!copied) throw new Error('copy_failed');
+        }
+        status.textContent = 'Link gekopieerd. Je kunt hem nu in een bericht plakken.';
+    } catch (error) {
+        status.textContent = 'Kopiëren lukte niet. Selecteer en kopieer de link: ' + activeShareData.url;
+    }
+}
+eventShareDialog.addEventListener('click', function (event) {
+    if (event.target === eventShareDialog || event.target.closest('.agenda-share-dialog__close')) {
+        closeEventShareDialog();
+        return;
+    }
+    if (event.target.closest('[data-share-copy]')) {
+        copyEventShareLink();
+        return;
+    }
+    if (event.target.closest('[data-share-native]')) {
+        if (!activeShareData) return;
+        const shareData = {title:activeShareData.title, text:activeShareData.title, url:activeShareData.url};
+        if (navigator.share && (!navigator.canShare || navigator.canShare(shareData))) {
+            navigator.share(shareData).then(closeEventShareDialog).catch(function (error) {
+                if (error.name !== 'AbortError') eventShareDialog.querySelector('.agenda-share-dialog__status').textContent = 'Delen is niet gelukt. Kies WhatsApp of kopieer de link.';
+            });
+        } else {
+            copyEventShareLink();
+        }
+    }
+});
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Escape' && !eventShareDialog.hidden) closeEventShareDialog();
+});
+document.addEventListener('click', function (event) {
     const shareButton = event.target.closest('[data-share-url]');
     if (!shareButton) return;
-
     event.preventDefault();
     const title = shareButton.dataset.shareTitle || 'Evenement';
     const url = shareButton.dataset.shareUrl || window.location.href;
-    const shareData = {
-        title: title,
-        text: title,
-        url: url
-    };
-
-    if (navigator.share && (!navigator.canShare || navigator.canShare(shareData))) {
-        try {
-            await navigator.share(shareData);
-        } catch (error) {
-            if (error.name !== 'AbortError') {
-                window.alert('Delen is niet gelukt. Probeer de link te kopiëren.');
-            }
-        }
-        return;
-    }
-
-    try {
-        if (navigator.clipboard && window.isSecureContext) {
-            await navigator.clipboard.writeText(url);
-            window.alert('De link naar het evenement is gekopieerd. Je kunt hem nu in elke app delen.');
-        } else {
-            window.prompt('Kopieer deze link om het evenement te delen:', url);
-        }
-    } catch (error) {
-        window.prompt('Kopieer deze link om het evenement te delen:', url);
-    }
+    activeShareData = {title:title, url:url};
+    const message = title + ' — ' + url;
+    eventShareDialog.querySelector('.agenda-share-dialog__event').textContent = title;
+    eventShareDialog.querySelector('[data-share-whatsapp]').href = 'https://wa.me/?text=' + encodeURIComponent(message);
+    eventShareDialog.querySelector('[data-share-facebook]').href = 'https://www.facebook.com/sharer/sharer.php?u=' + encodeURIComponent(url);
+    eventShareDialog.querySelector('[data-share-native]').hidden = !(navigator.share && (!navigator.canShare || navigator.canShare({title:title,text:title,url:url})));
+    eventShareDialog.querySelector('.agenda-share-dialog__status').textContent = '';
+    eventShareDialog.hidden = false;
 });
 </script>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
