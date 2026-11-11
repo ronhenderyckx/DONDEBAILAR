@@ -344,8 +344,8 @@ require dirname(__DIR__) . '/app/views/header.php';
                                 <?php if ($locationLabel !== ''): ?><span class="agenda-card__location"><span class="agenda-card__location-icon" aria-hidden="true">📍</span><?= $escape($locationLabel) ?></span><?php endif; ?>
                             </div>
                             <p class="agenda-card__date-line"><?= $escape(strtoupper($start->format('l, d M Y'))) ?> <span>◷</span> <?= $escape($start->format('H:i')) ?><?php if (!empty($event['ends_at'])): ?> – <?= $escape((new DateTimeImmutable((string) $event['ends_at'], $timezone))->format('H:i')) ?><?php endif; ?></p>
+                            <p class="agenda-card__swipe-hint">↔ Swipe om meer te zien</p>
                             <?php if (trim((string) ($event['description'] ?? '')) !== ''): ?>
-                                <p class="agenda-card__swipe-hint">↔ Swipe om meer te zien</p>
                                 <div class="agenda-card__description" data-event-description aria-hidden="true">
                                     <div class="agenda-card__description-inner"><?= nl2br($escape(trim((string) $event['description']))) ?></div>
                                 </div>
@@ -630,6 +630,18 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     margin:5px 0 0!important;
     font-size:12px!important;
     font-weight:650!important;
+}
+
+/* De swipe-aanwijzing blijft altijd zichtbaar op de evenementkaart. */
+.agenda-card__swipe-hint{
+    display:block!important;
+    visibility:visible!important;
+    margin:3px 0 5px!important;
+    color:var(--db-text)!important;
+    font-size:12px!important;
+    font-weight:700!important;
+    line-height:1.4;
+    opacity:1!important;
 }
 </style>
 <?php
