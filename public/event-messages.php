@@ -230,7 +230,7 @@ $renderMessage = static function (string $message) use ($mentionNames, $escape):
 };
 ?>
 <section class="event-chat<?= $popupMode ? ' event-chat--popup' : '' ?>" id="messages">
-    <div class="event-chat__heading" style="display:block!important;width:100%;height:70px;min-height:70px;box-sizing:border-box;overflow:hidden;padding:0 12px;background:var(--db-primary,#1456a0);color:#fff">
+    <div class="event-chat__heading" style="display:block!important;width:100%;height:70px;min-height:70px;box-sizing:border-box;overflow:hidden;padding:0 12px;background:var(--db-chat-day-color,var(--db-primary,#1456a0));color:#fff">
         <strong style="display:block!important;margin:0;padding:0;line-height:70px;color:#fff;font-size:16px;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis">
             <svg aria-hidden="true" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:8px;color:#fff"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"></path></svg><?= $escape($event['title']) ?> <span style="display:inline;font-size:14px;font-weight:600;white-space:nowrap">· <?= $messageCount ?> <?= $messageCount === 1 ? 'bericht' : 'berichten' ?></span>
         </strong>
@@ -344,7 +344,7 @@ $renderMessage = static function (string $message) use ($mentionNames, $escape):
 html,body{height:100%;margin:0!important;padding:0!important;overflow:hidden!important}
 body:has(.event-chat--popup) .site-header,body:has(.event-chat--popup) footer{display:none!important}
 body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;margin:0!important;padding:0!important;overflow:hidden}
-.event-chat{height:100%;min-height:0;display:flex;flex-direction:column;background:#fff;color:#222;font:14px/1.45 system-ui,sans-serif}
+.event-chat{height:100%;min-height:0;display:flex;flex-direction:column;background:var(--db-chat-day-color,var(--db-primary,#1456a0));color:#222;font:14px/1.45 system-ui,sans-serif}
 .event-chat__heading{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;gap:8px;}
 *{scrollbar-width:none;-ms-overflow-style:none}*::-webkit-scrollbar{display:none;width:0;height:0}.event-chat__messages{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;padding:12px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}.event-chat__messages::-webkit-scrollbar{display:none;width:0;height:0}
 .event-chat__empty{margin:auto;color:#888;text-align:center}
