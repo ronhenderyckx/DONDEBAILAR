@@ -349,6 +349,8 @@ body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;mar
 *{scrollbar-width:none;-ms-overflow-style:none}*::-webkit-scrollbar{display:none;width:0;height:0}.event-chat__messages{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;padding:12px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}.event-chat__messages::-webkit-scrollbar{display:none;width:0;height:0}
 .event-chat__empty{margin:auto;color:#888;text-align:center}
 .chat-message{max-width:88%;align-self:flex-start}.chat-message__bubble{position:relative;padding:9px 12px;border-radius:14px 14px 14px 4px;background:#f0f2f5;overflow-wrap:anywhere}
+.chat-message--highlight .chat-message__bubble{outline:3px solid var(--db-chat-day-color,var(--db-primary,#1456a0));outline-offset:2px;animation:chatMentionHighlight 2.5s ease-out forwards}
+@keyframes chatMentionHighlight{0%,55%{background:#fff4bd}100%{background:#f0f2f5}}
 .chat-message__meta{display:flex;gap:10px;align-items:center;margin-bottom:4px;font-size:11px;color:#777}.chat-message__meta strong{color:#444;font-size:12px}.chat-message__meta time{white-space:nowrap}
 .chat-message__bubble p{margin:0;white-space:normal}.chat-message__bubble small{display:block;color:#888;font-size:10px}
 .chat-message__deleted{color:#888;font-style:italic}.chat-mention{color:var(--db-primary,#2878c8);font-weight:700;background:rgba(40,120,200,.09);border-radius:4px;padding:0 2px}
@@ -371,7 +373,16 @@ body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;mar
 <script>
 (() => {
     const list = document.querySelector('.event-chat__messages');
-    if (list) list.scrollTop = list.scrollHeight;
+    if (list) {
+        const targetId = window.location.hash ? decodeURIComponent(window.location.hash.slice(1)) : '';
+        const target = targetId ? document.getElementById(targetId) : null;
+        if (target && list.contains(target)) {
+            list.scrollTop = Math.max(0, target.offsetTop - list.offsetTop - 12);
+            target.classList.add('chat-message--highlight');
+        } else {
+            list.scrollTop = list.scrollHeight;
+        }
+    }
     document.addEventListener('click', event => {
         const button = event.target.closest('[data-reply-toggle]');
         if (!button) return;
