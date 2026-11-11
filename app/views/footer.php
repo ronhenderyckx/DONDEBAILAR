@@ -12,27 +12,35 @@ declare(strict_types=1);
                 <span>&copy; <?= date('Y') ?> DONDEBAILAR</span>
                 <span>Salsa · Bachata · Kizomba</span>
             </div>
-            <form class="agenda-footer-search" method="get" action="/" role="search">
-                <?php if ($footerRegionId > 0): ?>
-                    <input type="hidden" name="region_id" value="<?= $footerRegionId ?>">
-                <?php endif; ?>
-                <label class="sr-only" for="agenda-footer-search-input">Zoek in de agenda</label>
-                <input
-                    type="search"
-                    id="agenda-footer-search-input"
-                    name="q"
-                    value="<?= $footerSearchEscape($agendaSearch ?? '') ?>"
-                    placeholder="Zoek evenement, stad of organisator…"
-                    maxlength="120"
-                    autocomplete="off"
-                >
-                <button type="submit" aria-label="Zoek in de agenda" title="Zoek in de agenda">
-                    <svg aria-hidden="true" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg>
+            <div class="agenda-footer-tools">
+                <form class="agenda-footer-search" method="get" action="/" role="search">
+                    <?php if ($footerRegionId > 0): ?>
+                        <input type="hidden" name="region_id" value="<?= $footerRegionId ?>">
+                    <?php endif; ?>
+                    <label class="sr-only" for="agenda-footer-search-input">Zoek in de agenda</label>
+                    <input
+                        type="search"
+                        id="agenda-footer-search-input"
+                        name="q"
+                        value="<?= $footerSearchEscape($agendaSearch ?? '') ?>"
+                        placeholder="Zoek evenement, stad of organisator…"
+                        maxlength="120"
+                        autocomplete="off"
+                    >
+                    <button type="submit" aria-label="Zoek in de agenda" title="Zoek in de agenda">
+                        <svg aria-hidden="true" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 5 5"></path></svg>
+                    </button>
+                    <?php if (trim((string) ($agendaSearch ?? '')) !== ''): ?>
+                        <a class="agenda-footer-search__clear" href="/?region_id=<?= $footerRegionId ?>" aria-label="Wis zoekopdracht" title="Wis zoekopdracht">×</a>
+                    <?php endif; ?>
+                </form>
+                <button type="button" class="agenda-back-to-top" id="agenda-back-to-top" aria-label="Terug naar boven" title="Terug naar boven">
+                    <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m5 14 7-7 7 7"></path>
+                        <path d="M12 7v13"></path>
+                    </svg>
                 </button>
-                <?php if (trim((string) ($agendaSearch ?? '')) !== ''): ?>
-                    <a class="agenda-footer-search__clear" href="/?region_id=<?= $footerRegionId ?>" aria-label="Wis zoekopdracht" title="Wis zoekopdracht">×</a>
-                <?php endif; ?>
-            </form>
+            </div>
         </div>
     </footer>
 <?php else: ?>
