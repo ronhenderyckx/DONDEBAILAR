@@ -323,8 +323,8 @@ require dirname(__DIR__) . '/app/views/header.php';
                         <div class="agenda-card__details">
                             <div class="agenda-card__quick">
                                 <button type="button" class="agenda-attendance<?= !empty($event['is_attending']) ? ' is-attending' : '' ?>" data-event-id="<?= (int) $event['id'] ?>" aria-label="Ik kom dansen" aria-pressed="<?= !empty($event['is_attending']) ? 'true' : 'false' ?>" title="Tik: Ik kom dansen · Lang indrukken: deelnemers"><span aria-hidden="true">👠</span><b><?= (int) ($event['attendance_count'] ?? 0) ?></b></button>
-                                <span class="agenda-card__quick-date" aria-label="Datum"><?= $escape($start->format('d')) ?></span>
                                 <button type="button" class="agenda-icon-button agenda-share" data-share-title="<?= $escape($event['title']) ?>" data-share-url="<?= $escape($shareUrl) ?>" aria-label="Deel evenement"><span aria-hidden="true">↗</span></button>
+                                <span class="agenda-card__quick-date" aria-label="Datum"><?= $escape($start->format('d')) ?></span>
                                 <?php if ($mapUrl !== ''): ?><a class="agenda-icon-button" href="<?= $escape($mapUrl) ?>" target="_blank" rel="noopener noreferrer" aria-label="Toon locatie op kaart"><span aria-hidden="true">⌖</span></a><?php endif; ?>
                             </div>
                             <h2><a href="<?= $eventUrl ?>"><?= $escape($event['title']) ?></a></h2>
