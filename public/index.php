@@ -339,19 +339,20 @@ require dirname(__DIR__) . '/app/views/header.php';
                                 $hashtagItems
                             ), static fn(string $tag): bool => preg_match('/^[\\p{L}\\p{N}_]+$/u', $tag) === 1));
                             ?>
-                            <div class="agenda-card__tags-location">
-                                <?php if (!empty($event['category_name'])): ?><span class="agenda-card__tags"># <?= $escape($event['category_name']) ?></span><?php endif; ?>
-                                <?php if ($locationLabel !== ''): ?><span class="agenda-card__location"><span class="agenda-card__location-icon" aria-hidden="true">📍</span><?= $escape($locationLabel) ?></span><?php endif; ?>
-                            </div>
                             <p class="agenda-card__date-line"><?= $escape(strtoupper($start->format('l, d M Y'))) ?> <span>◷</span> <?= $escape($start->format('H:i')) ?><?php if (!empty($event['ends_at'])): ?> – <?= $escape((new DateTimeImmutable((string) $event['ends_at'], $timezone))->format('H:i')) ?><?php endif; ?></p>
-                            <p class="agenda-card__swipe-hint">↔ Swipe om meer te zien</p>
                             <?php if (trim((string) ($event['description'] ?? '')) !== ''): ?>
                                 <div class="agenda-card__description" data-event-description aria-hidden="true">
                                     <div class="agenda-card__description-inner"><?= nl2br($escape(trim((string) $event['description']))) ?></div>
                                 </div>
                             <?php endif; ?>
-                            <?php if ($hashtagItems !== []): ?>
-                                <p class="agenda-card__hashtags"><?= $escape(implode(' ', array_map(static fn(string $tag): string => '#' . $tag, $hashtagItems))) ?></p>
+                            <?php
+                            $displayTags = array_map(static fn(string $tag): string => '#' . $tag, $hashtagItems);
+                            if ($locationLabel !== '') {
+                                $displayTags[] = '#' . $locationLabel;
+                            }
+                            ?>
+                            <?php if ($displayTags !== []): ?>
+                                <p class="agenda-card__hashtags"><?= $escape(implode(' ', $displayTags)) ?></p>
                             <?php endif; ?>
                         </div>
                     </article>
