@@ -246,6 +246,12 @@ if ($regionId > 0) {
     }
 }
 
+$agendaPageSizeFile = dirname(__DIR__) . '/storage/agenda-page-size.txt';
+$agendaPageSize = 20;
+if (is_file($agendaPageSizeFile)) {
+    $storedPageSize = (int) trim((string) file_get_contents($agendaPageSizeFile));
+    if ($storedPageSize >= 1 && $storedPageSize <= 100) $agendaPageSize = $storedPageSize;
+}
 $escape = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 $isAgendaPage = true;
 $pageTitle = 'Agenda' . ($region ? ' — ' . $region['name'] : '') . ' — DONDEBAILAR';
@@ -273,7 +279,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                     $shareScheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
                     $shareUrl = $shareScheme . ($_SERVER['HTTP_HOST'] ?? '') . $eventUrl;
                     ?>
-                    <article class="agenda-card"<?= $eventIndex >= 20 ? ' hidden' : '' ?> style="--db-event-day-color:var(--db-weekday-<?= (int) $start->format('N') ?>,var(--db-primary))">
+                    <article class="agenda-card"<?= $eventIndex >= $agendaPageSize ? ' hidden' : '' ?> style="--db-event-day-color:var(--db-weekday-<?= (int) $start->format('N') ?>,var(--db-primary))">
                         <div class="agenda-card__media-wrap">
                         <?php $eventMediaItems = $event['media_items'] ?? []; ?>
                         <?php if (count($eventMediaItems) > 1): ?>
@@ -417,13 +423,13 @@ require dirname(__DIR__) . '/app/views/header.php';
                     </article>
                 <?php endforeach; ?>
             </div>
-            <?php if (count($events) > 20): ?>
+            <?php if (count($events) > $agendaPageSize): ?>
                 <div class="agenda-load-more-wrap">
                     <button type="button" class="agenda-load-more" id="agenda-load-more">Meer evenementen laden</button>
                 </div>
             <?php endif; ?>
         <?php endif; ?>
-        <p class="agenda-count" id="agenda-count" data-total="<?= count($events) ?>"><?= min(20, count($events)) ?> van <?= count($events) ?> evenementen getoond</p>
+        <p class="agenda-count" id="agenda-count" data-total="<?= count($events) ?>"><?= min($agendaPageSize, count($events)) ?> van <?= count($events) ?> evenementen getoond</p>
     <?php endif; ?>
     <div class="agenda-message-modal" id="agenda-message-modal" hidden>
         <div class="agenda-message-modal__panel" role="dialog" aria-modal="true" aria-labelledby="agenda-message-modal-title">
@@ -745,7 +751,7 @@ foreach ($events as $instagramCheckEvent) {
 ?>
 <?php if ($hasInstagramReels): ?><script async src="https://www.instagram.com/embed.js"></script><?php endif; ?>
 <script>
-const agendaPageSize = 20;
+const agendaPageSize = <?= (int) $agendaPageSize ?>;
 const agendaCards = Array.from(document.querySelectorAll('.agenda-feed .agenda-card'));
 const agendaLoadMore = document.getElementById('agenda-load-more');
 const agendaCount = document.getElementById('agenda-count');
