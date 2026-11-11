@@ -733,6 +733,31 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
  .site-header__agenda-filters .agenda-organizer-strip{padding-bottom:2px}
 }
 
+/* Houd de filterbalk exact even hoog bij wisselen tussen organisator en stad. */
+.agenda-selector-line{
+    height:86px;
+    min-height:86px;
+    align-items:center!important;
+}
+.agenda-selector-panel{
+    height:86px;
+    min-height:86px;
+    box-sizing:border-box;
+    align-items:center!important;
+}
+.agenda-organizer-strip{
+    height:86px;
+    min-height:86px;
+    box-sizing:border-box;
+    align-items:center!important;
+    padding-top:0!important;
+    padding-bottom:0!important;
+}
+.agenda-selector-button{
+    align-self:center!important;
+    margin-top:0!important;
+}
+
 /* Compacte evenementinformatie: titel, categorie en locatie, datum, hint en hashtags. */
 .agenda-card__tags-location{
     display:flex;
