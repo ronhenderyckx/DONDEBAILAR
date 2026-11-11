@@ -1343,3 +1343,16 @@ document.addEventListener('click', function (event) {
 });
 </script>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
+
+/* Geselecteerde organisator: markering op het logo zelf, onafhankelijk van hover, focus en scrollen. */
+.agenda-organizer-item--organizer.is-selected img.agenda-organizer-logo,
+.agenda-organizer-item--organizer.is-selected .agenda-organizer-fallback{
+    border:3px solid var(--db-organizer-color,#E23A2C) !important;
+    background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 16%,#FFFFFF) !important;
+    box-shadow:0 0 0 3px var(--db-filter-bar-color,#FFFFFF),0 0 0 5px var(--db-organizer-color,#E23A2C) !important;
+    transform:none !important;
+}
+.agenda-organizer-item--organizer.is-selected .agenda-organizer-name{
+    color:var(--db-organizer-color,#E23A2C) !important;
+    font-weight:900 !important;
+}
