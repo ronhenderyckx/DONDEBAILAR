@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/Authorization.php';
 require_once __DIR__ . '/Security.php';
+require_once __DIR__ . '/ImageOptimization.php';
 
 /** Regio's waarin de gebruiker evenementen mag aanmaken. */
 function eventManageableRegions(PDO $db, array $user): array
@@ -108,14 +109,20 @@ function storeEventMedia(PDO $db, int $eventId, int $userId, array $fileGroups):
                         : 'Gebruik voor video’s en reels MP4, WebM of MOV.');
                 }
 
-                if ($type === 'photo' && @getimagesize($tmp) === false) {
-                    throw new RuntimeException('Een fotobestand is geen geldige afbeelding.');
-                }
-
-                $filename = bin2hex(random_bytes(16)) . '.' . $rule['mimes'][$mime];
-                $destination = $baseDirectory . '/' . $filename;
-                if (!move_uploaded_file($tmp, $destination)) {
-                    throw new RuntimeException('Een mediabestand kon niet worden opgeslagen.');
+                if ($type === 'photo') {
+                    $imageData = file_get_contents($tmp);
+                    if (!is_string($imageData)) {
+                        throw new RuntimeException('Een fotobestand kon niet worden gelezen.');
+                    }
+                    $filename = bin2hex(random_bytes(16)) . '.webp';
+                    $destination = $baseDirectory . '/' . $filename;
+                    optimizeLogoDataToWebp($imageData, $destination, 1600);
+                } else {
+                    $filename = bin2hex(random_bytes(16)) . '.' . $rule['mimes'][$mime];
+                    $destination = $baseDirectory . '/' . $filename;
+                    if (!move_uploaded_file($tmp, $destination)) {
+                        throw new RuntimeException('Een mediabestand kon niet worden opgeslagen.');
+                    }
                 }
 
                 $relativePath = 'uploads/events/' . $eventId . '/' . $filename;
