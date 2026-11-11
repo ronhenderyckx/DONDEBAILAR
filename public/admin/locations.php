@@ -43,14 +43,14 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 <?php if ($regions === []): ?><p>Je hebt nog geen regio toegewezen gekregen met rechten om locaties te beheren.</p>
 <?php else: ?>
 <form method="get" class="location-search"><label for="location-search">Zoeken</label><div class="location-search__controls">
-<input id="location-search" type="search" name="q" value="<?= escapeHtml($search) ?>" placeholder="Naam, gemeente, straat of postcode">
+<input id="location-search" type="search" name="q" value="<?= escapeHtml($search) ?>" placeholder="Naam, stad, straat of postcode">
 <?php if (count($regions) > 1): ?><select name="region_id" aria-label="Filter op regio"><option value="0">Alle regio's</option><?php foreach ($regions as $item): ?><option value="<?= (int) $item['id'] ?>" <?= $selectedRegionId === (int) $item['id'] ? 'selected' : '' ?>><?= escapeHtml($item['name']) ?></option><?php endforeach; ?></select><?php endif; ?>
-<button class="button" type="submit">Zoeken</button><?php if ($search !== '' || $selectedRegionId > 0): ?><a class="button" href="/admin/locations.php">Wissen</a><?php endif; ?>
+<button class="button" type="submit">Zoeken</button><?php if ($search !== '' || $selectedRegionId > 0): ?><a class="button" href="/admin/locations.php">Filters wissen</a><?php endif; ?>
 </div></form>
 <?php if ($locations === []): ?><p><?= $search !== '' ? 'Geen locaties gevonden.' : 'Er zijn nog geen locaties toegevoegd.' ?></p>
 <?php else: ?>
 <div class="table-wrapper location-table-wrapper"><table class="admin-table location-table">
-<thead><tr><th>Locatie</th><th>Gemeente</th><th>Regio</th><th>Google Maps</th><th>Status</th><th>Actie</th></tr></thead><tbody>
+<thead><tr><th>Locatie</th><th>Stad</th><th>Regio</th><th>Google Maps</th><th>Status</th><th>Actie</th></tr></thead><tbody>
 <?php foreach ($locations as $location): ?><tr>
 <td><div class="location-list-item">
 <?php if (preg_match('~\Auploads/locations/[a-f0-9]{32}\.(?:jpg|png|webp)\z~D', (string) ($location['logo_path'] ?? ''))): ?><img class="location-list-logo" src="/location-logo.php?file=<?= rawurlencode(basename((string) $location['logo_path'])) ?>" alt="" loading="lazy">
