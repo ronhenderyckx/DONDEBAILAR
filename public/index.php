@@ -340,7 +340,6 @@ require dirname(__DIR__) . '/app/views/header.php';
                             ), static fn(string $tag): bool => preg_match('/^[\\p{L}\\p{N}_]+$/u', $tag) === 1));
                             ?>
                             <p class="agenda-card__date-line"><?= $escape(strtoupper($start->format('l, d M Y'))) ?> <span>◷</span> <?= $escape($start->format('H:i')) ?><?php if (!empty($event['ends_at'])): ?> – <?= $escape((new DateTimeImmutable((string) $event['ends_at'], $timezone))->format('H:i')) ?><?php endif; ?></p>
-                            <p class="agenda-card__swipe-hint">↔ Swipe om meer te zien</p>
                             <?php if (trim((string) ($event['description'] ?? '')) !== ''): ?>
                                 <div class="agenda-card__description" data-event-description aria-hidden="true">
                                     <div class="agenda-card__description-inner"><?= nl2br($escape(trim((string) $event['description']))) ?></div>
@@ -355,6 +354,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                             <?php if ($displayTags !== []): ?>
                                 <p class="agenda-card__hashtags"><?= $escape(implode(' ', $displayTags)) ?></p>
                             <?php endif; ?>
+                            <p class="agenda-card__swipe-hint">↔ Swipe om meer te zien</p>
                         </div>
                     </article>
                 <?php endforeach; ?>
