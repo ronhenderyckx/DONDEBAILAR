@@ -5,6 +5,7 @@ require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
 require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
 require_once dirname(__DIR__, 2) . '/app/Organizers.php';
+require_once dirname(__DIR__, 2) . '/app/ImageOptimization.php';
 
 $user = requireOrganizerManagement();
 $db = Database::connection();
@@ -32,7 +33,7 @@ $isActive = (int) $organizer['is_active'] === 1;
 function isManagedOrganizerLogo(?string $path): bool
 {
     return is_string($path)
-        && preg_match('~\Auploads/organizers/[a-f0-9]{32}\.(?:jpg|png|webp)\z~D', $path) === 1;
+        && preg_match('~\Auploads/organizers/[a-f0-9]{32}\.webp\z~D', $path) === 1;
 }
 
 function deleteManagedOrganizerLogo(?string $path): void
@@ -49,52 +50,7 @@ function deleteManagedOrganizerLogo(?string $path): void
 
 function storeOrganizerLogo(array $file): ?string
 {
-    $error = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
-
-    if ($error === UPLOAD_ERR_NO_FILE) {
-        return null;
-    }
-    if ($error !== UPLOAD_ERR_OK) {
-        throw new RuntimeException('Het logo kon niet worden geüpload.');
-    }
-
-    $temporaryFile = (string) ($file['tmp_name'] ?? '');
-
-    if ($temporaryFile === '' || !is_uploaded_file($temporaryFile)) {
-        throw new RuntimeException('Het geüploade logo is ongeldig.');
-    }
-    if ((int) ($file['size'] ?? 0) > 2 * 1024 * 1024) {
-        throw new RuntimeException('Het logo mag maximaal 2 MB groot zijn.');
-    }
-
-    $imageInfo = @getimagesize($temporaryFile);
-    $mime = $imageInfo['mime'] ?? '';
-
-    $extensions = [
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
-        'image/webp' => 'webp',
-    ];
-
-    if (!isset($extensions[$mime])) {
-        throw new RuntimeException('Gebruik een JPG-, PNG- of WebP-logo.');
-    }
-
-    $baseDirectory = dirname(__DIR__, 2) . '/uploads/organizers';
-
-    if (!is_dir($baseDirectory)
-        && !mkdir($baseDirectory, 0755, true)
-        && !is_dir($baseDirectory)) {
-        throw new RuntimeException('De uploadmap kon niet worden aangemaakt.');
-    }
-
-    $filename = bin2hex(random_bytes(16)) . '.' . $extensions[$mime];
-
-    if (!move_uploaded_file($temporaryFile, $baseDirectory . '/' . $filename)) {
-        throw new RuntimeException('Het logo kon niet worden opgeslagen.');
-    }
-
-    return 'uploads/organizers/' . $filename;
+    return storeOptimizedLogoUpload($file, 'uploads/organizers', 256, 2 * 1024 * 1024);
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
