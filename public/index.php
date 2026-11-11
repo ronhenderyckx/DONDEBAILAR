@@ -354,7 +354,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                             <?php if ($displayTags !== []): ?>
                                 <p class="agenda-card__hashtags"><?= $escape(implode(' ', $displayTags)) ?></p>
                             <?php endif; ?>
-                            <p class="agenda-card__swipe-hint">→ Swipe rechts = meer · ← Swipe links = minder</p>
+                            <p class="agenda-card__swipe-hint" data-swipe-hint>→ Swipe rechts voor meer info</p>
                         </div>
                     </article>
                 <?php endforeach; ?>
@@ -708,6 +708,10 @@ function setEventDescription(info, show) {
     if (!description) return;
     description.classList.toggle('is-visible', show);
     description.setAttribute('aria-hidden', show ? 'false' : 'true');
+    const hint = info.querySelector('[data-swipe-hint]');
+    if (hint) hint.textContent = show
+        ? '← Swipe links voor minder info'
+        : '→ Swipe rechts voor meer info';
 }
 document.querySelectorAll('[data-event-info]').forEach(function (info) {
     if (!info.querySelector('[data-event-description]')) return;
