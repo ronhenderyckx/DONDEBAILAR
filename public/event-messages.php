@@ -14,7 +14,7 @@ if (!$id || $id < 1) {
 }
 
 $statement = $db->prepare(
-    "SELECT e.id, e.title, e.region_id, e.status, r.name AS region_name,
+    "SELECT e.id, e.title, e.region_id, e.status, e.created_by, r.name AS region_name,
             r.logo_path, r.timezone
      FROM events e INNER JOIN regions r ON r.id = e.region_id
      WHERE e.id = :id AND e.status = 'published' LIMIT 1"
