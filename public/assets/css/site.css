@@ -986,3 +986,8 @@ body.has-agenda-footer .site-footer--agenda{
 .site-menu{position:relative;z-index:5003}
 .site-menu__panel{position:absolute;z-index:5004}
 .site-header__agenda-filters{position:relative;z-index:1}
+
+
+/* Welkomsttekst naast de meldingen in de header */
+.site-welcome{flex:0 1 auto;min-width:0;margin-left:auto;color:var(--db-text,#222);font-size:14px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:600px){.site-header__inner{gap:9px}.site-welcome{font-size:12px;max-width:34vw}}
