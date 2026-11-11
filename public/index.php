@@ -1200,7 +1200,7 @@ document.addEventListener('click', function (event) {
         saveButton.dataset.busy = '0';
         saveButton.removeAttribute('aria-busy');
     });
-});
+}, true);
 
 document.addEventListener('click', function (event) {
     const backToTopButton = event.target.closest('#agenda-back-to-top');
