@@ -16,9 +16,10 @@ try {
  $q = $db->query("SELECT TABLE_NAME, COLUMN_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_NAME = 'regions'");
  $blocked = [];
  foreach ($q->fetchAll() as $ref) {
-  $table = str_replace('"','""',$ref['TABLE_NAME']);
-  $column = str_replace('"','""',$ref['COLUMN_NAME']);
-  $check = $db->prepare('SELECT 1 FROM "' . $table . '" WHERE "' . $column . '" = :id LIMIT 1');
+  $quote = chr(96);
+  $table = str_replace($quote, $quote . $quote, $ref['TABLE_NAME']);
+  $column = str_replace($quote, $quote . $quote, $ref['COLUMN_NAME']);
+  $check = $db->prepare('SELECT 1 FROM ' . $quote . $table . $quote . ' WHERE ' . $quote . $column . $quote . ' = :id LIMIT 1');
   $check->execute(['id'=>$id]);
   if ($check->fetchColumn()) $blocked[] = $ref['TABLE_NAME'];
  }
