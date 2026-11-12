@@ -54,5 +54,14 @@ declare(strict_types=1);
 <?php endif; ?>
 
 <script src="/assets/js/site.js" defer></script>
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register('/sw.js', { scope: '/' }).catch(function (error) {
+            console.warn('DONDEBAILAR offline ondersteuning kon niet worden gestart.', error);
+        });
+    });
+}
+</script>
 </body>
 </html>
