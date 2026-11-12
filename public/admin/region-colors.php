@@ -75,9 +75,11 @@ $logoPath = $saved !== []
 
 $cityIconSettingFile = dirname(__DIR__, 2) . '/storage/region-city-icons/' . $regionId . '.txt';
 $organizerIconSettingFile = dirname(__DIR__, 2) . '/storage/region-organizer-icons/' . $regionId . '.txt';
+$citySwitchIconSettingFile = dirname(__DIR__, 2) . '/storage/region-city-switch-icons/' . $regionId . '.txt';
 $cityIconPath = is_file($cityIconSettingFile) ? trim((string) file_get_contents($cityIconSettingFile)) : '';
 $organizerIconPath = is_file($organizerIconSettingFile) ? trim((string) file_get_contents($organizerIconSettingFile)) : '';
-foreach (['cityIconPath', 'organizerIconPath'] as $iconPathVariable) {
+$citySwitchIconPath = is_file($citySwitchIconSettingFile) ? trim((string) file_get_contents($citySwitchIconSettingFile)) : '';
+foreach (['cityIconPath', 'organizerIconPath', 'citySwitchIconPath'] as $iconPathVariable) {
     if (!preg_match('#^uploads/regions/[a-zA-Z0-9._-]+$#', $iconPathVariable)) {
         $iconPathVariable = '';
     }
@@ -93,8 +95,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newCityIconPath = $cityIconPath;
         $oldOrganizerIconPath = $organizerIconPath;
         $newOrganizerIconPath = $organizerIconPath;
+        $oldCitySwitchIconPath = $citySwitchIconPath;
+        $newCitySwitchIconPath = $citySwitchIconPath;
         if (!empty($_POST['delete_city_icon'])) $newCityIconPath = '';
         if (!empty($_POST['delete_organizer_icon'])) $newOrganizerIconPath = '';
+        if (!empty($_POST['delete_city_switch_icon'])) $newCitySwitchIconPath = '';
         if (isset($_FILES['city_icon']) && ($_FILES['city_icon']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
             try {
                 $uploadedCityIcon = storeOptimizedLogoUpload(
@@ -123,6 +128,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 );
                 if ($uploadedOrganizerIcon !== null) {
                     $newOrganizerIconPath = substr($uploadedOrganizerIcon, strlen('public/'));
+                }
+            } catch (RuntimeException $exception) {
+                $errorMessage = $exception->getMessage();
+            }
+        }
+
+        if (isset($_FILES['city_switch_icon']) && ($_FILES['city_switch_icon']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+            try {
+                $uploadedCitySwitchIcon = storeOptimizedLogoUpload(
+                    $_FILES['city_switch_icon'],
+                    'public/uploads/regions',
+                    256,
+                    5 * 1024 * 1024,
+                    'city-switch-icon-' . $regionId . '-'
+                );
+                if ($uploadedCitySwitchIcon !== null) {
+                    $newCitySwitchIconPath = substr($uploadedCitySwitchIcon, strlen('public/'));
                 }
             } catch (RuntimeException $exception) {
                 $errorMessage = $exception->getMessage();
@@ -257,12 +279,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $oldOrganizerIconFile = dirname(__DIR__) . '/' . $oldOrganizerIconPath;
                     if (is_file($oldOrganizerIconFile)) @unlink($oldOrganizerIconFile);
                 }
+                $citySwitchIconDirectory = dirname($citySwitchIconSettingFile);
+                if (!is_dir($citySwitchIconDirectory) && !mkdir($citySwitchIconDirectory, 0755, true) && !is_dir($citySwitchIconDirectory)) {
+                    throw new RuntimeException('De map voor het stedenkeuze-icoon kon niet worden aangemaakt.');
+                }
+                if ($newCitySwitchIconPath === '') {
+                    if (is_file($citySwitchIconSettingFile)) @unlink($citySwitchIconSettingFile);
+                } elseif (file_put_contents($citySwitchIconSettingFile, $newCitySwitchIconPath . PHP_EOL, LOCK_EX) === false) {
+                    throw new RuntimeException('Het stedenkeuze-icoon kon niet worden opgeslagen.');
+                }
+                $citySwitchIconPath = $newCitySwitchIconPath;
+                if ($oldCitySwitchIconPath !== '' && $oldCitySwitchIconPath !== $newCitySwitchIconPath
+                    && str_starts_with($oldCitySwitchIconPath, 'uploads/regions/')) {
+                    $oldCitySwitchIconFile = dirname(__DIR__) . '/' . $oldCitySwitchIconPath;
+                    if (is_file($oldCitySwitchIconFile)) @unlink($oldCitySwitchIconFile);
+                }
                 if ($oldLogoPath !== '' && $oldLogoPath !== $newLogoPath
                     && str_starts_with($oldLogoPath, 'uploads/regions/')) {
                     $oldFile = dirname(__DIR__) . '/' . $oldLogoPath;
                     if (is_file($oldFile)) @unlink($oldFile);
                 }
-                $successMessage = 'De kleuren, het logo en beide filtericonen zijn opgeslagen.';
+                $successMessage = 'De kleuren, het logo en de filtericonen zijn opgeslagen.';
             }
         }
     }
@@ -337,6 +374,14 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <?php endif; ?>
             <label for="city_icon">Nieuwe stadsicoon (PNG, JPG of WEBP)</label>
             <input type="file" id="city_icon" name="city_icon" accept="image/png,image/jpeg,image/webp">
+            <h2>Stedenkeuze-icoon voor de filterknop</h2>
+            <p>Dit is de aparte afbeelding op de knop waarmee je naar het stedenfilter schakelt. Dit staat los van de stadsicoontjes in de stedenlijst. PNG, JPG of WebP, maximaal 5 MB.</p>
+            <?php if ($citySwitchIconPath !== ''): ?>
+                <p><img src="/<?= escapeHtml($citySwitchIconPath) ?>" alt="Huidig stedenkeuze-icoon" style="width:88px;height:88px;object-fit:contain"></p>
+                <label class="checkbox-label"><input type="checkbox" name="delete_city_switch_icon" value="1"> Huidig stedenkeuze-icoon verwijderen</label>
+            <?php endif; ?>
+            <label for="city_switch_icon">Nieuwe afbeelding voor de stedenkeuzeknop</label>
+            <input type="file" id="city_switch_icon" name="city_switch_icon" accept="image/png,image/jpeg,image/webp">
             <h2>Organisatorenfilter-icoon</h2>
             <p>Afbeelding voor de knop waarmee je het organisatorenfilter kiest. PNG, JPG of WebP, maximaal 5 MB.</p>
             <?php if ($organizerIconPath !== ''): ?>
