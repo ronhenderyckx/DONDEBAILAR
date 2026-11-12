@@ -347,14 +347,18 @@ $escape = static fn ($value): string =>
 
 <style>
 .agenda-city-filter-icon{display:block;width:38px;height:38px;flex:none;object-fit:contain;background:transparent}
-.site-header__inner{display:flex;align-items:center;gap:16px}
-.site-brand-group{display:flex;align-items:center;gap:12px;min-width:0}
-.site-brand{display:flex;align-items:center;gap:8px;text-decoration:none;min-width:0}
-.site-brand--platform,.site-brand--region{min-height:48px}
-.site-brand__logo{display:block;max-width:170px;max-height:52px;width:auto;height:auto;object-fit:contain}
+.site-header__inner{display:flex;align-items:center;gap:6px}
+.site-brand-group{display:flex;align-items:center;gap:5px;min-width:0;flex:1 1 auto}
+.site-brand{display:flex;align-items:center;gap:4px;text-decoration:none;min-width:0;flex:0 1 auto}
+.site-brand--platform,.site-brand--region{min-height:42px}
+/* Compacte logo's en tekst voorkomen dat de bovenste regel overlapt. */
+.site-brand__logo{display:block;max-width:105px;max-height:42px;width:auto;height:auto;object-fit:contain;flex:0 1 auto}
 /* Houd het regiologo zichtbaar tijdens volledige navigatie door agenda-filters. */
-.site-brand--region{padding-left:12px;border-left:1px solid var(--db-border)}
-.site-brand__region-name{font-size:15px;font-weight:700;color:var(--db-text);white-space:nowrap}
+.site-brand--region{padding-left:6px;border-left:1px solid var(--db-border)}
+.site-brand__region-name{max-width:110px;overflow:hidden;text-overflow:ellipsis;font-size:13px;font-weight:700;color:var(--db-text);white-space:nowrap}
+.site-welcome{font-size:12px;white-space:nowrap;flex:0 1 auto}
+.site-notifications,.site-save-preferences{width:32px;height:36px}
+.site-menu__toggle{min-height:36px;padding:0 8px}
 .site-notifications{position:relative;display:grid;place-items:center;width:40px;height:40px;flex:none;color:var(--db-text);text-decoration:none;border-radius:10px}
 .site-save-preferences{display:grid;place-items:center;width:40px;height:40px;flex:none;padding:0;border:0;border-radius:10px;background:transparent;color:var(--db-text);cursor:pointer}
 .site-save-preferences:hover,.site-save-preferences.is-saved{background:var(--db-surface,#f2f4f7);color:var(--db-primary)}
@@ -362,7 +366,7 @@ $escape = static fn ($value): string =>
 .site-notifications:hover{background:var(--db-surface,#f2f4f7)}
 .site-notifications span{position:absolute;top:0;right:-2px;display:grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#dc3545;color:#fff;font-size:10px;font-weight:800;line-height:1}
 .site-menu{margin-left:0}
-@media(max-width:600px){.site-header__inner{gap:8px}.site-brand-group{gap:7px}.site-brand--region{padding-left:7px}.site-brand__logo{max-width:112px;max-height:42px}.site-brand__region-name{font-size:12px}}
+@media(max-width:600px){.site-header__inner{gap:3px;width:calc(100% - 16px)}.site-brand-group{gap:3px}.site-brand{gap:3px}.site-brand--region{padding-left:4px}.site-brand__logo{max-width:64px;max-height:34px}.site-brand__region-name{max-width:68px;font-size:11px}.site-welcome{font-size:10px}.site-notifications,.site-save-preferences{width:28px;height:32px}.site-notifications svg,.site-save-preferences svg{width:19px;height:19px}.site-menu__toggle{min-height:32px;padding:0 6px}}
 </style>
 </header>
 
