@@ -143,6 +143,7 @@ $escape = static fn ($value): string =>
     <meta name="theme-color" content="#FFFFFF">
     <title><?= $escape($pageTitle) ?></title>
     <link rel="stylesheet" href="/assets/css/site.css">
+    <link rel="stylesheet" href="/assets/css/agenda.css">
 </head>
 <body<?= !empty($isAgendaPage) ? ' class="has-agenda-footer"' : '' ?> style="<?= $escape($themeStyle) ?>">
 
