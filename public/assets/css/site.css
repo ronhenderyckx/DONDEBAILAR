@@ -1055,3 +1055,17 @@ textarea::placeholder {
 body.has-agenda-footer .site-footer--agenda .agenda-footer-search input[type="search"] {
     background-color: var(--db-search-field-color, #FFFFFF) !important;
 }
+
+
+/* De regiokleur voor tekst en placeholder van het agenda-zoekveld moet
+   ook de algemene invoerveldregels met !important overschrijven. */
+body.has-agenda-footer .site-footer--agenda .agenda-footer-tools form.agenda-footer-search input#agenda-footer-search-input[type="search"] {
+    color: var(--db-search-text-color, #222222) !important;
+    -webkit-text-fill-color: var(--db-search-text-color, #222222) !important;
+}
+body.has-agenda-footer .site-footer--agenda .agenda-footer-tools form.agenda-footer-search input#agenda-footer-search-input[type="search"]::placeholder,
+body.has-agenda-footer .site-footer--agenda .agenda-footer-tools form.agenda-footer-search input#agenda-footer-search-input[type="search"]::-webkit-input-placeholder {
+    color: var(--db-search-text-color, #222222) !important;
+    -webkit-text-fill-color: var(--db-search-text-color, #222222) !important;
+    opacity: 1 !important;
+}
