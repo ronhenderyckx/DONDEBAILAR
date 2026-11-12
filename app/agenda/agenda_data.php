@@ -86,6 +86,18 @@ foreach ($regions as $item) {
     $regionById[(int) $item['id']] = $item;
 }
 $region = $regionById[$regionId] ?? null;
+
+// Regiospecifieke tekst voor evenementen zonder media.
+$eventFallbackText = 'SALSA · BACHATA · KIZOMBA';
+if ($regionId > 0) {
+    $fallbackTextFile = dirname(__DIR__, 2) . '/storage/region-event-fallback-text/' . $regionId . '.txt';
+    if (is_file($fallbackTextFile)) {
+        $configuredFallbackText = trim((string) file_get_contents($fallbackTextFile));
+        if ($configuredFallbackText !== '') {
+            $eventFallbackText = mb_substr($configuredFallbackText, 0, 100);
+        }
+    }
+}
 $timezoneName = (string) ($region['timezone'] ?? 'Europe/Madrid');
 try {
     $timezone = new DateTimeZone($timezoneName);
