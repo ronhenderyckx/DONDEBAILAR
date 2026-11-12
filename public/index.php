@@ -858,6 +858,35 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     font-weight:900 !important;
 }
 
+/* Stadsicoon: behoud de transparante afbeelding; geen witte cirkel of kader. */
+.agenda-organizer-item img.agenda-city-filter-icon{
+    display:block!important;
+    width:62px!important;
+    height:62px!important;
+    flex:0 0 62px!important;
+    box-sizing:border-box!important;
+    padding:0!important;
+    object-fit:contain!important;
+    border:0!important;
+    border-radius:0!important;
+    background:transparent!important;
+    box-shadow:none!important;
+    outline:0!important;
+}
+.agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) img.agenda-city-filter-icon{
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    outline:0!important;
+}
+@media(max-width:700px){
+    .agenda-organizer-item img.agenda-city-filter-icon{
+        width:58px!important;
+        height:58px!important;
+        flex:0 0 58px!important;
+    }
+}
+
 /* Gekozen stad: één rustige markering, zonder dubbele kaders. */
 .agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer){
     background:color-mix(in srgb,var(--db-primary,#E23A2C) 16%,var(--db-filter-bar-color,#FFFFFF)) !important;
