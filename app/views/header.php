@@ -230,6 +230,7 @@ $escape = static fn ($value): string =>
 
             <nav class="site-menu__panel" aria-label="Hoofdnavigatie">
                 <a href="/">Agenda</a>
+                <a href="/info.php<?= $regionId > 0 ? '?region_id=' . $regionId : '' ?>">Info</a>
                 <?php if ($headerUser !== null): ?>
                     <a href="/events.php">Mijn evenementen</a>
                 <?php endif; ?>
@@ -244,12 +245,14 @@ $escape = static fn ($value): string =>
                         <a href="/admin/users.php">Gebruikers</a>
                         <a href="/admin/settings.php">Instellingen</a>
                         <a href="/admin/regions.php">Regio's</a>
+                        <?php if ($regionId > 0): ?><a href="/admin/region-info.php?region_id=<?= $regionId ?>">Info-pagina regio</a><?php endif; ?>
                     </details>
                 <?php elseif ($canManageRegion || $canManageLocations): ?>
                     <details class="site-menu__admin">
                         <summary>Regiobeheer</summary>
                         <?php if ($regionId > 0 && userHasRegionRole($regionId, ['region_admin'], $headerUser)): ?>
                             <a href="/admin/region-colors.php?region_id=<?= $regionId ?>">Kleuren en logo</a>
+                            <a href="/admin/region-info.php?region_id=<?= $regionId ?>">Info-pagina</a>
                         <?php endif; ?>
                         <?php if ($canManageLocations): ?>
                             <a href="/admin/locations.php">Locaties</a>
