@@ -18,6 +18,7 @@ declare(strict_types=1);
                         type="search"
                         id="agenda-footer-search-input"
                         name="q"
+                        style="background-color: var(--db-search-field-color, #FFFFFF) !important;"
                         value="<?= $footerSearchEscape($agendaSearch ?? '') ?>"
                         placeholder="Zoek evenement, stad of organisator…"
                         maxlength="120"
