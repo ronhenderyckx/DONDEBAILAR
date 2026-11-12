@@ -661,3 +661,6 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
         max-height:58px!important;
     }
 }
+
+/* Zorg dat het niet-actieve filtericoon echt verborgen blijft. */
+.agenda-filter-switch-icon[hidden]{display:none!important;}
