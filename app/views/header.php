@@ -195,10 +195,9 @@ $escape = static fn ($value): string =>
                     <span class="site-brand site-brand--region">
                 <?php endif; ?>
                     <?php if ($regionLogoPath !== ''): ?>
-                        <img src="<?= $escape($regionLogoPath) ?>" alt="<?= $escape($brandName) ?>" class="site-brand__logo">
-                    <?php else: ?>
-                        <span class="site-brand__region-name"><?= $escape($brandName) ?></span>
+                        <img src="<?= $escape($regionLogoPath) ?>" alt="" class="site-brand__logo">
                     <?php endif; ?>
+                    <span class="site-brand__region-name"><?= $escape($brandName) ?></span>
                 <?php if ($nextRegionId > 0): ?>
                     </a>
                 <?php else: ?>
