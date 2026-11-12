@@ -13,7 +13,7 @@ $regions = $db->query(
             a.filter_hover_color, a.filter_bar_color, a.filter_text_color,
             a.search_button_color, a.back_top_color, a.search_field_color,
             a.search_text_color, a.footer_color, a.background_color, a.text_color,
-            a.weekday_colors
+            a.logo_path AS appearance_logo_path, a.weekday_colors
      FROM regions r
      LEFT JOIN region_appearance a ON a.region_id = r.id
      WHERE r.is_active = 1 ORDER BY r.id"
@@ -65,7 +65,9 @@ require dirname(__DIR__) . '/app/views/header.php';
     <div class="region-info-heading">
         <div class="region-info-region">
             <?php
-            $regionIcon = '/' . ltrim(trim((string) ($region['logo_path'] ?? '')), '/');
+            $regionLogoPath = trim((string) ($region['appearance_logo_path'] ?? ''));
+            if ($regionLogoPath === '') $regionLogoPath = trim((string) ($region['logo_path'] ?? ''));
+            $regionIcon = '/' . ltrim($regionLogoPath, '/');
             $hasRegionIcon = preg_match('#^/uploads/regions/[a-zA-Z0-9._/-]+$#', $regionIcon)
                 && !str_contains($regionIcon, '/../')
                 && !str_contains($regionIcon, '/./');
