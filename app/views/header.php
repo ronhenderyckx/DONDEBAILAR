@@ -194,6 +194,16 @@ $escape = static fn ($value): string =>
                 <span class="site-brand__domain">dondebailar</span>
             </a>
 
+            <?php if ($nextRegionId > 0): ?>
+                <a class="site-brand site-brand--region" href="/?region_id=<?= $nextRegionId ?>&amp;agenda_change=1&amp;filter=<?= $escape($activeFilter ?? 'organizer') ?>" aria-label="Wissel naar volgende regio" title="Wissel regio">
+                    <?php if ($regionLogoPath !== ''): ?>
+                        <img src="<?= $escape($regionLogoPath) ?>" alt="" class="site-brand__logo site-brand__region-logo">
+                    <?php else: ?>
+                        <span class="site-brand__region-mark" aria-hidden="true">⌖</span>
+                    <?php endif; ?>
+                    <span class="site-brand__region-name"><?= $escape($brandName) ?></span>
+                </a>
+            <?php endif; ?>
 
         </div>
 
@@ -286,14 +296,7 @@ $escape = static fn ($value): string =>
     <?php if (!empty($isAgendaPage) && !empty($regions)): ?>
         <div class="site-header__agenda-filters">
             <form class="agenda-selectors" method="get" action="/">
-            <div class="agenda-region-selector">
-                <label class="visually-hidden" for="agenda-region-select">Kies regio</label>
-                <select id="agenda-region-select" name="region_id" aria-label="Kies regio" onchange="this.form.submit()">
-                    <?php foreach ($regions as $regionOption): ?>
-                        <option value="<?= (int) $regionOption['id'] ?>"<?= (int) $regionOption['id'] === $regionId ? ' selected' : '' ?>><?= $escape($regionOption['name']) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
+            <input type="hidden" name="region_id" value="<?= $regionId ?>">
             <input type="hidden" name="agenda_change" value="1">
             <input type="hidden" name="filter" value="<?= $escape($activeFilter) ?>">
             <div class="agenda-selector-line">
@@ -360,7 +363,7 @@ $escape = static fn ($value): string =>
 .site-brand__logo{display:block;max-width:105px;max-height:30px;width:auto;height:auto;object-fit:contain;flex:0 1 auto}
 /* Houd het regiologo zichtbaar tijdens volledige navigatie door agenda-filters. */
 .site-brand--region{padding-left:6px;border-left:1px solid var(--db-border)}
-.site-brand__region-name{max-width:110px;overflow:hidden;text-overflow:ellipsis;font-size:13px;font-weight:700;color:var(--db-text);white-space:nowrap}
+.site-brand__region-name{max-width:110px;overflow:hidden;text-overflow:ellipsis;font-size:13px;font-weight:700;color:var(--db-text);white-space:nowrap}\n.site-brand__region-logo{max-width:42px;max-height:30px}\n.site-brand__region-mark{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:var(--db-primary);color:#fff;font-size:19px;font-weight:800;line-height:1}
 .site-welcome{font-size:12px;white-space:nowrap;flex:0 1 auto}
 .site-notifications,.site-save-preferences{width:30px;height:30px}
 .site-menu__toggle{min-height:30px;padding:0 7px}
@@ -371,7 +374,7 @@ $escape = static fn ($value): string =>
 .site-notifications:hover{background:var(--db-surface,#f2f4f7)}
 .site-notifications span{position:absolute;top:0;right:-2px;display:grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#dc3545;color:#fff;font-size:10px;font-weight:800;line-height:1}
 .site-menu{margin-left:0}
-@media(max-width:600px){.site-header__inner{gap:3px;width:calc(100% - 16px);min-height:32px!important}.site-brand-group{gap:3px}.site-brand{gap:3px}.site-brand--region{padding-left:4px}.site-brand--platform,.site-brand--region{min-height:30px}.site-brand__logo{max-width:64px;max-height:28px}.site-brand__domain{font-size:11px}.site-brand__region-name{max-width:68px;font-size:11px}.site-welcome{font-size:10px}.site-notifications,.site-save-preferences{width:26px;height:28px}.site-notifications svg,.site-save-preferences svg{width:19px;height:19px}.site-menu__toggle{min-height:28px;padding:0 6px}}
+@media(max-width:600px){.site-header__inner{gap:3px;width:calc(100% - 16px);min-height:32px!important}.site-brand-group{gap:3px}.site-brand{gap:3px}.site-brand--region{padding-left:4px}.site-brand--platform,.site-brand--region{min-height:30px}.site-brand__logo{max-width:64px;max-height:28px}.site-brand__domain{font-size:11px}.site-brand__region-name{max-width:68px;font-size:11px}.site-brand__region-logo{max-width:30px;max-height:26px}.site-brand__region-mark{width:24px;height:24px;font-size:17px}.site-welcome{font-size:10px}.site-notifications,.site-save-preferences{width:26px;height:28px}.site-notifications svg,.site-save-preferences svg{width:19px;height:19px}.site-menu__toggle{min-height:28px;padding:0 6px}}
 </style>
 </header>
 
