@@ -1048,7 +1048,3 @@ textarea::placeholder {
 }
 
 
-/* Dunne scheidingslijn direct onder de bovenste DONDEBAILAR-regel. */
-.site-header .site-header__inner {
-    border-bottom: 1px solid var(--db-border, #D9DDE3) !important;
-}
