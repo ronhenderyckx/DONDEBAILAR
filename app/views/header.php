@@ -302,7 +302,7 @@ $escape = static fn ($value): string =>
                             ?>
                             <a class="agenda-organizer-item<?= $citySelected ? ' is-selected' : '' ?>" data-city="<?= $escape($cityName) ?>" href="<?= $escape($cityHref) ?>" title="<?= $escape($cityName) ?>" aria-label="<?= $citySelected ? 'Verwijder stadsfilter ' : 'Toon evenementen in ' ?><?= $escape($cityName) ?>">
                                 <?php if ($cityFilterIconPath !== ''): ?>
-                                    <img class="agenda-city-filter-icon" src="<?= $escape($cityFilterIconPath) ?>" alt="" loading="lazy">
+                                    <img class="agenda-city-filter-icon" src="<?= $escape($cityFilterIconPath) ?>" alt="" loading="eager" decoding="async">
                                 <?php else: ?>
                                     <span class="agenda-organizer-fallback" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr($cityName, 0, 1))) ?></span>
                                 <?php endif; ?>
