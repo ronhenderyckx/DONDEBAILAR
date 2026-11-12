@@ -207,4 +207,4 @@ window.DONDEBAILAR_AGENDA_CONFIG = <?= json_encode([
 <script src="/assets/js/agenda.js"></script>
 <script>window.DONDEBAILAR_AGENDA_PAGE_SIZE = <?= (int) $agendaPageSize ?>;</script>
 <script src="/assets/js/agenda-filters.js"></script>
-<?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
+<?php require dirname(__DIR__, 3) . '/app/views/footer.php'; ?>
