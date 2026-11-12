@@ -83,20 +83,20 @@ if ($regionId > 0) {
     $citySwitchIconSettingFile = $projectRoot . '/storage/region-city-switch-icons/' . $regionId . '.txt';
     if (is_file($cityIconSettingFile)) {
         $configuredCityIcon = trim((string) file_get_contents($cityIconSettingFile));
-        if (preg_match('#^uploads/regions/[a-zA-Z0-9._-]+$#', $configuredCityIcon)) {
-            $cityFilterIconPath = '/' . $configuredCityIcon;
+        if (preg_match('#^(?:public/)?uploads/regions/[a-zA-Z0-9._-]+$#', $configuredCityIcon)) {
+            $cityFilterIconPath = '/' . preg_replace('#^public/#', '', $configuredCityIcon);
         }
     }
     if (is_file($organizerIconSettingFile)) {
         $configuredOrganizerIcon = trim((string) file_get_contents($organizerIconSettingFile));
-        if (preg_match('#^uploads/regions/[a-zA-Z0-9._-]+$#', $configuredOrganizerIcon)) {
-            $organizerFilterIconPath = '/' . $configuredOrganizerIcon;
+        if (preg_match('#^(?:public/)?uploads/regions/[a-zA-Z0-9._-]+$#', $configuredOrganizerIcon)) {
+            $organizerFilterIconPath = '/' . preg_replace('#^public/#', '', $configuredOrganizerIcon);
         }
     }
     if (is_file($citySwitchIconSettingFile)) {
         $configuredCitySwitchIcon = trim((string) file_get_contents($citySwitchIconSettingFile));
-        if (preg_match('#^uploads/regions/[a-zA-Z0-9._-]+$#', $configuredCitySwitchIcon)) {
-            $citySwitchFilterIconPath = '/' . $configuredCitySwitchIcon;
+        if (preg_match('#^(?:public/)?uploads/regions/[a-zA-Z0-9._-]+$#', $configuredCitySwitchIcon)) {
+            $citySwitchFilterIconPath = '/' . preg_replace('#^public/#', '', $configuredCitySwitchIcon);
         }
     }
 }
