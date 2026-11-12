@@ -494,3 +494,11 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     border-color:var(--db-filter-hover-color,var(--db-primary)) !important;
     color:var(--db-filter-hover-color,var(--db-primary)) !important;
 }
+
+/* Uploadbare afbeeldingen voor de twee filterwisselknoppen. */
+.agenda-filter-icon--image{
+    display:block;
+    width:42px;
+    height:42px;
+    object-fit:contain;
+}
