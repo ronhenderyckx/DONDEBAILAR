@@ -321,11 +321,6 @@ $escape = static fn ($value): string =>
 .agenda-city-filter-icon{display:block;width:38px;height:38px;flex:none;object-fit:contain;background:transparent}
 .site-header__inner{display:flex;align-items:center;gap:16px}
 .site-brand-group{display:flex;align-items:center;gap:12px;min-width:0}
-/* Neem de volledige merkengroep mee in de paginawissel, zodat het regiologo niet wegflitst bij filters. */
-.site-brand-group{view-transition-name:db-brand-group}
-@view-transition{navigation:auto}
-::view-transition-old(db-brand-group),::view-transition-new(db-brand-group){animation:none}
-::view-transition-group(db-brand-group){overflow:visible}
 .site-brand{display:flex;align-items:center;gap:8px;text-decoration:none;min-width:0}
 .site-brand--platform,.site-brand--region{min-height:48px}
 .site-brand__logo{display:block;max-width:170px;max-height:52px;width:auto;height:auto;object-fit:contain}
