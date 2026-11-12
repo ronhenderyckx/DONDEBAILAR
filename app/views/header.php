@@ -286,8 +286,16 @@ $escape = static fn ($value): string =>
     <?php if (!empty($isAgendaPage) && !empty($regions)): ?>
         <div class="site-header__agenda-filters">
             <form class="agenda-selectors" method="get" action="/">
-            <input type="hidden" name="region_id" value="<?= $regionId ?>">
+            <div class="agenda-region-selector">
+                <label class="visually-hidden" for="agenda-region-select">Kies regio</label>
+                <select id="agenda-region-select" name="region_id" aria-label="Kies regio" onchange="this.form.submit()">
+                    <?php foreach ($regions as $regionOption): ?>
+                        <option value="<?= (int) $regionOption['id'] ?>"<?= (int) $regionOption['id'] === $regionId ? ' selected' : '' ?>><?= $escape($regionOption['name']) ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
             <input type="hidden" name="agenda_change" value="1">
+            <input type="hidden" name="filter" value="<?= $escape($activeFilter) ?>">
             <div class="agenda-selector-line">
                 <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" aria-label="Wissel tussen filters" title="Wissel tussen filters"><span class="agenda-filter-switch-icon agenda-filter-switch-icon--city"><?php if ($citySwitchFilterIconPath !== ''): ?><img class="agenda-filter-icon agenda-filter-icon--image" src="<?= $escape($citySwitchFilterIconPath) ?>" alt="" aria-hidden="true" decoding="async"><?php else: ?><span class="agenda-filter-icon" aria-hidden="true">🏙️</span><?php endif; ?></span><span class="agenda-filter-switch-icon agenda-filter-switch-icon--organizer" hidden><?php if ($organizerFilterIconPath !== ''): ?><img class="agenda-filter-icon agenda-filter-icon--image" src="<?= $escape($organizerFilterIconPath) ?>" alt="" aria-hidden="true" decoding="async"><?php else: ?><span class="agenda-filter-icon" aria-hidden="true">💃</span><?php endif; ?></span><span class="agenda-filter-switch-label">ORGANISATOREN</span></button>
                 <div class="agenda-selector-panel is-open" data-panel="organizer">
@@ -340,6 +348,8 @@ $escape = static fn ($value): string =>
     <?php endif; ?>
 
 <style>
+.agenda-region-selector{display:flex;align-items:center;margin:0 0 7px}
+.agenda-region-selector select{width:100%;min-height:34px;padding:5px 32px 5px 10px;border:1px solid var(--db-border,#ddd);border-radius:9px;background:var(--db-surface,#fff);color:var(--db-text);font:inherit;font-size:13px;font-weight:700}
 .agenda-city-filter-icon{display:block;width:38px;height:38px;flex:none;object-fit:contain;background:transparent}
 .site-header__inner{display:flex;align-items:center;gap:6px}
 .site-brand-group{display:flex;align-items:center;gap:5px;min-width:0;flex:1 1 auto}
