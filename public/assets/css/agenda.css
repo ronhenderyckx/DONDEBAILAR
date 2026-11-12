@@ -564,6 +564,8 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     justify-content:center!important;
     gap:3px!important;
     padding:2px 0!important;
+    border:2px solid var(--db-primary,#E23A2C)!important;
+    border-radius:12px!important;
 }
 .agenda-filter-switch-icon{
     display:grid;
