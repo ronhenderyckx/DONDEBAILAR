@@ -28,6 +28,12 @@ function optimizeLogoDataToWebp(string $data, string $destination, int $maxDimen
         throw new RuntimeException('De afbeelding kon niet worden gelezen.');
     }
 
+    // Bewaar het alfakanaal van PNG- en WebP-bronbestanden expliciet.
+    // Zonder deze instellingen kan GD transparante pixels bij het resamplen
+    // als een vaste achtergrondkleur behandelen.
+    imagealphablending($source, false);
+    imagesavealpha($source, true);
+
     $scale = min(1, $maxDimension / max($width, $height));
     $targetWidth = max(1, (int) round($width * $scale));
     $targetHeight = max(1, (int) round($height * $scale));
