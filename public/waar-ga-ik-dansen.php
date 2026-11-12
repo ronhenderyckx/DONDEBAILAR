@@ -8,6 +8,31 @@ require_once dirname(__DIR__) . '/app/Security.php';
 $user = requireLogin();
 $db = Database::connection();
 
+$regions = $db->query(
+    "SELECT r.id, r.name, r.timezone,
+            CASE WHEN a.region_id IS NOT NULL THEN a.logo_path ELSE r.logo_path END AS logo_path,
+            a.primary_color, a.primary_dark, a.accent_color, a.secondary_color,
+            a.tertiary_color, a.header_color, a.menu_color, a.organizer_color,
+            a.filter_hover_color, a.filter_bar_color, a.filter_text_color,
+            a.search_button_color, a.back_top_color, a.search_field_color,
+            a.search_text_color, a.footer_color, a.background_color,
+            a.text_color, a.weekday_colors
+     FROM regions r
+     LEFT JOIN region_appearance a ON a.region_id = r.id
+     WHERE r.is_active = 1 ORDER BY r.id"
+)->fetchAll();
+$requestedRegionId = filter_input(INPUT_GET, 'region_id', FILTER_VALIDATE_INT) ?: 0;
+$region = null;
+foreach ($regions as $regionOption) {
+    if ((int) $regionOption['id'] === $requestedRegionId) {
+        $region = $regionOption;
+        break;
+    }
+}
+if ($region === null && $regions !== []) {
+    $region = $regions[0];
+}
+
 $statement = $db->prepare(
     "SELECT e.id, e.title, e.starts_at, e.ends_at, e.timezone,
             r.id AS region_id, r.name AS region_name, r.logo_path AS region_logo,
