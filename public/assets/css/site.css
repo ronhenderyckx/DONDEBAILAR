@@ -1014,3 +1014,19 @@ body.has-agenda-footer .site-footer--agenda{
     accent-color: var(--db-primary, #E23A2C);
 }
 
+/* Zorg dat ingevoerde tekst in elk invulveld altijd duidelijk zichtbaar is. */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+select,
+textarea {
+    color: var(--db-text, #222222) !important;
+    -webkit-text-fill-color: var(--db-text, #222222) !important;
+    caret-color: var(--db-primary, #E23A2C) !important;
+    background-color: #FFFFFF;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"])::placeholder,
+textarea::placeholder {
+    color: #777777 !important;
+    -webkit-text-fill-color: #777777 !important;
+    opacity: 1;
+}
+
