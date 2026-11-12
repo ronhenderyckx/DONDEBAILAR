@@ -32,6 +32,7 @@ $defaults = [
     'header_color' => '#222222',
     'menu_color' => '#FFFFFF',
     'organizer_color' => '#E23A2C',
+    'filter_hover_color' => '#E23A2C',
     'filter_bar_color' => '#FFFFFF',
     'filter_text_color' => '#222222',
     'search_button_color' => '#E23A2C',
@@ -163,16 +164,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($errorMessage === '') {
                 $upsert = $db->prepare("INSERT INTO region_appearance
                     (region_id, primary_color, primary_dark, accent_color, secondary_color,
-                     tertiary_color, header_color, menu_color, organizer_color, filter_bar_color, filter_text_color,
+                     tertiary_color, header_color, menu_color, organizer_color, filter_hover_color, filter_bar_color, filter_text_color,
                      search_button_color, back_top_color, search_field_color, search_text_color, footer_color, background_color, text_color, weekday_colors, logo_path)
                     VALUES (:region_id, :primary_color, :primary_dark, :accent_color, :secondary_color,
-                     :tertiary_color, :header_color, :menu_color, :organizer_color, :filter_bar_color, :filter_text_color,
+                     :tertiary_color, :header_color, :menu_color, :organizer_color, :filter_hover_color, :filter_bar_color, :filter_text_color,
                      :search_button_color, :back_top_color, :search_field_color, :search_text_color, :footer_color, :background_color, :text_color, :weekday_colors, :logo_path)
                     ON DUPLICATE KEY UPDATE primary_color=VALUES(primary_color),
                      primary_dark=VALUES(primary_dark), accent_color=VALUES(accent_color),
                      secondary_color=VALUES(secondary_color), tertiary_color=VALUES(tertiary_color),
                      header_color=VALUES(header_color), menu_color=VALUES(menu_color),
-                     organizer_color=VALUES(organizer_color),
+                     organizer_color=VALUES(organizer_color), filter_hover_color=VALUES(filter_hover_color),
                      filter_bar_color=VALUES(filter_bar_color), filter_text_color=VALUES(filter_text_color),
                      search_button_color=VALUES(search_button_color), back_top_color=VALUES(back_top_color),
                      search_field_color=VALUES(search_field_color), search_text_color=VALUES(search_text_color),
@@ -189,6 +190,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'header_color' => $colors['header_color'],
                     'menu_color' => $colors['menu_color'],
                     'organizer_color' => $colors['organizer_color'],
+                    'filter_hover_color' => $colors['filter_hover_color'],
                     'filter_bar_color' => $colors['filter_bar_color'],
                     'filter_text_color' => $colors['filter_text_color'],
                     'search_button_color' => $colors['search_button_color'],
@@ -259,6 +261,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 'header_color' => 'Headerkleur',
                 'menu_color' => 'Menukleur',
                 'organizer_color' => 'Achtergrondkleur van de organisatorknoppen',
+                'filter_hover_color' => 'Hoverkleur van de filterknoppen (stad en organisator)',
                 'filter_bar_color' => 'Achtergrondkleur van de filterbalk',
                 'filter_text_color' => 'Tekstkleur van de filterknoppen',
                 'search_button_color' => 'Achtergrondkleur zoekknop',
