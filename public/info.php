@@ -31,6 +31,12 @@ if ($region === null) {
 }
 $regionId = (int) $region['id'];
 
+// De gedeelde header leest logo_path. Gebruik hier hetzelfde regiologo
+// als de Info-pagina zelf: eerst het logo uit de regio-uitstraling.
+if (trim((string) ($region['appearance_logo_path'] ?? '')) !== '') {
+    $region['logo_path'] = $region['appearance_logo_path'];
+}
+
 $languages = ['nl', 'es', 'en', 'fr'];
 $defaultLanguage = strtolower((string) ($region['default_language'] ?? 'nl'));
 if (!in_array($defaultLanguage, $languages, true)) $defaultLanguage = 'nl';
@@ -47,7 +53,7 @@ if (!is_array($content)) $content = [];
 
 $labels = [
     'nl' => ['info' => 'Info', 'back' => 'Terug naar agenda', 'empty' => 'De informatie voor deze regio wordt binnenkort toegevoegd.'],
-    'es' => ['info' => 'Información', 'back' => 'Volver a la agenda', 'empty' => 'La información de esta región estará disponible próximamente.'],
+    'es' => ['info' => 'Información', 'back' => 'Volver a la agenda', 'empty' => 'Information for this region will be added soon.'],
     'en' => ['info' => 'Info', 'back' => 'Back to calendar', 'empty' => 'Information for this region will be added soon.'],
     'fr' => ['info' => 'Infos', 'back' => 'Retour à l’agenda', 'empty' => 'Les informations de cette région seront bientôt disponibles.'],
 ];
