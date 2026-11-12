@@ -34,15 +34,24 @@ if ($region === null && $regions !== []) {
 }
 
 $statement = $db->prepare(
-    "SELECT e.id, e.title, e.starts_at, e.ends_at, e.timezone,
-            r.id AS region_id, r.name AS region_name, r.logo_path AS region_logo,
-            o.name AS organizer_name,
-            l.name AS location_name, l.city AS location_city
+    "SELECT e.id, e.title, e.description, e.starts_at, e.ends_at, e.timezone,
+            e.event_language, e.hashtags,
+            r.id AS region_id, r.name AS region_name,
+            o.name AS organizer_name, o.logo_path AS organizer_logo,
+            c.name AS category_name,
+            l.name AS location_name, l.street AS location_street,
+            l.house_number AS location_house_number, l.postal_code AS location_postal_code,
+            l.city AS location_city, l.country_code AS location_country,
+            l.google_maps_url, l.latitude, l.longitude,
+            cover.id AS cover_media_id, cover.media_type AS cover_media_type,
+            cover.caption AS cover_caption
      FROM event_attendances ea
      INNER JOIN events e ON e.id = ea.event_id
      INNER JOIN regions r ON r.id = e.region_id
      INNER JOIN organizers o ON o.id = e.organizer_id
+     LEFT JOIN categories c ON c.id = e.category_id
      LEFT JOIN locations l ON l.id = e.location_id
+     LEFT JOIN event_media cover ON cover.id = e.cover_media_id
      WHERE ea.user_id = :user_id
        AND ea.status = 'attending'
        AND e.status = 'published'
@@ -79,14 +88,34 @@ require dirname(__DIR__) . '/app/views/header.php';
                     </div>
                     <div class="my-dance-events__details">
                         <h2><a href="/event.php?id=<?= (int) $event['id'] ?>"><?= escapeHtml($event['title']) ?></a></h2>
-                        <p><?= escapeHtml(date('d-m-Y · H:i', strtotime($event['starts_at']))) ?></p>
-                        <p><?= escapeHtml($event['organizer_name']) ?></p>
-                        <?php if (!empty($event['location_name']) || !empty($event['location_city'])): ?>
-                            <p><?= escapeHtml(trim((string) ($event['location_name'] ?? '') . ' ' . (string) ($event['location_city'] ?? ''))) ?></p>
+                        <p class="my-dance-events__when">
+                            <strong><?= escapeHtml(date('d-m-Y', strtotime($event['starts_at']))) ?></strong>
+                            · <?= escapeHtml(date('H:i', strtotime($event['starts_at']))) ?> uur
+                            <?php if (!empty($event['ends_at'])): ?>– <?= escapeHtml(date('H:i', strtotime($event['ends_at']))) ?> uur<?php endif; ?>
+                        </p>
+                        <?php if (!empty($event['category_name'])): ?><p><strong>Dansstijl:</strong> <?= escapeHtml($event['category_name']) ?></p><?php endif; ?>
+                        <p><strong>Organisator:</strong> <?= escapeHtml($event['organizer_name']) ?></p>
+                        <?php if (!empty($event['location_name'])): ?><p><strong>Locatie:</strong> <?= escapeHtml($event['location_name']) ?></p><?php endif; ?>
+                        <?php
+                        $addressParts = array_filter([
+                            trim((string) ($event['location_street'] ?? '') . ' ' . (string) ($event['location_house_number'] ?? '')),
+                            trim((string) ($event['location_postal_code'] ?? '') . ' ' . (string) ($event['location_city'] ?? '')),
+                            $event['location_country'] ?? '',
+                        ]);
+                        ?>
+                        <?php if ($addressParts !== []): ?><p><strong>Adres:</strong> <?= escapeHtml(implode(', ', $addressParts)) ?></p><?php endif; ?>
+                        <?php if (!empty($event['google_maps_url'])): ?>
+                            <p><a href="<?= escapeHtml($event['google_maps_url']) ?>" target="_blank" rel="noopener noreferrer">Bekijk route</a></p>
+                        <?php elseif (!empty($event['latitude']) && !empty($event['longitude'])): ?>
+                            <p><a href="https://www.google.com/maps?q=<?= rawurlencode((string) $event['latitude']) ?>,<?= rawurlencode((string) $event['longitude']) ?>" target="_blank" rel="noopener noreferrer">Bekijk route</a></p>
                         <?php endif; ?>
+                        <?php if (!empty($event['description'])): ?>
+                            <p class="my-dance-events__description"><?= nl2br(escapeHtml($event['description'])) ?></p>
+                        <?php endif; ?>
+                        <?php if (!empty($event['hashtags'])): ?><p class="my-dance-events__hashtags"><?= escapeHtml($event['hashtags']) ?></p><?php endif; ?>
                         <p class="my-dance-events__region"><?= escapeHtml($event['region_name']) ?></p>
                     </div>
-                    <a class="button button--small" href="/event.php?id=<?= (int) $event['id'] ?>">Bekijk</a>
+                    <a class="button button--small" href="/event.php?id=<?= (int) $event['id'] ?>">Details</a>
                 </article>
             <?php endforeach; ?>
         </div>
@@ -101,7 +130,11 @@ require dirname(__DIR__) . '/app/views/header.php';
 .my-dance-events__date span{font-size:12px;text-transform:uppercase}
 .my-dance-events__details{flex:1;min-width:0}
 .my-dance-events__details h2{font-size:18px;margin:0 0 5px}
-.my-dance-events__details p{margin:3px 0;font-size:14px}
+.my-dance-events__details p{margin:4px 0;font-size:14px;line-height:1.45}
+.my-dance-events__when{font-size:15px!important}
+.my-dance-events__description{margin-top:10px!important;white-space:normal}
+.my-dance-events__hashtags{color:var(--db-primary);overflow-wrap:anywhere}
+.my-dance-events__details a{color:var(--db-primary);font-weight:600}
 .my-dance-events__region{color:var(--db-primary);font-weight:700}
 @media(max-width:600px){.my-dance-events__item{gap:10px;padding:12px}.my-dance-events__item>.button{padding:8px 10px}.my-dance-events__date{flex-basis:48px}}
 </style>
