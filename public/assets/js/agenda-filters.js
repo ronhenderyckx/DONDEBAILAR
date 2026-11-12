@@ -26,6 +26,14 @@
 
         currentPage.replaceWith(incomingPage);
 
+        // Ververs ook het zoekformulier buiten .agenda-page. Zo verdwijnt een
+        // oude zoekterm én de wislink zodra een filterkeuze de zoekopdracht wist.
+        const currentSearchForm = document.querySelector('.site-footer--agenda .agenda-footer-search');
+        const incomingSearchForm = parsedDocument.querySelector('.site-footer--agenda .agenda-footer-search');
+        if (currentSearchForm && incomingSearchForm) {
+            currentSearchForm.replaceWith(incomingSearchForm);
+        }
+
         // Vervang alleen de inhoud van de filterstrips; de filterknop en header blijven staan.
         ['organizer', 'city'].forEach(function (panelName) {
             const currentStrip = document.querySelector('[data-panel="' + panelName + '"] .agenda-organizer-strip');
@@ -147,6 +155,20 @@
     }
 
     document.addEventListener('click', function (event) {
+        // Wisselen tussen STEDEN en ORGANISATOREN wist een actieve vrije zoekterm.
+        const filterSwitch = event.target instanceof Element ? event.target.closest('#agenda-filter-switch') : null;
+        if (filterSwitch) {
+            const url = new URL(window.location.href);
+            if (url.searchParams.has('q') && url.searchParams.get('q') !== '') {
+                url.searchParams.delete('q');
+                url.searchParams.set('agenda_change', '1');
+                loadAgendaFilter(url, true).catch(function (error) {
+                    if (error.name !== 'AbortError') window.location.assign(url.href);
+                });
+            }
+            return;
+        }
+
         const link = event.target instanceof Element ? event.target.closest('.agenda-organizer-strip a[href]') : null;
         if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         const url = new URL(link.href, window.location.origin);
