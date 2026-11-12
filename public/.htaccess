@@ -9,3 +9,8 @@ Options -Indexes
 <FilesMatch "^\.(?!well-known)">
     Require all denied
 </FilesMatch>
+
+
+<IfModule mod_mime.c>
+    AddType application/manifest+json .webmanifest
+</IfModule>
