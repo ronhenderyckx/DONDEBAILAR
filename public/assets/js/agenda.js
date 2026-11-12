@@ -71,7 +71,7 @@ function showAgendaFilter(index) {
     if (!agendaFilterSwitch) return;
     const iconPath = agendaFilterIndex === 0
         ? agendaFilterSwitch.dataset.iconOrganizer
-        : agendaFilterSwitch.dataset.iconCity;
+        : (agendaFilterSwitch.dataset.iconCity || '');
     if (iconPath) {
         const iconImage = document.createElement('img');
         iconImage.className = 'agenda-filter-icon agenda-filter-icon--image';
