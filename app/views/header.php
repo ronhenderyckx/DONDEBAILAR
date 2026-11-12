@@ -285,7 +285,7 @@ $escape = static fn ($value): string =>
             <input type="hidden" name="region_id" value="<?= $regionId ?>">
             <input type="hidden" name="agenda_change" value="1">
             <div class="agenda-selector-line">
-                <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" data-icon-organizer="<?= $escape($organizerFilterIconPath) ?>" data-icon-city="<?= $escape($citySwitchFilterIconPath) ?>" aria-label="Wissel tussen filters" title="Wissel tussen filters"><span class="agenda-filter-icon" aria-hidden="true">👥</span></button>
+                <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" data-icon-organizer="<?= $escape($citySwitchFilterIconPath) ?>" data-icon-city="<?= $escape($citySwitchFilterIconPath) ?>" aria-label="Wissel tussen filters" title="Wissel tussen filters"><span class="agenda-filter-icon" aria-hidden="true">👥</span></button>
                 <div class="agenda-selector-panel is-open" data-panel="organizer">
                     <div class="agenda-organizer-strip" aria-label="Organisatoren met toekomstige evenementen">
                         <?php foreach ($organizers as $organizerOption): ?>
