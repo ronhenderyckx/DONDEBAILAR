@@ -63,8 +63,18 @@ require dirname(__DIR__) . '/app/views/header.php';
 ?>
 <section class="region-info-page">
     <div class="region-info-heading">
-        <p class="eyebrow">DONDEBAILAR</p>
-        <h1><?= $escape($region['name']) ?></h1>
+        <div class="region-info-region">
+            <?php
+            $regionIcon = '/' . ltrim(trim((string) ($region['logo_path'] ?? '')), '/');
+            $hasRegionIcon = preg_match('#^/uploads/regions/[a-zA-Z0-9._/-]+$#', $regionIcon)
+                && !str_contains($regionIcon, '/../')
+                && !str_contains($regionIcon, '/./');
+            ?>
+            <?php if ($hasRegionIcon): ?>
+                <img src="<?= $escape($regionIcon) ?>" alt="" class="region-info-region-icon">
+            <?php endif; ?>
+            <h1><?= $escape($region['name']) ?></h1>
+        </div>
         <?php if (trim((string) ($content['title'] ?? '')) !== ''): ?>
             <h2 class="region-info-subtitle"><?= $escape($content['title']) ?></h2>
         <?php endif; ?>
@@ -83,8 +93,9 @@ require dirname(__DIR__) . '/app/views/header.php';
 </section>
 <style>
 .region-info-page{max-width:900px;margin:30px auto;padding:clamp(20px,4vw,42px);background:var(--db-menu-color,#fff);color:var(--db-text,#222);border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.08);border-top:6px solid var(--db-primary,#e23a2c)}
-.region-info-heading .eyebrow{color:var(--db-primary);font-weight:800;letter-spacing:.08em;text-transform:uppercase}
-.region-info-heading h1{margin:8px 0 8px;color:var(--db-primary-dark,var(--db-primary));font-size:clamp(28px,5vw,42px)}
+.region-info-region{display:flex;align-items:center;gap:12px;margin:0 0 16px}
+.region-info-region-icon{display:block;width:auto;height:auto;max-width:72px;max-height:64px;object-fit:contain}
+.region-info-region h1{margin:0;color:var(--db-primary-dark,var(--db-primary));font-size:clamp(28px,5vw,42px)}
 .region-info-heading .region-info-subtitle{margin:0 0 24px;color:var(--db-text,#222);font-size:clamp(19px,3vw,25px)}
 .region-info-content{font-size:17px;line-height:1.8;overflow-wrap:anywhere}
 .region-info-empty{padding:22px;background:var(--db-background,#f7f8fa);border-radius:12px}
