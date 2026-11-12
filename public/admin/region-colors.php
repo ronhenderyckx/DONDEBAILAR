@@ -71,6 +71,14 @@ if (!empty($saved['weekday_colors'])) {
 $logoPath = $saved !== []
     ? (string) ($saved['logo_path'] ?? '')
     : (string) ($region['logo_path'] ?? '');
+
+$cityIconSettingFile = dirname(__DIR__, 2) . '/storage/region-city-icons/' . $regionId . '.txt';
+$cityIconPath = is_file($cityIconSettingFile)
+    ? trim((string) file_get_contents($cityIconSettingFile))
+    : '';
+if (!preg_match('#^uploads/regions/[a-zA-Z0-9._-]+$#', $cityIconPath)) {
+    $cityIconPath = '';
+}
 $errorMessage = '';
 $successMessage = '';
 
@@ -78,6 +86,28 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifyCsrfToken(is_string($_POST['csrf_token'] ?? null) ? $_POST['csrf_token'] : null)) {
         $errorMessage = 'De beveiligingscontrole is verlopen. Vernieuw de pagina.';
     } else {
+        $oldCityIconPath = $cityIconPath;
+        $newCityIconPath = $cityIconPath;
+        if (!empty($_POST['delete_city_icon'])) {
+            $newCityIconPath = '';
+        }
+        if (isset($_FILES['city_icon']) && ($_FILES['city_icon']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+            try {
+                $uploadedCityIcon = storeOptimizedLogoUpload(
+                    $_FILES['city_icon'],
+                    'public/uploads/regions',
+                    256,
+                    5 * 1024 * 1024,
+                    'city-icon-' . $regionId . '-'
+                );
+                if ($uploadedCityIcon !== null) {
+                    $newCityIconPath = substr($uploadedCityIcon, strlen('public/'));
+                }
+            } catch (RuntimeException $exception) {
+                $errorMessage = $exception->getMessage();
+            }
+        }
+
         foreach ($defaults as $key => $default) {
             $value = strtoupper(trim((string) ($_POST[$key] ?? $default)));
             if (!preg_match('/^#[0-9A-F]{6}$/', $value)) {
@@ -175,12 +205,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'logo_path' => $newLogoPath,
                 ]);
                 $logoPath = $newLogoPath;
+                $iconDirectory = dirname($cityIconSettingFile);
+                if (!is_dir($iconDirectory) && !mkdir($iconDirectory, 0755, true) && !is_dir($iconDirectory)) {
+                    throw new RuntimeException('De map voor de stadsicoon kon niet worden aangemaakt.');
+                }
+                if ($newCityIconPath === '') {
+                    if (is_file($cityIconSettingFile)) @unlink($cityIconSettingFile);
+                } elseif (file_put_contents($cityIconSettingFile, $newCityIconPath . PHP_EOL, LOCK_EX) === false) {
+                    throw new RuntimeException('De stadsicoon kon niet worden opgeslagen.');
+                }
+                $cityIconPath = $newCityIconPath;
+                if ($oldCityIconPath !== '' && $oldCityIconPath !== $newCityIconPath
+                    && str_starts_with($oldCityIconPath, 'uploads/regions/')) {
+                    $oldIconFile = dirname(__DIR__) . '/' . $oldCityIconPath;
+                    if (is_file($oldIconFile)) @unlink($oldIconFile);
+                }
                 if ($oldLogoPath !== '' && $oldLogoPath !== $newLogoPath
                     && str_starts_with($oldLogoPath, 'uploads/regions/')) {
                     $oldFile = dirname(__DIR__) . '/' . $oldLogoPath;
                     if (is_file($oldFile)) @unlink($oldFile);
                 }
-                $successMessage = 'De kleuren en het logo zijn opgeslagen.';
+                $successMessage = 'De kleuren, het logo en de stadsicoon zijn opgeslagen.';
             }
         }
     }
@@ -246,6 +291,14 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 <label class="region-color-field" for="agenda_arrow_background"><span>Achtergrondkleur pijlen</span><input type="color" id="agenda_arrow_background" name="agenda_arrow_background" value="<?= escapeHtml($colors['agenda_arrow_background']) ?>"><code><?= escapeHtml($colors['agenda_arrow_background']) ?></code></label>
                 <label class="region-color-field" for="agenda_arrow_text"><span>Kleur pijlsymbool</span><input type="color" id="agenda_arrow_text" name="agenda_arrow_text" value="<?= escapeHtml($colors['agenda_arrow_text']) ?>"><code><?= escapeHtml($colors['agenda_arrow_text']) ?></code></label>
             </div>
+            <h2>Stadsicoon voor de filterbalk</h2>
+            <p>Upload hier de afbeelding die bij het filter Steden / Plaatsen wordt gebruikt. PNG, JPG of WebP, maximaal 5 MB. De afbeelding wordt automatisch verkleind.</p>
+            <?php if ($cityIconPath !== ''): ?>
+                <p><img src="/<?= escapeHtml($cityIconPath) ?>" alt="Huidige stadsicoon" style="width:88px;height:88px;object-fit:contain"></p>
+                <label class="checkbox-label"><input type="checkbox" name="delete_city_icon" value="1"> Huidige stadsicoon verwijderen</label>
+            <?php endif; ?>
+            <label for="city_icon">Nieuwe stadsicoon (PNG, JPG of WEBP)</label>
+            <input type="file" id="city_icon" name="city_icon" accept="image/png,image/jpeg,image/webp">
             <h2>Regiologo</h2>
             <?php if ($logoPath !== ''): ?>
                 <p><img src="/<?= escapeHtml(ltrim($logoPath, '/')) ?>" alt="Huidig regiologo" style="max-width:220px;max-height:100px;object-fit:contain"></p>
