@@ -438,3 +438,23 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     color:var(--db-organizer-color,#E23A2C) !important;
     font-weight:900 !important;
 }
+
+
+/* Sterkere ingedrukte status voor organisatoren: duidelijk zichtbaar logo én knop. */
+.agenda-organizer-item--organizer.is-selected{
+    background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 25%,var(--db-filter-bar-color,#FFFFFF)) !important;
+    border:2px solid var(--db-organizer-color,#E23A2C) !important;
+    border-radius:10px !important;
+    box-shadow:0 2px 8px color-mix(in srgb,var(--db-organizer-color,#E23A2C) 35%,transparent) !important;
+}
+.agenda-organizer-item--organizer.is-selected img.agenda-organizer-logo,
+.agenda-organizer-item--organizer.is-selected .agenda-organizer-fallback{
+    border:4px solid var(--db-organizer-color,#E23A2C) !important;
+    border-radius:15px !important;
+    background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 22%,var(--db-filter-bar-color,#FFFFFF)) !important;
+    box-shadow:0 0 0 2px var(--db-filter-bar-color,#FFFFFF),0 0 0 5px var(--db-organizer-color,#E23A2C) !important;
+}
+.agenda-organizer-item--organizer.is-selected .agenda-organizer-name{
+    color:var(--db-organizer-color,#E23A2C) !important;
+    font-weight:900 !important;
+}
