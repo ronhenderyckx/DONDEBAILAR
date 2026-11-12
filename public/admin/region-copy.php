@@ -26,9 +26,32 @@ try {
  $q = $db->prepare("INSERT INTO regions (name, slug, subdomain, country_code, timezone, default_language, is_active) VALUES (:n,:s,:d,:c,:t,:l,0)");
  $q->execute(['n'=>$name,'s'=>$slug,'d'=>$subdomain,'c'=>$r['country_code'],'t'=>$r['timezone'],'l'=>$r['default_language']]);
  $newId = (int)$db->lastInsertId();
- $q = $db->prepare("INSERT INTO region_appearance (region_id, primary_color, primary_dark, accent_color, secondary_color, tertiary_color, header_color, background_color, text_color, weekday_colors, logo_path, updated_by) SELECT :new_id, primary_color, primary_dark, accent_color, secondary_color, tertiary_color, header_color, background_color, text_color, weekday_colors, logo_path, :user_id FROM region_appearance WHERE region_id = :old_id");
- $q->execute(['new_id'=>$newId,'user_id'=>(int)currentUser()['id'],'old_id'=>$id]);
- if ($q->rowCount() === 0) { $q=$db->prepare("INSERT INTO region_appearance (region_id, updated_by) VALUES (:id,:uid)"); $q->execute(['id'=>$newId,'uid'=>(int)currentUser()['id']]); }
+ // Kopieer alle instellingen uit region_appearance, niet alleen de basisvelden.
+ // Zo gaan ook menu-, filter-, zoek-, footer- en overige kleurinstellingen mee.
+ $columnQuery = $db->query("SELECT COLUMN_NAME, EXTRA FROM information_schema.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'region_appearance'
+  ORDER BY ORDINAL_POSITION");
+ $appearanceColumns = [];
+ foreach ($columnQuery->fetchAll(PDO::FETCH_ASSOC) as $column) {
+  $columnName = (string) $column['COLUMN_NAME'];
+  if (in_array($columnName, ['id', 'region_id', 'updated_by', 'created_at', 'updated_at'], true)
+      || str_contains((string) $column['EXTRA'], 'auto_increment')) continue;
+  if (preg_match('/^[a-zA-Z0-9_]+$/', $columnName)) $appearanceColumns[] = $columnName;
+ }
+ $quoteColumn = static fn (string $column): string => chr(96) . str_replace(chr(96), chr(96) . chr(96), $column) . chr(96);
+ $q = $db->prepare("SELECT COUNT(*) FROM region_appearance WHERE region_id = :old_id");
+ $q->execute(['old_id' => $id]);
+ if ((int) $q->fetchColumn() > 0) {
+  $targetColumns = array_merge(['region_id'], $appearanceColumns, ['updated_by']);
+  $selectColumns = array_merge([':new_id'], array_map($quoteColumn, $appearanceColumns), [':user_id']);
+  $sql = "INSERT INTO region_appearance (" . implode(', ', array_map($quoteColumn, $targetColumns)) . ")
+   SELECT " . implode(', ', $selectColumns) . " FROM region_appearance WHERE region_id = :old_id";
+  $q = $db->prepare($sql);
+  $q->execute(['new_id' => $newId, 'user_id' => (int) currentUser()['id'], 'old_id' => $id]);
+ } else {
+  $q = $db->prepare("INSERT INTO region_appearance (region_id, updated_by) VALUES (:id, :uid)");
+  $q->execute(['id' => $newId, 'uid' => (int) currentUser()['id']]);
+ }
  // Neem ook de drie afzonderlijk ingestelde filtericonen mee.
  // Maak echte kopieën van de bestanden, zodat wijzigingen in de nieuwe regio
  // de oorspronkelijke iconen niet overschrijven.
