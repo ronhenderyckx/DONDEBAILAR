@@ -54,7 +54,7 @@ $regions = $db->query(
     "SELECT r.id, r.name, r.timezone,
             CASE WHEN a.region_id IS NOT NULL THEN a.logo_path ELSE r.logo_path END AS logo_path,
             a.primary_color, a.primary_dark, a.accent_color,
-            a.secondary_color, a.tertiary_color, a.header_color, a.menu_color, a.organizer_color,
+            a.secondary_color, a.tertiary_color, a.header_color, a.menu_color, a.organizer_color, a.filter_hover_color,
             a.filter_bar_color, a.filter_text_color, a.search_button_color, a.back_top_color,
              a.search_field_color, a.search_text_color, a.footer_color, a.background_color, a.text_color, a.weekday_colors
      FROM regions r
