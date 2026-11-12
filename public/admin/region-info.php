@@ -26,6 +26,8 @@ $region = $query->fetch(PDO::FETCH_ASSOC);
 if (!$region) { http_response_code(404); exit('Actieve regio niet gevonden.'); }
 
 $languages = ['nl'=>'Nederlands','es'=>'Spaans','en'=>'Engels','fr'=>'Frans'];
+$defaultLanguage = strtolower((string) ($region['default_language'] ?? 'nl'));
+if (!isset($languages[$defaultLanguage])) $defaultLanguage = 'nl';
 $storageDirectory = dirname(__DIR__, 2) . '/storage/region-info';
 $storageFile = $storageDirectory . '/' . $regionId . '.json';
 $translations = [];
@@ -48,8 +50,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'body' => mb_substr($body, 0, 30000),
             ];
         }
-        if (trim($newTranslations['nl']['title']) === '' && trim($newTranslations['nl']['body']) === '') {
-            $errorMessage = 'Vul minstens de Nederlandse titel of tekst in als standaardinhoud.';
+        if (trim($newTranslations[$defaultLanguage]['title']) === '' && trim($newTranslations[$defaultLanguage]['body']) === '') {
+            $errorMessage = 'Vul minstens de titel of tekst in de standaardtaal (' . $languages[$defaultLanguage] . ').';
         } else {
             if (!is_dir($storageDirectory) && !mkdir($storageDirectory, 0755, true) && !is_dir($storageDirectory)) {
                 $errorMessage = 'De opslagmap kon niet worden aangemaakt.';
@@ -81,7 +83,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <p>Vul de titel en tekst per taal in. De bezoeker kan op de openbare infopagina zelf de taal kiezen. Als een vertaling leeg is, wordt de standaardtaal van de regio getoond.</p>
             <?php foreach ($languages as $code => $languageName): $translation = $translations[$code] ?? []; if (!is_array($translation)) $translation = []; ?>
                 <fieldset>
-                    <legend><?= escapeHtml($languageName) ?><?= $code === 'nl' ? ' (standaard)' : '' ?></legend>
+                    <legend><?= escapeHtml($languageName) ?><?= $code === $defaultLanguage ? ' (standaardtaal van deze regio)' : '' ?></legend>
                     <label for="info_title_<?= $code ?>">Titel</label>
                     <input type="text" id="info_title_<?= $code ?>" name="title[<?= $code ?>]" maxlength="180" value="<?= escapeHtml($translation['title'] ?? '') ?>">
                     <label for="info_body_<?= $code ?>">Informatietekst</label>
