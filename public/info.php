@@ -32,10 +32,9 @@ if ($region === null) {
 $regionId = (int) $region['id'];
 
 $languages = ['nl', 'es', 'en', 'fr'];
-$requestedLanguage = strtolower(trim((string) ($_GET['lang'] ?? '')));
 $defaultLanguage = strtolower((string) ($region['default_language'] ?? 'nl'));
 if (!in_array($defaultLanguage, $languages, true)) $defaultLanguage = 'nl';
-$language = in_array($requestedLanguage, $languages, true) ? $requestedLanguage : $defaultLanguage;
+$language = $defaultLanguage;
 
 $storageFile = dirname(__DIR__) . '/storage/region-info/' . $regionId . '.json';
 $translations = [];
@@ -43,10 +42,7 @@ if (is_file($storageFile)) {
     $decoded = json_decode((string) file_get_contents($storageFile), true);
     if (is_array($decoded)) $translations = $decoded;
 }
-$content = $translations[$language] ?? [];
-if (!is_array($content) || (trim((string) ($content['title'] ?? '')) === '' && trim((string) ($content['body'] ?? '')) === '')) {
-    $content = $translations[$defaultLanguage] ?? [];
-}
+$content = $translations[$defaultLanguage] ?? [];
 if (!is_array($content)) $content = [];
 
 $labels = [
@@ -86,11 +82,6 @@ require dirname(__DIR__) . '/app/views/header.php';
     <?php else: ?>
         <p class="region-info-empty"><?= $escape($label['empty']) ?></p>
     <?php endif; ?>
-    <div class="region-info-languages" aria-label="Taal">
-        <?php foreach (['nl'=>'Nederlands','es'=>'Español','en'=>'English','fr'=>'Français'] as $code => $name): ?>
-            <a href="/info.php?region_id=<?= $regionId ?>&amp;lang=<?= $code ?>"<?= $language === $code ? ' aria-current="page"' : '' ?>><?= $escape($name) ?></a>
-        <?php endforeach; ?>
-    </div>
     <a class="button button--primary region-info-back" href="/?region_id=<?= $regionId ?>"><?= $escape($label['back']) ?></a>
 </section>
 <style>
@@ -101,9 +92,6 @@ require dirname(__DIR__) . '/app/views/header.php';
 .region-info-heading .region-info-subtitle{margin:0 0 24px;color:var(--db-text,#222);font-size:clamp(19px,3vw,25px)}
 .region-info-content{font-size:17px;line-height:1.8;overflow-wrap:anywhere}
 .region-info-empty{padding:22px;background:var(--db-background,#f7f8fa);border-radius:12px}
-.region-info-languages{display:flex;flex-wrap:wrap;gap:10px;margin:30px 0 20px}
-.region-info-languages a{padding:9px 14px;border:1px solid var(--db-primary);border-radius:999px;color:var(--db-primary);text-decoration:none;font-weight:700}
-.region-info-languages a[aria-current=page]{background:var(--db-primary);color:#fff}
 .region-info-back{display:inline-flex;margin-top:8px}
 </style>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
