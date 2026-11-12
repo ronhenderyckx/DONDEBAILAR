@@ -100,14 +100,14 @@ if ($regionId > 0) {
         }
     }
 
-    // Voeg een bestandsversie toe zodat browsers nooit een oude filterafbeelding hergebruiken.
+    // Geef de afbeelding een actuele versie zodat een vervangen upload direct zichtbaar is.
     foreach (['cityFilterIconPath', 'organizerFilterIconPath', 'citySwitchFilterIconPath'] as $iconVariable) {
-        if ($iconVariable === '') {
+        if ($$iconVariable === '') {
             continue;
         }
-        $iconFile = $projectRoot . '/public' . parse_url($iconVariable, PHP_URL_PATH);
+        $iconFile = $projectRoot . '/public' . parse_url($$iconVariable, PHP_URL_PATH);
         if (is_file($iconFile)) {
-            $iconVariable .= '?v=' . (string) filemtime($iconFile);
+            $$iconVariable .= '?v=' . (string) filemtime($iconFile) . '-' . (string) filesize($iconFile);
         }
     }
 }
@@ -296,7 +296,7 @@ $escape = static fn ($value): string =>
             <input type="hidden" name="region_id" value="<?= $regionId ?>">
             <input type="hidden" name="agenda_change" value="1">
             <div class="agenda-selector-line">
-                <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" data-icon-organizer="<?= $escape($cityFilterIconPath) ?>" data-icon-city="<?= $escape($cityFilterIconPath) ?>" aria-label="Wissel tussen filters" title="Wissel tussen filters"><span class="agenda-filter-icon" aria-hidden="true">👥</span></button>
+                <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" aria-label="Wissel tussen filters" title="Wissel tussen filters"><?php if ($cityFilterIconPath !== ''): ?><img class="agenda-filter-icon agenda-filter-icon--image" src="<?= $escape($cityFilterIconPath) ?>" alt="" aria-hidden="true" decoding="async"><?php else: ?><span class="agenda-filter-icon" aria-hidden="true">🏙️</span><?php endif; ?></button>
                 <div class="agenda-selector-panel is-open" data-panel="organizer">
                     <div class="agenda-organizer-strip" aria-label="Organisatoren met toekomstige evenementen">
                         <?php foreach ($organizers as $organizerOption): ?>
