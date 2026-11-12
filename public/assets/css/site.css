@@ -1048,3 +1048,10 @@ textarea::placeholder {
 }
 
 
+
+
+/* Laat de per regio ingestelde achtergrondkleur van het agenda-zoekveld voorgaan
+   op de algemene witte achtergrond voor invoervelden hierboven. */
+body.has-agenda-footer .site-footer--agenda .agenda-footer-search input[type="search"] {
+    background-color: var(--db-search-field-color, #FFFFFF) !important;
+}
