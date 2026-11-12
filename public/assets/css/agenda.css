@@ -710,3 +710,10 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
 .agenda-card__placeholder{
     background:var(--db-event-day-color,var(--db-primary,#f78d19)) !important;
 }
+
+
+/* Compactere hoogte voor evenementkaarten zonder media. */
+.agenda-card__placeholder{
+    min-height:150px;
+    padding:18px 20px;
+}
