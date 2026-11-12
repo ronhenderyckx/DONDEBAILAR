@@ -10,6 +10,7 @@ $errorMessage = '';
 $successMessage = '';
 $displayName = '';
 $email = '';
+$preferredLanguage = 'nl';
 
 if (currentUser() !== null) {
     header('Location: /');
@@ -37,6 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = strtolower(trim((string) ($_POST['email'] ?? '')));
     $password = (string) ($_POST['password'] ?? '');
     $passwordConfirm = (string) ($_POST['password_confirm'] ?? '');
+    $preferredLanguage = (string) ($_POST['preferred_language'] ?? 'nl');
     $csrf = $_POST['csrf_token'] ?? null;
 
     if (!verifyCsrfToken(is_string($csrf) ? $csrf : null)) {
@@ -45,6 +47,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errorMessage = 'Vul een naam in van maximaal 120 tekens.';
     } elseif (strlen($email) > 190 || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $errorMessage = 'Vul een geldig e-mailadres in.';
+    } elseif (!in_array($preferredLanguage, ['nl', 'es', 'en', 'fr'], true)) {
+        $errorMessage = 'Kies een geldige taal.';
     } elseif (strlen($password) < 12 || strlen($password) > 4096) {
         $errorMessage = 'Kies een wachtwoord van minstens 12 tekens.';
     } elseif (!hash_equals($password, $passwordConfirm)) {
@@ -80,8 +84,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!preg_match('/^[a-z0-9.-]+$/', $host) || !($host === $baseDomain || str_ends_with($host, '.' . $baseDomain))) $host = $baseDomain;
 
             $db->beginTransaction();
-            $insert = $db->prepare("INSERT INTO users (email, password_hash, display_name, preferred_language, platform_role, status) VALUES (:email, :password_hash, :display_name, 'nl', 'user', 'pending_email')");
-            $insert->execute(['email' => $email, 'password_hash' => password_hash($password, PASSWORD_DEFAULT), 'display_name' => $displayName]);
+            $insert = $db->prepare("INSERT INTO users (email, password_hash, display_name, preferred_language, platform_role, status) VALUES (:email, :password_hash, :display_name, :preferred_language, 'user', 'pending_email')");
+            $insert->execute(['email' => $email, 'password_hash' => password_hash($password, PASSWORD_DEFAULT), 'display_name' => $displayName, 'preferred_language' => $preferredLanguage]);
             $userId = (int) $db->lastInsertId();
             $rawToken = bin2hex(random_bytes(32));
             $tokenInsert = $db->prepare("INSERT INTO user_email_verification_tokens (user_id, token_hash, expires_at) VALUES (:user_id, :token_hash, DATE_ADD(NOW(), INTERVAL 24 HOUR))");
@@ -94,6 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $successMessage = 'Je registratie is bijna klaar. We hebben een bevestigingsmail gestuurd. Klik op de link in die e-mail om je e-mailadres te bevestigen en automatisch in te loggen.';
             $displayName = '';
             $email = '';
+            $preferredLanguage = 'nl';
         } catch (DomainException $exception) {
             if ($db->inTransaction()) $db->rollBack();
             $errorMessage = $exception->getMessage();
@@ -117,6 +122,13 @@ require dirname(__DIR__) . '/app/views/header.php';
         <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
         <label for="display_name">Naam</label>
         <input type="text" id="display_name" name="display_name" value="<?= escapeHtml($displayName) ?>" autocomplete="name" maxlength="120" required>
+        <label for="preferred_language">Taal</label>
+        <select id="preferred_language" name="preferred_language" required>
+            <option value="nl" <?= $preferredLanguage === 'nl' ? 'selected' : '' ?>>Nederlands</option>
+            <option value="es" <?= $preferredLanguage === 'es' ? 'selected' : '' ?>>Español</option>
+            <option value="en" <?= $preferredLanguage === 'en' ? 'selected' : '' ?>>English</option>
+            <option value="fr" <?= $preferredLanguage === 'fr' ? 'selected' : '' ?>>Français</option>
+        </select>
         <label for="email">E-mailadres</label>
         <input type="email" id="email" name="email" value="<?= escapeHtml($email) ?>" autocomplete="email" maxlength="190" required>
         <label for="password">Wachtwoord (minstens 12 tekens)</label>
