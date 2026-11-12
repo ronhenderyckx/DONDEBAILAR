@@ -29,6 +29,41 @@ try {
  $q = $db->prepare("INSERT INTO region_appearance (region_id, primary_color, primary_dark, accent_color, secondary_color, tertiary_color, header_color, background_color, text_color, weekday_colors, logo_path, updated_by) SELECT :new_id, primary_color, primary_dark, accent_color, secondary_color, tertiary_color, header_color, background_color, text_color, weekday_colors, logo_path, :user_id FROM region_appearance WHERE region_id = :old_id");
  $q->execute(['new_id'=>$newId,'user_id'=>(int)currentUser()['id'],'old_id'=>$id]);
  if ($q->rowCount() === 0) { $q=$db->prepare("INSERT INTO region_appearance (region_id, updated_by) VALUES (:id,:uid)"); $q->execute(['id'=>$newId,'uid'=>(int)currentUser()['id']]); }
+ // Neem ook de drie afzonderlijk ingestelde filtericonen mee.
+ // Maak echte kopieën van de bestanden, zodat wijzigingen in de nieuwe regio
+ // de oorspronkelijke iconen niet overschrijven.
+ $iconSettings = [
+  'region-city-icons' => 'city-icon-',
+  'region-organizer-icons' => 'organizer-icon-',
+  'region-city-switch-icons' => 'city-switch-icon-',
+ ];
+ $storageRoot = dirname(__DIR__, 2) . '/storage';
+ $uploadRoot = dirname(__DIR__) . '/uploads/regions';
+ foreach ($iconSettings as $settingDirectory => $prefix) {
+  $sourceSetting = $storageRoot . '/' . $settingDirectory . '/' . $id . '.txt';
+  if (!is_file($sourceSetting)) continue;
+  $sourceRelativePath = trim((string) file_get_contents($sourceSetting));
+  if (!preg_match('#^uploads/regions/[a-zA-Z0-9._-]+$#', $sourceRelativePath)) continue;
+  $sourceImage = dirname(__DIR__) . '/' . $sourceRelativePath;
+  if (!is_file($sourceImage)) continue;
+  $extension = strtolower((string) pathinfo($sourceImage, PATHINFO_EXTENSION));
+  if (!in_array($extension, ['png', 'webp', 'jpg', 'jpeg'], true)) continue;
+  if (!is_dir($uploadRoot) && !mkdir($uploadRoot, 0755, true) && !is_dir($uploadRoot)) {
+   throw new RuntimeException('De map voor filtericonen kon niet worden aangemaakt.');
+  }
+  $newFilename = $prefix . $newId . '-' . bin2hex(random_bytes(12)) . '.' . $extension;
+  $newImage = $uploadRoot . '/' . $newFilename;
+  if (!copy($sourceImage, $newImage)) {
+   throw new RuntimeException('Een filtericoon kon niet worden gekopieerd.');
+  }
+  $targetDirectory = $storageRoot . '/' . $settingDirectory;
+  if (!is_dir($targetDirectory) && !mkdir($targetDirectory, 0755, true) && !is_dir($targetDirectory)) {
+   throw new RuntimeException('De instellingenmap voor filtericonen kon niet worden aangemaakt.');
+  }
+  if (file_put_contents($targetDirectory . '/' . $newId . '.txt', 'uploads/regions/' . $newFilename . PHP_EOL, LOCK_EX) === false) {
+   throw new RuntimeException('De instelling van een filtericoon kon niet worden opgeslagen.');
+  }
+ }
  $db->commit();
  header('Location: /admin/regions.php?copied=1'); exit;
 } catch (Throwable $e) { if ($db->inTransaction()) $db->rollBack(); error_log('Regio kopiëren: '.$e->getMessage()); http_response_code(500); exit('Kopiëren mislukt. Controleer de serverlog.'); }
