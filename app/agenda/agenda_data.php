@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/app/bootstrap.php';
-require_once dirname(__DIR__) . '/app/Security.php';
-require_once dirname(__DIR__) . '/app/Authorization.php';
+require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
+require_once dirname(__DIR__, 2) . '/app/Security.php';
+require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 
 $db = Database::connection();
 $currentUser = currentUser();
@@ -304,7 +304,7 @@ if ($regionId > 0) {
     }
 }
 
-$agendaPageSizeFile = dirname(__DIR__) . '/storage/agenda-page-size.txt';
+$agendaPageSizeFile = dirname(__DIR__, 2) . '/storage/agenda-page-size.txt';
 $regionAppearanceSettings = json_decode((string) ($region['weekday_colors'] ?? ''), true);
 if (!is_array($regionAppearanceSettings)) $regionAppearanceSettings = [];
 $agendaArrowBackground = (string) ($regionAppearanceSettings['agenda_arrow_background'] ?? '#F6B22E');
@@ -320,5 +320,5 @@ $escape = static fn($value): string => htmlspecialchars((string) $value, ENT_QUO
 $isAgendaPage = true;
 $pageTitle = 'Agenda' . ($region ? ' — ' . $region['name'] : '') . ' — DONDEBAILAR';
 $pageRobots = 'index, follow';
-require dirname(__DIR__) . '/app/views/header.php';
+require dirname(__DIR__, 2) . '/app/views/header.php';
 ?>
