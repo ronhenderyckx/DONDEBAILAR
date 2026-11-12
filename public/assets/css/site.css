@@ -991,3 +991,26 @@ body.has-agenda-footer .site-footer--agenda{
 /* Welkomsttekst naast de meldingen in de header */
 .site-welcome{flex:0 1 auto;min-width:0;margin-left:auto;color:var(--db-text,#222);font-size:14px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media(max-width:600px){.site-header__inner{gap:9px}.site-welcome{font-size:12px;max-width:34vw}}
+
+/* Algemene invulvelden: dezelfde rustige basis op alle pagina's, met regiokleur bij focus. */
+:where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]), select, textarea) {
+    color: var(--db-text, #222222);
+    background-color: #FFFFFF;
+    border: 1px solid #CCCCCC;
+    border-radius: 7px;
+    accent-color: var(--db-primary, #E23A2C);
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+:where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]), select, textarea)::placeholder {
+    color: #888888;
+    opacity: 1;
+}
+:where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]), select, textarea):focus {
+    border-color: var(--db-primary, #E23A2C);
+    outline: none;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--db-primary, #E23A2C) 18%, transparent);
+}
+:where(input[type="checkbox"], input[type="radio"], input[type="range"]) {
+    accent-color: var(--db-primary, #E23A2C);
+}
+
