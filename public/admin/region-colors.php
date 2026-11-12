@@ -74,11 +74,13 @@ $logoPath = $saved !== []
     : (string) ($region['logo_path'] ?? '');
 
 $cityIconSettingFile = dirname(__DIR__, 2) . '/storage/region-city-icons/' . $regionId . '.txt';
-$cityIconPath = is_file($cityIconSettingFile)
-    ? trim((string) file_get_contents($cityIconSettingFile))
-    : '';
-if (!preg_match('#^uploads/regions/[a-zA-Z0-9._-]+$#', $cityIconPath)) {
-    $cityIconPath = '';
+$organizerIconSettingFile = dirname(__DIR__, 2) . '/storage/region-organizer-icons/' . $regionId . '.txt';
+$cityIconPath = is_file($cityIconSettingFile) ? trim((string) file_get_contents($cityIconSettingFile)) : '';
+$organizerIconPath = is_file($organizerIconSettingFile) ? trim((string) file_get_contents($organizerIconSettingFile)) : '';
+foreach (['cityIconPath', 'organizerIconPath'] as $iconPathVariable) {
+    if (!preg_match('#^uploads/regions/[a-zA-Z0-9._-]+$#', $iconPathVariable)) {
+        $iconPathVariable = '';
+    }
 }
 $errorMessage = '';
 $successMessage = '';
@@ -89,9 +91,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         $oldCityIconPath = $cityIconPath;
         $newCityIconPath = $cityIconPath;
-        if (!empty($_POST['delete_city_icon'])) {
-            $newCityIconPath = '';
-        }
+        $oldOrganizerIconPath = $organizerIconPath;
+        $newOrganizerIconPath = $organizerIconPath;
+        if (!empty($_POST['delete_city_icon'])) $newCityIconPath = '';
+        if (!empty($_POST['delete_organizer_icon'])) $newOrganizerIconPath = '';
         if (isset($_FILES['city_icon']) && ($_FILES['city_icon']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
             try {
                 $uploadedCityIcon = storeOptimizedLogoUpload(
@@ -103,6 +106,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 );
                 if ($uploadedCityIcon !== null) {
                     $newCityIconPath = substr($uploadedCityIcon, strlen('public/'));
+                }
+            } catch (RuntimeException $exception) {
+                $errorMessage = $exception->getMessage();
+            }
+        }
+
+        if (isset($_FILES['organizer_icon']) && ($_FILES['organizer_icon']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
+            try {
+                $uploadedOrganizerIcon = storeOptimizedLogoUpload(
+                    $_FILES['organizer_icon'],
+                    'public/uploads/regions',
+                    256,
+                    5 * 1024 * 1024,
+                    'organizer-icon-' . $regionId . '-'
+                );
+                if ($uploadedOrganizerIcon !== null) {
+                    $newOrganizerIconPath = substr($uploadedOrganizerIcon, strlen('public/'));
                 }
             } catch (RuntimeException $exception) {
                 $errorMessage = $exception->getMessage();
@@ -222,12 +242,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $oldIconFile = dirname(__DIR__) . '/' . $oldCityIconPath;
                     if (is_file($oldIconFile)) @unlink($oldIconFile);
                 }
+                $organizerIconDirectory = dirname($organizerIconSettingFile);
+                if (!is_dir($organizerIconDirectory) && !mkdir($organizerIconDirectory, 0755, true) && !is_dir($organizerIconDirectory)) {
+                    throw new RuntimeException('De map voor het organisatorenicoon kon niet worden aangemaakt.');
+                }
+                if ($newOrganizerIconPath === '') {
+                    if (is_file($organizerIconSettingFile)) @unlink($organizerIconSettingFile);
+                } elseif (file_put_contents($organizerIconSettingFile, $newOrganizerIconPath . PHP_EOL, LOCK_EX) === false) {
+                    throw new RuntimeException('Het organisatorenicoon kon niet worden opgeslagen.');
+                }
+                $organizerIconPath = $newOrganizerIconPath;
+                if ($oldOrganizerIconPath !== '' && $oldOrganizerIconPath !== $newOrganizerIconPath
+                    && str_starts_with($oldOrganizerIconPath, 'uploads/regions/')) {
+                    $oldOrganizerIconFile = dirname(__DIR__) . '/' . $oldOrganizerIconPath;
+                    if (is_file($oldOrganizerIconFile)) @unlink($oldOrganizerIconFile);
+                }
                 if ($oldLogoPath !== '' && $oldLogoPath !== $newLogoPath
                     && str_starts_with($oldLogoPath, 'uploads/regions/')) {
                     $oldFile = dirname(__DIR__) . '/' . $oldLogoPath;
                     if (is_file($oldFile)) @unlink($oldFile);
                 }
-                $successMessage = 'De kleuren, het logo en de stadsicoon zijn opgeslagen.';
+                $successMessage = 'De kleuren, het logo en beide filtericonen zijn opgeslagen.';
             }
         }
     }
@@ -302,6 +337,14 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <?php endif; ?>
             <label for="city_icon">Nieuwe stadsicoon (PNG, JPG of WEBP)</label>
             <input type="file" id="city_icon" name="city_icon" accept="image/png,image/jpeg,image/webp">
+            <h2>Organisatorenfilter-icoon</h2>
+            <p>Afbeelding voor de knop waarmee je het organisatorenfilter kiest. PNG, JPG of WebP, maximaal 5 MB.</p>
+            <?php if ($organizerIconPath !== ''): ?>
+                <p><img src="/<?= escapeHtml($organizerIconPath) ?>" alt="Huidig organisatorenfilter-icoon" style="width:88px;height:88px;object-fit:contain"></p>
+                <label class="checkbox-label"><input type="checkbox" name="delete_organizer_icon" value="1"> Huidig organisatorenfilter-icoon verwijderen</label>
+            <?php endif; ?>
+            <label for="organizer_icon">Nieuwe afbeelding organisatorenfilter</label>
+            <input type="file" id="organizer_icon" name="organizer_icon" accept="image/png,image/jpeg,image/webp">
             <h2>Regiologo</h2>
             <?php if ($logoPath !== ''): ?>
                 <p><img src="/<?= escapeHtml(ltrim($logoPath, '/')) ?>" alt="Huidig regiologo" style="max-width:220px;max-height:100px;object-fit:contain"></p>
