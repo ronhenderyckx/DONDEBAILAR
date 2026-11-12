@@ -84,7 +84,8 @@ require dirname(__DIR__) . '/app/views/header.php';
     <?php endif; ?>
 </section>
 <style>
-.region-info-page{max-width:900px;margin:30px auto;padding:clamp(20px,4vw,42px);background:var(--db-menu-color,#fff);color:var(--db-text,#222);border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.08);border-top:6px solid var(--db-primary,#e23a2c)}
+.site-main{padding-top:0!important}
+.region-info-page{max-width:900px;margin:0 auto;padding:clamp(20px,4vw,42px);background:var(--db-menu-color,#fff);color:var(--db-text,#222);border-radius:18px;box-shadow:0 8px 30px rgba(0,0,0,.08);border-top:6px solid var(--db-primary,#e23a2c)}
 .region-info-region{display:flex;align-items:center;gap:12px;margin:0 0 16px}
 .region-info-region-icon{display:block;width:auto;height:auto;max-width:72px;max-height:64px;object-fit:contain}
 .region-info-region h1{margin:0;color:var(--db-primary-dark,var(--db-primary));font-size:clamp(28px,5vw,42px)}
