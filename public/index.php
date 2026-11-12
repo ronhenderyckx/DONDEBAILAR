@@ -966,52 +966,6 @@ const agendaFilterLabels = ['Organisator', 'Stad'];
 let agendaFilterIndex = <?= $activeFilter === 'city' ? '1' : '0' ?>;
 const agendaFilterSwitch = document.getElementById('agenda-filter-switch');
 
-/*
- * Houd de filterbalk zichtbaar tijdens het laden van een gekozen filter.
- * De agenda gebruikt gewone pagina-navigatie; daarom tonen we tijdelijk
- * een exacte, niet-interactieve kopie van de balk boven de oude pagina.
- * Zo verdwijnen de iconen niet tijdens de overgang naar de gefilterde agenda.
- */
-document.addEventListener('click', function (event) {
-    const target = event.target instanceof Element ? event.target : null;
-    const filterLink = target ? target.closest('.agenda-organizer-item[href]') : null;
-    if (!filterLink || event.defaultPrevented || event.button !== 0
-        || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey
-        || (filterLink.target && filterLink.target !== '_self')) {
-        return;
-    }
-
-    const filterBar = document.querySelector('.site-header__agenda-filters .agenda-selectors');
-    if (!filterBar || document.querySelector('.agenda-filter-loading-snapshot')) return;
-
-    const rect = filterBar.getBoundingClientRect();
-    const snapshot = filterBar.cloneNode(true);
-    snapshot.classList.add('agenda-filter-loading-snapshot');
-    snapshot.setAttribute('aria-hidden', 'true');
-    snapshot.querySelectorAll('[id]').forEach(function (element) {
-        element.removeAttribute('id');
-    });
-    snapshot.querySelectorAll('a,button,input,select,textarea').forEach(function (element) {
-        element.setAttribute('tabindex', '-1');
-    });
-
-    snapshot.style.position = 'fixed';
-    snapshot.style.top = Math.max(0, rect.top) + 'px';
-    snapshot.style.left = rect.left + 'px';
-    snapshot.style.width = rect.width + 'px';
-    snapshot.style.margin = '0';
-    snapshot.style.zIndex = '2147483000';
-    snapshot.style.pointerEvents = 'none';
-    snapshot.style.boxSizing = 'border-box';
-    snapshot.style.background = getComputedStyle(filterBar).backgroundColor;
-    snapshot.style.boxShadow = 'none';
-    document.body.appendChild(snapshot);
-
-    // Voorkom dat de kopie blijft staan als de navigatie door een fout afbreekt.
-    window.setTimeout(function () {
-        if (snapshot.isConnected) snapshot.remove();
-    }, 30000);
-}, true);
 
 function updateAgendaStripIndicators() {
     document.querySelectorAll('.agenda-selector-panel').forEach(function (panel) {
