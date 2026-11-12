@@ -16,6 +16,11 @@ try {
  $q = $db->query("SELECT TABLE_NAME, COLUMN_NAME FROM information_schema.KEY_COLUMN_USAGE WHERE REFERENCED_TABLE_SCHEMA = DATABASE() AND REFERENCED_TABLE_NAME = 'regions'");
  $blocked = [];
  foreach ($q->fetchAll() as $ref) {
+  // Deze twee tabellen bevatten alleen regio-instellingen en regionale roltoewijzingen.
+  // Ze worden hieronder veilig mee verwijderd; inhoudelijke gegevens blijven beschermd.
+  if (in_array($ref['TABLE_NAME'], ['region_appearance', 'user_region_roles'], true)) {
+   continue;
+  }
   $quote = chr(96);
   $table = str_replace($quote, $quote . $quote, $ref['TABLE_NAME']);
   $column = str_replace($quote, $quote . $quote, $ref['COLUMN_NAME']);
@@ -28,6 +33,8 @@ try {
   http_response_code(409);
   exit('Deze regio heeft nog gekoppelde gegevens (' . htmlspecialchars(implode(', ', array_unique($blocked)), ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '). Verwijder of verplaats die eerst.');
  }
+ $q = $db->prepare("DELETE FROM user_region_roles WHERE region_id = :id");
+ $q->execute(['id'=>$id]);
  $q = $db->prepare("DELETE FROM region_appearance WHERE region_id = :id");
  $q->execute(['id'=>$id]);
  $q = $db->prepare("DELETE FROM regions WHERE id = :id");
