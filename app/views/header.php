@@ -324,6 +324,10 @@ $escape = static fn ($value): string =>
 .site-brand{display:flex;align-items:center;gap:8px;text-decoration:none;min-width:0}
 .site-brand--platform,.site-brand--region{min-height:48px}
 .site-brand__logo{display:block;max-width:170px;max-height:52px;width:auto;height:auto;object-fit:contain}
+/* Houd het regiologo zichtbaar tijdens volledige navigatie door agenda-filters. */
+.site-brand--region .site-brand__logo{view-transition-name:region-brand-logo}
+@view-transition{navigation:auto}
+::view-transition-old(region-brand-logo),::view-transition-new(region-brand-logo){animation-duration:180ms}
 .site-brand--region{padding-left:12px;border-left:1px solid var(--db-border)}
 .site-brand__region-name{font-size:15px;font-weight:700;color:var(--db-text);white-space:nowrap}
 .site-notifications{position:relative;display:grid;place-items:center;width:40px;height:40px;flex:none;color:var(--db-text);text-decoration:none;border-radius:10px}
