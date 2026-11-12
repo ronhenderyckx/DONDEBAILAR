@@ -185,25 +185,10 @@ $escape = static fn ($value): string =>
                 <?php else: ?>
                     <span class="site-brand__mark" style="--brand-color:<?= $escape($primaryColor) ?>" aria-hidden="true">D</span>
                 <?php endif; ?>
-                <span class="site-brand__domain">dondebailar.eu</span>
+                <span class="site-brand__domain">dondebailar</span>
             </a>
 
-            <?php if ($region !== null): ?>
-                <?php if ($nextRegionId > 0): ?>
-                    <a class="site-brand site-brand--region" href="/?region_id=<?= $nextRegionId ?>&amp;agenda_change=1" aria-label="Volgende regio: <?= $escape($brandName) ?>" title="Klik voor de volgende regio">
-                <?php else: ?>
-                    <span class="site-brand site-brand--region">
-                <?php endif; ?>
-                    <?php if ($regionLogoPath !== ''): ?>
-                        <img src="<?= $escape($regionLogoPath) ?>" alt="" class="site-brand__logo">
-                    <?php endif; ?>
-                    <span class="site-brand__region-name"><?= $escape($brandName) ?></span>
-                <?php if ($nextRegionId > 0): ?>
-                    </a>
-                <?php else: ?>
-                    </span>
-                <?php endif; ?>
-            <?php endif; ?>
+
         </div>
 
         <?php if ($headerUser !== null): ?>
