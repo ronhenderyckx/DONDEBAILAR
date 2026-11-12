@@ -87,6 +87,18 @@ try {
    throw new RuntimeException('De instelling van een filtericoon kon niet worden opgeslagen.');
   }
  }
+ // Kopieer ook de aangepaste tekst voor evenementen zonder media.
+ $fallbackTextDirectory = $storageRoot . '/region-event-fallback-text';
+ $sourceFallbackText = $fallbackTextDirectory . '/' . $id . '.txt';
+ if (is_file($sourceFallbackText)) {
+  $fallbackText = mb_substr(trim((string) file_get_contents($sourceFallbackText)), 0, 100);
+  if (!is_dir($fallbackTextDirectory) && !mkdir($fallbackTextDirectory, 0755, true) && !is_dir($fallbackTextDirectory)) {
+   throw new RuntimeException('De map voor regioteksten kon niet worden aangemaakt.');
+  }
+  if (file_put_contents($fallbackTextDirectory . '/' . $newId . '.txt', $fallbackText . PHP_EOL, LOCK_EX) === false) {
+   throw new RuntimeException('De evenementtekst kon niet worden gekopieerd.');
+  }
+ }
  $db->commit();
  header('Location: /admin/regions.php?copied=1'); exit;
 } catch (Throwable $e) { if ($db->inTransaction()) $db->rollBack(); error_log('Regio kopiëren: '.$e->getMessage()); http_response_code(500); exit('Kopiëren mislukt. Controleer de serverlog.'); }
