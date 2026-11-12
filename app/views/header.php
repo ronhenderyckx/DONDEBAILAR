@@ -99,6 +99,17 @@ if ($regionId > 0) {
             $citySwitchFilterIconPath = '/' . preg_replace('#^public/#', '', $configuredCitySwitchIcon);
         }
     }
+
+    // Voeg een bestandsversie toe zodat browsers nooit een oude filterafbeelding hergebruiken.
+    foreach (['cityFilterIconPath', 'organizerFilterIconPath', 'citySwitchFilterIconPath'] as $iconVariable) {
+        if ($iconVariable === '') {
+            continue;
+        }
+        $iconFile = $projectRoot . '/public' . parse_url($iconVariable, PHP_URL_PATH);
+        if (is_file($iconFile)) {
+            $iconVariable .= '?v=' . (string) filemtime($iconFile);
+        }
+    }
 }
 
 $nextRegionId = 0;
