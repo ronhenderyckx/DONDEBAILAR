@@ -495,6 +495,26 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     color:var(--db-filter-hover-color,var(--db-primary)) !important;
 }
 
+/* Transparante filterwisselknop: laat de achtergrond door het stadsicoon heen zichtbaar. */
+.agenda-selector-button{
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+    outline:0!important;
+}
+.agenda-selector-button:hover,
+.agenda-selector-button:focus,
+.agenda-selector-button:active,
+.agenda-selector-button.is-active{
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+}
+.agenda-filter-icon--image{
+    background:transparent!important;
+    border:0!important;
+    box-shadow:none!important;
+}
 /* De filterwisselknop gebruikt hetzelfde stadsicoon als de stadskeuzes. */
 .agenda-selector-button{
     flex:0 0 66px!important;
