@@ -166,9 +166,15 @@ $escape = static fn ($value): string =>
 <html lang="nl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="robots" content="<?= $escape($pageRobots ?? 'noindex, nofollow') ?>">
-    <meta name="theme-color" content="#FFFFFF">
+    <meta name="theme-color" content="<?= $escape($primaryColor) ?>">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="DONDEBAILAR">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="icon" href="/icons/app-icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icons/app-icon.svg">
     <title><?= $escape($pageTitle) ?></title>
     <link rel="stylesheet" href="/assets/css/site.css">
     <link rel="stylesheet" href="/assets/css/agenda.css">
