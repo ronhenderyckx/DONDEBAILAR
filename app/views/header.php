@@ -75,12 +75,20 @@ if ($region !== null) {
 }
 
 $cityFilterIconPath = '';
+$organizerFilterIconPath = '';
 if ($regionId > 0) {
     $cityIconSettingFile = $projectRoot . '/storage/region-city-icons/' . $regionId . '.txt';
+    $organizerIconSettingFile = $projectRoot . '/storage/region-organizer-icons/' . $regionId . '.txt';
     if (is_file($cityIconSettingFile)) {
         $configuredCityIcon = trim((string) file_get_contents($cityIconSettingFile));
         if (preg_match('#^uploads/regions/[a-zA-Z0-9._-]+$#', $configuredCityIcon)) {
             $cityFilterIconPath = '/' . $configuredCityIcon;
+        }
+    }
+    if (is_file($organizerIconSettingFile)) {
+        $configuredOrganizerIcon = trim((string) file_get_contents($organizerIconSettingFile));
+        if (preg_match('#^uploads/regions/[a-zA-Z0-9._-]+$#', $configuredOrganizerIcon)) {
+            $organizerFilterIconPath = '/' . $configuredOrganizerIcon;
         }
     }
 }
@@ -269,7 +277,7 @@ $escape = static fn ($value): string =>
             <input type="hidden" name="region_id" value="<?= $regionId ?>">
             <input type="hidden" name="agenda_change" value="1">
             <div class="agenda-selector-line">
-                <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" aria-label="Wissel tussen filters" title="Wissel tussen filters"><span class="agenda-filter-icon" aria-hidden="true">👥</span></button>
+                <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" data-icon-organizer="<?= $escape($organizerFilterIconPath) ?>" data-icon-city="<?= $escape($cityFilterIconPath) ?>" aria-label="Wissel tussen filters" title="Wissel tussen filters"><span class="agenda-filter-icon" aria-hidden="true">👥</span></button>
                 <div class="agenda-selector-panel is-open" data-panel="organizer">
                     <div class="agenda-organizer-strip" aria-label="Organisatoren met toekomstige evenementen">
                         <?php foreach ($organizers as $organizerOption): ?>
