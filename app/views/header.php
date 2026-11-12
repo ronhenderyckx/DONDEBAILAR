@@ -185,6 +185,7 @@ $escape = static fn ($value): string =>
                 <?php else: ?>
                     <span class="site-brand__mark" style="--brand-color:<?= $escape($primaryColor) ?>" aria-hidden="true">D</span>
                 <?php endif; ?>
+                <span class="site-brand__domain">dondebailar</span>
             </a>
 
 
