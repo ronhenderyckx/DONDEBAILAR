@@ -27,7 +27,7 @@
 }
 .agenda-organizer-item:hover img.agenda-organizer-logo{
     transform:translateY(-2px);
-    border-color:var(--db-primary);
+    border-color:var(--db-filter-hover-color,var(--db-primary));
     box-shadow:0 5px 13px #17203329, inset 0 1px 0 #ffffff;
 }
 @media(max-width:700px){
@@ -478,4 +478,19 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
 .agenda-organizer-item.agenda-organizer-item--organizer.is-selected .agenda-organizer-name{
     color:var(--db-primary,#E23A2C)!important;
     font-weight:900!important;
+}
+
+
+/* Hoverkleur van stads- en organisatiefilters is per regio instelbaar. */
+.agenda-organizer-item:not(.is-selected):hover img.agenda-city-filter-icon,
+.agenda-organizer-item:not(.is-selected):hover img.agenda-organizer-logo,
+.agenda-organizer-item:not(.is-selected):hover .agenda-organizer-fallback{
+    border-color:var(--db-filter-hover-color,var(--db-primary)) !important;
+}
+.agenda-organizer-item:not(.is-selected):hover{
+    background:color-mix(in srgb,var(--db-filter-hover-color,var(--db-primary)) 12%,var(--db-filter-bar-color,#FFFFFF)) !important;
+}
+.agenda-selector-button:hover{
+    border-color:var(--db-filter-hover-color,var(--db-primary)) !important;
+    color:var(--db-filter-hover-color,var(--db-primary)) !important;
 }
