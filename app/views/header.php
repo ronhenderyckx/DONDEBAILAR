@@ -74,6 +74,17 @@ if ($region !== null) {
     }
 }
 
+$cityFilterIconPath = '';
+if ($regionId > 0) {
+    $cityIconSettingFile = $projectRoot . '/storage/region-city-icons/' . $regionId . '.txt';
+    if (is_file($cityIconSettingFile)) {
+        $configuredCityIcon = trim((string) file_get_contents($cityIconSettingFile));
+        if (preg_match('#^uploads/regions/[a-zA-Z0-9._-]+$#', $configuredCityIcon)) {
+            $cityFilterIconPath = '/' . $configuredCityIcon;
+        }
+    }
+}
+
 $nextRegionId = 0;
 if (isset($regions) && is_array($regions) && count($regions) > 1 && $regionId > 0) {
     $regionPosition = null;
@@ -290,7 +301,11 @@ $escape = static fn ($value): string =>
                                 : '/?region_id=' . $regionId . '&agenda_change=1&filter=city&city=' . rawurlencode($cityName);
                             ?>
                             <a class="agenda-organizer-item<?= $citySelected ? ' is-selected' : '' ?>" data-city="<?= $escape($cityName) ?>" href="<?= $escape($cityHref) ?>" title="<?= $escape($cityName) ?>" aria-label="<?= $citySelected ? 'Verwijder stadsfilter ' : 'Toon evenementen in ' ?><?= $escape($cityName) ?>">
-                                <span class="agenda-organizer-fallback" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr($cityName, 0, 1))) ?></span>
+                                <?php if ($cityFilterIconPath !== ''): ?>
+                                    <img class="agenda-city-filter-icon" src="<?= $escape($cityFilterIconPath) ?>" alt="" loading="lazy">
+                                <?php else: ?>
+                                    <span class="agenda-organizer-fallback" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr($cityName, 0, 1))) ?></span>
+                                <?php endif; ?>
                                 <span class="agenda-organizer-name"><?= $escape($cityName) ?></span>
                             </a>
                         <?php endforeach; ?>
@@ -303,6 +318,7 @@ $escape = static fn ($value): string =>
     <?php endif; ?>
 
 <style>
+.agenda-city-filter-icon{display:block;width:38px;height:38px;flex:none;object-fit:contain}
 .site-header__inner{display:flex;align-items:center;gap:16px}
 .site-brand-group{display:flex;align-items:center;gap:12px;min-width:0}
 .site-brand{display:flex;align-items:center;gap:8px;text-decoration:none;min-width:0}
