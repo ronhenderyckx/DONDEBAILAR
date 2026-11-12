@@ -6,6 +6,47 @@ require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
 require_once dirname(__DIR__, 2) . '/app/ImageOptimization.php';
 
+/**
+ * Sla filtericonen op zonder ze naar WebP om te zetten.
+ * Zo blijft het alfakanaal van transparante PNG/WebP-bestanden exact behouden.
+ */
+function storeFilterIconUpload(array $file, int $regionId, string $prefix): ?string
+{
+    $error = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
+    if ($error === UPLOAD_ERR_NO_FILE) return null;
+    if ($error !== UPLOAD_ERR_OK) {
+        throw new RuntimeException('De afbeelding kon niet worden geüpload. Controleer de maximale uploadgrootte.');
+    }
+
+    $temporaryFile = (string) ($file['tmp_name'] ?? '');
+    $size = (int) ($file['size'] ?? 0);
+    if ($temporaryFile === '' || !is_uploaded_file($temporaryFile) || $size < 1 || $size > 5 * 1024 * 1024) {
+        throw new RuntimeException('Kies een geldige afbeelding van maximaal 5 MB.');
+    }
+
+    $info = @getimagesize($temporaryFile);
+    $mime = is_array($info) ? (string) ($info['mime'] ?? '') : '';
+    $extensions = ['image/png' => 'png', 'image/webp' => 'webp', 'image/jpeg' => 'jpg'];
+    if (!isset($extensions[$mime])) {
+        throw new RuntimeException('Gebruik een PNG-, WebP- of JPG-afbeelding.');
+    }
+    $width = (int) ($info[0] ?? 0);
+    $height = (int) ($info[1] ?? 0);
+    if ($width < 1 || $height < 1 || $width > 6000 || $height > 6000) {
+        throw new RuntimeException('De afbeelding mag maximaal 6000 × 6000 pixels zijn.');
+    }
+
+    $directory = dirname(__DIR__) . '/uploads/regions';
+    if (!is_dir($directory) && !mkdir($directory, 0755, true) && !is_dir($directory)) {
+        throw new RuntimeException('De map voor filtericonen kon niet worden aangemaakt.');
+    }
+    $filename = $prefix . $regionId . '-' . bin2hex(random_bytes(12)) . '.' . $extensions[$mime];
+    if (!move_uploaded_file($temporaryFile, $directory . '/' . $filename)) {
+        throw new RuntimeException('De afbeelding kon niet ongewijzigd worden opgeslagen.');
+    }
+    return 'public/uploads/regions/' . $filename;
+}
+
 $db = Database::connection();
 $regionId = filter_input(INPUT_GET, 'region_id', FILTER_VALIDATE_INT);
 if (!$regionId || $regionId < 1) {
@@ -102,12 +143,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (!empty($_POST['delete_city_switch_icon'])) $newCitySwitchIconPath = '';
         if (isset($_FILES['city_icon']) && ($_FILES['city_icon']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
             try {
-                $uploadedCityIcon = storeOptimizedLogoUpload(
+                $uploadedCityIcon = storeFilterIconUpload(
                     $_FILES['city_icon'],
-                    'public/uploads/regions',
-                    256,
-                    5 * 1024 * 1024,
-                    'city-icon-' . $regionId . '-'
+                    $regionId,
+                    'city-icon-'
                 );
                 if ($uploadedCityIcon !== null) {
                     $newCityIconPath = substr($uploadedCityIcon, strlen('public/'));
@@ -119,12 +158,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (isset($_FILES['organizer_icon']) && ($_FILES['organizer_icon']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
             try {
-                $uploadedOrganizerIcon = storeOptimizedLogoUpload(
+                $uploadedOrganizerIcon = storeFilterIconUpload(
                     $_FILES['organizer_icon'],
-                    'public/uploads/regions',
-                    256,
-                    5 * 1024 * 1024,
-                    'organizer-icon-' . $regionId . '-'
+                    $regionId,
+                    'organizer-icon-'
                 );
                 if ($uploadedOrganizerIcon !== null) {
                     $newOrganizerIconPath = substr($uploadedOrganizerIcon, strlen('public/'));
@@ -136,12 +173,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (isset($_FILES['city_switch_icon']) && ($_FILES['city_switch_icon']['error'] ?? UPLOAD_ERR_NO_FILE) !== UPLOAD_ERR_NO_FILE) {
             try {
-                $uploadedCitySwitchIcon = storeOptimizedLogoUpload(
+                $uploadedCitySwitchIcon = storeFilterIconUpload(
                     $_FILES['city_switch_icon'],
-                    'public/uploads/regions',
-                    256,
-                    5 * 1024 * 1024,
-                    'city-switch-icon-' . $regionId . '-'
+                    $regionId,
+                    'city-switch-icon-'
                 );
                 if ($uploadedCitySwitchIcon !== null) {
                     $newCitySwitchIconPath = substr($uploadedCitySwitchIcon, strlen('public/'));
