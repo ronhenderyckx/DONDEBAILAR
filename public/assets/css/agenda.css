@@ -399,3 +399,18 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     color:var(--db-primary,#E23A2C) !important;
     font-weight:900 !important;
 }
+
+/* Duidelijke rand rond het geselecteerde stadsicoon; behoud transparantie. */
+.agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) img.agenda-city-filter-icon,
+.agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) .agenda-organizer-fallback{
+    box-sizing:border-box!important;
+    border:3px solid var(--db-primary,#E23A2C)!important;
+    border-radius:15px!important;
+    padding:2px!important;
+    background:transparent!important;
+    box-shadow:0 0 0 2px var(--db-filter-bar-color,#FFFFFF)!important;
+}
+.agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) .agenda-organizer-name{
+    color:var(--db-primary,#E23A2C)!important;
+}
+
