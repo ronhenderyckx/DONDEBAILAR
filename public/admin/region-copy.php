@@ -87,6 +87,21 @@ try {
    throw new RuntimeException('De instelling van een filtericoon kon niet worden opgeslagen.');
   }
  }
+ // Kopieer ook de vertaalde openbare infopagina naar de nieuwe regio.
+ $sourceInfoFile = $storageRoot . '/region-info/' . $id . '.json';
+ if (is_file($sourceInfoFile)) {
+  $infoDirectory = $storageRoot . '/region-info';
+  $infoContent = file_get_contents($sourceInfoFile);
+  if ($infoContent === false || json_decode($infoContent, true) === null) {
+   throw new RuntimeException('De regionale infopagina kon niet worden gelezen.');
+  }
+  if (!is_dir($infoDirectory) && !mkdir($infoDirectory, 0755, true) && !is_dir($infoDirectory)) {
+   throw new RuntimeException('De map voor regionale infopagina’s kon niet worden aangemaakt.');
+  }
+  if (file_put_contents($infoDirectory . '/' . $newId . '.json', $infoContent, LOCK_EX) === false) {
+   throw new RuntimeException('De regionale infopagina kon niet worden gekopieerd.');
+  }
+ }
  // Kopieer ook de aangepaste tekst voor evenementen zonder media.
  $fallbackTextDirectory = $storageRoot . '/region-event-fallback-text';
  $sourceFallbackText = $fallbackTextDirectory . '/' . $id . '.txt';
