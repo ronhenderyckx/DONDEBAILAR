@@ -69,7 +69,11 @@ window.addEventListener('resize', updateAgendaStripIndicators);
 function showAgendaFilter(index) {
     agendaFilterIndex = index % agendaFilterIcons.length;
     if (!agendaFilterSwitch) return;
-    // Het stadsicoon blijft vast; de tekst benoemt het actieve filter.
+    // Toon het ingestelde icoon dat hoort bij het actieve filter.
+    const citySwitchIcon = agendaFilterSwitch.querySelector('.agenda-filter-switch-icon--city');
+    const organizerSwitchIcon = agendaFilterSwitch.querySelector('.agenda-filter-switch-icon--organizer');
+    if (citySwitchIcon) citySwitchIcon.hidden = agendaFilterIndex === 0;
+    if (organizerSwitchIcon) organizerSwitchIcon.hidden = agendaFilterIndex !== 0;
     const switchLabel = agendaFilterSwitch.querySelector('.agenda-filter-switch-label');
     if (switchLabel) switchLabel.textContent = agendaFilterIndex === 0 ? 'ORGANISATOREN' : 'STEDEN';
     agendaFilterSwitch.setAttribute('aria-label', 'Filter: ' + agendaFilterLabels[agendaFilterIndex] + '. Klik om te wisselen');
