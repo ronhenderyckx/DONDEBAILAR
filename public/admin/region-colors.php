@@ -59,6 +59,13 @@ requireRegionRole($regionId, ['region_admin']);
 $regionQuery = $db->prepare("SELECT id, name, logo_path FROM regions WHERE id = :id LIMIT 1");
 $regionQuery->execute(['id' => $regionId]);
 $region = $regionQuery->fetch();
+
+$fallbackTextSettingFile = dirname(__DIR__, 2) . '/storage/region-event-fallback-text/' . $regionId . '.txt';
+$eventFallbackText = 'SALSA · BACHATA · KIZOMBA';
+if (is_file($fallbackTextSettingFile)) {
+    $savedFallbackText = trim((string) file_get_contents($fallbackTextSettingFile));
+    if ($savedFallbackText !== '') $eventFallbackText = mb_substr($savedFallbackText, 0, 100);
+}
 if (!$region) {
     http_response_code(404);
     exit('Regio niet gevonden.');
@@ -334,7 +341,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $oldFile = dirname(__DIR__) . '/' . $oldLogoPath;
                     if (is_file($oldFile)) @unlink($oldFile);
                 }
-                $successMessage = 'De kleuren, het logo en de filtericonen zijn opgeslagen.';
+                $newFallbackText = trim((string) ($_POST['event_fallback_text'] ?? $eventFallbackText));
+                $newFallbackText = mb_substr($newFallbackText, 0, 100);
+                $fallbackDirectory = dirname($fallbackTextSettingFile);
+                if (!is_dir($fallbackDirectory) && !mkdir($fallbackDirectory, 0755, true) && !is_dir($fallbackDirectory)) {
+                    throw new RuntimeException('De map voor de regiotekst kon niet worden aangemaakt.');
+                }
+                if (file_put_contents($fallbackTextSettingFile, $newFallbackText . PHP_EOL, LOCK_EX) === false) {
+                    throw new RuntimeException('De regiotekst kon niet worden opgeslagen.');
+                }
+                $eventFallbackText = $newFallbackText !== '' ? $newFallbackText : 'SALSA · BACHATA · KIZOMBA';
+                $successMessage = 'De kleuren, het logo, de filtericonen en de evenementtekst zijn opgeslagen.';
             }
         }
     }
@@ -425,6 +442,10 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <?php endif; ?>
             <label for="organizer_icon">Nieuwe afbeelding organisatorenfilter</label>
             <input type="file" id="organizer_icon" name="organizer_icon" accept="image/png,image/jpeg,image/webp">
+            <h2>Tekst bij evenementen zonder media</h2>
+            <p>Deze tekst verschijnt op de evenementkaart wanneer er geen afbeelding of video is toegevoegd. De naam van het evenement wordt eronder getoond.</p>
+            <label for="event_fallback_text">Tekst voor deze regio (maximaal 100 tekens)</label>
+            <input type="text" id="event_fallback_text" name="event_fallback_text" maxlength="100" value="<?= escapeHtml($eventFallbackText) ?>">
             <h2>Regiologo</h2>
             <?php if ($logoPath !== ''): ?>
                 <p><img src="/<?= escapeHtml(ltrim($logoPath, '/')) ?>" alt="Huidig regiologo" style="max-width:220px;max-height:100px;object-fit:contain"></p>
