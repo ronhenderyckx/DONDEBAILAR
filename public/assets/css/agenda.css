@@ -712,8 +712,8 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
 }
 
 
-/* Extra compacte hoogte voor evenementkaarten zonder media. */
+/* Zeer compacte hoogte voor evenementkaarten zonder media. */
 .agenda-card__placeholder{
-    min-height:100px;
-    padding:10px 14px;
+    min-height:70px;
+    padding:6px 10px;
 }
