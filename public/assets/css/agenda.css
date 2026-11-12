@@ -600,3 +600,62 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
         height:42px!important;
     }
 }
+
+
+/* Filterwissel: stadsicoon even groot als de iconen in de filterrij. */
+.agenda-selector-button{
+    flex:0 0 82px!important;
+    width:82px!important;
+    min-width:82px!important;
+    height:86px!important;
+    min-height:86px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:3px!important;
+    padding:2px 0!important;
+}
+.agenda-filter-switch-icon{
+    display:grid!important;
+    place-items:center!important;
+    width:62px!important;
+    height:62px!important;
+    flex:0 0 62px!important;
+}
+.agenda-filter-switch-icon .agenda-filter-icon--image{
+    width:62px!important;
+    height:62px!important;
+    max-width:62px!important;
+    max-height:62px!important;
+    object-fit:contain!important;
+}
+.agenda-filter-switch-label{
+    display:block!important;
+    width:max-content!important;
+    max-width:100px!important;
+    white-space:nowrap!important;
+    color:var(--db-filter-text-color,#222222)!important;
+    font-size:8px!important;
+    font-weight:800!important;
+    line-height:1!important;
+    text-align:center!important;
+}
+@media(max-width:700px){
+    .agenda-selector-button{
+        flex-basis:78px!important;
+        width:78px!important;
+        min-width:78px!important;
+    }
+    .agenda-filter-switch-icon{
+        width:58px!important;
+        height:58px!important;
+        flex-basis:58px!important;
+    }
+    .agenda-filter-switch-icon .agenda-filter-icon--image{
+        width:58px!important;
+        height:58px!important;
+        max-width:58px!important;
+        max-height:58px!important;
+    }
+}
