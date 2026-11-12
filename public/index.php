@@ -1423,7 +1423,7 @@ document.addEventListener('click', function (event) {
 
     let requestController = null;
 
-    function refreshAgendaPage(parsedDocument, targetUrl) {
+    function refreshAgendaPage(parsedDocument, targetUrl, addHistory) {
         const currentPage = document.querySelector('.site-main > .agenda-page');
         const incomingPage = parsedDocument.querySelector('.site-main > .agenda-page');
         if (!currentPage || !incomingPage) {
@@ -1450,7 +1450,8 @@ document.addEventListener('click', function (event) {
         // Vernieuw de URL zonder de eenmalige agenda_change-vlag.
         const cleanUrl = new URL(targetUrl.href);
         cleanUrl.searchParams.delete('agenda_change');
-        window.history.pushState({agendaAjax:true}, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
+        const historyMethod = addHistory ? 'pushState' : 'replaceState';
+        window.history[historyMethod]({agendaAjax:true}, '', cleanUrl.pathname + cleanUrl.search + cleanUrl.hash);
 
         // Nieuwe reeks en paginaknoppen.
         const cards = Array.from(document.querySelectorAll('.agenda-feed .agenda-card'));
@@ -1556,12 +1557,7 @@ document.addEventListener('click', function (event) {
         if (!response.ok) throw new Error('De agenda kon niet worden bijgewerkt.');
         const html = await response.text();
         const parsed = new DOMParser().parseFromString(html, 'text/html');
-        refreshAgendaPage(parsed, url);
-        if (!addHistory) {
-            const clean = new URL(url.href);
-            clean.searchParams.delete('agenda_change');
-            window.history.replaceState({agendaAjax:true}, '', clean.pathname + clean.search + clean.hash);
-        }
+        refreshAgendaPage(parsed, url, addHistory);
     }
 
     document.addEventListener('click', function (event) {
