@@ -69,7 +69,23 @@ window.addEventListener('resize', updateAgendaStripIndicators);
 function showAgendaFilter(index) {
     agendaFilterIndex = index % agendaFilterIcons.length;
     if (!agendaFilterSwitch) return;
-    agendaFilterSwitch.innerHTML = '<span class="agenda-filter-icon" aria-hidden="true">' + agendaFilterIcons[agendaFilterIndex] + '</span>';
+    const iconPath = agendaFilterIndex === 0
+        ? agendaFilterSwitch.dataset.iconOrganizer
+        : agendaFilterSwitch.dataset.iconCity;
+    if (iconPath) {
+        const iconImage = document.createElement('img');
+        iconImage.className = 'agenda-filter-icon agenda-filter-icon--image';
+        iconImage.src = iconPath;
+        iconImage.alt = '';
+        iconImage.setAttribute('aria-hidden', 'true');
+        agendaFilterSwitch.replaceChildren(iconImage);
+    } else {
+        const icon = document.createElement('span');
+        icon.className = 'agenda-filter-icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.textContent = agendaFilterIcons[agendaFilterIndex];
+        agendaFilterSwitch.replaceChildren(icon);
+    }
     agendaFilterSwitch.setAttribute('aria-label', 'Filter: ' + agendaFilterLabels[agendaFilterIndex] + '. Klik om te wisselen');
     agendaFilterSwitch.setAttribute('title', 'Filter: ' + agendaFilterLabels[agendaFilterIndex] + ' — klik om te wisselen');
     document.querySelectorAll('[data-panel]').forEach(function (panel) {
