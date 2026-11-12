@@ -41,17 +41,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifyCsrfToken(is_string($_POST['csrf_token'] ?? null) ? $_POST['csrf_token'] : null)) {
         $errorMessage = 'De beveiligingscontrole is verlopen. Vernieuw de pagina.';
     } else {
-        $newTranslations = [];
-        foreach ($languages as $code => $languageName) {
-            $title = trim((string) ($_POST['title'][$code] ?? ''));
-            $body = trim((string) ($_POST['body'][$code] ?? ''));
-            $newTranslations[$code] = [
+        $title = trim((string) ($_POST['title'] ?? ''));
+        $body = trim((string) ($_POST['body'] ?? ''));
+        $newTranslations = [
+            $defaultLanguage => [
                 'title' => mb_substr($title, 0, 180),
                 'body' => mb_substr($body, 0, 30000),
-            ];
-        }
+            ],
+        ];
         if (trim($newTranslations[$defaultLanguage]['title']) === '' && trim($newTranslations[$defaultLanguage]['body']) === '') {
-            $errorMessage = 'Vul minstens de titel of tekst in de standaardtaal (' . $languages[$defaultLanguage] . ').';
+            $errorMessage = 'Vul minstens de titel of tekst in (' . $languages[$defaultLanguage] . ').';
         } else {
             if (!is_dir($storageDirectory) && !mkdir($storageDirectory, 0755, true) && !is_dir($storageDirectory)) {
                 $errorMessage = 'De opslagmap kon niet worden aangemaakt.';
@@ -61,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $errorMessage = 'De infopagina kon niet worden opgeslagen.';
                 } else {
                     $translations = $newTranslations;
-                    $successMessage = 'De vier taalversies zijn opgeslagen.';
+                    $successMessage = 'De infopagina is opgeslagen.';
                 }
             }
         }
@@ -72,7 +71,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 ?>
 <section class="admin-page">
     <div class="admin-heading">
-        <div><p class="eyebrow">REGIOBEHEER</p><h1>Info-pagina</h1><p>Beheer de openbare informatie voor <?= escapeHtml($region['name']) ?> in vier talen.</p></div>
+        <div><p class="eyebrow">REGIOBEHEER</p><h1>Info-pagina</h1><p>Beheer de openbare informatie voor <?= escapeHtml($region['name']) ?> in de standaardtaal: <?= escapeHtml($languages[$defaultLanguage]) ?>.</p></div>
         <a class="button" href="/info.php?region_id=<?= (int) $regionId ?>" target="_blank" rel="noopener">Bekijk infopagina</a>
     </div>
     <section class="admin-section">
@@ -80,16 +79,15 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <?php if ($successMessage !== ''): ?><div class="message message--success" role="status"><?= escapeHtml($successMessage) ?></div><?php endif; ?>
         <form method="post" class="auth-form region-info-editor">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
-            <p>Vul de titel en tekst per taal in. De bezoeker kan op de openbare infopagina zelf de taal kiezen. Als een vertaling leeg is, wordt de standaardtaal van de regio getoond.</p>
-            <?php foreach ($languages as $code => $languageName): $translation = $translations[$code] ?? []; if (!is_array($translation)) $translation = []; ?>
-                <fieldset>
-                    <legend><?= escapeHtml($languageName) ?><?= $code === $defaultLanguage ? ' (standaardtaal van deze regio)' : '' ?></legend>
-                    <label for="info_title_<?= $code ?>">Titel</label>
-                    <input type="text" id="info_title_<?= $code ?>" name="title[<?= $code ?>]" maxlength="180" value="<?= escapeHtml($translation['title'] ?? '') ?>">
-                    <label for="info_body_<?= $code ?>">Informatietekst</label>
-                    <textarea id="info_body_<?= $code ?>" name="body[<?= $code ?>]" rows="9" maxlength="30000"><?= escapeHtml($translation['body'] ?? '') ?></textarea>
-                </fieldset>
-            <?php endforeach; ?>
+            <p>De infopagina gebruikt één taal: de ingestelde standaardtaal van deze regio (<?= escapeHtml($languages[$defaultLanguage]) ?>).</p>
+            <?php $translation = $translations[$defaultLanguage] ?? []; if (!is_array($translation)) $translation = []; ?>
+            <fieldset>
+                <legend><?= escapeHtml($languages[$defaultLanguage]) ?></legend>
+                <label for="info_title">Titel</label>
+                <input type="text" id="info_title" name="title" maxlength="180" value="<?= escapeHtml($translation['title'] ?? '') ?>">
+                <label for="info_body">Informatietekst</label>
+                <textarea id="info_body" name="body" rows="9" maxlength="30000"><?= escapeHtml($translation['body'] ?? '') ?></textarea>
+            </fieldset>
             <div class="form-actions"><button type="submit" class="button button--primary">Info-pagina opslaan</button><a class="button" href="/admin/region-colors.php?region_id=<?= (int) $regionId ?>">Terug</a></div>
         </form>
     </section>
