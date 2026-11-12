@@ -318,7 +318,7 @@ $escape = static fn ($value): string =>
     <?php endif; ?>
 
 <style>
-.agenda-city-filter-icon{display:block;width:38px;height:38px;flex:none;object-fit:contain}
+.agenda-city-filter-icon{display:block;width:38px;height:38px;flex:none;object-fit:contain;background:transparent;mix-blend-mode:multiply}
 .site-header__inner{display:flex;align-items:center;gap:16px}
 .site-brand-group{display:flex;align-items:center;gap:12px;min-width:0}
 .site-brand{display:flex;align-items:center;gap:8px;text-decoration:none;min-width:0}
