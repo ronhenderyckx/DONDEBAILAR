@@ -704,3 +704,9 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
         max-height:42px!important;
     }
 }
+
+
+/* Media-loze evenementkaarten volgen de ingestelde kleur van de weekdag. */
+.agenda-card__placeholder{
+    background:var(--db-event-day-color,var(--db-primary,#f78d19)) !important;
+}
