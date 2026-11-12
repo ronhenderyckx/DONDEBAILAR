@@ -50,7 +50,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                             <th>Tijdzone</th>
                             <th>Taal</th>
                             <th>Status</th>
-                            <th>Actie</th>
+                            <th>Acties</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -77,6 +77,18 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                                        href="/admin/region-colors.php?region_id=<?= (int) $region['id'] ?>">
                                         Kleuren en logo
                                     </a>
+                                    <form method="post" action="/admin/region-copy.php" style="display:inline"
+                                          onsubmit="return confirm('Een kopie maken van deze regio? Evenementen en gebruikers worden niet meegekopieerd.');">
+                                        <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+                                        <input type="hidden" name="region_id" value="<?= (int) $region['id'] ?>">
+                                        <button class="button button--small" type="submit">Kopiëren</button>
+                                    </form>
+                                    <form method="post" action="/admin/region-delete.php" style="display:inline"
+                                          onsubmit="return confirm('Weet je zeker dat je deze regio definitief wilt wissen? Dit kan niet ongedaan worden gemaakt.');">
+                                        <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+                                        <input type="hidden" name="region_id" value="<?= (int) $region['id'] ?>">
+                                        <button class="button button--small" type="submit">Wissen</button>
+                                    </form>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
