@@ -1569,7 +1569,6 @@ document.addEventListener('click', function (event) {
         if (!link || event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         const url = new URL(link.href, window.location.origin);
         if (url.origin !== window.location.origin || url.pathname !== '/' || url.searchParams.get('agenda_change') !== '1') return;
-        if (url.searchParams.get('region_id') !== new URL(window.location.href).searchParams.get('region_id')) return;
         event.preventDefault();
         loadAgendaFilter(url, true).catch(function (error) {
             if (error.name !== 'AbortError') window.location.assign(url.href);
