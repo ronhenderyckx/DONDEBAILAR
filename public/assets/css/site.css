@@ -1031,3 +1031,18 @@ textarea::placeholder {
     opacity: 1 !important;
 }
 
+
+
+/* Compactere bovenste DONDEBAILAR-regel: minder ruimte tot de horizontale scheiding. */
+.site-header__inner {
+    min-height: 44px !important;
+    padding-top: 2px !important;
+    padding-bottom: 2px !important;
+}
+@media (max-width: 760px) {
+    .site-header__inner {
+        min-height: 42px !important;
+        padding-top: 1px !important;
+        padding-bottom: 1px !important;
+    }
+}
