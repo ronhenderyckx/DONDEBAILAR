@@ -184,8 +184,8 @@ $escape = static fn ($value): string =>
                     <img src="<?= $escape($platformLogoPath) ?>" alt="DONDEBAILAR" class="site-brand__logo">
                 <?php else: ?>
                     <span class="site-brand__mark" style="--brand-color:<?= $escape($primaryColor) ?>" aria-hidden="true">D</span>
-                    <span class="site-brand__name">DONDEBAILAR</span>
                 <?php endif; ?>
+                <span class="site-brand__domain">dondebailar.eu</span>
             </a>
 
             <?php if ($region !== null): ?>
@@ -354,6 +354,7 @@ $escape = static fn ($value): string =>
 .site-brand-group{display:flex;align-items:center;gap:5px;min-width:0;flex:1 1 auto}
 .site-brand{display:flex;align-items:center;gap:4px;text-decoration:none;min-width:0;flex:0 1 auto}
 .site-brand--platform,.site-brand--region{min-height:42px}
+.site-brand__domain{font-size:14px;font-weight:800;color:var(--db-text);white-space:nowrap;letter-spacing:-.02em}
 /* Compacte logo's en tekst voorkomen dat de bovenste regel overlapt. */
 .site-brand__logo{display:block;max-width:105px;max-height:42px;width:auto;height:auto;object-fit:contain;flex:0 1 auto}
 /* Houd het regiologo zichtbaar tijdens volledige navigatie door agenda-filters. */
@@ -369,7 +370,7 @@ $escape = static fn ($value): string =>
 .site-notifications:hover{background:var(--db-surface,#f2f4f7)}
 .site-notifications span{position:absolute;top:0;right:-2px;display:grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#dc3545;color:#fff;font-size:10px;font-weight:800;line-height:1}
 .site-menu{margin-left:0}
-@media(max-width:600px){.site-header__inner{gap:3px;width:calc(100% - 16px)}.site-brand-group{gap:3px}.site-brand{gap:3px}.site-brand--region{padding-left:4px}.site-brand__logo{max-width:64px;max-height:34px}.site-brand__region-name{max-width:68px;font-size:11px}.site-welcome{font-size:10px}.site-notifications,.site-save-preferences{width:28px;height:32px}.site-notifications svg,.site-save-preferences svg{width:19px;height:19px}.site-menu__toggle{min-height:32px;padding:0 6px}}
+@media(max-width:600px){.site-header__inner{gap:3px;width:calc(100% - 16px)}.site-brand-group{gap:3px}.site-brand{gap:3px}.site-brand--region{padding-left:4px}.site-brand__logo{max-width:64px;max-height:34px}.site-brand__domain{font-size:11px}.site-brand__region-name{max-width:68px;font-size:11px}.site-welcome{font-size:10px}.site-notifications,.site-save-preferences{width:28px;height:32px}.site-notifications svg,.site-save-preferences svg{width:19px;height:19px}.site-menu__toggle{min-height:32px;padding:0 6px}}
 </style>
 </header>
 
