@@ -737,3 +737,23 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
         font-size:10px!important;
     }
 }
+
+/* Zet icoon en label van de wisselknop lager, op dezelfde hoogte als de andere filteritems. */
+.agenda-selector-button{
+    justify-content:flex-start!important;
+    padding:11px 0 5px!important;
+    gap:6px!important;
+}
+.agenda-filter-switch-label{
+    font-size:10px!important;
+    line-height:1.25!important;
+    margin:0!important;
+}
+@media(max-width:700px){
+    .agenda-selector-button{
+        padding-top:11px!important;
+    }
+    .agenda-filter-switch-label{
+        font-size:10px!important;
+    }
+}
