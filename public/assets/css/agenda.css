@@ -757,3 +757,15 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
         font-size:10px!important;
     }
 }
+
+
+/* Wisselknop nog lager uitlijnen met de overige filterkeuzes. */
+.agenda-selector-button{
+    padding-top:17px!important;
+    padding-bottom:0!important;
+}
+@media(max-width:700px){
+    .agenda-selector-button{
+        padding-top:17px!important;
+    }
+}
