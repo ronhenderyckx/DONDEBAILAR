@@ -769,3 +769,47 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
         padding-top:17px!important;
     }
 }
+
+
+/* Wisselknop exact gelijk uitlijnen met de andere filteritems. */
+.agenda-selector-button{
+    align-self:flex-start!important;
+    margin-top:5px!important;
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    gap:6px!important;
+    padding:0!important;
+}
+.agenda-filter-switch-icon{
+    width:48px!important;
+    height:48px!important;
+    flex:0 0 48px!important;
+}
+.agenda-filter-switch-label{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    font-size:11px!important;
+    line-height:1.25!important;
+    letter-spacing:0!important;
+    text-align:center!important;
+}
+@media(max-width:700px){
+    .agenda-selector-button{
+        margin-top:5px!important;
+    }
+    .agenda-filter-switch-icon{
+        width:44px!important;
+        height:44px!important;
+        flex-basis:44px!important;
+    }
+    .agenda-organizer-item img.agenda-organizer-logo,
+    .agenda-organizer-item .agenda-organizer-fallback,
+    .agenda-organizer-item img.agenda-city-filter-icon{
+        width:44px!important;
+        height:44px!important;
+        flex-basis:44px!important;
+    }
+}
