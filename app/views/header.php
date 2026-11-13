@@ -374,11 +374,13 @@ $escape = static fn ($value): string =>
 .site-brand{display:flex;align-items:center;gap:4px;text-decoration:none;min-width:0;flex:0 1 auto}
 .site-brand--platform,.site-brand--region{min-height:30px}
 .site-brand__domain{font-size:14px;font-weight:800;color:var(--db-text);white-space:nowrap;letter-spacing:-.02em}
-/* Compacte logo's en tekst voorkomen dat de bovenste regel overlapt. */
-.site-brand__logo{display:block;max-width:105px;max-height:30px;width:auto;height:auto;object-fit:contain;flex:0 1 auto}
+/* Iets hogere header zodat het bestaande platformlogo beter zichtbaar is. */
+.site-header__inner{min-height:64px!important}
+.site-brand--platform,.site-brand--region{min-height:48px}
+.site-brand__logo{display:block;max-width:125px;max-height:48px;width:auto;height:auto;object-fit:contain;flex:0 1 auto}
 /* Houd het regiologo zichtbaar tijdens volledige navigatie door agenda-filters. */
 .site-brand--region{padding-left:6px;border-left:1px solid var(--db-border)}
-.site-brand__region-name{max-width:110px;overflow:hidden;text-overflow:ellipsis;font-size:13px;font-weight:700;color:var(--db-text);white-space:nowrap}\n.site-brand__region-logo{max-width:42px;max-height:30px}\n.site-brand__region-mark{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:var(--db-primary);color:#fff;font-size:19px;font-weight:800;line-height:1}
+.site-brand__region-name{max-width:110px;overflow:hidden;text-overflow:ellipsis;font-size:13px;font-weight:700;color:var(--db-text);white-space:nowrap}\n.site-brand__region-logo{max-width:48px;max-height:42px}\n.site-brand__region-mark{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:var(--db-primary);color:#fff;font-size:19px;font-weight:800;line-height:1}
 .site-welcome{font-size:12px;white-space:nowrap;flex:0 1 auto}
 .site-notifications,.site-save-preferences{width:30px;height:30px}
 .site-menu__toggle{min-height:30px;padding:0 7px}
@@ -389,7 +391,7 @@ $escape = static fn ($value): string =>
 .site-notifications:hover{background:var(--db-surface,#f2f4f7)}
 .site-notifications span{position:absolute;top:0;right:-2px;display:grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#dc3545;color:#fff;font-size:10px;font-weight:800;line-height:1}
 .site-menu{margin-left:0}
-@media(max-width:600px){.site-header__inner{gap:3px;width:calc(100% - 16px);min-height:32px!important}.site-brand-group{gap:3px}.site-brand{gap:3px}.site-brand--region{padding-left:4px}.site-brand--platform,.site-brand--region{min-height:30px}.site-brand__logo{max-width:64px;max-height:28px}.site-brand__domain{font-size:11px}.site-brand__region-name{max-width:68px;font-size:11px}.site-brand__region-logo{max-width:30px;max-height:26px}.site-brand__region-mark{width:24px;height:24px;font-size:17px}.site-welcome{font-size:10px}.site-notifications,.site-save-preferences{width:26px;height:28px}.site-notifications svg,.site-save-preferences svg{width:19px;height:19px}.site-menu__toggle{min-height:28px;padding:0 6px}}
+@media(max-width:600px){.site-header__inner{gap:3px;width:calc(100% - 16px);min-height:56px!important}.site-brand-group{gap:3px}.site-brand{gap:3px}.site-brand--region{padding-left:4px}.site-brand--platform,.site-brand--region{min-height:42px}.site-brand__logo{max-width:76px;max-height:42px}.site-brand__domain{font-size:11px}.site-brand__region-name{max-width:68px;font-size:11px}.site-brand__region-logo{max-width:36px;max-height:36px}.site-brand__region-mark{width:24px;height:24px;font-size:17px}.site-welcome{font-size:10px}.site-notifications,.site-save-preferences{width:26px;height:28px}.site-notifications svg,.site-save-preferences svg{width:19px;height:19px}.site-menu__toggle{min-height:28px;padding:0 6px}}
 </style>
 </header>
 
