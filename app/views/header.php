@@ -192,6 +192,9 @@ foreach ($weekdayDefaults as $index => $fallback) {
     $textCandidate = is_array($weekdayPalette) ? (string) ($weekdayPalette['weekday_text_' . $index] ?? '#222222') : '#222222';
     if (!preg_match('/^#[0-9a-fA-F]{6}$/', $textCandidate)) $textCandidate = '#222222';
     $themeStyle .= ';--db-weekday-text-' . ($index + 1) . ':' . strtoupper($textCandidate);
+    $titleCandidate = is_array($weekdayPalette) ? (string) ($weekdayPalette['weekday_title_' . $index] ?? $eventTitleCandidate) : $eventTitleCandidate;
+    if (!preg_match('/^#[0-9a-fA-F]{6}$/', $titleCandidate)) $titleCandidate = '#222222';
+    $themeStyle .= ';--db-weekday-title-' . ($index + 1) . ':' . strtoupper($titleCandidate);
 }
 
 $escape = static fn ($value): string =>
