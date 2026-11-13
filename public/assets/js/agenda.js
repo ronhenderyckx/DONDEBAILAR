@@ -144,8 +144,9 @@ document.addEventListener('pointercancel', function () { eventInfoPointerStart =
 
 let agendaVideosMuted = window.DONDEBAILAR_AGENDA_CONFIG.soundMuted;
 let activeAgendaVideo = null;
+let agendaVideoIdleTimer = null;
 
-// Houd het geheugengebruik en de decoderbelasting laag: nooit meerdere video's tegelijk.
+// Houd het geheugengebruik laag: nooit meerdere video's tegelijk.
 function playAgendaVideo(video) {
     document.querySelectorAll('.agenda-card__video').forEach(function (otherVideo) {
         if (otherVideo !== video && !otherVideo.paused) otherVideo.pause();
@@ -157,6 +158,30 @@ function playAgendaVideo(video) {
         playPromise.catch(function () {});
     }
 }
+
+// Start pas een video nadat het scrollen even gestopt is.
+function scheduleVisibleAgendaVideo() {
+    window.clearTimeout(agendaVideoIdleTimer);
+    agendaVideoIdleTimer = window.setTimeout(function () {
+        let bestVideo = null;
+        let bestRatio = 0;
+        document.querySelectorAll('.agenda-card__video').forEach(function (video) {
+            const rect = video.getBoundingClientRect();
+            const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
+            const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+            const ratio = rect.width > 0 && rect.height > 0
+                ? (visibleWidth * visibleHeight) / (rect.width * rect.height)
+                : 0;
+            if (ratio > bestRatio) {
+                bestRatio = ratio;
+                bestVideo = video;
+            }
+        });
+        if (bestVideo && bestRatio >= 0.6) playAgendaVideo(bestVideo);
+    }, 450);
+}
+window.addEventListener('scroll', scheduleVisibleAgendaVideo, {passive:true});
+window.addEventListener('resize', scheduleVisibleAgendaVideo, {passive:true});
 document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
     const track = gallery.querySelector('[data-gallery-track]');
     const counter = gallery.querySelector('[data-gallery-count]');
@@ -336,25 +361,25 @@ document.addEventListener('click', function (event) {
     });
 });
 
-// Speel alleen een voldoende zichtbare video af. Een andere video wordt eerst gepauzeerd.
+// Pauzeer video's zodra ze niet meer voldoende zichtbaar zijn.
+// Het starten gebeurt pas nadat het scrollen is gestopt.
 const agendaVideoObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
         const video = entry.target;
-        if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
-            playAgendaVideo(video);
-        } else {
+        if (!entry.isIntersecting || entry.intersectionRatio < 0.6) {
             video.pause();
             if (activeAgendaVideo === video) activeAgendaVideo = null;
         }
     });
 }, {threshold:[0, 0.6]});
 document.querySelectorAll('.agenda-card__video').forEach(function (video) {
-    // Gebruik meteen de bewaarde geluidskeuze van het ingelogde account.
     video.muted = agendaVideosMuted;
-    video.setAttribute('autoplay', '');
+    video.removeAttribute('autoplay');
+    video.setAttribute('preload', 'none');
     video.setAttribute('muted', '');
     agendaVideoObserver.observe(video);
 });
+scheduleVisibleAgendaVideo();
 
 // Geluid van geüploade video's centraal aan- en uitzetten.
 // De footer wordt pas na dit script geladen; daarom gebruiken we event delegation.
