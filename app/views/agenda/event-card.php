@@ -1,7 +1,7 @@
 <?php
 // Eén evenementkaart. Vereist $event, $eventIndex en de agenda-hulpfuncties/instellingen.
 ?>
-                    <article class="agenda-card"<?= $eventIndex >= $agendaPageSize ? ' hidden' : '' ?> style="--db-event-day-color:var(--db-weekday-<?= (int) $start->format('N') ?>,var(--db-primary))">
+                    <article class="agenda-card"<?= $eventIndex >= $agendaPageSize ? ' hidden' : '' ?> style="--db-event-day-color:var(--db-weekday-<?= (int) $start->format('N') ?>,var(--db-primary));--db-event-day-text-color:var(--db-weekday-text-<?= (int) $start->format('N') ?>,#222222)">
                         <div class="agenda-card__media-wrap">
                         <?php $eventMediaItems = $event['media_items'] ?? []; ?>
                         <?php if (count($eventMediaItems) > 1): ?>
