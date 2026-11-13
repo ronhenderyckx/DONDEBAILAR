@@ -806,3 +806,44 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
         max-height:44px!important;
     }
 }
+
+
+/* Houd de horizontale bladerpijlen zichtbaar boven de logo's. */
+.agenda-selector-panel{
+    position:relative!important;
+    overflow:visible!important;
+}
+.agenda-selector-panel.has-more::after,
+.agenda-selector-panel.has-prev::before{
+    position:absolute!important;
+    top:0!important;
+    z-index:20!important;
+    display:grid!important;
+    place-items:center!important;
+    width:30px!important;
+    height:86px!important;
+    margin:0!important;
+    padding:0!important;
+    background:linear-gradient(90deg,var(--db-filter-bar-color,#fff) 35%,transparent 100%)!important;
+    color:var(--db-primary,#E23A2C)!important;
+    font-family:Arial,Helvetica,sans-serif!important;
+    font-size:38px!important;
+    font-weight:900!important;
+    line-height:1!important;
+    -webkit-text-stroke:1.5px currentColor;
+    text-shadow:0 1px 2px #fff!important;
+    pointer-events:none!important;
+}
+.agenda-selector-panel.has-more::after{right:0!important;content:'›'!important;}
+.agenda-selector-panel.has-prev::before{
+    left:0!important;
+    content:'‹'!important;
+    transform:none!important;
+    background:linear-gradient(270deg,var(--db-filter-bar-color,#fff) 35%,transparent 100%)!important;
+}
+@media(max-width:700px){
+    .agenda-selector-panel.has-more::after,
+    .agenda-selector-panel.has-prev::before{
+        height:86px!important;
+    }
+}
