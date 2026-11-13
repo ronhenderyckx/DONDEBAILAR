@@ -442,13 +442,8 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 </label>
             <?php endforeach; ?>
             </div>
-            <h2>Titel van evenementen</h2>
-            <p>Deze kleur geldt voor de titel van alle evenementkaarten. Bij evenementen zonder media wordt ook de titel in het gekleurde vlak hiermee weergegeven.</p>
-            <div class="region-color-grid">
-                <label class="region-color-field" for="event_title_color"><span>Tekstkleur evenementtitel</span><input type="color" id="event_title_color" name="event_title_color" value="<?= escapeHtml($eventTitleColor) ?>"><code><?= escapeHtml($eventTitleColor) ?></code></label>
-            </div>
             <h2>Weekdagen</h2>
-            <p>Per dag kun je hier zowel de achtergrondkleur als de tekstkleur instellen.</p>
+            <p>Per dag kun je hier zowel de achtergrondkleur als de tekstkleur instellen. Je kunt hieronder ook de tekstkleur van de evenementtitels apart bepalen.</p>
             <div class="region-weekday-grid">
             <?php foreach (['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag','Zondag'] as $i => $day): ?>
                 <div class="region-weekday-card">
@@ -465,6 +460,11 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                     </div>
                 </div>
             <?php endforeach; ?>
+            </div>
+            <h3>Tekstkleur evenementtitel</h3>
+            <p>Deze kleur geldt voor de titel van alle evenementkaarten. Bij evenementen zonder media wordt ook de titel in het gekleurde vlak hiermee weergegeven.</p>
+            <div class="region-color-grid">
+                <label class="region-color-field" for="event_title_color"><span>Tekstkleur evenementtitel</span><input type="color" id="event_title_color" name="event_title_color" value="<?= escapeHtml($eventTitleColor) ?>"><code><?= escapeHtml($eventTitleColor) ?></code></label>
             </div>
             <h2>Kleur van de bladerpijlen</h2>
             <p>Stel de kleur van de linker- en rechterpijl in. De achtergrond van deze pijlen blijft altijd transparant.</p>
