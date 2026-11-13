@@ -168,6 +168,16 @@ $appearancePalette = json_decode((string) ($region['weekday_colors'] ?? ''), tru
 $agendaArrowColor = is_array($appearancePalette) ? (string) ($appearancePalette['agenda_arrow_text'] ?? '#222222') : '#222222';
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowColor)) $agendaArrowColor = '#222222';
 $themeStyle .= ';--db-agenda-arrow-color:' . strtoupper($agendaArrowColor);
+$footerIconDefaults = [
+    'back_top_icon_color' => '#FFFFFF',
+    'search_icon_color' => '#FFFFFF',
+    'speaker_icon_color' => '#FFFFFF',
+];
+foreach ($footerIconDefaults as $iconKey => $fallback) {
+    $candidate = is_array($appearancePalette) ? (string) ($appearancePalette[$iconKey] ?? $fallback) : $fallback;
+    if (!preg_match('/^#[0-9a-fA-F]{6}$/', $candidate)) $candidate = $fallback;
+    $themeStyle .= ';--db-' . str_replace('_', '-', $iconKey) . ':' . strtoupper($candidate);
+}
 $weekdayPalette = json_decode((string) ($region['weekday_colors'] ?? ''), true);
 $weekdayDefaults = ['#F6D84A', '#4A90D9', '#55A96B', '#A78BDA', '#E78AAE', '#F49A45', '#999999'];
 foreach ($weekdayDefaults as $index => $fallback) {
