@@ -7,9 +7,10 @@ declare(strict_types=1);
  */
 return [
     'app' => [
-        'name' => 'DONDEBAILAR',
+        'name' => 'DONDEBAILE',
         'environment' => 'development',
         'debug' => true,
+        // Update base_domain after dond ebaile.eu has been registered and configured.
         'base_domain' => 'dondebailar.eu',
         'default_timezone' => 'Europe/Madrid',
         'supported_languages' => ['nl', 'en', 'es', 'fr'],
