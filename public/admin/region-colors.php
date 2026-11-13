@@ -201,13 +201,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $colors[$key] = $value;
         }
-        foreach (['agenda_arrow_background', 'agenda_arrow_text'] as $arrowKey) {
-            $value = strtoupper(trim((string) ($_POST[$arrowKey] ?? $defaults[$arrowKey])));
-            if (!preg_match('/^#[0-9A-F]{6}$/', $value)) {
-                $errorMessage = 'Een of meer kleuren van de agendapijlen zijn ongeldig.';
-                break;
-            }
-            $colors[$arrowKey] = $value;
+        $arrowColor = strtoupper(trim((string) ($_POST['agenda_arrow_text'] ?? $colors['agenda_arrow_text'])));
+        if (!preg_match('/^#[0-9A-F]{6}$/', $arrowColor)) {
+            $errorMessage = 'De kleur van de bladerpijlen is ongeldig.';
+        } else {
+            $colors['agenda_arrow_text'] = $arrowColor;
         }
         $weekdayInput = $_POST['weekday_colors'] ?? [];
         if (!is_array($weekdayInput)) $weekdayInput = [];
@@ -413,10 +411,10 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 </label>
             <?php endforeach; ?>
             </div>
-            <h2>Kleuren van de agendapijlen</h2>
+            <h2>Kleur van de bladerpijlen</h2>
+            <p>Stel de kleur van de linker- en rechterpijl in. De achtergrond van deze pijlen blijft altijd transparant.</p>
             <div class="region-color-grid">
-                <label class="region-color-field" for="agenda_arrow_background"><span>Achtergrondkleur pijlen</span><input type="color" id="agenda_arrow_background" name="agenda_arrow_background" value="<?= escapeHtml($colors['agenda_arrow_background']) ?>"><code><?= escapeHtml($colors['agenda_arrow_background']) ?></code></label>
-                <label class="region-color-field" for="agenda_arrow_text"><span>Kleur pijlsymbool</span><input type="color" id="agenda_arrow_text" name="agenda_arrow_text" value="<?= escapeHtml($colors['agenda_arrow_text']) ?>"><code><?= escapeHtml($colors['agenda_arrow_text']) ?></code></label>
+                <label class="region-color-field" for="agenda_arrow_text"><span>Kleur bladerpijlen</span><input type="color" id="agenda_arrow_text" name="agenda_arrow_text" value="<?= escapeHtml($colors['agenda_arrow_text']) ?>"><code><?= escapeHtml($colors['agenda_arrow_text']) ?></code></label>
             </div>
             <h2>Stadsicoon voor de filterbalk</h2>
             <p>Upload hier de afbeelding die bij het filter Steden / Plaatsen wordt gebruikt. PNG, JPG of WebP, maximaal 5 MB. De afbeelding wordt automatisch verkleind.</p>
