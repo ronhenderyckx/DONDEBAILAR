@@ -436,25 +436,23 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 </label>
             <?php endforeach; ?>
             </div>
-            <h2>Kleuren per weekdag</h2>
-            <div class="region-color-grid">
+            <h2>Weekdagen</h2>
+            <p>Per dag kun je hier zowel de achtergrondkleur als de tekstkleur instellen.</p>
+            <div class="region-weekday-grid">
             <?php foreach (['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag','Zondag'] as $i => $day): ?>
-                <label class="region-color-field" for="weekday_<?= $i ?>">
-                    <span><?= $day ?></span>
-                    <input type="color" id="weekday_<?= $i ?>" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>">
-                    <code><?= escapeHtml($weekdayColors[$i]) ?></code>
-                </label>
-            <?php endforeach; ?>
-            </div>
-            <h2>Tekstkleur per weekdag</h2>
-            <p>Stel de kleur van de dagnamen afzonderlijk in, los van de achtergrondkleur.</p>
-            <div class="region-color-grid">
-            <?php foreach (['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag','Zondag'] as $i => $day): ?>
-                <label class="region-color-field" for="weekday_text_<?= $i ?>">
-                    <span><?= $day ?> – tekstkleur</span>
-                    <input type="color" id="weekday_text_<?= $i ?>" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>">
-                    <code><?= escapeHtml($weekdayTextColors[$i]) ?></code>
-                </label>
+                <div class="region-weekday-card">
+                    <strong><?= $day ?></strong>
+                    <label for="weekday_<?= $i ?>">Achtergrondkleur</label>
+                    <div class="region-weekday-color">
+                        <input type="color" id="weekday_<?= $i ?>" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>">
+                        <code><?= escapeHtml($weekdayColors[$i]) ?></code>
+                    </div>
+                    <label for="weekday_text_<?= $i ?>">Tekstkleur</label>
+                    <div class="region-weekday-color">
+                        <input type="color" id="weekday_text_<?= $i ?>" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>">
+                        <code><?= escapeHtml($weekdayTextColors[$i]) ?></code>
+                    </div>
+                </div>
             <?php endforeach; ?>
             </div>
             <h2>Kleur van de bladerpijlen</h2>
@@ -520,9 +518,19 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     </section>
 </section>
 <style>
-.region-color-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:14px 0 26px}
-.region-color-field{display:grid;grid-template-columns:1fr 48px;align-items:center;gap:8px;padding:10px;border:1px solid #e1e5eb;border-radius:10px}
-.region-color-field input[type=color]{width:48px;height:38px;padding:2px;border:1px solid #ddd;border-radius:7px;background:#fff}
-.region-color-field code{grid-column:1/-1;color:#596273}
+.region-color-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0 30px}
+.region-color-field{display:grid;grid-template-columns:minmax(0,1fr) 52px;align-items:center;gap:8px 12px;min-height:64px;padding:12px;border:1px solid #e1e5eb;border-radius:10px;background:#fff}
+.region-color-field span{font-size:13px;line-height:1.35;font-weight:600}
+.region-color-field input[type=color],.region-weekday-color input[type=color]{width:52px;height:40px;padding:3px;border:1px solid #d5dbe3;border-radius:8px;background:#fff;cursor:pointer}
+.region-color-field code,.region-weekday-color code{grid-column:1/-1;color:#596273;font-size:12px}
+.admin-section .auth-form>h2{margin:30px 0 8px;padding-bottom:10px;border-bottom:1px solid #e5e9ef}
+.admin-section .auth-form>h2:first-of-type{margin-top:8px}
+.region-weekday-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:14px 0 30px}
+.region-weekday-card{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;padding:14px;border:1px solid #e1e5eb;border-radius:10px;background:#fff}
+.region-weekday-card>strong{grid-column:1/-1;padding-bottom:7px;border-bottom:1px solid #edf0f4;font-size:14px}
+.region-weekday-card>label{grid-column:1/-1;margin:2px 0 -5px;color:#596273;font-size:12px;font-weight:600}
+.region-weekday-color{grid-column:1/-1;display:flex;align-items:center;gap:10px}
+.region-weekday-color code{font-size:12px;color:#596273}
+@media(max-width:520px){.region-color-grid,.region-weekday-grid{grid-template-columns:1fr}.region-color-field{grid-template-columns:minmax(0,1fr) 52px}}
 </style>
 <?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
