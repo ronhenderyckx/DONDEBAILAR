@@ -105,6 +105,7 @@ foreach ($defaults as $key => $value) {
 $weekdayColors = $weekdayDefaults;
 $weekdayTextDefaults = array_fill(0, 7, '#222222');
 $weekdayTextColors = $weekdayTextDefaults;
+$eventTitleColor = '#222222';
 $iconColorDefaults = [
     'back_top_icon_color' => '#FFFFFF',
     'search_icon_color' => '#FFFFFF',
@@ -114,6 +115,8 @@ $iconColors = $iconColorDefaults;
 if (!empty($saved['weekday_colors'])) {
     $decoded = json_decode((string) $saved['weekday_colors'], true);
     if (is_array($decoded)) {
+        $titleCandidate = (string) ($decoded['event_title_color'] ?? '#222222');
+        $eventTitleColor = preg_match('/^#[0-9a-fA-F]{6}$/', $titleCandidate) ? strtoupper($titleCandidate) : '#222222';
         foreach (['agenda_arrow_background', 'agenda_arrow_text'] as $arrowKey) {
             $candidate = (string) ($decoded[$arrowKey] ?? $defaults[$arrowKey]);
             $colors[$arrowKey] = preg_match('/^#[0-9a-fA-F]{6}$/', $candidate) ? strtoupper($candidate) : $defaults[$arrowKey];
@@ -225,6 +228,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $colors['agenda_arrow_text'] = $arrowColor;
         }
+        $eventTitleCandidate = strtoupper(trim((string) ($_POST['event_title_color'] ?? $eventTitleColor)));
+        if (!preg_match('/^#[0-9A-F]{6}$/', $eventTitleCandidate)) {
+            $errorMessage = 'De tekstkleur van de evenementtitel is ongeldig.';
+        } else {
+            $eventTitleColor = $eventTitleCandidate;
+        }
         foreach ($iconColorDefaults as $iconKey => $iconDefault) {
             $value = strtoupper(trim((string) ($_POST[$iconKey] ?? $iconColors[$iconKey])));
             if (!preg_match('/^#[0-9A-F]{6}$/', $value)) {
@@ -320,7 +329,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     ) + [
                         'agenda_arrow_background' => $colors['agenda_arrow_background'],
                         'agenda_arrow_text' => $colors['agenda_arrow_text'],
-                    ] + $iconColors, JSON_THROW_ON_ERROR),
+                    ] + $iconColors + ['event_title_color' => $eventTitleColor], JSON_THROW_ON_ERROR),
                     'logo_path' => $newLogoPath,
                 ]);
                 $logoPath = $newLogoPath;
@@ -432,6 +441,11 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                     <code><?= escapeHtml($colors[$key]) ?></code>
                 </label>
             <?php endforeach; ?>
+            </div>
+            <h2>Titel van evenementen</h2>
+            <p>Deze kleur geldt voor de titel van alle evenementkaarten. Bij evenementen zonder media wordt ook de titel in het gekleurde vlak hiermee weergegeven.</p>
+            <div class="region-color-grid">
+                <label class="region-color-field" for="event_title_color"><span>Tekstkleur evenementtitel</span><input type="color" id="event_title_color" name="event_title_color" value="<?= escapeHtml($eventTitleColor) ?>"><code><?= escapeHtml($eventTitleColor) ?></code></label>
             </div>
             <h2>Weekdagen</h2>
             <p>Per dag kun je hier zowel de achtergrondkleur als de tekstkleur instellen.</p>
