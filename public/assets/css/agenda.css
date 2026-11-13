@@ -867,3 +867,10 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
 .agenda-card__date-line span{
     color:inherit!important;
 }
+
+/* Gebruik de ingestelde weekdag-tekstkleur voor ALLE tekst in de evenementkaart.
+   De datumregel gebruikt dezelfde variabele; media en kaartachtergrond blijven ongewijzigd. */
+.agenda-card__details,
+.agenda-card__details :where(h2,h2 a,p,strong,span,a,b,h3,.agenda-card__description,.agenda-card__hashtags,.agenda-attendance,.agenda-icon-button,.agenda-card__more,.agenda-card__quick-date){
+    color:var(--db-event-day-text-color,#222222)!important;
+}
