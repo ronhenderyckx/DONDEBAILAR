@@ -105,6 +105,8 @@ foreach ($defaults as $key => $value) {
 $weekdayColors = $weekdayDefaults;
 $weekdayTextDefaults = array_fill(0, 7, '#222222');
 $weekdayTextColors = $weekdayTextDefaults;
+$weekdayTitleDefaults = array_fill(0, 7, '#222222');
+$weekdayTitleColors = $weekdayTitleDefaults;
 $eventTitleColor = '#222222';
 $iconColorDefaults = [
     'back_top_icon_color' => '#FFFFFF',
@@ -117,6 +119,7 @@ if (!empty($saved['weekday_colors'])) {
     if (is_array($decoded)) {
         $titleCandidate = (string) ($decoded['event_title_color'] ?? '#222222');
         $eventTitleColor = preg_match('/^#[0-9a-fA-F]{6}$/', $titleCandidate) ? strtoupper($titleCandidate) : '#222222';
+        $weekdayTitleDefaults = array_fill(0, 7, $eventTitleColor);
         foreach (['agenda_arrow_background', 'agenda_arrow_text'] as $arrowKey) {
             $candidate = (string) ($decoded[$arrowKey] ?? $defaults[$arrowKey]);
             $colors[$arrowKey] = preg_match('/^#[0-9a-fA-F]{6}$/', $candidate) ? strtoupper($candidate) : $defaults[$arrowKey];
@@ -135,7 +138,12 @@ if (!empty($saved['weekday_colors'])) {
             if (isset($decoded[$key]) && preg_match('/^#[0-9a-fA-F]{6}$/', (string) $decoded[$key])) {
                 $weekdayTextColors[$i] = strtoupper((string) $decoded[$key]);
             }
+            $titleKey = 'weekday_title_' . $i;
+            if (isset($decoded[$titleKey]) && preg_match('/^#[0-9a-fA-F]{6}$/', (string) $decoded[$titleKey])) {
+                $weekdayTitleDefaults[$i] = strtoupper((string) $decoded[$titleKey]);
+            }
         }
+        $weekdayTitleColors = $weekdayTitleDefaults;
     }
 }
 $logoPath = $saved !== []
@@ -228,12 +236,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $colors['agenda_arrow_text'] = $arrowColor;
         }
-        $eventTitleCandidate = strtoupper(trim((string) ($_POST['event_title_color'] ?? $eventTitleColor)));
-        if (!preg_match('/^#[0-9A-F]{6}$/', $eventTitleCandidate)) {
-            $errorMessage = 'De tekstkleur van de evenementtitel is ongeldig.';
-        } else {
-            $eventTitleColor = $eventTitleCandidate;
-        }
         foreach ($iconColorDefaults as $iconKey => $iconDefault) {
             $value = strtoupper(trim((string) ($_POST[$iconKey] ?? $iconColors[$iconKey])));
             if (!preg_match('/^#[0-9A-F]{6}$/', $value)) {
@@ -257,6 +259,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
             $weekdayTextColors[$i] = $textValue;
+            $titleValue = strtoupper(trim((string) ($_POST['weekday_title_colors'][$i] ?? $weekdayTitleDefaults[$i])));
+            if (!preg_match('/^#[0-9A-F]{6}$/', $titleValue)) {
+                $errorMessage = 'Een of meer tekstkleuren van de evenementtitels zijn ongeldig.';
+                break;
+            }
+            $weekdayTitleColors[$i] = $titleValue;
         }
 
         if ($errorMessage === '') {
@@ -443,7 +451,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <?php endforeach; ?>
             </div>
             <h2>Weekdagen</h2>
-            <p>Per dag kun je hier zowel de achtergrondkleur als de tekstkleur instellen. Je kunt hieronder ook de tekstkleur van de evenementtitels apart bepalen.</p>
+            <p>Stel per weekdag de achtergrondkleur, de dagtekstkleur en de tekstkleur van de evenementtitel afzonderlijk in.</p>
             <div class="region-weekday-grid">
             <?php foreach (['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag','Zondag'] as $i => $day): ?>
                 <div class="region-weekday-card">
@@ -453,18 +461,18 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                         <input type="color" id="weekday_<?= $i ?>" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>">
                         <code><?= escapeHtml($weekdayColors[$i]) ?></code>
                     </div>
-                    <label for="weekday_text_<?= $i ?>">Tekstkleur</label>
+                    <label for="weekday_text_<?= $i ?>">Tekstkleur dag</label>
                     <div class="region-weekday-color">
                         <input type="color" id="weekday_text_<?= $i ?>" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>">
                         <code><?= escapeHtml($weekdayTextColors[$i]) ?></code>
                     </div>
+                    <label for="weekday_title_<?= $i ?>">Tekstkleur evenementtitel</label>
+                    <div class="region-weekday-color">
+                        <input type="color" id="weekday_title_<?= $i ?>" name="weekday_title_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTitleColors[$i]) ?>">
+                        <code><?= escapeHtml($weekdayTitleColors[$i]) ?></code>
+                    </div>
                 </div>
             <?php endforeach; ?>
-            </div>
-            <h3>Tekstkleur evenementtitel</h3>
-            <p>Deze kleur geldt voor de titel van alle evenementkaarten. Bij evenementen zonder media wordt ook de titel in het gekleurde vlak hiermee weergegeven.</p>
-            <div class="region-color-grid">
-                <label class="region-color-field" for="event_title_color"><span>Tekstkleur evenementtitel</span><input type="color" id="event_title_color" name="event_title_color" value="<?= escapeHtml($eventTitleColor) ?>"><code><?= escapeHtml($eventTitleColor) ?></code></label>
             </div>
             <h2>Kleur van de bladerpijlen</h2>
             <p>Stel de kleur van de linker- en rechterpijl in. De achtergrond van deze pijlen blijft altijd transparant.</p>
