@@ -99,6 +99,18 @@
                     });
                 });
             };
+            // Ga ook bij via AJAX geladen agenda's naar het volgende item na een video.
+            slides.forEach(function (slide, slideIndex) {
+                slide.querySelectorAll('video.agenda-card__video').forEach(function (video) {
+                    video.addEventListener('ended', function () {
+                        if (slideIndex >= slides.length - 1) return;
+                        track.scrollTo({
+                            left: (slideIndex + 1) * track.clientWidth,
+                            behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+                        });
+                    });
+                });
+            });
             track.addEventListener('scroll', updateCounter, {passive:true});
             window.addEventListener('resize', updateCounter);
             updateCounter();
