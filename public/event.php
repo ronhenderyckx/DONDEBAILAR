@@ -11,10 +11,11 @@ if (!$id || $id < 1) {
     exit('Evenement niet gevonden.');
 }
 $statement = $db->prepare(
-    "SELECT e.*, r.name AS region_name, r.logo_path, o.name AS organizer_name,
+    "SELECT e.*, r.name AS region_name, r.logo_path, ra.text_color, o.name AS organizer_name,
             l.name AS location_name, l.city AS location_city
      FROM events e
      INNER JOIN regions r ON r.id = e.region_id
+     LEFT JOIN region_appearance ra ON ra.region_id = r.id
      INNER JOIN organizers o ON o.id = e.organizer_id
      LEFT JOIN locations l ON l.id = e.location_id
      WHERE e.id = :id AND e.status = 'published' LIMIT 1"
@@ -39,6 +40,7 @@ $region = [
     'id' => (int) $event['region_id'],
     'name' => (string) $event['region_name'],
     'logo_path' => $event['logo_path'],
+    'text_color' => $event['text_color'] ?: '#222222',
 ];
 require dirname(__DIR__) . '/app/views/header.php';
 $escape = static fn($value): string => escapeHtml((string) $value);
