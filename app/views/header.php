@@ -186,6 +186,9 @@ foreach ($weekdayDefaults as $index => $fallback) {
         $candidate = $fallback;
     }
     $themeStyle .= ';--db-weekday-' . ($index + 1) . ':' . strtoupper($candidate);
+    $textCandidate = is_array($weekdayPalette) ? (string) ($weekdayPalette['weekday_text_' . $index] ?? '#222222') : '#222222';
+    if (!preg_match('/^#[0-9a-fA-F]{6}$/', $textCandidate)) $textCandidate = '#222222';
+    $themeStyle .= ';--db-weekday-text-' . ($index + 1) . ':' . strtoupper($textCandidate);
 }
 
 $escape = static fn ($value): string =>
