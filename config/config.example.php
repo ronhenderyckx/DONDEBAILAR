@@ -10,7 +10,7 @@ return [
         'name' => 'DONDEBAILE',
         'environment' => 'development',
         'debug' => true,
-        // Update base_domain after dond ebaile.eu has been registered and configured.
+        // Keep the current production domain until the new domain is registered and configured.
         'base_domain' => 'dondebailar.eu',
         'default_timezone' => 'Europe/Madrid',
         'supported_languages' => ['nl', 'en', 'es', 'fr'],
