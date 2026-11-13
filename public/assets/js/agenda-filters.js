@@ -140,7 +140,8 @@
         if (typeof agendaVideoObserver !== 'undefined') {
             document.querySelectorAll('.agenda-page video.agenda-card__video').forEach(function (video) {
                 video.muted = typeof agendaVideosMuted !== 'undefined' ? agendaVideosMuted : true;
-                video.setAttribute('autoplay', '');
+                video.removeAttribute('autoplay');
+                video.setAttribute('preload', 'none');
                 video.setAttribute('muted', '');
                 agendaVideoObserver.observe(video);
             });
