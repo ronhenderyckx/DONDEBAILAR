@@ -103,6 +103,8 @@ foreach ($defaults as $key => $value) {
     $colors[$key] = preg_match('/^#[0-9a-fA-F]{6}$/', $candidate) ? strtoupper($candidate) : $value;
 }
 $weekdayColors = $weekdayDefaults;
+$weekdayTextDefaults = array_fill(0, 7, '#222222');
+$weekdayTextColors = $weekdayTextDefaults;
 $iconColorDefaults = [
     'back_top_icon_color' => '#FFFFFF',
     'search_icon_color' => '#FFFFFF',
@@ -123,6 +125,12 @@ if (!empty($saved['weekday_colors'])) {
         foreach ($weekdayDefaults as $i => $value) {
             if (isset($decoded[$i]) && preg_match('/^#[0-9a-fA-F]{6}$/', (string) $decoded[$i])) {
                 $weekdayColors[$i] = strtoupper((string) $decoded[$i]);
+            }
+        }
+        foreach ($weekdayTextDefaults as $i => $value) {
+            $key = 'weekday_text_' . $i;
+            if (isset($decoded[$key]) && preg_match('/^#[0-9a-fA-F]{6}$/', (string) $decoded[$key])) {
+                $weekdayTextColors[$i] = strtoupper((string) $decoded[$key]);
             }
         }
     }
@@ -234,6 +242,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 break;
             }
             $weekdayColors[$i] = $value;
+            $textValue = strtoupper(trim((string) ($_POST['weekday_text_colors'][$i] ?? $weekdayTextDefaults[$i])));
+            if (!preg_match('/^#[0-9A-F]{6}$/', $textValue)) {
+                $errorMessage = 'Een of meer tekstkleuren van de weekdagen zijn ongeldig.';
+                break;
+            }
+            $weekdayTextColors[$i] = $textValue;
         }
 
         if ($errorMessage === '') {
@@ -300,7 +314,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'footer_color' => $colors['footer_color'],
                     'background_color' => $colors['background_color'],
                     'text_color' => $colors['text_color'],
-                    'weekday_colors' => json_encode($weekdayColors + [
+                    'weekday_colors' => json_encode($weekdayColors + array_combine(
+                        array_map(static fn (int $i): string => 'weekday_text_' . $i, array_keys($weekdayTextColors)),
+                        array_values($weekdayTextColors)
+                    ) + [
                         'agenda_arrow_background' => $colors['agenda_arrow_background'],
                         'agenda_arrow_text' => $colors['agenda_arrow_text'],
                     ] + $iconColors, JSON_THROW_ON_ERROR),
@@ -426,6 +443,17 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                     <span><?= $day ?></span>
                     <input type="color" id="weekday_<?= $i ?>" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>">
                     <code><?= escapeHtml($weekdayColors[$i]) ?></code>
+                </label>
+            <?php endforeach; ?>
+            </div>
+            <h2>Tekstkleur per weekdag</h2>
+            <p>Stel de kleur van de dagnamen afzonderlijk in, los van de achtergrondkleur.</p>
+            <div class="region-color-grid">
+            <?php foreach (['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag','Zondag'] as $i => $day): ?>
+                <label class="region-color-field" for="weekday_text_<?= $i ?>">
+                    <span><?= $day ?> – tekstkleur</span>
+                    <input type="color" id="weekday_text_<?= $i ?>" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>">
+                    <code><?= escapeHtml($weekdayTextColors[$i]) ?></code>
                 </label>
             <?php endforeach; ?>
             </div>
