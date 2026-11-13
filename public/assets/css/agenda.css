@@ -887,5 +887,5 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
 .agenda-card__details > h2,
 .agenda-card__details > h2 a,
 .agenda-card__placeholder strong{
-    color:var(--db-event-title-color,#222222)!important;
+    color:var(--db-event-day-title-color,#222222)!important;
 }
