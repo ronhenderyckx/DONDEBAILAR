@@ -411,7 +411,7 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     box-shadow:0 0 0 2px var(--db-filter-bar-color,#FFFFFF)!important;
 }
 .agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) .agenda-organizer-name{
-    color:var(--db-primary,#E23A2C)!important;
+    color:var(--db-agenda-arrow-color,var(--db-primary,#E23A2C))!important;
 }
 
 
