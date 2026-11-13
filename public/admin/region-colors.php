@@ -421,11 +421,8 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 'filter_hover_color' => 'Hoverkleur van de filterknoppen (stad en organisator)',
                 'filter_bar_color' => 'Achtergrondkleur van de filterbalk',
                 'filter_text_color' => 'Tekstkleur van de filterknoppen',
-                'search_button_color' => 'Achtergrondkleur zoekknop',
-                'back_top_color' => 'Achtergrondkleur naar-bovenknop',
                 'search_field_color' => 'Achtergrondkleur zoekveld',
                 'search_text_color' => 'Tekstkleur zoekfunctie (invoer en placeholder)',
-                'footer_color' => 'Achtergrondkleur footer',
                 'background_color' => 'Achtergrondkleur',
                 'text_color' => 'Tekstkleur',
             ] as $key => $label): ?>
@@ -460,11 +457,22 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <div class="region-color-grid">
                 <label class="region-color-field" for="agenda_arrow_text"><span>Kleur bladerpijlen</span><input type="color" id="agenda_arrow_text" name="agenda_arrow_text" value="<?= escapeHtml($colors['agenda_arrow_text']) ?>"><code><?= escapeHtml($colors['agenda_arrow_text']) ?></code></label>
             </div>
-            <h2>Kleur van de pictogrammen</h2>
-            <p>Deze instellingen veranderen alleen de kleur van het symbool. De achtergrondkleuren van de knoppen blijven afzonderlijk instelbaar.</p>
+            <h2>Footer en footerknoppen</h2>
+            <p>Alle kleuren die bij de footer horen staan hier samen. Je kunt de achtergrond van de footer en knoppen apart instellen van de kleur van de pictogrammen.</p>
             <div class="region-color-grid">
                 <?php foreach ([
-                    'back_top_icon_color' => 'Kleur terug-naar-bovenknop',
+                    'footer_color' => 'Achtergrondkleur footer',
+                    'search_button_color' => 'Achtergrondkleur zoekknop',
+                    'back_top_color' => 'Achtergrondkleur terug-naar-bovenknop',
+                ] as $key => $label): ?>
+                    <label class="region-color-field" for="<?= escapeHtml($key) ?>">
+                        <span><?= escapeHtml($label) ?></span>
+                        <input type="color" id="<?= escapeHtml($key) ?>" name="<?= escapeHtml($key) ?>" value="<?= escapeHtml($colors[$key]) ?>">
+                        <code><?= escapeHtml($colors[$key]) ?></code>
+                    </label>
+                <?php endforeach; ?>
+                <?php foreach ([
+                    'back_top_icon_color' => 'Kleur pijl terug-naar-bovenknop',
                     'search_icon_color' => 'Kleur zoeklogo (vergrootglas)',
                     'speaker_icon_color' => 'Kleur luidsprekerlogo',
                 ] as $key => $label): ?>
