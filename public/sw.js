@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'dondebailar-shell-v1';
+const CACHE_NAME = 'dondebaile-shell-v1';
 const SHELL_FILES = [
     '/offline.html',
     '/icons/app-icon.svg',
@@ -20,7 +20,7 @@ self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys()
             .then((keys) => Promise.all(
-                keys.filter((key) => key.startsWith('dondebailar-shell-') && key !== CACHE_NAME)
+                keys.filter((key) => key.startsWith('dondebaile-shell-') && key !== CACHE_NAME)
                     .map((key) => caches.delete(key))
             ))
             .then(() => self.clients.claim())
