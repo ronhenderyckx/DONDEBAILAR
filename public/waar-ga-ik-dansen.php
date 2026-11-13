@@ -154,7 +154,6 @@ require dirname(__DIR__) . '/app/views/header.php';
 <section class="agenda-page my-dance-events">
     <div class="agenda-heading">
         <div>
-            <p class="eyebrow">MIJN DONDEBAILAR</p>
             <h1>Waar ga ik dansen?</h1>
             <p>De evenementen waarvoor je hebt aangegeven dat je gaat dansen.</p>
         </div>
