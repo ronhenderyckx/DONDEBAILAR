@@ -1,4 +1,4 @@
-# DONDEBAILAR
+# DONDEBAILE
 
 Regionale agenda en sociale feed voor dansactiviteiten en evenementen.
 
@@ -30,7 +30,7 @@ Regionale agenda en sociale feed voor dansactiviteiten en evenementen.
 8. Start de lokale server:
 
    ```powershell
-   D:\Projecten\DONDEBAILAR\.tools\php-8.1.34\php.exe -S 127.0.0.1:8000 -t D:\Projecten\DONDEBAILAR\public
+   D:\\Projecten\\DONDEBAILAR\\.tools\\php-8.1.34\\php.exe -S 127.0.0.1:8000 -t D:\\Projecten\\DONDEBAILAR\\public
    ```
 
 9. Open `http://127.0.0.1:8000`.
