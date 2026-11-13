@@ -334,6 +334,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'weekday_colors' => json_encode($weekdayColors + array_combine(
                         array_map(static fn (int $i): string => 'weekday_text_' . $i, array_keys($weekdayTextColors)),
                         array_values($weekdayTextColors)
+                    ) + array_combine(
+                        array_map(static fn (int $i): string => 'weekday_title_' . $i, array_keys($weekdayTitleColors)),
+                        array_values($weekdayTitleColors)
                     ) + [
                         'agenda_arrow_background' => $colors['agenda_arrow_background'],
                         'agenda_arrow_text' => $colors['agenda_arrow_text'],
