@@ -113,7 +113,7 @@ if ($regionId > 0) {
 }
 
 $nextRegionId = 0;
-if (isset($regions) && is_array($regions) && count($regions) > 1 && $regionId > 0) {
+if (isset($regions) && is_array($regions) && count($regions) > 0) {
     $regionPosition = null;
     foreach ($regions as $position => $regionOption) {
         if ((int) ($regionOption['id'] ?? 0) === $regionId) {
@@ -121,9 +121,17 @@ if (isset($regions) && is_array($regions) && count($regions) > 1 && $regionId > 
             break;
         }
     }
-    if ($regionPosition !== null) {
+
+    if ($regionPosition !== null && count($regions) > 1) {
+        // De huidige regio is actief: wissel naar de volgende actieve regio.
         $nextRegion = $regions[($regionPosition + 1) % count($regions)];
-        $nextRegionId = (int) $nextRegion['id'];
+        $nextRegionId = (int) ($nextRegion['id'] ?? 0);
+    } elseif ($regionPosition === null) {
+        // De huidige regio is inactief: bied de eerste actieve regio aan.
+        $nextRegionId = (int) ($regions[0]['id'] ?? 0);
+        if ($nextRegionId === $regionId) {
+            $nextRegionId = 0;
+        }
     }
 }
 $colorValue = static function (string $key, string $fallback) use ($region): string {
