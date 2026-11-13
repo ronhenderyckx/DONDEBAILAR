@@ -868,6 +868,13 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     color:inherit!important;
 }
 
+/* De uitklapbare evenementinformatie moet dezelfde dagtekstkleur gebruiken.
+   Beperk dit tot het infoblok zodat de evenementtitel niet wordt gewijzigd. */
+.agenda-card__description-inner,
+.agenda-card__description-inner *{
+    color:var(--db-event-day-text-color,#222222)!important;
+}
+
 /* Gebruik de ingestelde weekdag-tekstkleur voor ALLE tekst in de evenementkaart.
    De datumregel gebruikt dezelfde variabele; media en kaartachtergrond blijven ongewijzigd. */
 .agenda-card__details,
