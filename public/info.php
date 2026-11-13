@@ -59,7 +59,7 @@ $labels = [
 ];
 $label = $labels[$language];
 $escape = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-$pageTitle = 'DONDEBAILAR - ' . (string) $region['name'];
+$pageTitle = 'DONDEBAILE - ' . (string) $region['name'];
 $pageRobots = 'index, follow';
 require dirname(__DIR__) . '/app/views/header.php';
 ?>
