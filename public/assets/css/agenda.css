@@ -825,7 +825,7 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     margin:0!important;
     padding:0!important;
     background:transparent!important;
-    color:var(--db-primary,#E23A2C)!important;
+    color:var(--db-agenda-arrow-color,var(--db-primary,#E23A2C))!important;
     font-family:Arial,Helvetica,sans-serif!important;
     font-size:38px!important;
     font-weight:900!important;
