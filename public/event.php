@@ -11,7 +11,7 @@ if (!$id || $id < 1) {
     exit('Evenement niet gevonden.');
 }
 $statement = $db->prepare(
-    "SELECT e.*, r.name AS region_name, r.logo_path, ra.text_color, o.name AS organizer_name,
+    "SELECT e.*, r.name AS region_name, r.logo_path, ra.weekday_colors, o.name AS organizer_name,
             l.name AS location_name, l.city AS location_city
      FROM events e
      INNER JOIN regions r ON r.id = e.region_id
@@ -40,12 +40,18 @@ $region = [
     'id' => (int) $event['region_id'],
     'name' => (string) $event['region_name'],
     'logo_path' => $event['logo_path'],
-    'text_color' => $event['text_color'] ?: '#222222',
+    'weekday_colors' => $event['weekday_colors'] ?? '',
 ];
 require dirname(__DIR__) . '/app/views/header.php';
 $escape = static fn($value): string => escapeHtml((string) $value);
+$eventWeekday = (int) date('N', strtotime((string) $event['starts_at']));
+$weekdayPalette = json_decode((string) ($event['weekday_colors'] ?? ''), true);
+$eventInfoTextColor = is_array($weekdayPalette)
+    ? (string) ($weekdayPalette['weekday_text_' . ($eventWeekday - 1)] ?? '#222222')
+    : '#222222';
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $eventInfoTextColor)) $eventInfoTextColor = '#222222';
 ?>
-<section class="admin-page public-event-page">
+<section class="admin-page public-event-page" style="--db-event-info-text-color:<?= $escape($eventInfoTextColor) ?>">
     <p class="eyebrow"><?= $escape($event['region_name']) ?></p>
     <h1><?= $escape($event['title']) ?></h1>
     <p><strong><?= $escape(date('d-m-Y H:i', strtotime($event['starts_at']))) ?></strong></p>
@@ -105,6 +111,6 @@ $escape = static fn($value): string => escapeHtml((string) $value);
     <?php endif; ?>
 </section>
 <style>
-.public-event-page{max-width:1000px;margin:0 auto}.public-event-message-link{margin:18px 0 24px}.public-event-description{margin:24px 0;line-height:1.7}.public-event-hashtags{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 24px;color:var(--db-primary);font-weight:700;overflow-wrap:anywhere}.public-event-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}.public-event-media-item{min-width:0;padding:12px;border:1px solid #e7eaf0;border-radius:10px;background:#fff}.public-event-media-item img,.public-event-media-item video,.public-event-media-item iframe{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/5;border:0;border-radius:7px;background:#111;object-fit:contain}.public-event-media-item iframe{height:520px}.public-event-media-item p{overflow-wrap:anywhere}
+.public-event-page{max-width:1000px;margin:0 auto;color:var(--db-event-info-text-color,#222222)}.public-event-page h1,.public-event-page h2,.public-event-page h3,.public-event-page p:not(:has(>strong:first-child)){color:var(--db-event-info-text-color,#222222)}.public-event-page .public-event-description,.public-event-page .public-event-media-item p{color:var(--db-event-info-text-color,#222222)}.public-event-page a:not(.button){color:var(--db-event-info-text-color,#222222)}.public-event-message-link{margin:18px 0 24px}.public-event-description{margin:24px 0;line-height:1.7}.public-event-hashtags{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 24px;color:var(--db-primary);font-weight:700;overflow-wrap:anywhere}.public-event-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}.public-event-media-item{min-width:0;padding:12px;border:1px solid #e7eaf0;border-radius:10px;background:#fff}.public-event-media-item img,.public-event-media-item video,.public-event-media-item iframe{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/5;border:0;border-radius:7px;background:#111;object-fit:contain}.public-event-media-item iframe{height:520px}.public-event-media-item p{overflow-wrap:anywhere}
 </style>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
