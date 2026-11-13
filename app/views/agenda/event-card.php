@@ -51,7 +51,7 @@
                             <?php endif; ?>
                         <?php else: ?>
                             <a class="agenda-card__image-link" href="<?= $eventUrl ?>" aria-label="Bekijk <?= $escape($event['title']) ?>">
-                                <div class="agenda-card__placeholder"><span><?= $escape($eventFallbackText) ?></span><strong><?= $escape($event['title']) ?></strong></div>
+                                <div class="agenda-card__placeholder"><strong><?= $escape($event['title']) ?></strong></div>
                             </a>
                         <?php endif; ?>
                         </div>
