@@ -52,19 +52,17 @@ try {
 }
 $eventDate = new DateTimeImmutable((string) $event['starts_at'], $eventTimezone);
 $eventWeekday = (int) $eventDate->format('N');
-$weekdayPalette = json_decode((string) ($event['weekday_colors'] ?? ''), true);
-$eventInfoTextColor = is_array($weekdayPalette)
-    ? (string) ($weekdayPalette['weekday_text_' . ($eventWeekday - 1)] ?? '#222222')
-    : '#222222';
-if (!preg_match('/^#[0-9a-fA-F]{6}$/', $eventInfoTextColor)) $eventInfoTextColor = '#222222';
+// Gebruik exact dezelfde CSS-kleurvariabele als de agenda voor deze weekdag.
+// Zo volgen alle informatieteksten de instelling uit Regiokleuren.
+$eventInfoTextColor = 'var(--db-weekday-text-' . $eventWeekday . ', #222222)';
 ?>
 <section class="admin-page public-event-page" style="--db-event-info-text-color:<?= $escape($eventInfoTextColor) ?>">
     <p class="eyebrow"><?= $escape($event['region_name']) ?></p>
     <h1><?= $escape($event['title']) ?></h1>
     <p><strong><?= $escape(date('d-m-Y H:i', strtotime($event['starts_at']))) ?></strong></p>
-    <p class="public-event-info-text">Organisator: <?= $escape($event['organizer_name']) ?></p>
+    <p class="public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important">Organisator: <?= $escape($event['organizer_name']) ?></p>
     <?php if (!empty($event['location_name'])): ?>
-        <p class="public-event-info-text">Locatie: <?= $escape($event['location_name']) ?><?= !empty($event['location_city']) ? ' — ' . $escape($event['location_city']) : '' ?></p>
+        <p class="public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important">Locatie: <?= $escape($event['location_name']) ?><?= !empty($event['location_city']) ? ' — ' . $escape($event['location_city']) : '' ?></p>
     <?php endif; ?>
     <?php if (!empty($event['description'])): ?><div class="public-event-description public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important"><?= nl2br($escape($event['description'])) ?></div><?php endif; ?>
     <?php
@@ -74,7 +72,7 @@ if (!preg_match('/^#[0-9a-fA-F]{6}$/', $eventInfoTextColor)) $eventInfoTextColor
         return preg_match('/\A[\p{L}\p{N}_]+\z/u', $tag) ? '#' . $tag : '';
     }, $eventHashtags)));
     ?>
-    <?php if ($eventHashtags !== []): ?><p class="public-event-hashtags public-event-info-text"><?= implode(' ', array_map($escape, $eventHashtags)) ?></p><?php endif; ?>
+    <?php if ($eventHashtags !== []): ?><p class="public-event-hashtags public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important"><?= implode(' ', array_map($escape, $eventHashtags)) ?></p><?php endif; ?>
     <?php
     $messageCountQuery = $db->prepare("SELECT COUNT(*) FROM event_messages WHERE event_id = :event_id AND is_deleted = 0");
     $messageCountQuery->execute(['event_id' => $id]);
@@ -97,20 +95,20 @@ if (!preg_match('/^#[0-9a-fA-F]{6}$/', $eventInfoTextColor)) $eventInfoTextColor
                             <?php if (preg_match('/\A[A-Za-z0-9_-]+\z/', $shortcode)): ?>
                                 <iframe src="https://www.instagram.com/<?= $embedPath ?>/<?= rawurlencode($shortcode) ?>/embed" title="Instagram <?= $escape($item['media_type']) ?>" loading="lazy" allowtransparency="true" allowfullscreen></iframe>
                             <?php endif; ?>
-                            <p class="public-event-info-text"><a href="<?= $escape($item['external_url']) ?>" target="_blank" rel="noopener noreferrer">Bekijk op Instagram</a></p>
+                            <p class="public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important"><a href="<?= $escape($item['external_url']) ?>" target="_blank" rel="noopener noreferrer">Bekijk op Instagram</a></p>
                         <?php elseif (($item['media_source'] ?? 'upload') === 'facebook'): ?>
                             <?php
                             $plugin = $item['media_type'] === 'reel' ? 'video.php' : 'post.php';
                             $embedUrl = 'https://www.facebook.com/plugins/' . $plugin . '?href=' . rawurlencode((string) $item['external_url']) . '&show_text=true&width=500';
                             ?>
                             <iframe src="<?= $escape($embedUrl) ?>" title="Facebook <?= $escape($item['media_type']) ?>" loading="lazy" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share" allowfullscreen></iframe>
-                            <p class="public-event-info-text"><a href="<?= $escape($item['external_url']) ?>" target="_blank" rel="noopener noreferrer">Bekijk op Facebook</a></p>
+                            <p class="public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important"><a href="<?= $escape($item['external_url']) ?>" target="_blank" rel="noopener noreferrer">Bekijk op Facebook</a></p>
                         <?php elseif ($item['media_type'] === 'image'): ?>
                             <img src="/event-media.php?id=<?= (int) $item['id'] ?>" alt="<?= $escape($item['caption'] ?: $event['title']) ?>" loading="lazy">
                         <?php else: ?>
                             <video src="/event-media.php?id=<?= (int) $item['id'] ?>" controls preload="metadata"></video>
                         <?php endif; ?>
-                        <?php if (!empty($item['caption'])): ?><p class="public-event-info-text"><?= $escape($item['caption']) ?></p><?php endif; ?>
+                        <?php if (!empty($item['caption'])): ?><p class="public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important"><?= $escape($item['caption']) ?></p><?php endif; ?>
                     </article>
                 <?php endforeach; ?>
             </div>
@@ -118,6 +116,6 @@ if (!preg_match('/^#[0-9a-fA-F]{6}$/', $eventInfoTextColor)) $eventInfoTextColor
     <?php endif; ?>
 </section>
 <style>
-.public-event-page{max-width:1000px;margin:0 auto}.public-event-page .public-event-info-text{color:var(--db-event-info-text-color,#222222)!important}.public-event-page .public-event-description,.public-event-page .public-event-description *{color:var(--db-event-info-text-color,#222222)!important}.public-event-page .public-event-info-text a:not(.button){color:var(--db-event-info-text-color,#222222)!important}.public-event-message-link{margin:18px 0 24px}.public-event-description{margin:24px 0;line-height:1.7}.public-event-hashtags{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 24px;color:var(--db-primary);font-weight:700;overflow-wrap:anywhere}.public-event-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}.public-event-media-item{min-width:0;padding:12px;border:1px solid #e7eaf0;border-radius:10px;background:#fff}.public-event-media-item img,.public-event-media-item video,.public-event-media-item iframe{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/5;border:0;border-radius:7px;background:#111;object-fit:contain}.public-event-media-item iframe{height:520px}.public-event-media-item p{overflow-wrap:anywhere}
+.public-event-page{max-width:1000px;margin:0 auto}.public-event-page .public-event-info-text,.public-event-page .public-event-info-text *{color:var(--db-event-info-text-color,#222222)!important}.public-event-page .public-event-description,.public-event-page .public-event-description *{color:var(--db-event-info-text-color,#222222)!important}.public-event-page .public-event-info-text a:not(.button){color:var(--db-event-info-text-color,#222222)!important}.public-event-message-link{margin:18px 0 24px}.public-event-description{margin:24px 0;line-height:1.7}.public-event-hashtags{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 24px;color:var(--db-primary);font-weight:700;overflow-wrap:anywhere}.public-event-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}.public-event-media-item{min-width:0;padding:12px;border:1px solid #e7eaf0;border-radius:10px;background:#fff}.public-event-media-item img,.public-event-media-item video,.public-event-media-item iframe{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/5;border:0;border-radius:7px;background:#111;object-fit:contain}.public-event-media-item iframe{height:520px}.public-event-media-item p{overflow-wrap:anywhere}
 </style>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
