@@ -129,10 +129,15 @@ if (isset($regions) && is_array($regions) && count($regions) > 0) {
             }
         }
 
-        if ($regionPosition !== null && count($regions) > 1) {
-            // De huidige regio is actief: wissel naar de volgende actieve regio.
-            $nextRegion = $regions[($regionPosition + 1) % count($regions)];
-            $nextRegionId = (int) ($nextRegion['id'] ?? 0);
+        if ($regionPosition !== null) {
+            if (count($regions) > 1) {
+                // De huidige regio is actief: wissel naar de volgende actieve regio.
+                $nextRegion = $regions[($regionPosition + 1) % count($regions)];
+                $nextRegionId = (int) ($nextRegion['id'] ?? 0);
+            } else {
+                // Toon de regioknop ook wanneer er maar één actieve regio overblijft.
+                $nextRegionId = $regionId;
+            }
         }
     }
 }
