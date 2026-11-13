@@ -11,7 +11,7 @@
                                         <div class="agenda-card__media-slide<?= $mediaItem['type'] === 'reel' && $mediaItem['source'] === 'instagram' ? ' agenda-card__media-slide--instagram' : '' ?>">
                                             <?php if ($mediaItem['type'] === 'image' && $mediaItem['source'] === 'upload'): ?>
                                                 <div class="agenda-card__image-link">
-                                                    <img class="agenda-card__image" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" alt="<?= $escape($event['title']) ?> — foto <?= $mediaIndex + 1 ?>" loading="<?= $mediaIndex === 0 ? 'eager' : 'lazy' ?>">
+                                                    <img class="agenda-card__image" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" alt="<?= $escape($event['title']) ?> — foto <?= $mediaIndex + 1 ?>" loading="<?= $eventIndex === 0 && $mediaIndex === 0 ? 'eager' : 'lazy' ?>"<?= $eventIndex === 0 && $mediaIndex === 0 ? ' fetchpriority="high"' : '' ?>>
                                                 </div>
                                             <?php elseif ($mediaItem['type'] === 'video' && $mediaItem['source'] === 'upload'): ?>
                                                 <video class="agenda-card__video" playsinline preload="none" controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>"></video>
@@ -36,7 +36,7 @@
                             <?php $mediaItem = $eventMediaItems[0]; ?>
                             <?php if ($mediaItem['type'] === 'image' && $mediaItem['source'] === 'upload'): ?>
                                 <div class="agenda-card__image-link">
-                                    <img class="agenda-card__image" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" alt="<?= $escape($event['title']) ?>" loading="lazy">
+                                    <img class="agenda-card__image" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" alt="<?= $escape($event['title']) ?>" loading="<?= $eventIndex === 0 ? 'eager' : 'lazy' ?>"<?= $eventIndex === 0 ? ' fetchpriority="high"' : '' ?>>
                                 </div>
                             <?php elseif ($mediaItem['type'] === 'video' && $mediaItem['source'] === 'upload'): ?>
                                 <video class="agenda-card__video" playsinline preload="none" controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>"></video>
