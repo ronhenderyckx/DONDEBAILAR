@@ -1085,3 +1085,12 @@ body.has-agenda-footer .site-footer--agenda .agenda-footer-tools form.agenda-foo
 .agenda-footer-search button svg{
     stroke:currentColor!important;
 }
+
+/* Afzonderlijk instelbare tekstkleur voor de namen van de weekdagen. */
+.agenda-calendar__weekday:nth-child(1){color:var(--db-weekday-text-1,#222222)!important}
+.agenda-calendar__weekday:nth-child(2){color:var(--db-weekday-text-2,#222222)!important}
+.agenda-calendar__weekday:nth-child(3){color:var(--db-weekday-text-3,#222222)!important}
+.agenda-calendar__weekday:nth-child(4){color:var(--db-weekday-text-4,#222222)!important}
+.agenda-calendar__weekday:nth-child(5){color:var(--db-weekday-text-5,#222222)!important}
+.agenda-calendar__weekday:nth-child(6){color:var(--db-weekday-text-6,#222222)!important}
+.agenda-calendar__weekday:nth-child(7){color:var(--db-weekday-text-7,#222222)!important}
