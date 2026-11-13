@@ -179,6 +179,18 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
             });
         });
     };
+    // Ga automatisch naar het volgende media-item zodra een video afgelopen is.
+    slides.forEach(function (slide, index) {
+        slide.querySelectorAll('video.agenda-card__video').forEach(function (video) {
+            video.addEventListener('ended', function () {
+                if (index >= slides.length - 1) return;
+                track.scrollTo({
+                    left: (index + 1) * track.clientWidth,
+                    behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+                });
+            });
+        });
+    });
     track.addEventListener('scroll', updateCounter, { passive: true });
     window.addEventListener('resize', updateCounter);
     updateCounter();
