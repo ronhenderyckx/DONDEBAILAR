@@ -233,7 +233,7 @@ $escape = static fn ($value): string =>
                 <a href="/<?= $regionId > 0 ? '?region_id=' . $regionId : '' ?>">Agenda</a>
                 <a href="/info.php<?= $regionId > 0 ? '?region_id=' . $regionId : '' ?>">Info</a>
                 <?php if ($headerUser !== null): ?>
-                    <a href="/waar-ga-ik-dansen.php"><span aria-hidden="true">👟</span> Waar ga ik dansen?</a>
+                    <a href="/waar-ga-ik-dansen.php">Waar ga ik dansen?</a>
                 <?php endif; ?>
 
                 <?php if ($isAdmin): ?>
