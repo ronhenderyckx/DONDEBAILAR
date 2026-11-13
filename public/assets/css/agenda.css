@@ -718,98 +718,91 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     padding:6px 10px;
 }
 
-/* Lijn de tekst van de wisselknop gelijk uit met de namen in de filterbalk. */
+/* Gelijke afmetingen en uitlijning voor de wisselknop, steden en organisatoren. */
+.agenda-selector-line{
+    align-items:center!important;
+}
 .agenda-selector-button{
-    justify-content:flex-start!important;
-    gap:6px!important;
-    padding:5px 0 8px!important;
-}
-.agenda-filter-switch-label{
-    width:100%!important;
-    max-width:none!important;
-    font-size:11px!important;
-    line-height:1.25!important;
-    letter-spacing:0!important;
-    text-align:center!important;
-}
-@media(max-width:700px){
-    .agenda-filter-switch-label{
-        font-size:10px!important;
-    }
-}
-
-/* Zet icoon en label van de wisselknop lager, op dezelfde hoogte als de andere filteritems. */
-.agenda-selector-button{
-    justify-content:flex-start!important;
-    padding:11px 0 5px!important;
-    gap:6px!important;
-}
-.agenda-filter-switch-label{
-    font-size:10px!important;
-    line-height:1.25!important;
-    margin:0!important;
-}
-@media(max-width:700px){
-    .agenda-selector-button{
-        padding-top:11px!important;
-    }
-    .agenda-filter-switch-label{
-        font-size:10px!important;
-    }
-}
-
-
-/* Wisselknop nog lager uitlijnen met de overige filterkeuzes. */
-.agenda-selector-button{
-    padding-top:17px!important;
-    padding-bottom:0!important;
-}
-@media(max-width:700px){
-    .agenda-selector-button{
-        padding-top:17px!important;
-    }
-}
-
-
-/* Wisselknop exact gelijk uitlijnen met de andere filteritems. */
-.agenda-selector-button{
-    align-self:flex-start!important;
-    margin-top:5px!important;
+    box-sizing:border-box!important;
     display:flex!important;
+    flex:0 0 66px!important;
     flex-direction:column!important;
     align-items:center!important;
     justify-content:flex-start!important;
-    gap:6px!important;
-    padding:0!important;
+    gap:3px!important;
+    width:66px!important;
+    height:auto!important;
+    min-width:66px!important;
+    min-height:0!important;
+    align-self:center!important;
+    margin:0!important;
+    padding:3px 2px!important;
 }
+.agenda-organizer-item{
+    box-sizing:border-box!important;
+    flex:0 0 66px!important;
+    gap:3px!important;
+    padding:3px 2px!important;
+}
+.agenda-organizer-item img.agenda-organizer-logo,
+.agenda-organizer-item img.agenda-city-filter-icon,
+.agenda-organizer-item .agenda-organizer-fallback,
 .agenda-filter-switch-icon{
+    box-sizing:border-box!important;
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
     width:48px!important;
     height:48px!important;
     flex:0 0 48px!important;
+    max-width:48px!important;
+    max-height:48px!important;
+    object-fit:contain!important;
 }
+.agenda-organizer-item img.agenda-organizer-logo{
+    padding:4px!important;
+}
+.agenda-filter-switch-icon .agenda-filter-icon--image{
+    display:block!important;
+    width:48px!important;
+    height:48px!important;
+    max-width:48px!important;
+    max-height:48px!important;
+    object-fit:contain!important;
+    padding:0!important;
+    margin:0!important;
+}
+.agenda-organizer-name,
 .agenda-filter-switch-label{
+    display:block!important;
     width:100%!important;
     max-width:none!important;
     margin:0!important;
-    font-size:11px!important;
+    font-size:10px!important;
     line-height:1.25!important;
     letter-spacing:0!important;
     text-align:center!important;
 }
 @media(max-width:700px){
-    .agenda-selector-button{
-        margin-top:5px!important;
+    .agenda-selector-button,
+    .agenda-organizer-item{
+        flex-basis:66px!important;
+        width:66px!important;
     }
+    .agenda-organizer-item img.agenda-organizer-logo,
+    .agenda-organizer-item img.agenda-city-filter-icon,
+    .agenda-organizer-item .agenda-organizer-fallback,
     .agenda-filter-switch-icon{
         width:44px!important;
         height:44px!important;
         flex-basis:44px!important;
+        max-width:44px!important;
+        max-height:44px!important;
     }
-    .agenda-organizer-item img.agenda-organizer-logo,
-    .agenda-organizer-item .agenda-organizer-fallback,
-    .agenda-organizer-item img.agenda-city-filter-icon{
+    .agenda-filter-switch-icon .agenda-filter-icon--image{
         width:44px!important;
         height:44px!important;
-        flex-basis:44px!important;
+        max-width:44px!important;
+        max-height:44px!important;
     }
 }
