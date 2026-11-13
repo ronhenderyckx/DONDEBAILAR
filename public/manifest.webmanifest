@@ -1,15 +1,15 @@
 {
   "id": "/",
-  "name": "DONDEBAILAR",
-  "short_name": "DONDEBAILAR",
-  "description": "Dansactiviteiten en evenementen in jouw regio.",
+  "name": "DONDEBAILE",
+  "short_name": "DONDEBAILE",
+  "description": "Agenda de actividades y eventos de baile en tu región.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#FFFFFF",
   "theme_color": "#E23A2C",
-  "lang": "nl",
+  "lang": "es",
   "categories": ["lifestyle", "social"],
   "icons": [
     {
