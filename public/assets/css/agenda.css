@@ -717,3 +717,23 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     min-height:70px;
     padding:6px 10px;
 }
+
+/* Lijn de tekst van de wisselknop gelijk uit met de namen in de filterbalk. */
+.agenda-selector-button{
+    justify-content:flex-start!important;
+    gap:6px!important;
+    padding:5px 0 8px!important;
+}
+.agenda-filter-switch-label{
+    width:100%!important;
+    max-width:none!important;
+    font-size:11px!important;
+    line-height:1.25!important;
+    letter-spacing:0!important;
+    text-align:center!important;
+}
+@media(max-width:700px){
+    .agenda-filter-switch-label{
+        font-size:10px!important;
+    }
+}
