@@ -114,23 +114,25 @@ if ($regionId > 0) {
 
 $nextRegionId = 0;
 if (isset($regions) && is_array($regions) && count($regions) > 0) {
-    $regionPosition = null;
-    foreach ($regions as $position => $regionOption) {
-        if ((int) ($regionOption['id'] ?? 0) === $regionId) {
-            $regionPosition = $position;
-            break;
+    // Wanneer de URL nog naar een inactieve regio verwijst, toont de agenda
+    // automatisch de eerste actieve regio. Laat de wisselknop dan zichtbaar
+    // zodat de bezoeker bewust naar die actieve regio kan overschakelen.
+    $requestedRegionId = (int) ($requestedRegion ?? 0);
+    if ($requestedRegionId > 0 && $requestedRegionId !== $regionId) {
+        $nextRegionId = $regionId;
+    } else {
+        $regionPosition = null;
+        foreach ($regions as $position => $regionOption) {
+            if ((int) ($regionOption['id'] ?? 0) === $regionId) {
+                $regionPosition = $position;
+                break;
+            }
         }
-    }
 
-    if ($regionPosition !== null && count($regions) > 1) {
-        // De huidige regio is actief: wissel naar de volgende actieve regio.
-        $nextRegion = $regions[($regionPosition + 1) % count($regions)];
-        $nextRegionId = (int) ($nextRegion['id'] ?? 0);
-    } elseif ($regionPosition === null) {
-        // De huidige regio is inactief: bied de eerste actieve regio aan.
-        $nextRegionId = (int) ($regions[0]['id'] ?? 0);
-        if ($nextRegionId === $regionId) {
-            $nextRegionId = 0;
+        if ($regionPosition !== null && count($regions) > 1) {
+            // De huidige regio is actief: wissel naar de volgende actieve regio.
+            $nextRegion = $regions[($regionPosition + 1) % count($regions)];
+            $nextRegionId = (int) ($nextRegion['id'] ?? 0);
         }
     }
 }
