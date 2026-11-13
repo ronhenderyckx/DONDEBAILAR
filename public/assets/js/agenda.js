@@ -178,7 +178,7 @@ function scheduleVisibleAgendaVideo() {
             }
         });
         if (bestVideo && bestRatio >= 0.6) playAgendaVideo(bestVideo);
-    }, 450);
+    }, 150);
 }
 window.addEventListener('scroll', scheduleVisibleAgendaVideo, {passive:true});
 window.addEventListener('resize', scheduleVisibleAgendaVideo, {passive:true});
