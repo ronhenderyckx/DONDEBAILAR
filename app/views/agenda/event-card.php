@@ -14,7 +14,7 @@
                                                     <img class="agenda-card__image" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" alt="<?= $escape($event['title']) ?> — foto <?= $mediaIndex + 1 ?>" loading="<?= $eventIndex === 0 && $mediaIndex === 0 ? 'eager' : 'lazy' ?>"<?= $eventIndex === 0 && $mediaIndex === 0 ? ' fetchpriority="high"' : '' ?>>
                                                 </div>
                                             <?php elseif ($mediaItem['type'] === 'video' && $mediaItem['source'] === 'upload'): ?>
-                                                <video class="agenda-card__video" playsinline preload="<?= $eventIndex === 0 && $mediaIndex === 0 ? 'auto' : 'none' ?>"<?= $eventIndex === 0 && $mediaIndex === 0 ? ' data-priority-load' : '' ?> controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>"></video>
+                                                <video class="agenda-card__video" playsinline preload="none" controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>"></video>
                                             <?php elseif ($mediaItem['type'] === 'reel' && $mediaItem['source'] === 'instagram'): ?>
                                                 <div class="agenda-card__instagram">
                                                     <blockquote class="instagram-media" data-instgrm-permalink="<?= $escape($mediaItem['external_url']) ?>" data-instgrm-version="14">
@@ -39,7 +39,7 @@
                                     <img class="agenda-card__image" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" alt="<?= $escape($event['title']) ?>" loading="<?= $eventIndex === 0 ? 'eager' : 'lazy' ?>"<?= $eventIndex === 0 ? ' fetchpriority="high"' : '' ?>>
                                 </div>
                             <?php elseif ($mediaItem['type'] === 'video' && $mediaItem['source'] === 'upload'): ?>
-                                <video class="agenda-card__video" playsinline preload="<?= $eventIndex === 0 ? 'auto' : 'none' ?>"<?= $eventIndex === 0 ? ' data-priority-load' : '' ?> controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>"></video>
+                                <video class="agenda-card__video" playsinline preload="none" controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>"></video>
                             <?php elseif ($mediaItem['type'] === 'reel' && $mediaItem['source'] === 'instagram'): ?>
                                 <div class="agenda-card__instagram">
                                     <blockquote class="instagram-media" data-instgrm-permalink="<?= $escape($mediaItem['external_url']) ?>" data-instgrm-version="14">
