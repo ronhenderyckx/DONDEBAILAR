@@ -577,11 +577,7 @@
     font-weight:700;
     overflow-wrap:anywhere
 }
-.agenda-card__description-inner {
-    font-size:14px;
-    line-height:1.55;
-    overflow-wrap:anywhere
-}
+
 .agenda-card__quick {
     display:flex;
     align-items:center;
@@ -1310,10 +1306,7 @@ body.has-agenda-footer .site-header {
     margin:0!important;
     padding:0!important
 }
-body.has-agenda-footer .site-main {
-    padding-top:0!important;
-    margin-top:0!important
-}
+
 body.has-agenda-footer .site-main > .agenda-page {
     margin:0 auto!important;
     padding-top:0!important
@@ -1640,10 +1633,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     outline:0 !important;
     transform:none !important;
 }
-.agenda-organizer-item--organizer.is-selected .agenda-organizer-name {
-    color:var(--db-organizer-color,#E23A2C) !important;
-    font-weight:900 !important;
-}
+
 /* Sterkere ingedrukte status voor organisatoren: duidelijk zichtbaar logo én knop. */
 .agenda-organizer-item--organizer.is-selected {
     background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 25%,var(--db-filter-bar-color,#FFFFFF)) !important;
@@ -1657,10 +1647,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 22%,var(--db-filter-bar-color,#FFFFFF)) !important;
     box-shadow:0 0 0 2px var(--db-filter-bar-color,#FFFFFF),0 0 0 5px var(--db-organizer-color,#E23A2C) !important;
 }
-.agenda-organizer-item--organizer.is-selected .agenda-organizer-name {
-    color:var(--db-organizer-color,#E23A2C) !important;
-    font-weight:900 !important;
-}
+
 /* Geselecteerde organisator: dezelfde opvallende rand als bij een geselecteerde stad. */
 .agenda-organizer-item.agenda-organizer-item--organizer.is-selected img.agenda-organizer-logo, .agenda-organizer-item.agenda-organizer-item--organizer.is-selected .agenda-organizer-fallback {
     box-sizing:border-box!important;
