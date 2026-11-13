@@ -143,6 +143,20 @@ document.addEventListener('pointerup', function (event) {
 document.addEventListener('pointercancel', function () { eventInfoPointerStart = null; }, {passive:true});
 
 let agendaVideosMuted = window.DONDEBAILAR_AGENDA_CONFIG.soundMuted;
+let activeAgendaVideo = null;
+
+// Houd het geheugengebruik en de decoderbelasting laag: nooit meerdere video's tegelijk.
+function playAgendaVideo(video) {
+    document.querySelectorAll('.agenda-card__video').forEach(function (otherVideo) {
+        if (otherVideo !== video && !otherVideo.paused) otherVideo.pause();
+    });
+    activeAgendaVideo = video;
+    video.muted = agendaVideosMuted;
+    const playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+        playPromise.catch(function () {});
+    }
+}
 document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
     const track = gallery.querySelector('[data-gallery-track]');
     const counter = gallery.querySelector('[data-gallery-count]');
@@ -165,16 +179,13 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
 
                 // Hervat de video wanneer deze galerij-slide weer zichtbaar is.
                 const rect = video.getBoundingClientRect();
-                const inViewport = rect.width > 0 && rect.height > 0
-                    && rect.bottom > 0 && rect.right > 0
-                    && rect.top < window.innerHeight && rect.left < window.innerWidth;
-                if (inViewport) {
-                    // Behoud de geluidskeuze van de centrale geluidsknop bij terugkeren naar deze video.
-                    video.muted = agendaVideosMuted;
-                    const playPromise = video.play();
-                    if (playPromise && typeof playPromise.catch === 'function') {
-                        playPromise.catch(function () {});
-                    }
+                const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
+                const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+                const visibleRatio = rect.width > 0 && rect.height > 0
+                    ? (visibleWidth * visibleHeight) / (rect.width * rect.height)
+                    : 0;
+                if (visibleRatio >= 0.6) {
+                    playAgendaVideo(video);
                 }
             });
         });
@@ -325,23 +336,18 @@ document.addEventListener('click', function (event) {
     });
 });
 
-// Speel geüploade video's af zodra ze zichtbaar zijn en pauzeer ze
-// zodra ze bijna uit beeld verdwijnen. Autoplay start gedempt.
+// Speel alleen een voldoende zichtbare video af. Een andere video wordt eerst gepauzeerd.
 const agendaVideoObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
         const video = entry.target;
-        if (entry.isIntersecting && entry.intersectionRatio > 0) {
-            // Hervatten na scrollen mag de gekozen geluidsinstelling niet overschrijven.
-            video.muted = agendaVideosMuted;
-            const playPromise = video.play();
-            if (playPromise && typeof playPromise.catch === 'function') {
-                playPromise.catch(function () {});
-            }
+        if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+            playAgendaVideo(video);
         } else {
             video.pause();
+            if (activeAgendaVideo === video) activeAgendaVideo = null;
         }
     });
-}, {threshold:0});
+}, {threshold:[0, 0.6]});
 document.querySelectorAll('.agenda-card__video').forEach(function (video) {
     // Gebruik meteen de bewaarde geluidskeuze van het ingelogde account.
     video.muted = agendaVideosMuted;
