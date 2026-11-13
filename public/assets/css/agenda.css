@@ -1,4 +1,4 @@
-*/
+/* DONDEBAILAR agenda styles — extracted without changing selectors or rules. */
 .agenda-page {
     width:100%;
     max-width:1080px;
@@ -948,7 +948,7 @@
         display:none
     }
 }
-*/
+/* Alleen de logo-afbeeldingen van organisatoren: afgeronde vierkanten met zachte kleurschakering. */
 .agenda-organizer-item img.agenda-organizer-logo {
     display:block;
     width:62px;
@@ -975,7 +975,7 @@
         flex-basis:58px;
     }
 }
-*/
+/* Locatieknoppen en organisator-fallbacks krijgen dezelfde afgeronde vierkante vorm. */
 .agenda-organizer-item .agenda-organizer-fallback {
     width:62px;
     height:62px;
@@ -993,7 +993,7 @@
     border-color:var(--db-primary);
     box-shadow:0 5px 13px #17203329, inset 0 1px 0 #ffffff;
 }
-*/
+/* De wisselknop gebruikt exact dezelfde maat, vorm en achtergrondstijl. */
 .agenda-selector-button {
     border:1px solid #d8dee8;
     border-radius:15px;
@@ -1110,7 +1110,7 @@
     background:#f78d19;
     box-shadow:0 4px 8px -8px #0009
 }
-*/
+/* Houd de organisator- en stedenfilters beschikbaar tijdens het scrollen. */
 .agenda-selectors {
     position:sticky;
     top:0;
@@ -1122,7 +1122,7 @@
     background:transparent;
     box-shadow:none;
 }
-*/
+/* Laat de filterbalk direct aansluiten op de header. */
 .agenda-page {
     margin-top:-42px
 }
@@ -1131,7 +1131,7 @@
         margin-top:-28px
     }
 }
-*/
+/* Compactere organisator- en stadskeuzes. */
 .agenda-organizer-strip {
     gap:10px
 }
@@ -1171,13 +1171,13 @@
         gap:8px
     }
 }
-*/
+/* Laat de sticky filterrij op mobiel onder de vaste header staan. */
 @media(max-width:760px) {
     .agenda-selectors {
         top:67px
     }
 }
-*/
+/* Lage, rechte achtergrond over de volledige breedte van de filterrij. */
 .agenda-selector-line {
     box-sizing:border-box;
     width:100%;
@@ -1197,7 +1197,7 @@
     padding-bottom:1px;
     gap:3px
 }
-*/
+/* Compacte achtergrond rond elke organisator- en stadsknop. */
 .agenda-organizer-item {
     box-sizing:border-box;
     flex-basis:66px;
@@ -1220,7 +1220,7 @@
         flex-basis:66px
     }
 }
-*/
+/* Regio-instellingen blijven leidend voor de volledige filterbalk. */
 .agenda-selector-line {
     background:var(--db-filter-bar-color,#FFFFFF) !important
 }
@@ -1243,7 +1243,7 @@
     box-shadow:none !important;
     background:transparent !important
 }
-*/
+/* Agenda: geen decoratieve witte lijnen of kaders rond de onderdelen. */
 .agenda-card,.agenda-calendar,.agenda-filters,.agenda-empty {
     border:0!important;
 }
@@ -1257,7 +1257,7 @@
 .agenda-organizer-item img.agenda-organizer-logo {
     background:transparent!important;
 }
-*/
+/* Filterbalk sluit zonder opening direct aan op de header. */
 body.has-agenda-footer .site-header {
     margin-bottom:-10px!important;
     padding-bottom:0!important
@@ -1273,7 +1273,7 @@ body.has-agenda-footer .site-main > .agenda-page {
 body.has-agenda-footer .agenda-selectors {
     margin-top:0!important
 }
-*/
+/* Eventinformatie gebruikt de ingestelde kleur van de betreffende weekdag. */
 .agenda-card {
     background:var(--db-event-day-color,var(--db-primary))!important;
     border:0!important
@@ -1294,7 +1294,7 @@ body.has-agenda-footer .agenda-selectors {
 .agenda-card__quick {
     box-shadow:none!important
 }
-*/
+/* De filterbalk maakt nu deel uit van de header, ook op smartphones. */
 .site-header__agenda-filters {
     width:min(100% - 40px,1180px);
     margin:0 auto;
@@ -1330,7 +1330,7 @@ body.has-agenda-footer .site-main > .agenda-page {
         padding-bottom:2px
     }
 }
-*/
+/* Houd de gekozen organisator ook visueel duidelijk geselecteerd. */
 .agenda-organizer-item--organizer.is-selected {
     background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 38%,var(--db-filter-bar-color,#FFFFFF)) !important;
     outline:2px solid var(--db-organizer-color,#E23A2C) !important;
@@ -1342,7 +1342,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     outline:2px solid var(--db-organizer-color,#E23A2C);
     outline-offset:1px;
 }
-*/
+/* Houd de filterbalk exact even hoog bij wisselen tussen organisator en stad. */
 .agenda-selector-line {
     height:86px;
     min-height:86px;
@@ -1366,7 +1366,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     align-self:center!important;
     margin-top:0!important;
 }
-*/
+/* Compacte evenementinformatie: titel, categorie en locatie, datum, hint en hashtags. */
 .agenda-card__tags-location {
     display:flex;
     align-items:center;
@@ -1405,7 +1405,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     font-size:12px!important;
     font-weight:650!important;
 }
-*/
+/* De swipe-aanwijzing blijft altijd zichtbaar op de evenementkaart. */
 .agenda-card__swipe-hint {
     display:block!important;
     visibility:visible!important;
@@ -1416,7 +1416,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     line-height:1.4;
     opacity:1!important;
 }
-*/
+/* Gebruiksvriendelijk deelvenster voor agenda-evenementen. */
 .agenda-share-dialog {
     position:fixed;
     inset:0;
@@ -1555,7 +1555,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     outline:3px solid var(--db-accent,#F6B22E);
     outline-offset:3px
 }
-*/
+/* Geselecteerde organisator: markering op het logo zelf, onafhankelijk van hover, focus en scrollen. */
 .agenda-organizer-item--organizer.is-selected img.agenda-organizer-logo, .agenda-organizer-item--organizer.is-selected .agenda-organizer-fallback {
     border:3px solid var(--db-organizer-color,#E23A2C) !important;
     background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 16%,#FFFFFF) !important;
@@ -1566,7 +1566,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     color:var(--db-organizer-color,#E23A2C) !important;
     font-weight:900 !important;
 }
-*/
+/* Stadsicoon: behoud de transparante afbeelding; geen witte cirkel of kader. */
 .agenda-organizer-item img.agenda-city-filter-icon {
     display:block!important;
     width:62px!important;
@@ -1594,7 +1594,7 @@ body.has-agenda-footer .site-main > .agenda-page {
         flex:0 0 58px!important;
     }
 }
-*/
+/* Gekozen stad: één rustige markering, zonder dubbele kaders. */
 .agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) {
     background:color-mix(in srgb,var(--db-primary,#E23A2C) 16%,var(--db-filter-bar-color,#FFFFFF)) !important;
     outline:0 !important;
@@ -1611,7 +1611,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     color:var(--db-primary,#E23A2C) !important;
     font-weight:900 !important;
 }
-*/
+/* Duidelijke rand rond het geselecteerde stadsicoon; behoud transparantie. */
 .agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) img.agenda-city-filter-icon, .agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) .agenda-organizer-fallback {
     box-sizing:border-box!important;
     border:3px solid var(--db-primary,#E23A2C)!important;
@@ -1623,7 +1623,7 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) .agenda-organizer-name {
     color:var(--db-agenda-arrow-color,var(--db-primary,#E23A2C))!important;
 }
-*/
+/* Geselecteerde organisator krijgt exact dezelfde markering als een stad, in de organisatorkleur. */
 .agenda-organizer-item--organizer.is-selected {
     background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 16%,var(--db-filter-bar-color,#FFFFFF)) !important;
     outline:0 !important;
@@ -1644,7 +1644,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     color:var(--db-organizer-color,#E23A2C) !important;
     font-weight:900 !important;
 }
-*/
+/* Sterkere ingedrukte status voor organisatoren: duidelijk zichtbaar logo én knop. */
 .agenda-organizer-item--organizer.is-selected {
     background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 25%,var(--db-filter-bar-color,#FFFFFF)) !important;
     border:2px solid var(--db-organizer-color,#E23A2C) !important;
@@ -1661,7 +1661,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     color:var(--db-organizer-color,#E23A2C) !important;
     font-weight:900 !important;
 }
-*/
+/* Geselecteerde organisator: dezelfde opvallende rand als bij een geselecteerde stad. */
 .agenda-organizer-item.agenda-organizer-item--organizer.is-selected img.agenda-organizer-logo, .agenda-organizer-item.agenda-organizer-item--organizer.is-selected .agenda-organizer-fallback {
     box-sizing:border-box!important;
     border:3px solid var(--db-primary,#E23A2C)!important;
@@ -1679,7 +1679,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     color:var(--db-primary,#E23A2C)!important;
     font-weight:900!important;
 }
-*/
+/* Hoverkleur van stads- en organisatiefilters is per regio instelbaar. */
 .agenda-organizer-item:not(.is-selected):hover img.agenda-city-filter-icon, .agenda-organizer-item:not(.is-selected):hover img.agenda-organizer-logo, .agenda-organizer-item:not(.is-selected):hover .agenda-organizer-fallback {
     border-color:var(--db-filter-hover-color,var(--db-primary)) !important;
 }
@@ -1690,7 +1690,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     border-color:var(--db-filter-hover-color,var(--db-primary)) !important;
     color:var(--db-filter-hover-color,var(--db-primary)) !important;
 }
-*/
+/* Transparante filterwisselknop: laat de achtergrond door het stadsicoon heen zichtbaar. */
 .agenda-selector-button {
     background:transparent!important;
     border:0!important;
@@ -1707,7 +1707,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     border:0!important;
     box-shadow:none!important;
 }
-*/
+/* De filterwisselknop gebruikt hetzelfde stadsicoon als de stadskeuzes. */
 .agenda-selector-button {
     flex:0 0 66px!important;
     width:66px!important;
@@ -1745,7 +1745,7 @@ body.has-agenda-footer .site-main > .agenda-page {
         height:58px!important;
     }
 }
-*/
+/* Label STEDEN onder het transparante stadsicoon van de filterwisselknop. */
 .agenda-selector-button {
     height:86px!important;
     min-height:86px!important;
@@ -1792,7 +1792,7 @@ body.has-agenda-footer .site-main > .agenda-page {
         height:42px!important;
     }
 }
-*/
+/* Filterwissel: stadsicoon even groot als de iconen in de filterrij. */
 .agenda-selector-button {
     flex:0 0 82px!important;
     width:82px!important;
@@ -1849,11 +1849,11 @@ body.has-agenda-footer .site-main > .agenda-page {
         max-height:58px!important;
     }
 }
-*/
+/* Zorg dat het niet-actieve filtericoon echt verborgen blijft. */
 .agenda-filter-switch-icon[hidden] {
     display:none!important;
 }
-*/
+/* Compactere iconen in de agenda-filterbalk. */
 .agenda-organizer-item img.agenda-organizer-logo, .agenda-organizer-item .agenda-organizer-fallback, .agenda-organizer-item img.agenda-city-filter-icon {
     width:48px!important;
     height:48px!important;
@@ -1888,16 +1888,16 @@ body.has-agenda-footer .site-main > .agenda-page {
         max-height:42px!important;
     }
 }
-*/
+/* Media-loze evenementkaarten volgen de ingestelde kleur van de weekdag. */
 .agenda-card__placeholder {
     background:var(--db-event-day-color,var(--db-primary,#f78d19)) !important;
 }
-*/
+/* Zeer compacte hoogte voor evenementkaarten zonder media. */
 .agenda-card__placeholder {
     min-height:70px;
     padding:6px 10px;
 }
-*/
+/* Gelijke afmetingen en uitlijning voor de wisselknop, steden en organisatoren. */
 .agenda-selector-line {
     align-items:center!important;
 }
@@ -1977,7 +1977,7 @@ body.has-agenda-footer .site-main > .agenda-page {
         max-height:44px!important;
     }
 }
-*/
+/* Houd de horizontale bladerpijlen zichtbaar boven de logo's. */
 .agenda-selector-panel {
     position:relative!important;
     overflow:visible!important;
@@ -2017,7 +2017,8 @@ body.has-agenda-footer .site-main > .agenda-page {
         height:86px!important;
     }
 }
-*/
+/* Regio-instelbare tekstkleur voor de namen van de weekdagen in de agenda.
+   Deze regels staan bewust in agenda.css zodat ze de standaardkleur overschrijven. */
 .agenda-calendar__weekday:nth-child(1) {
     color:var(--db-weekday-text-1,#222222)!important
 }
@@ -2039,22 +2040,24 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-calendar__weekday:nth-child(7) {
     color:var(--db-weekday-text-7,#222222)!important
 }
-*/
+/* De instelbare dagtekstkleur wordt gebruikt op de datumregel van elke evenementkaart. */
 .agenda-card__date-line {
     color:var(--db-event-day-text-color,#222222)!important;
 }
 .agenda-card__date-line span {
     color:inherit!important;
 }
-*/
+/* De uitklapbare evenementinformatie moet dezelfde dagtekstkleur gebruiken.
+   Beperk dit tot het infoblok zodat de evenementtitel niet wordt gewijzigd. */
 .agenda-card__description-inner, .agenda-card__description-inner * {
     color:var(--db-event-day-text-color,#222222)!important;
 }
-*/
+/* Gebruik de ingestelde weekdag-tekstkleur voor ALLE tekst in de evenementkaart.
+   De datumregel gebruikt dezelfde variabele; media en kaartachtergrond blijven ongewijzigd. */
 .agenda-card__details, .agenda-card__details :where(h2,h2 a,p,strong,span,a,b,h3,.agenda-card__description,.agenda-card__hashtags,.agenda-attendance,.agenda-icon-button,.agenda-card__more,.agenda-card__quick-date) {
     color:var(--db-event-day-text-color,#222222)!important;
 }
-*/
+/* Afzonderlijk instelbare tekstkleur voor de evenementtitel, ook in media-loze kaarten. */
 .agenda-card__details > h2, .agenda-card__details > h2 a, .agenda-card__placeholder strong {
     color:var(--db-event-day-title-color,#222222)!important;
 }
