@@ -11,7 +11,7 @@ if (!$id || $id < 1) {
     exit('Evenement niet gevonden.');
 }
 $statement = $db->prepare(
-    "SELECT e.*, r.name AS region_name, r.logo_path, ra.weekday_colors, o.name AS organizer_name,
+    "SELECT e.*, r.name AS region_name, r.timezone AS region_timezone, r.logo_path, ra.weekday_colors, o.name AS organizer_name,
             l.name AS location_name, l.city AS location_city
      FROM events e
      INNER JOIN regions r ON r.id = e.region_id
@@ -44,7 +44,14 @@ $region = [
 ];
 require dirname(__DIR__) . '/app/views/header.php';
 $escape = static fn($value): string => escapeHtml((string) $value);
-$eventWeekday = (int) date('N', strtotime((string) $event['starts_at']));
+$eventTimezoneName = (string) ($event['region_timezone'] ?? 'Europe/Madrid');
+try {
+    $eventTimezone = new DateTimeZone($eventTimezoneName);
+} catch (Throwable $exception) {
+    $eventTimezone = new DateTimeZone('Europe/Madrid');
+}
+$eventDate = new DateTimeImmutable((string) $event['starts_at'], $eventTimezone);
+$eventWeekday = (int) $eventDate->format('N');
 $weekdayPalette = json_decode((string) ($event['weekday_colors'] ?? ''), true);
 $eventInfoTextColor = is_array($weekdayPalette)
     ? (string) ($weekdayPalette['weekday_text_' . ($eventWeekday - 1)] ?? '#222222')
