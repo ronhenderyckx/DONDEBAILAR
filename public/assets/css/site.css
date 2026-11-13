@@ -981,7 +981,7 @@ body.has-agenda-footer .site-footer--agenda{
 
 
 /* De volledige bovenste headerregel staat altijd boven de filterbalk. */
-.site-header{position:relative;z-index:5000}
+.site-header{position:sticky;top:0;z-index:5000}
 .site-header__inner{position:relative;z-index:5002}
 .site-menu{position:relative;z-index:5003}
 .site-menu__panel{position:absolute;z-index:5004}
