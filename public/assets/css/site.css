@@ -1069,3 +1069,19 @@ body.has-agenda-footer .site-footer--agenda .agenda-footer-tools form.agenda-foo
     -webkit-text-fill-color: var(--db-search-text-color, #222222) !important;
     opacity: 1 !important;
 }
+
+
+/* Pictogramkleuren zijn onafhankelijk instelbaar van de knopachtergronden. */
+.agenda-back-to-top:not(.agenda-toggle-sound){
+    color:var(--db-back-top-icon-color,#FFFFFF)!important;
+}
+.agenda-footer-search button{
+    color:var(--db-search-icon-color,#FFFFFF)!important;
+}
+.agenda-toggle-sound{
+    color:var(--db-speaker-icon-color,#FFFFFF)!important;
+}
+.agenda-back-to-top svg,
+.agenda-footer-search button svg{
+    stroke:currentColor!important;
+}
