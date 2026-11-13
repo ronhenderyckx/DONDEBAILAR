@@ -18,9 +18,7 @@
 }
 .agenda-selector-button {
     align-self:flex-start;
-    margin-top:8px
-}
-.agenda-selector-button {
+    margin-top:8px;
     flex:0 0 62px;
     width:62px;
     height:62px;
@@ -46,7 +44,8 @@
     display:flex;
     align-items:center;
     flex:1;
-    min-width:0
+    min-width:0;
+    position:relative
 }
 .agenda-selector-panel.has-more::after {
     content:'›';
@@ -83,9 +82,6 @@
     line-height:1;
     pointer-events:none;
     text-shadow:none
-}
-.agenda-selector-panel {
-    position:relative
 }
 .agenda-selector-panel[hidden] {
     display:none
@@ -452,9 +448,6 @@
 .agenda-card__details {
     padding:17px 20px 20px;
     color:#fff;
-    touch-action:pan-y
-}
-.agenda-card__details {
     touch-action:pan-y
 }
 .agenda-card__description {
