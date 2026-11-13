@@ -375,8 +375,8 @@ const agendaVideoObserver = new IntersectionObserver(function (entries) {
 document.querySelectorAll('.agenda-card__video').forEach(function (video) {
     video.muted = agendaVideosMuted;
     video.removeAttribute('autoplay');
-    // Laad alleen de eerste video alvast voor het eerste beeld; de rest blijft op none.
-    video.setAttribute('preload', video.hasAttribute('data-priority-load') ? 'auto' : 'none');
+    // Video's pas ophalen wanneer ze daadwerkelijk worden afgespeeld.
+    video.setAttribute('preload', 'none');
     video.setAttribute('muted', '');
     agendaVideoObserver.observe(video);
 });
