@@ -824,7 +824,7 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     height:86px!important;
     margin:0!important;
     padding:0!important;
-    background:linear-gradient(90deg,var(--db-filter-bar-color,#fff) 35%,transparent 100%)!important;
+    background:transparent!important;
     color:var(--db-primary,#E23A2C)!important;
     font-family:Arial,Helvetica,sans-serif!important;
     font-size:38px!important;
@@ -839,7 +839,7 @@ body.has-agenda-footer .site-main > .agenda-page{margin:0 auto!important;padding
     left:0!important;
     content:'‹'!important;
     transform:none!important;
-    background:linear-gradient(270deg,var(--db-filter-bar-color,#fff) 35%,transparent 100%)!important;
+    background:transparent!important;
 }
 @media(max-width:700px){
     .agenda-selector-panel.has-more::after,
