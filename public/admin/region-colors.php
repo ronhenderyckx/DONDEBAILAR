@@ -103,12 +103,22 @@ foreach ($defaults as $key => $value) {
     $colors[$key] = preg_match('/^#[0-9a-fA-F]{6}$/', $candidate) ? strtoupper($candidate) : $value;
 }
 $weekdayColors = $weekdayDefaults;
+$iconColorDefaults = [
+    'back_top_icon_color' => '#FFFFFF',
+    'search_icon_color' => '#FFFFFF',
+    'speaker_icon_color' => '#FFFFFF',
+];
+$iconColors = $iconColorDefaults;
 if (!empty($saved['weekday_colors'])) {
     $decoded = json_decode((string) $saved['weekday_colors'], true);
     if (is_array($decoded)) {
         foreach (['agenda_arrow_background', 'agenda_arrow_text'] as $arrowKey) {
             $candidate = (string) ($decoded[$arrowKey] ?? $defaults[$arrowKey]);
             $colors[$arrowKey] = preg_match('/^#[0-9a-fA-F]{6}$/', $candidate) ? strtoupper($candidate) : $defaults[$arrowKey];
+        }
+        foreach ($iconColorDefaults as $iconKey => $iconDefault) {
+            $candidate = (string) ($decoded[$iconKey] ?? $iconDefault);
+            $iconColors[$iconKey] = preg_match('/^#[0-9a-fA-F]{6}$/', $candidate) ? strtoupper($candidate) : $iconDefault;
         }
         foreach ($weekdayDefaults as $i => $value) {
             if (isset($decoded[$i]) && preg_match('/^#[0-9a-fA-F]{6}$/', (string) $decoded[$i])) {
@@ -207,6 +217,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $colors['agenda_arrow_text'] = $arrowColor;
         }
+        foreach ($iconColorDefaults as $iconKey => $iconDefault) {
+            $value = strtoupper(trim((string) ($_POST[$iconKey] ?? $iconColors[$iconKey])));
+            if (!preg_match('/^#[0-9A-F]{6}$/', $value)) {
+                $errorMessage = 'Een of meer icoonkleuren zijn ongeldig.';
+                break;
+            }
+            $iconColors[$iconKey] = $value;
+        }
         $weekdayInput = $_POST['weekday_colors'] ?? [];
         if (!is_array($weekdayInput)) $weekdayInput = [];
         foreach ($weekdayDefaults as $i => $default) {
@@ -285,7 +303,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'weekday_colors' => json_encode($weekdayColors + [
                         'agenda_arrow_background' => $colors['agenda_arrow_background'],
                         'agenda_arrow_text' => $colors['agenda_arrow_text'],
-                    ], JSON_THROW_ON_ERROR),
+                    ] + $iconColors, JSON_THROW_ON_ERROR),
                     'logo_path' => $newLogoPath,
                 ]);
                 $logoPath = $newLogoPath;
@@ -415,6 +433,21 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <p>Stel de kleur van de linker- en rechterpijl in. De achtergrond van deze pijlen blijft altijd transparant.</p>
             <div class="region-color-grid">
                 <label class="region-color-field" for="agenda_arrow_text"><span>Kleur bladerpijlen</span><input type="color" id="agenda_arrow_text" name="agenda_arrow_text" value="<?= escapeHtml($colors['agenda_arrow_text']) ?>"><code><?= escapeHtml($colors['agenda_arrow_text']) ?></code></label>
+            </div>
+            <h2>Kleur van de pictogrammen</h2>
+            <p>Deze instellingen veranderen alleen de kleur van het symbool. De achtergrondkleuren van de knoppen blijven afzonderlijk instelbaar.</p>
+            <div class="region-color-grid">
+                <?php foreach ([
+                    'back_top_icon_color' => 'Kleur terug-naar-bovenknop',
+                    'search_icon_color' => 'Kleur zoeklogo (vergrootglas)',
+                    'speaker_icon_color' => 'Kleur luidsprekerlogo',
+                ] as $key => $label): ?>
+                    <label class="region-color-field" for="<?= escapeHtml($key) ?>">
+                        <span><?= escapeHtml($label) ?></span>
+                        <input type="color" id="<?= escapeHtml($key) ?>" name="<?= escapeHtml($key) ?>" value="<?= escapeHtml($iconColors[$key]) ?>">
+                        <code><?= escapeHtml($iconColors[$key]) ?></code>
+                    </label>
+                <?php endforeach; ?>
             </div>
             <h2>Stadsicoon voor de filterbalk</h2>
             <p>Upload hier de afbeelding die bij het filter Steden / Plaatsen wordt gebruikt. PNG, JPG of WebP, maximaal 5 MB. De afbeelding wordt automatisch verkleind.</p>
