@@ -185,7 +185,7 @@ if ($regionId > 0) {
                    l.latitude, l.longitude, l.google_maps_url,
                    cover.id AS cover_media_id
             FROM events e
-            INNER JOIN organizers o ON o.id = e.organizer_id
+            LEFT JOIN organizers o ON o.id = e.organizer_id
             LEFT JOIN categories c ON c.id = e.category_id
             LEFT JOIN locations l ON l.id = e.location_id
             LEFT JOIN event_media cover ON cover.id = COALESCE(
