@@ -142,7 +142,9 @@ document.addEventListener('pointerup', function (event) {
 }, {passive:true});
 document.addEventListener('pointercancel', function () { eventInfoPointerStart = null; }, {passive:true});
 
-let agendaVideosMuted = window.DONDEBAILAR_AGENDA_CONFIG.soundMuted;
+// Mobiele browsers blokkeren automatisch afspelen met geluid.
+const agendaIsMobileVideo = window.matchMedia('(max-width: 700px)').matches;
+let agendaVideosMuted = agendaIsMobileVideo ? true : window.DONDEBAILAR_AGENDA_CONFIG.soundMuted;
 let activeAgendaVideo = null;
 let agendaVideoIdleTimer = null;
 
@@ -153,6 +155,7 @@ function playAgendaVideo(video) {
     });
     activeAgendaVideo = video;
     video.muted = agendaVideosMuted;
+    if (agendaIsMobileVideo) video.controls = true;
     const playPromise = video.play();
     if (playPromise && typeof playPromise.catch === 'function') {
         playPromise.catch(function () {});
@@ -387,6 +390,7 @@ const agendaVideoObserver = new IntersectionObserver(function (entries) {
 }, {threshold:[0, 0.6]});
 document.querySelectorAll('.agenda-card__video').forEach(function (video) {
     video.muted = agendaVideosMuted;
+    if (agendaIsMobileVideo) video.controls = true;
     video.removeAttribute('autoplay');
     // Video's pas ophalen wanneer ze daadwerkelijk worden afgespeeld.
     video.setAttribute('preload', 'none');
