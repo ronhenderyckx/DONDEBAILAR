@@ -368,9 +368,6 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                     <details class="site-menu__admin site-menu__admin--platform">
                         <summary>Platformbeheer</summary>
                         <a href="/admin/">Overzicht</a>
-                        <a href="/events.php">Evenementen</a>
-                        <a href="/admin/organizers.php">Organisatoren</a>
-                        <a href="/admin/locations.php">Locaties</a>
                         <a href="/admin/users.php">Gebruikers</a>
                         <a href="/admin/regions.php">Regio's</a>
                         <?php if ($regionId > 0): ?><a href="/admin/region-info.php?region_id=<?= $regionId ?>">Info-pagina regio</a><?php endif; ?>
