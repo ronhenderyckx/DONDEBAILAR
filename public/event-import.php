@@ -6,6 +6,9 @@ require_once dirname(__DIR__) . '/app/Authorization.php';
 require_once dirname(__DIR__) . '/app/Security.php';
 require_once dirname(__DIR__) . '/app/Events.php';
 
+http_response_code(403);
+exit('Evenementen importeren is tijdelijk uitgeschakeld.');
+
 $user = requireLogin();
 $db = Database::connection();
 $regions = eventManageableRegions($db, $user);
