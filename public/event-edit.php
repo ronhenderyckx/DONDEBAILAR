@@ -18,7 +18,7 @@ $statement = $db->prepare(
             o.name AS organizer_name
      FROM events e
      INNER JOIN regions r ON r.id = e.region_id
-     INNER JOIN organizers o ON o.id = e.organizer_id
+     LEFT JOIN organizers o ON o.id = e.organizer_id
      WHERE e.id = :id LIMIT 1"
 );
 $statement->execute(['id' => $id]);
@@ -52,7 +52,7 @@ $description = (string) ($event['description'] ?? '');
 $extraInfo = (string) ($event['extra_info'] ?? '');
 $hashtags = (string) ($event['hashtags'] ?? '');
 $eventLanguage = (string) $event['event_language'];
-$organizerId = (int) $event['organizer_id'];
+$organizerId = (int) ($event['organizer_id'] ?? 0);
 $locationId = (int) ($event['location_id'] ?? 0);
 $categoryId = (int) ($event['category_id'] ?? 0);
 $startsAt = date('Y-m-d\TH:i', strtotime($event['starts_at']));
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (mb_strlen($hashtags) > 500) $errors[] = 'Gebruik maximaal 500 tekens voor de hashtags.';
     if (!in_array($eventLanguage, ['nl','en','es','fr'], true)) $errors[] = 'Kies een geldige inhoudstaal.';
     $organizerIds = array_map(static fn($o) => (int) $o['id'], $organizers);
-    if (!in_array($organizerId, $organizerIds, true)) $errors[] = 'Kies een geldige organisator.';
+    if ($organizerId > 0 && !in_array($organizerId, $organizerIds, true)) $errors[] = 'Kies een geldige organisator.';
     if (!in_array($locationId, array_merge([0], array_map(static fn($l) => (int) $l['id'], $locations)), true)) $errors[] = 'Kies een geldige locatie.';
     if (!in_array($categoryId, array_merge([0], array_map(static fn($c) => (int) $c['id'], $categories)), true)) $errors[] = 'Kies een geldige categorie.';
     if ($canPublish && !in_array($status, ['draft','published','unpublished','cancelled'], true)) $errors[] = 'Kies een geldige status.';
@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                  WHERE id = :id"
             );
             $update->execute([
-                'organizer_id' => $organizerId,
+                'organizer_id' => $organizerId > 0 ? $organizerId : null,
                 'location_id' => $locationId > 0 ? $locationId : null,
                 'category_id' => $categoryId > 0 ? $categoryId : null,
                 'title' => $title,
@@ -161,7 +161,7 @@ require dirname(__DIR__) . '/app/views/header.php';
 ?>
 <section class="admin-page">
     <div class="admin-heading">
-        <div><p class="eyebrow">EVENEMENTEN · <?= escapeHtml($event['region_name']) ?></p><h1>Evenement wijzigen</h1><p>Aangemaakt door <?= escapeHtml((string) $event['created_by']) ?> · organisator <?= escapeHtml($event['organizer_name']) ?></p></div>
+        <div><p class="eyebrow">EVENEMENTEN · <?= escapeHtml($event['region_name']) ?></p><h1>Evenement wijzigen</h1><p>Aangemaakt door <?= escapeHtml((string) $event['created_by']) ?> · organisator <?= escapeHtml((string) ($event['organizer_name'] ?? 'Geen organisator')) ?></p></div>
         <a class="button" href="/events.php">Terug naar evenementen</a>
     </div>
     <?php if (isset($_GET['created'])): ?><div class="message message--success">Het evenement is aangemaakt. Het staat als concept klaar.</div><?php elseif (isset($_GET['updated'])): ?><div class="message message--success">De wijzigingen zijn opgeslagen.</div><?php endif; ?>
@@ -170,7 +170,7 @@ require dirname(__DIR__) . '/app/views/header.php';
         <form method="post" enctype="multipart/form-data" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="title">Titel *</label><input id="title" name="title" maxlength="220" required value="<?= escapeHtml($title) ?>">
-            <label for="organizer_id">Organisator *</label><select id="organizer_id" name="organizer_id" required><?php foreach ($organizers as $item): ?><option value="<?= (int) $item['id'] ?>" <?= $organizerId === (int) $item['id'] ? 'selected' : '' ?>><?= escapeHtml($item['name']) ?></option><?php endforeach; ?></select>
+            <label for="organizer_id">Organisator</label><select id="organizer_id" name="organizer_id"><option value="0">Geen organisator</option><?php foreach ($organizers as $item): ?><option value="<?= (int) $item['id'] ?>" <?= $organizerId === (int) $item['id'] ? 'selected' : '' ?>><?= escapeHtml($item['name']) ?></option><?php endforeach; ?></select>
             <label for="location_id">Locatie</label><select id="location_id" name="location_id"><option value="0">Geen locatie</option><?php foreach ($locations as $item): ?><option value="<?= (int) $item['id'] ?>" <?= $locationId === (int) $item['id'] ? 'selected' : '' ?>><?= escapeHtml($item['name'] . ' — ' . $item['city']) ?></option><?php endforeach; ?></select>
             <label for="category_id">Categorie</label><select id="category_id" name="category_id"><option value="0">Geen categorie</option><?php foreach ($categories as $item): ?><option value="<?= (int) $item['id'] ?>" <?= $categoryId === (int) $item['id'] ? 'selected' : '' ?>><?= escapeHtml($item['name']) ?></option><?php endforeach; ?></select>
             <label for="event_language">Taal van de evenementinhoud *</label><select id="event_language" name="event_language"><?php foreach (['nl'=>'Nederlands','en'=>'English','es'=>'Español','fr'=>'Français'] as $code=>$label): ?><option value="<?= $code ?>" <?= $eventLanguage === $code ? 'selected' : '' ?>><?= $label ?></option><?php endforeach; ?></select>
