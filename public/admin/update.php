@@ -172,6 +172,25 @@ function migrateEventHashtags(PDO $db): void
 
 
 /**
+ * Voeg het afzonderlijke veld Extra info aan evenementen toe.
+ * Idempotent: veilig bij iedere platformupdate uit te voeren.
+ */
+function migrateEventExtraInfo(PDO $db): void
+{
+    $check = $db->prepare(
+        "SELECT COUNT(*) FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'events'
+           AND COLUMN_NAME = 'extra_info'"
+    );
+    $check->execute();
+    if ((int) $check->fetchColumn() === 0) {
+        $db->exec("ALTER TABLE events ADD COLUMN extra_info MEDIUMTEXT NULL AFTER description");
+    }
+}
+
+
+/**
  * Bewaar herhalingen als een reeks met afzonderlijke evenementrecords.
  * De migratie is idempotent en wordt door de website-UPDATE uitgevoerd.
  */
@@ -524,6 +543,9 @@ try {
 
     migrateEventHashtags($db);
     $messages[] = 'Database: apart hashtagveld voor evenementen is gecontroleerd.';
+
+    migrateEventExtraInfo($db);
+    $messages[] = 'Database: apart veld Extra info voor evenementen is gecontroleerd.';
 
     migrateEventMessages($db);
     $messages[] = 'Database: berichten per evenement zijn gecontroleerd.';
