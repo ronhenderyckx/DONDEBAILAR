@@ -25,11 +25,27 @@
                     <?php require __DIR__ . '/event-card.php'; ?>
                 <?php endforeach; ?>
             </div>
-            <div class="agenda-page-navigation" aria-label="Navigatie tussen evenementreeksen">
-                    <button type="button" class="agenda-page-nav-icon" id="agenda-page-previous" aria-label="Vorige reeks" title="Vorige reeks">‹</button>
-                    <span id="agenda-page-range">1–<?= min($agendaPageSize, count($events)) ?> van <?= count($events) ?></span>
-                    <button type="button" class="agenda-page-nav-icon" id="agenda-page-next" aria-label="Volgende reeks" title="Volgende reeks">›</button>
-            </div>
+            <?php if ($totalEvents > $agendaPageSize): ?>
+                <?php
+                $previousPageUrl = '?' . http_build_query(array_merge($_GET, ['page' => max(1, $agendaPage - 1)]));
+                $nextPageUrl = '?' . http_build_query(array_merge($_GET, ['page' => min((int) ceil($totalEvents / $agendaPageSize), $agendaPage + 1)]));
+                $firstEventNumber = (($agendaPage - 1) * $agendaPageSize) + 1;
+                $lastEventNumber = min($agendaPage * $agendaPageSize, $totalEvents);
+                ?>
+                <nav class="agenda-page-navigation" aria-label="Navigatie tussen evenementreeksen">
+                    <?php if ($agendaPage > 1): ?>
+                        <a class="agenda-page-nav-icon" href="<?= $escape($previousPageUrl) ?>" aria-label="Vorige reeks" title="Vorige reeks">‹</a>
+                    <?php else: ?>
+                        <span class="agenda-page-nav-icon" aria-disabled="true">‹</span>
+                    <?php endif; ?>
+                    <span><?= $firstEventNumber ?>–<?= $lastEventNumber ?> van <?= $totalEvents ?></span>
+                    <?php if ($lastEventNumber < $totalEvents): ?>
+                        <a class="agenda-page-nav-icon" href="<?= $escape($nextPageUrl) ?>" aria-label="Volgende reeks" title="Volgende reeks">›</a>
+                    <?php else: ?>
+                        <span class="agenda-page-nav-icon" aria-disabled="true">›</span>
+                    <?php endif; ?>
+                </nav>
+            <?php endif; ?>
         <?php endif; ?>
     <?php endif; ?>
     <div class="agenda-message-modal" id="agenda-message-modal" hidden>
