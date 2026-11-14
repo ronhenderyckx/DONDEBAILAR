@@ -150,6 +150,23 @@ let agendaVideoIdleTimer = null;
 
 // Houd het geheugengebruik laag: nooit meerdere video's tegelijk.
 function playAgendaVideo(video) {
+    // Start niet zolang de browser nog geen eerste videobeeld heeft ontvangen.
+    // Haal voor de gekozen zichtbare video tijdelijk voldoende data op.
+    if (video.readyState < HTMLMediaElement.HAVE_CURRENT_DATA) {
+        video.setAttribute('preload', 'auto');
+        if (video.dataset.waitingForFrame !== '1') {
+            video.dataset.waitingForFrame = '1';
+            video.addEventListener('loadeddata', function () {
+                delete video.dataset.waitingForFrame;
+                scheduleVisibleAgendaVideo();
+            }, {once:true});
+        }
+        // load() opnieuw aanroepen nadat preload is verhoogd, zodat ook de
+        // eerste zichtbare video daadwerkelijk een frame kan ophalen.
+        video.load();
+        return;
+    }
+
     document.querySelectorAll('.agenda-card__video').forEach(function (otherVideo) {
         if (otherVideo !== video && !otherVideo.paused) otherVideo.pause();
     });
