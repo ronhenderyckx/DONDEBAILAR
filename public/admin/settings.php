@@ -18,6 +18,36 @@ $logoSettingFile = $projectRoot . '/storage/platform-logo-path.txt';
 $logoPath = is_file($logoSettingFile) ? trim((string) file_get_contents($logoSettingFile)) : '';
 
 $platformMenuColorFile = $projectRoot . '/storage/platform-menu-color.txt';
+$platformAdminColors = {
+    'primary' => '#0A4D9F',
+    'primary_dark' => '#083B79',
+    'accent' => '#00AFC5',
+    'header' => '#FFFFFF',
+    'menu' => '#FFFFFF',
+    'background' => '#F7F8FA',
+    'surface' => '#FFFFFF',
+    'text' => '#202B38',
+    'muted' => '#687586',
+    'border' => '#E7EAF0'
+};
+$platformColorsFile = $projectRoot . '/storage/platform-admin-colors.json';
+if (is_file($platformColorsFile)) {
+    $savedPlatformColors = json_decode((string) file_get_contents($platformColorsFile), true);
+    if (is_array($savedPlatformColors)) {
+        foreach ($platformAdminColors as $colorKey => $fallbackColor) {
+            $candidateColor = strtoupper(trim((string) ($savedPlatformColors[$colorKey] ?? '')));
+            if (preg_match('/^#[0-9A-F]{6}$/', $candidateColor)) {
+                $platformAdminColors[$colorKey] = $candidateColor;
+            }
+        }
+    }
+} elseif (is_file($platformMenuColorFile)) {
+    $legacyMenuColor = strtoupper(trim((string) file_get_contents($platformMenuColorFile)));
+    if (preg_match('/^#[0-9A-F]{6}$/', $legacyMenuColor)) {
+        $platformAdminColors['menu'] = $legacyMenuColor;
+    }
+}
+
 $platformMenuColor = '#FFFFFF';
 if (is_file($platformMenuColorFile)) {
     $storedMenuColor = strtoupper(trim((string) file_get_contents($platformMenuColorFile)));
@@ -42,15 +72,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!verifyCsrfToken(is_string($csrf) ? $csrf : null)) {
         $errorMessage = 'De beveiligingscontrole is verlopen. Vernieuw de pagina.';
-    } elseif (isset($_POST['save_platform_menu_color'])) {
-        $requestedMenuColor = strtoupper(trim((string) ($_POST['platform_menu_color'] ?? '')));
-        if (!preg_match('/^#[0-9A-F]{6}$/', $requestedMenuColor)) {
-            $errorMessage = 'Kies een geldige menukleur.';
-        } elseif (file_put_contents($platformMenuColorFile, $requestedMenuColor . PHP_EOL, LOCK_EX) === false) {
-            $errorMessage = 'De menukleur kon niet worden opgeslagen. Controleer de schrijfrechten van storage.';
-        } else {
-            $platformMenuColor = $requestedMenuColor;
-            $successMessage = 'De platformmenukleur is opgeslagen.';
+    } elseif (isset($_POST['save_platform_colors'])) {
+        $requestedColors = [];
+        foreach ($platformAdminColors as $colorKey => $fallbackColor) {
+            $candidateColor = strtoupper(trim((string) ($_POST['platform_colors'][$colorKey] ?? '')));
+            if (!preg_match('/^#[0-9A-F]{6}$/', $candidateColor)) {
+                $errorMessage = 'Controleer alle gekozen kleuren.';
+                break;
+            }
+            $requestedColors[$colorKey] = $candidateColor;
+        }
+        if ($errorMessage === '') {
+            $encodedColors = json_encode($requestedColors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+            if ($encodedColors === false || file_put_contents($platformColorsFile, $encodedColors . PHP_EOL, LOCK_EX) === false) {
+                $errorMessage = 'De platformkleuren konden niet worden opgeslagen. Controleer de schrijfrechten van storage.';
+            } else {
+                $platformAdminColors = $requestedColors;
+                $platformMenuColor = $requestedColors['menu'];
+                $successMessage = 'De kleuren van het platformbeheer zijn opgeslagen.';
+            }
         }
     } elseif (isset($_POST['save_agenda_settings'])) {
         $requestedPageSize = filter_var($_POST['agenda_page_size'] ?? null, FILTER_VALIDATE_INT);
@@ -134,19 +174,64 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     <section class="admin-section">
         <div class="section-heading">
             <div>
-                <h2>Menukleur platformbeheer</h2>
-                <p>Deze kleur geldt voor het algemene dashboard en staat los van de menukleuren van de regio’s.</p>
+                <h2>Kleuren platformbeheer</h2>
+                <p>Deze kleuren gelden uitsluitend voor de pagina's van Platformbeheer. Regiobeheer en de openbare website behouden hun eigen kleuren.</p>
             </div>
         </div>
         <form method="post" action="/admin/settings.php" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
-            <label for="platform_menu_color">Achtergrondkleur van het menu</label>
-            <div style="display:flex;align-items:center;gap:12px;max-width:300px">
-                <input type="color" id="platform_menu_color" name="platform_menu_color" value="<?= escapeHtml($platformMenuColor) ?>" style="width:64px;height:42px;padding:3px">
-                <strong><?= escapeHtml($platformMenuColor) ?></strong>
+            <label for="platform_color_primary">Primaire kleur (knoppen en links)</label>
+            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
+                <input type="color" id="platform_color_primary" name="platform_colors[primary]" value="<?= escapeHtml($platformAdminColors['primary']) ?>" style="width:64px;height:42px;padding:3px">
+                <code><?= escapeHtml($platformAdminColors['primary']) ?></code>
+            </div>
+            <label for="platform_color_primary_dark">Donkere primaire kleur</label>
+            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
+                <input type="color" id="platform_color_primary_dark" name="platform_colors[primary_dark]" value="<?= escapeHtml($platformAdminColors['primary_dark']) ?>" style="width:64px;height:42px;padding:3px">
+                <code><?= escapeHtml($platformAdminColors['primary_dark']) ?></code>
+            </div>
+            <label for="platform_color_accent">Accentkleur</label>
+            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
+                <input type="color" id="platform_color_accent" name="platform_colors[accent]" value="<?= escapeHtml($platformAdminColors['accent']) ?>" style="width:64px;height:42px;padding:3px">
+                <code><?= escapeHtml($platformAdminColors['accent']) ?></code>
+            </div>
+            <label for="platform_color_header">Achtergrondkleur bovenbalk</label>
+            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
+                <input type="color" id="platform_color_header" name="platform_colors[header]" value="<?= escapeHtml($platformAdminColors['header']) ?>" style="width:64px;height:42px;padding:3px">
+                <code><?= escapeHtml($platformAdminColors['header']) ?></code>
+            </div>
+            <label for="platform_color_menu">Achtergrondkleur menu</label>
+            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
+                <input type="color" id="platform_color_menu" name="platform_colors[menu]" value="<?= escapeHtml($platformAdminColors['menu']) ?>" style="width:64px;height:42px;padding:3px">
+                <code><?= escapeHtml($platformAdminColors['menu']) ?></code>
+            </div>
+            <label for="platform_color_background">Achtergrondkleur pagina</label>
+            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
+                <input type="color" id="platform_color_background" name="platform_colors[background]" value="<?= escapeHtml($platformAdminColors['background']) ?>" style="width:64px;height:42px;padding:3px">
+                <code><?= escapeHtml($platformAdminColors['background']) ?></code>
+            </div>
+            <label for="platform_color_surface">Achtergrondkleur panelen en kaarten</label>
+            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
+                <input type="color" id="platform_color_surface" name="platform_colors[surface]" value="<?= escapeHtml($platformAdminColors['surface']) ?>" style="width:64px;height:42px;padding:3px">
+                <code><?= escapeHtml($platformAdminColors['surface']) ?></code>
+            </div>
+            <label for="platform_color_text">Tekstkleur</label>
+            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
+                <input type="color" id="platform_color_text" name="platform_colors[text]" value="<?= escapeHtml($platformAdminColors['text']) ?>" style="width:64px;height:42px;padding:3px">
+                <code><?= escapeHtml($platformAdminColors['text']) ?></code>
+            </div>
+            <label for="platform_color_muted">Gedempte tekstkleur</label>
+            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
+                <input type="color" id="platform_color_muted" name="platform_colors[muted]" value="<?= escapeHtml($platformAdminColors['muted']) ?>" style="width:64px;height:42px;padding:3px">
+                <code><?= escapeHtml($platformAdminColors['muted']) ?></code>
+            </div>
+            <label for="platform_color_border">Randkleur</label>
+            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
+                <input type="color" id="platform_color_border" name="platform_colors[border]" value="<?= escapeHtml($platformAdminColors['border']) ?>" style="width:64px;height:42px;padding:3px">
+                <code><?= escapeHtml($platformAdminColors['border']) ?></code>
             </div>
             <div class="form-actions">
-                <button type="submit" class="button button--primary" name="save_platform_menu_color" value="1">Menukleur opslaan</button>
+                <button type="submit" class="button button--primary" name="save_platform_colors" value="1">Platformkleuren opslaan</button>
             </div>
         </form>
     </section>
