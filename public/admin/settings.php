@@ -10,6 +10,23 @@ requirePlatformAdmin();
 
 $pageTitle = 'Instellingen - DONDEBAILAR';
 $platformAdminPage = true;
+
+// Geef het menu ook op deze platformpagina een actieve regio-context.
+// Zo blijven Platformbeheer en Regiobeheer afzonderlijk zichtbaar.
+$regionQuery = Database::connection()->prepare(
+    "SELECT r.*, ra.*
+     FROM regions r
+     LEFT JOIN region_appearance ra ON ra.region_id = r.id
+     INNER JOIN user_region_roles urr ON urr.region_id = r.id
+     WHERE urr.user_id = :user_id
+       AND urr.role IN ('region_admin', 'editor')
+       AND r.is_active = 1
+     ORDER BY CASE WHEN urr.role = 'region_admin' THEN 0 ELSE 1 END, r.name
+     LIMIT 1"
+);
+$regionQuery->execute(['user_id' => (int) currentUser()['id']]);
+$region = $regionQuery->fetch() ?: null;
+
 $errorMessage = '';
 $successMessage = '';
 
