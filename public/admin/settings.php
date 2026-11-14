@@ -9,6 +9,7 @@ require_once dirname(__DIR__, 2) . '/app/ImageOptimization.php';
 requirePlatformAdmin();
 
 $pageTitle = 'Instellingen - DONDEBAILAR';
+$platformAdminPage = true;
 $errorMessage = '';
 $successMessage = '';
 
