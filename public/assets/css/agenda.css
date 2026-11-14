@@ -2048,3 +2048,8 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-card__details > h2, .agenda-card__details > h2 a, .agenda-card__placeholder strong {
     color:var(--db-event-day-title-color,#222222)!important;
 }
+
+/* Geselecteerde stad: gebruik de ingestelde filtertekstkleur voor de stadsnaam. */
+.agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) .agenda-organizer-name {
+    color:var(--db-filter-text-color,#222222)!important;
+}
