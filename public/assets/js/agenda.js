@@ -196,7 +196,7 @@ function scheduleVisibleAgendaVideo() {
                 bestVideo = video;
             }
         });
-        if (bestVideo && bestRatio >= 0.6) playAgendaVideo(bestVideo);
+        if (bestVideo && bestRatio >= 0.2) playAgendaVideo(bestVideo);
     }, 50);
 }
 window.addEventListener('scroll', scheduleVisibleAgendaVideo, {passive:true});
@@ -228,7 +228,7 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
                 const visibleRatio = rect.width > 0 && rect.height > 0
                     ? (visibleWidth * visibleHeight) / (rect.width * rect.height)
                     : 0;
-                if (visibleRatio >= 0.6) {
+                if (visibleRatio >= 0.2) {
                     playAgendaVideo(video);
                 }
             });
