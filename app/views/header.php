@@ -342,7 +342,7 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                 </a>
 
                 <?php if ($isAdmin): ?>
-                    <details class="site-menu__admin">
+                    <details class="site-menu__admin site-menu__admin--platform">
                         <summary>Platformbeheer</summary>
                         <a href="/admin/">Overzicht</a>
                         <a href="/events.php">Evenementen</a>
@@ -354,16 +354,16 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                         <a href="/admin/update-center.php">Updates uitvoeren</a>
                         <a href="/admin/settings.php">Instellingen</a>
                     </details>
-                <?php elseif ($canManageRegion || $canManageLocations): ?>
-                    <details class="site-menu__admin">
+                <?php endif; ?>
+
+                <?php if ($canManageRegion): ?>
+                    <details class="site-menu__admin site-menu__admin--region">
                         <summary>Regiobeheer</summary>
                         <?php if ($regionId > 0 && userHasRegionRole($regionId, ['region_admin'], $headerUser)): ?>
                             <a href="/admin/region-colors.php?region_id=<?= $regionId ?>">Kleuren en logo</a>
                             <a href="/admin/region-info.php?region_id=<?= $regionId ?>">Info-pagina</a>
                         <?php endif; ?>
-                        <?php if ($canManageLocations): ?>
-                            <a href="/admin/locations.php">Locaties</a>
-                        <?php endif; ?>
+                        <a href="/admin/locations.php">Locaties</a>
                         <?php
                         $organizerAccess = Database::connection()->prepare(
                             "SELECT 1 FROM user_region_roles
