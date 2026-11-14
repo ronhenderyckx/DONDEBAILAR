@@ -31,6 +31,7 @@ if (!$region) {
 }
 
 $pageTitle = 'Regio wijzigen - DONDEBAILAR';
+$platformAdminPage = true;
 $errorMessage = '';
 
 $form = [
