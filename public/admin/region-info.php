@@ -71,7 +71,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 ?>
 <section class="admin-page">
     <div class="admin-heading">
-        <div><p class="eyebrow">REGIOBEHEER</p><h1>Info-pagina</h1><p>Beheer de openbare informatie voor <?= escapeHtml($region['name']) ?> in de standaardtaal: <?= escapeHtml($languages[$defaultLanguage]) ?>.</p></div>
+        <div><p class="eyebrow">REGIOBEHEER</p><h1>Info-pagina – <?= escapeHtml($region['name']) ?></h1><p>Je bewerkt de openbare informatie van deze regio in de standaardtaal: <?= escapeHtml($languages[$defaultLanguage]) ?>.</p></div>
         <a class="button" href="/info.php?region_id=<?= (int) $regionId ?>" target="_blank" rel="noopener">Bekijk infopagina</a>
     </div>
     <section class="admin-section">
