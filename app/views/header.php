@@ -165,8 +165,10 @@ $themeStyle = '--db-primary:' . $primaryColor
     . ';--db-background:' . $colorValue('background_color', '#F7F8FA')
     . ';--db-text:' . $colorValue('text_color', '#202B38');
 
-// Gebruik voor algemene platformpagina's een eigen menukleur; regiopagina's houden hun regiokleur.
-if ($region === null) {
+// Alleen expliciet gemarkeerde platformbeheerpagina's gebruiken de platformmenukleur.
+// Regiobeheer, openbare pagina's en gedeelde beheerpagina's behouden hun eigen kleur.
+$isPlatformAdminPage = !empty($platformAdminPage) && $isAdmin;
+if ($isPlatformAdminPage) {
     $platformMenuColorFile = $projectRoot . '/storage/platform-menu-color.txt';
     if (is_file($platformMenuColorFile)) {
         $platformMenuColor = strtoupper(trim((string) file_get_contents($platformMenuColorFile)));
@@ -233,7 +235,13 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
 <link rel="stylesheet" href="/assets/css/agenda.css?v=<?= rawurlencode($agendaCssVersion) ?>">
     <link rel="stylesheet" href="/assets/css/agenda-arrows.css">
 </head>
-<body<?= !empty($isAgendaPage) ? ' class="has-agenda-footer"' : '' ?> style="<?= $escape($themeStyle) ?>">
+<body<?= implode(' ', array_filter([
+    !empty($isAgendaPage) ? 'has-agenda-footer' : '',
+    $isPlatformAdminPage ? 'platform-admin-page' : '',
+])) !== '' ? ' class="' . $escape(implode(' ', array_filter([
+    !empty($isAgendaPage) ? 'has-agenda-footer' : '',
+    $isPlatformAdminPage ? 'platform-admin-page' : '',
+]))) . '"' : '' ?> style="<?= $escape($themeStyle) ?>">
 
 <header class="site-header">
     <div class="site-header__inner">
