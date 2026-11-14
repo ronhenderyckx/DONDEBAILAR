@@ -161,7 +161,6 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <h1>Instellingen</h1>
             <p>Beheer de algemene instellingen en huisstijl van DONDEBAILAR.</p>
         </div>
-        <a class="button" href="/admin/">Terug naar platformbeheer</a>
     </div>
 
     <?php if ($errorMessage !== ''): ?>
