@@ -272,11 +272,20 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
             </summary>
 
             <nav class="site-menu__panel" aria-label="Hoofdnavigatie">
-                <a href="/<?= $regionId > 0 ? '?region_id=' . $regionId : '' ?>">Agenda</a>
+                <a href="/<?= $regionId > 0 ? '?region_id=' . $regionId : '' ?>">
+                    <svg class="site-menu__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
+                    <span>Agenda</span>
+                </a>
                 <?php if ($headerUser !== null): ?>
-                    <a href="/waar-ga-ik-dansen.php">Waar ga ik dansen?</a>
+                    <a href="/waar-ga-ik-dansen.php">
+                        <svg class="site-menu__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18M5 7l7-4 7 4M5 17l7 4 7-4"></path><path d="M5 7v10M19 7v10"></path></svg>
+                        <span>Waar ga ik dansen?</span>
+                    </a>
                 <?php endif; ?>
-                <a href="/info.php<?= $regionId > 0 ? '?region_id=' . $regionId : '' ?>">Info</a>
+                <a href="/info.php<?= $regionId > 0 ? '?region_id=' . $regionId : '' ?>">
+                    <svg class="site-menu__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>
+                    <span>Info</span>
+                </a>
 
                 <?php if ($isAdmin): ?>
                     <details class="site-menu__admin">
