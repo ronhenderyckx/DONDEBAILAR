@@ -9,6 +9,7 @@ $user = requirePlatformAdmin();
 $db = Database::connection();
 
 $pageTitle = 'Nieuwe regio - DONDEBAILAR';
+$platformAdminPage = true;
 $errorMessage = '';
 
 $form = [
