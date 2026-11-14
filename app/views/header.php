@@ -359,6 +359,7 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                 <?php if ($canManageRegion): ?>
                     <details class="site-menu__admin site-menu__admin--region">
                         <summary>Regiobeheer</summary>
+                        <a href="/events.php">Evenementen</a>
                         <?php if ($regionId > 0 && userHasRegionRole($regionId, ['region_admin'], $headerUser)): ?>
                             <a href="/admin/region-colors.php?region_id=<?= $regionId ?>">Kleuren en logo</a>
                             <a href="/admin/region-info.php?region_id=<?= $regionId ?>">Info-pagina</a>
