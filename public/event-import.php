@@ -32,11 +32,19 @@ if (isset($_GET['template'])) {
     exit;
 }
 
+function importNormalizeText(string $value): string
+{
+    $value = trim(mb_strtolower($value, 'UTF-8'));
+    $ascii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+    if ($ascii !== false) {
+        $value = $ascii;
+    }
+    return preg_replace('/[^a-z0-9]/', '', $value) ?? '';
+}
+
 function importHeaderKey(string $value): string
 {
-    $value = mb_strtolower(trim($value));
-    $value = str_replace([' ', '-', '_'], '', $value);
-    return strtr($value, ['ë' => 'e', 'é' => 'e', 'ï' => 'i']);
+    return importNormalizeText($value);
 }
 
 function importDateTime(string $date, string $time, DateTimeZone $timezone, bool $required): ?DateTimeImmutable
@@ -136,9 +144,15 @@ function resolveImportRow(PDO $db, array $raw, array $headerMap, array $region, 
 
     $row['organizer_id'] = null;
     if ($row['organizer'] !== '') {
-        $organizerQuery = $db->prepare("SELECT id FROM organizers WHERE is_active = 1 AND LOWER(name) = LOWER(:name) LIMIT 1");
-        $organizerQuery->execute(['name' => $row['organizer']]);
-        $organizerId = (int) ($organizerQuery->fetchColumn() ?: 0);
+        $organizerQuery = $db->query("SELECT id, name FROM organizers WHERE is_active = 1");
+        $organizerId = 0;
+        $wantedOrganizer = importNormalizeText($row['organizer']);
+        foreach ($organizerQuery->fetchAll(PDO::FETCH_ASSOC) as $candidate) {
+            if (importNormalizeText((string) $candidate['name']) === $wantedOrganizer) {
+                $organizerId = (int) $candidate['id'];
+                break;
+            }
+        }
         if ($organizerId > 0) {
             $row['organizer_id'] = $organizerId;
         } else {
@@ -149,19 +163,20 @@ function resolveImportRow(PDO $db, array $raw, array $headerMap, array $region, 
     $row['location_id'] = null;
     if ($row['location'] !== '') {
         $locationQuery = $db->prepare(
-            "SELECT id FROM locations
-             WHERE region_id = :region_id AND is_active = 1
-               AND LOWER(name) = LOWER(:name)
-               AND (:city_filter = '' OR LOWER(city) = LOWER(:city_value))
-             LIMIT 1"
+            "SELECT id, name, city FROM locations
+             WHERE region_id = :region_id AND is_active = 1"
         );
-        $locationQuery->execute([
-            'region_id' => (int) $region['id'],
-            'name' => $row['location'],
-            'city_filter' => $row['city'],
-            'city_value' => $row['city'],
-        ]);
-        $locationId = (int) ($locationQuery->fetchColumn() ?: 0);
+        $locationQuery->execute(['region_id' => (int) $region['id']]);
+        $locationId = 0;
+        $wantedLocation = importNormalizeText($row['location']);
+        $wantedCity = importNormalizeText($row['city']);
+        foreach ($locationQuery->fetchAll(PDO::FETCH_ASSOC) as $candidate) {
+            if (importNormalizeText((string) $candidate['name']) === $wantedLocation
+                && ($wantedCity === '' || importNormalizeText((string) ($candidate['city'] ?? '')) === $wantedCity)) {
+                $locationId = (int) $candidate['id'];
+                break;
+            }
+        }
         if ($locationId > 0) {
             $row['location_id'] = $locationId;
         } else {
@@ -172,13 +187,18 @@ function resolveImportRow(PDO $db, array $raw, array $headerMap, array $region, 
     $row['category_id'] = null;
     if ($row['category'] !== '') {
         $categoryQuery = $db->prepare(
-            "SELECT id FROM categories
-             WHERE is_active = 1 AND (region_id IS NULL OR region_id = :region_id)
-               AND LOWER(name) = LOWER(:name)
-             LIMIT 1"
+            "SELECT id, name FROM categories
+             WHERE is_active = 1 AND (region_id IS NULL OR region_id = :region_id)"
         );
-        $categoryQuery->execute(['region_id' => (int) $region['id'], 'name' => $row['category']]);
-        $categoryId = (int) ($categoryQuery->fetchColumn() ?: 0);
+        $categoryQuery->execute(['region_id' => (int) $region['id']]);
+        $categoryId = 0;
+        $wantedCategory = importNormalizeText($row['category']);
+        foreach ($categoryQuery->fetchAll(PDO::FETCH_ASSOC) as $candidate) {
+            if (importNormalizeText((string) $candidate['name']) === $wantedCategory) {
+                $categoryId = (int) $candidate['id'];
+                break;
+            }
+        }
         if ($categoryId > 0) {
             $row['category_id'] = $categoryId;
         } else {
