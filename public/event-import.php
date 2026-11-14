@@ -170,12 +170,21 @@ function resolveImportRow(PDO $db, array $raw, array $headerMap, array $region, 
         $locationId = 0;
         $wantedLocation = importNormalizeText($row['location']);
         $wantedCity = importNormalizeText($row['city']);
+        $matchingLocations = [];
         foreach ($locationQuery->fetchAll(PDO::FETCH_ASSOC) as $candidate) {
-            if (importNormalizeText((string) $candidate['name']) === $wantedLocation
-                && ($wantedCity === '' || importNormalizeText((string) ($candidate['city'] ?? '')) === $wantedCity)) {
+            if (importNormalizeText((string) $candidate['name']) === $wantedLocation) {
+                $matchingLocations[] = $candidate;
+            }
+        }
+        // Eerst naam + stad, daarna de naam alleen als die uniek is in de regio.
+        foreach ($matchingLocations as $candidate) {
+            if ($wantedCity !== '' && importNormalizeText((string) ($candidate['city'] ?? '')) === $wantedCity) {
                 $locationId = (int) $candidate['id'];
                 break;
             }
+        }
+        if ($locationId === 0 && count($matchingLocations) === 1) {
+            $locationId = (int) $matchingLocations[0]['id'];
         }
         if ($locationId > 0) {
             $row['location_id'] = $locationId;
@@ -187,14 +196,18 @@ function resolveImportRow(PDO $db, array $raw, array $headerMap, array $region, 
     $row['category_id'] = null;
     if ($row['category'] !== '') {
         $categoryQuery = $db->prepare(
-            "SELECT id, name FROM categories
-             WHERE is_active = 1 AND (region_id IS NULL OR region_id = :region_id)"
+            "SELECT c.id, c.name, ct.name AS translated_name
+             FROM categories c
+             LEFT JOIN category_translations ct ON ct.category_id = c.id
+             WHERE c.is_active = 1 AND (c.region_id IS NULL OR c.region_id = :region_id)"
         );
         $categoryQuery->execute(['region_id' => (int) $region['id']]);
         $categoryId = 0;
         $wantedCategory = importNormalizeText($row['category']);
         foreach ($categoryQuery->fetchAll(PDO::FETCH_ASSOC) as $candidate) {
-            if (importNormalizeText((string) $candidate['name']) === $wantedCategory) {
+            if (importNormalizeText((string) $candidate['name']) === $wantedCategory
+                || ($candidate['translated_name'] !== null
+                    && importNormalizeText((string) $candidate['translated_name']) === $wantedCategory)) {
                 $categoryId = (int) $candidate['id'];
                 break;
             }
