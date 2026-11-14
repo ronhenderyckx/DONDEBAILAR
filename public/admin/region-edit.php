@@ -16,10 +16,10 @@ if (!$regionId || $regionId < 1) {
 }
 
 $statement = $db->prepare(
-    "SELECT id, name, slug, subdomain, country_code,
-            timezone, default_language, is_active
-     FROM regions
-     WHERE id = :id
+    "SELECT r.*, ra.*
+     FROM regions r
+     LEFT JOIN region_appearance ra ON ra.region_id = r.id
+     WHERE r.id = :id
      LIMIT 1"
 );
 $statement->execute(['id' => $regionId]);
@@ -60,7 +60,7 @@ function createRegionEditSlug(string $name): string
     return trim($value, '-');
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['save_appearance'])) {
     foreach ($form as $key => $default) {
         if ($key === 'is_active') {
             $form[$key] = isset($_POST[$key]) ? '1' : '0';
@@ -204,6 +204,17 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             </div>
         </form>
     </section>
+
+    <?php
+    $appearanceEditorHtml = (static function () use ($db, $regionId): string {
+        $embeddedRegionAppearanceEditor = true;
+        $embeddedRegionId = $regionId;
+        ob_start();
+        require dirname(__DIR__) . '/admin/region-colors.php';
+        return (string) ob_get_clean();
+    })();
+    echo $appearanceEditorHtml;
+    ?>
 </section>
 
 <?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
