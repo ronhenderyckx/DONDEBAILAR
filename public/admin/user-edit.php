@@ -31,6 +31,7 @@ if (!$editUser) {
 }
 
 $pageTitle = 'Gebruiker wijzigen - DONDEBAILAR';
+$platformAdminPage = true;
 $errorMessage = '';
 
 $regions = $db->query(
