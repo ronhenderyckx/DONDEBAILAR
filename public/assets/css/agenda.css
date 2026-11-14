@@ -2049,7 +2049,8 @@ body.has-agenda-footer .site-main > .agenda-page {
     color:var(--db-event-day-title-color,#222222)!important;
 }
 
-/* Geselecteerde stad: gebruik de ingestelde filtertekstkleur voor de stadsnaam. */
+/* Geselecteerde stad: dezelfde tekstkleur als de geselecteerde organisatorknoppen. */
 .agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) .agenda-organizer-name {
-    color:var(--db-filter-text-color,#222222)!important;
+    color:var(--db-primary,#E23A2C)!important;
+    font-weight:900!important;
 }
