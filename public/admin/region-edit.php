@@ -16,7 +16,15 @@ if (!$regionId || $regionId < 1) {
 }
 
 $statement = $db->prepare(
-    "SELECT r.*, ra.*
+    "SELECT r.id, r.name, r.slug, r.subdomain, r.country_code,
+            r.timezone, r.default_language, r.is_active,
+            COALESCE(ra.logo_path, r.logo_path) AS logo_path,
+            ra.primary_color, ra.primary_dark, ra.accent_color,
+            ra.secondary_color, ra.tertiary_color, ra.header_color,
+            ra.menu_color, ra.organizer_color, ra.filter_hover_color,
+            ra.filter_bar_color, ra.filter_text_color, ra.search_button_color,
+            ra.back_top_color, ra.search_field_color, ra.search_text_color,
+            ra.footer_color, ra.background_color, ra.text_color, ra.weekday_colors
      FROM regions r
      LEFT JOIN region_appearance ra ON ra.region_id = r.id
      WHERE r.id = :id
