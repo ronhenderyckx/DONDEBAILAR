@@ -215,7 +215,11 @@ $escape = static fn ($value): string =>
     <link rel="apple-touch-icon" href="/icons/app-icon.svg">
     <title><?= $escape($pageTitle) ?></title>
     <link rel="stylesheet" href="/assets/css/site.css">
-    <link rel="stylesheet" href="/assets/css/agenda.css">
+    <?php
+$agendaCssFile = $projectRoot . '/public/assets/css/agenda.css';
+$agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile) . '-' . (string) filesize($agendaCssFile) : '1';
+?>
+<link rel="stylesheet" href="/assets/css/agenda.css?v=<?= rawurlencode($agendaCssVersion) ?>">
     <link rel="stylesheet" href="/assets/css/agenda-arrows.css">
 </head>
 <body<?= !empty($isAgendaPage) ? ' class="has-agenda-footer"' : '' ?> style="<?= $escape($themeStyle) ?>">
