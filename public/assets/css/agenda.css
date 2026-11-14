@@ -1,7 +1,7 @@
 /* DONDEBAILAR agenda styles — extracted without changing selectors or rules. */
 .agenda-page {
     width:100%;
-    max-width:1080px;
+    max-width:1800px;
     margin:-26px auto 0
 }
 .agenda-selectors {
@@ -2086,17 +2086,29 @@ body.has-agenda-footer .site-main > .agenda-page {
     color: var(--db-text) !important;
 }
 
-/* Desktop agenda layout: meerdere evenementen naast elkaar. */
-@media (min-width: 1200px) {
+/* Responsieve agenda: meer kolommen naarmate het scherm breder wordt. */
+@media (min-width: 1700px) {
     .agenda-feed {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        max-width: 1500px;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        max-width: 1800px;
     }
 }
-@media (min-width: 701px) and (max-width: 1199px) {
+@media (min-width: 1200px) and (max-width: 1699px) {
+    .agenda-feed {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        max-width: 1600px;
+    }
+}
+@media (min-width: 1000px) and (max-width: 1199px) {
+    .agenda-feed {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        max-width: 1100px;
+    }
+}
+@media (min-width: 701px) and (max-width: 999px) {
     .agenda-feed {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        max-width: 1100px;
+        max-width: 900px;
     }
 }
 @media (max-width: 700px) {
