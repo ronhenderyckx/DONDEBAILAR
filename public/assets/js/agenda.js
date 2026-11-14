@@ -178,7 +178,7 @@ function scheduleVisibleAgendaVideo() {
             }
         });
         if (bestVideo && bestRatio >= 0.6) playAgendaVideo(bestVideo);
-    }, 150);
+    }, 50);
 }
 window.addEventListener('scroll', scheduleVisibleAgendaVideo, {passive:true});
 window.addEventListener('resize', scheduleVisibleAgendaVideo, {passive:true});
@@ -374,6 +374,11 @@ document.addEventListener('click', function (event) {
 const agendaVideoObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
         const video = entry.target;
+        if (entry.isIntersecting) {
+            // Laad alvast de metadata van video's die op het scherm komen.
+            // Zo kan de eerste frame sneller verschijnen zonder alle video's vooraf te downloaden.
+            video.setAttribute('preload', 'metadata');
+        }
         if (!entry.isIntersecting || entry.intersectionRatio < 0.6) {
             video.pause();
             if (activeAgendaVideo === video) activeAgendaVideo = null;
