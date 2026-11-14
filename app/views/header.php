@@ -278,7 +278,7 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                 </a>
                 <?php if ($headerUser !== null): ?>
                     <a href="/waar-ga-ik-dansen.php">
-                        <svg class="site-menu__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 16.5c2.7.1 4.2-.7 5.2-2.6l1.1-2.2 2.1 2.2c1.2 1.2 2.7 1.8 5 2.1l3.1.4c1.1.1 1.9 1 1.9 2.1V20H4.1c-1.2 0-2.1-.9-2.1-2.1 0-.5.3-1 .8-1.4Z"></path><path d="m9.2 11.7 1.1-3.2 2.1 2.1 2.4 1.1"></path><path d="M4 20v-1.2M19.5 20v-1.1"></path></svg>
+                        <span class="site-menu__item-icon" aria-hidden="true">👠</span>
                         <span>Waar ga ik dansen?</span>
                     </a>
                 <?php endif; ?>
