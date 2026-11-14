@@ -44,6 +44,7 @@ if ($region !== null) {
 
 $title = trim((string) ($_POST['title'] ?? ''));
 $description = trim((string) ($_POST['description'] ?? ''));
+$extraInfo = trim((string) ($_POST['extra_info'] ?? ''));
 $hashtags = trim((string) ($_POST['hashtags'] ?? ''));
 $eventLanguage = (string) ($_POST['event_language'] ?? ($region['default_language'] ?? 'es'));
 $organizerId = (int) ($_POST['organizer_id'] ?? 0);
@@ -127,11 +128,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $insert = $db->prepare(
                 "INSERT INTO events
-                    (region_id, organizer_id, location_id, category_id, title, description, hashtags,
+                    (region_id, organizer_id, location_id, category_id, title, description, extra_info, hashtags,
                      event_language, starts_at, ends_at, timezone, status, created_by, updated_by,
                      recurrence_series_id, recurrence_number)
                  VALUES
-                    (:region_id, :organizer_id, :location_id, :category_id, :title, :description, :hashtags,
+                    (:region_id, :organizer_id, :location_id, :category_id, :title, :description, :extra_info, :hashtags,
                      :event_language, :starts_at, :ends_at, :timezone, 'draft', :created_by, :updated_by,
                      :recurrence_series_id, :recurrence_number)"
             );
@@ -174,6 +175,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'category_id' => $categoryId > 0 ? $categoryId : null,
                     'title' => $title,
                     'description' => $description !== '' ? $description : null,
+                    'extra_info' => $extraInfo !== '' ? $extraInfo : null,
                     'hashtags' => $hashtags !== '' ? $hashtags : null,
                     'event_language' => $eventLanguage,
                     'starts_at' => $occurrenceStart->format('Y-m-d H:i:s'),
@@ -315,6 +317,8 @@ require dirname(__DIR__) . '/app/views/header.php';
             </div>
             <label for="description">Beschrijving</label>
             <textarea id="description" name="description" rows="8"><?= escapeHtml($description) ?></textarea>
+            <label for="extra_info">Extra info</label>
+            <textarea id="extra_info" name="extra_info" rows="4"><?= escapeHtml($extraInfo) ?></textarea>
             <label for="hashtags">Hashtags</label>
             <input id="hashtags" name="hashtags" maxlength="500" value="<?= escapeHtml($hashtags) ?>" placeholder="#salsa #bachata #kizomba">
             <p class="event-form-note">Zet de hashtags apart van de beschrijving, gescheiden door spaties of komma's.</p>
