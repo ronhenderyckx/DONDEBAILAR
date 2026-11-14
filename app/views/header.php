@@ -164,6 +164,17 @@ $themeStyle = '--db-primary:' . $primaryColor
     . ';--db-footer-color:' . $colorValue('footer_color', '#FFFFFF')
     . ';--db-background:' . $colorValue('background_color', '#F7F8FA')
     . ';--db-text:' . $colorValue('text_color', '#202B38');
+
+// Gebruik voor algemene platformpagina's een eigen menukleur; regiopagina's houden hun regiokleur.
+if ($region === null) {
+    $platformMenuColorFile = $projectRoot . '/storage/platform-menu-color.txt';
+    if (is_file($platformMenuColorFile)) {
+        $platformMenuColor = strtoupper(trim((string) file_get_contents($platformMenuColorFile)));
+        if (preg_match('/^#[0-9A-F]{6}$/', $platformMenuColor)) {
+            $themeStyle .= ';--db-menu-color:' . $platformMenuColor;
+        }
+    }
+}
 $appearancePalette = json_decode((string) ($region['weekday_colors'] ?? ''), true);
 $agendaArrowColor = is_array($appearancePalette) ? (string) ($appearancePalette['agenda_arrow_text'] ?? '#222222') : '#222222';
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowColor)) $agendaArrowColor = '#222222';
