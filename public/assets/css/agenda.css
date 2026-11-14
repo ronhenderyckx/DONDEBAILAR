@@ -2072,3 +2072,10 @@ body.has-agenda-footer .site-main > .agenda-page {
     stroke:var(--db-event-day-text-color,#222222)!important;
     opacity:1!important;
 }
+
+/* Mobiele browsers moeten ook vóór het laden van videometadata een zichtbaar videovlak hebben. */
+@media(max-width:700px) {
+    .agenda-card__video {
+        min-height:240px;
+    }
+}
