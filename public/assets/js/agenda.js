@@ -7,41 +7,6 @@ if (agendaCurrentUrl.searchParams.get('agenda_change') === '1') {
     agendaCurrentUrl.searchParams.delete('agenda_change');
     window.history.replaceState({}, '', agendaCurrentUrl.pathname + agendaCurrentUrl.search + agendaCurrentUrl.hash);
 }
-const agendaPageSize = window.DONDEBAILAR_AGENDA_CONFIG.pageSize;
-const agendaCards = Array.from(document.querySelectorAll('.agenda-feed .agenda-card'));
-const agendaPagePrevious = document.getElementById('agenda-page-previous');
-const agendaPageNext = document.getElementById('agenda-page-next');
-const agendaPageRange = document.getElementById('agenda-page-range');
-let agendaPageStart = 0;
-let agendaVisibleEnd = Math.min(agendaPageSize, agendaCards.length);
-function updateAgendaPagination() {
-    agendaCards.forEach(function (card, index) {
-        card.hidden = index < agendaPageStart || index >= agendaVisibleEnd;
-    });
-    if (agendaPageRange) {
-        agendaPageRange.textContent = (agendaPageStart + 1) + '–' + agendaVisibleEnd + ' van ' + agendaCards.length;
-    }
-    if (agendaPagePrevious) agendaPagePrevious.disabled = agendaPageStart === 0;
-    if (agendaPageNext) agendaPageNext.disabled = agendaPageStart + agendaPageSize >= agendaCards.length;
-}
-if (agendaCards.length) updateAgendaPagination();
-if (agendaPagePrevious) {
-    agendaPagePrevious.addEventListener('click', function () {
-        agendaPageStart = Math.max(0, agendaPageStart - agendaPageSize);
-        agendaVisibleEnd = Math.min(agendaPageStart + agendaPageSize, agendaCards.length);
-        updateAgendaPagination();
-        document.querySelector('.agenda-feed').scrollIntoView({behavior: 'smooth', block: 'start'});
-    });
-}
-if (agendaPageNext) {
-    agendaPageNext.addEventListener('click', function () {
-        if (agendaPageStart + agendaPageSize >= agendaCards.length) return;
-        agendaPageStart += agendaPageSize;
-        agendaVisibleEnd = Math.min(agendaPageStart + agendaPageSize, agendaCards.length);
-        updateAgendaPagination();
-        document.querySelector('.agenda-feed').scrollIntoView({behavior: 'smooth', block: 'start'});
-    });
-}
 const agendaFilterIcons = ['👥', '🗺️'];
 const agendaFilterLabels = ['Organisator', 'Stad'];
 let agendaFilterIndex = window.DONDEBAILAR_AGENDA_CONFIG.activeFilterIndex;
