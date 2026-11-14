@@ -2054,3 +2054,10 @@ body.has-agenda-footer .site-main > .agenda-page {
     color:var(--db-primary,#E23A2C)!important;
     font-weight:900!important;
 }
+
+/* SVG-actiepictogrammen volgen de ingestelde dagtekstkleur.
+   De oudere algemene regel voor alle kaartkinderen overschreef currentColor. */
+.agenda-card__details .agenda-icon-button svg {
+    color:var(--db-event-day-text-color,#222222)!important;
+    stroke:currentColor!important;
+}
