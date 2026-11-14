@@ -349,9 +349,9 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                         <a href="/admin/organizers.php">Organisatoren</a>
                         <a href="/admin/locations.php">Locaties</a>
                         <a href="/admin/users.php">Gebruikers</a>
-                        <a href="/admin/settings.php">Instellingen</a>
                         <a href="/admin/regions.php">Regio's</a>
                         <?php if ($regionId > 0): ?><a href="/admin/region-info.php?region_id=<?= $regionId ?>">Info-pagina regio</a><?php endif; ?>
+                        <a href="/admin/settings.php">Instellingen</a>
                     </details>
                 <?php elseif ($canManageRegion || $canManageLocations): ?>
                     <details class="site-menu__admin">
