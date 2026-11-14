@@ -20,7 +20,7 @@ if (isset($_GET['template'])) {
     fwrite($out, "\xEF\xBB\xBF");
     fputcsv($out, [
         'Titel', 'Begindatum', 'Beginuur', 'Einddatum', 'Einduur',
-        'Organisator', 'Locatie', 'Stad', 'Categorie', 'Taal',
+        'Organisator (optioneel)', 'Locatie', 'Stad', 'Categorie (optioneel)', 'Taal',
         'Beschrijving', 'Extra info', 'Hashtags'
     ], ';');
     fputcsv($out, [
@@ -134,11 +134,16 @@ function resolveImportRow(PDO $db, array $raw, array $headerMap, array $region, 
     }
     $row['language'] = $language;
 
-    $organizerQuery = $db->prepare("SELECT id FROM organizers WHERE is_active = 1 AND LOWER(name) = LOWER(:name) LIMIT 1");
-    $organizerQuery->execute(['name' => $row['organizer']]);
-    $row['organizer_id'] = (int) ($organizerQuery->fetchColumn() ?: 0);
-    if ($row['organizer_id'] < 1) {
-        $row['errors'][] = 'Organisator niet gevonden: ' . ($row['organizer'] !== '' ? $row['organizer'] : '(leeg)');
+    $row['organizer_id'] = null;
+    if ($row['organizer'] !== '') {
+        $organizerQuery = $db->prepare("SELECT id FROM organizers WHERE is_active = 1 AND LOWER(name) = LOWER(:name) LIMIT 1");
+        $organizerQuery->execute(['name' => $row['organizer']]);
+        $organizerId = (int) ($organizerQuery->fetchColumn() ?: 0);
+        if ($organizerId > 0) {
+            $row['organizer_id'] = $organizerId;
+        } else {
+            $row['errors'][] = 'Organisator niet gevonden: ' . $row['organizer'];
+        }
     }
 
     $row['location_id'] = null;
@@ -219,13 +224,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 );
                 $duplicateQuery = $db->prepare(
                     "SELECT id FROM events
-                     WHERE region_id = :region_id AND organizer_id = :organizer_id
-                       AND title = :title AND starts_at = :starts_at LIMIT 1"
+                     WHERE region_id = :region_id AND title = :title AND starts_at = :starts_at
+                       AND (organizer_id = :organizer_id OR (organizer_id IS NULL AND :organizer_is_null = 1)) LIMIT 1"
                 );
                 foreach ($validRows as $row) {
                     $duplicateQuery->execute([
                         'region_id' => $selectedRegionId,
                         'organizer_id' => $row['organizer_id'],
+                        'organizer_is_null' => $row['organizer_id'] === null ? 1 : 0,
                         'title' => $row['title'],
                         'starts_at' => $row['starts_at'],
                     ]);
@@ -287,7 +293,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     foreach ($headers as $index => $heading) {
                         $headerMap[importHeaderKey((string) $heading)] = $index;
                     }
-                    $requiredHeaders = ['titel', 'begindatum', 'beginuur', 'organisator'];
+                    $requiredHeaders = ['titel', 'begindatum', 'beginuur'];
                     foreach ($requiredHeaders as $requiredHeader) {
                         if (!isset($headerMap[$requiredHeader])) {
                             $errors[] = 'Verplichte kolom ontbreekt: ' . $requiredHeader;
@@ -356,7 +362,7 @@ require dirname(__DIR__) . '/app/views/header.php';
 
     <section class="admin-section event-import-section">
         <p><a class="button" href="/event-import.php?template=1">Download CSV-voorbeeldbestand</a></p>
-        <p>Vul het voorbeeldbestand in met Excel. Sla het daarna op als <strong>CSV UTF-8</strong> en laad het hier opnieuw in. Datums: DD-MM-JJJJ; tijden: UU:MM.</p>
+        <p>Vul het voorbeeldbestand in met Excel. Organisator en categorie zijn optioneel. Sla het op als <strong>CSV UTF-8</strong>. Datums: DD-MM-JJJJ; tijden: UU:MM.</p>
         <?php if ($regions === []): ?>
             <p>Je hebt nog geen toegang tot een regio.</p>
         <?php else: ?>
