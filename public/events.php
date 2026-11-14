@@ -38,7 +38,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <h1>Evenementen</h1>
             <p>Beheer evenementen in de regio's waartoe je toegang hebt.</p>
         </div>
-        <div class="form-actions"><a class="button" href="/event-import.php">Evenementen importeren</a><a class="button button--primary" href="/event-new.php">+ Evenement toevoegen</a></div>
+        <div class="form-actions"><button class="button" type="button" disabled title="Evenementen importeren is tijdelijk uitgeschakeld">Evenementen importeren</button><a class="button button--primary" href="/event-new.php">+ Evenement toevoegen</a></div>
     </div>
 
     <?php if (isset($_GET['created'])): ?>
