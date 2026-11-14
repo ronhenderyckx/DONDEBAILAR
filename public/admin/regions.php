@@ -74,10 +74,6 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                                        href="/admin/region-edit.php?id=<?= (int) $region['id'] ?>">
                                         Wijzigen
                                     </a>
-                                    <a class="button button--small"
-                                       href="/admin/region-colors.php?region_id=<?= (int) $region['id'] ?>">
-                                        Kleuren en logo
-                                    </a>
                                     <form method="post" action="/admin/region-copy.php" style="display:inline"
                                           onsubmit="return confirm('Een kopie maken van deze regio? Evenementen en gebruikers worden niet meegekopieerd.');">
                                         <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
