@@ -136,6 +136,15 @@ if (mb_strlen($agendaSearch) > 120) {
 $organizers = [];
 $cities = [];
 $events = [];
+$agendaPageSizeFile = dirname(__DIR__, 2) . '/storage/agenda-page-size.txt';
+$agendaPageSize = 20;
+if (is_file($agendaPageSizeFile)) {
+    $storedPageSize = (int) trim((string) file_get_contents($agendaPageSizeFile));
+    if ($storedPageSize >= 1 && $storedPageSize <= 100) $agendaPageSize = $storedPageSize;
+}
+$agendaPage = max(1, (int) ($_GET['page'] ?? 1));
+$totalEvents = 0;
+
 if ($regionId > 0) {
     $organizerQuery = $db->prepare(
         "SELECT DISTINCT o.id, o.name, o.logo_path
@@ -229,7 +238,20 @@ if ($regionId > 0) {
         $params['search_city'] = $searchTerm;
         $params['search_category'] = $searchTerm;
     }
-    $sql .= " ORDER BY e.starts_at ASC, e.id ASC";
+    $fromPosition = strpos($sql, ' FROM ');
+    if ($fromPosition !== false) {
+        $countSql = 'SELECT COUNT(DISTINCT e.id)' . substr($sql, $fromPosition);
+        $countQuery = $db->prepare($countSql);
+        $countQuery->execute($params);
+        $totalEvents = (int) $countQuery->fetchColumn();
+    }
+
+    $totalPages = max(1, (int) ceil($totalEvents / $agendaPageSize));
+    $agendaPage = min($agendaPage, $totalPages);
+    $agendaOffset = ($agendaPage - 1) * $agendaPageSize;
+
+    $sql .= " ORDER BY e.starts_at ASC, e.id ASC
+              LIMIT " . (int) $agendaPageSize . " OFFSET " . (int) $agendaOffset;
     $eventQuery = $db->prepare($sql);
     $eventQuery->execute($params);
     $events = $eventQuery->fetchAll();
@@ -316,18 +338,12 @@ if ($regionId > 0) {
     }
 }
 
-$agendaPageSizeFile = dirname(__DIR__, 2) . '/storage/agenda-page-size.txt';
 $regionAppearanceSettings = json_decode((string) ($region['weekday_colors'] ?? ''), true);
 if (!is_array($regionAppearanceSettings)) $regionAppearanceSettings = [];
 $agendaArrowBackground = (string) ($regionAppearanceSettings['agenda_arrow_background'] ?? '#F6B22E');
 $agendaArrowText = (string) ($regionAppearanceSettings['agenda_arrow_text'] ?? '#222222');
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowBackground)) $agendaArrowBackground = '#F6B22E';
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowText)) $agendaArrowText = '#222222';
-$agendaPageSize = 20;
-if (is_file($agendaPageSizeFile)) {
-    $storedPageSize = (int) trim((string) file_get_contents($agendaPageSizeFile));
-    if ($storedPageSize >= 1 && $storedPageSize <= 100) $agendaPageSize = $storedPageSize;
-}
 $escape = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 $isAgendaPage = true;
 $pageTitle = 'Agenda' . ($region ? ' — ' . $region['name'] : '') . ' — DONDEBAILAR';
