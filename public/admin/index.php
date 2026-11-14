@@ -6,7 +6,7 @@ require_once dirname(__DIR__, 2) . '/app/Authorization.php';
 require_once dirname(__DIR__, 2) . '/app/Security.php';
 
 $user = requirePlatformAdmin();
-$pageTitle = 'Platformbeheer - DONDEBAILAR';
+$pageTitle = 'Overzicht - DONDEBAILAR';
 $platformAdminPage = true;
 
 $db = Database::connection();
@@ -42,7 +42,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     <div class="admin-heading">
         <div>
             <p class="eyebrow">DONDEBAILAR</p>
-            <h1>Platformbeheer</h1>
+            <h1>Overzicht</h1>
             <p>Welkom, <?= escapeHtml($user['display_name']) ?>.</p>
         </div>
     </div>
