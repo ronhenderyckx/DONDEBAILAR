@@ -255,13 +255,18 @@ if (messageModal) {
         const eventTitle = eventCard?.querySelector('.agenda-card__details h2 a')?.textContent.trim() || 'Evenement';
         const count = Number(button.querySelector('.agenda-message-count')?.textContent || 0);
         const titleText = eventTitle + ' · ' + count + ' ' + (count === 1 ? 'bericht' : 'berichten');
-        const dayColor = eventCard ? getComputedStyle(eventCard).getPropertyValue('--db-event-day-color').trim() : '';
-        messageModal.querySelector('.agenda-message-modal__panel').style.setProperty('--db-chat-day-color', dayColor || 'var(--db-primary,#E23A2C)');
-        messageFrame.addEventListener('load', function applyChatDayColor() {
+        const cardStyles = eventCard ? getComputedStyle(eventCard) : null;
+        const dayColor = cardStyles ? cardStyles.getPropertyValue('--db-event-day-color').trim() : '';
+        const dayTextColor = cardStyles ? cardStyles.getPropertyValue('--db-event-day-text-color').trim() : '';
+        const chatPanel = messageModal.querySelector('.agenda-message-modal__panel');
+        chatPanel.style.setProperty('--db-chat-day-color', dayColor || 'var(--db-primary,#E23A2C)');
+        chatPanel.style.setProperty('--db-chat-text-color', dayTextColor || '#222222');
+        messageFrame.addEventListener('load', function applyChatDayColors() {
             try {
                 const chatDocument = messageFrame.contentDocument;
                 if (!chatDocument) return;
                 chatDocument.documentElement.style.setProperty('--db-chat-day-color', dayColor || 'var(--db-primary,#E23A2C)');
+                chatDocument.documentElement.style.setProperty('--db-chat-text-color', dayTextColor || '#222222');
             } catch (error) {}
         }, {once:true});
         const modalTitle = document.getElementById('agenda-message-modal-title');
@@ -299,8 +304,11 @@ document.addEventListener('pointerdown', function (event) {
         const eventId = button.dataset.eventId;
         const eventCard = button.closest('.agenda-card');
         const eventTitle = button.dataset.eventTitle || eventCard?.querySelector('.agenda-card__details h2 a')?.textContent.trim() || '';
-        const dayColor = eventCard ? getComputedStyle(eventCard).getPropertyValue('--db-event-day-color').trim() : '';
+        const cardStyles = eventCard ? getComputedStyle(eventCard) : null;
+        const dayColor = cardStyles ? cardStyles.getPropertyValue('--db-event-day-color').trim() : '';
+        const dayTextColor = cardStyles ? cardStyles.getPropertyValue('--db-event-day-text-color').trim() : '';
         attendanceDialog.style.setProperty('--db-attendance-day-color', dayColor || 'var(--db-primary,#E23A2C)');
+        attendanceDialog.style.setProperty('--db-attendance-day-text-color', dayTextColor || '#222222');
         attendanceDialog.querySelector('.agenda-attendance-list__event-title').textContent = eventTitle;
         fetch('/event-attendance.php?action=names&event_id=' + encodeURIComponent(eventId), {credentials:'same-origin'})
             .then(response => response.json()).then(data => {
