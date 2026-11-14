@@ -240,7 +240,16 @@ if ($regionId > 0) {
     }
     $fromPosition = strpos($sql, ' FROM ');
     if ($fromPosition !== false) {
-        $countSql = 'SELECT COUNT(DISTINCT e.id)' . substr($sql, $fromPosition);
+        // Voor de telling is de cover-afbeelding niet nodig. Laat de
+        // bijbehorende subquery weg, zodat de telling licht blijft.
+        $countFromSql = substr($sql, $fromPosition);
+        $countFromSql = preg_replace(
+            '/\\s+LEFT JOIN event_media cover ON cover\\.id = COALESCE\\([\\s\\S]*?\\)\\s+WHERE/',
+            ' WHERE',
+            $countFromSql,
+            1
+        );
+        $countSql = 'SELECT COUNT(*)' . $countFromSql;
         $countQuery = $db->prepare($countSql);
         $countQuery->execute($params);
         $totalEvents = (int) $countQuery->fetchColumn();
