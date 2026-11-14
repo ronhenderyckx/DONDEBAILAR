@@ -147,13 +147,14 @@ function resolveImportRow(PDO $db, array $raw, array $headerMap, array $region, 
             "SELECT id FROM locations
              WHERE region_id = :region_id AND is_active = 1
                AND LOWER(name) = LOWER(:name)
-               AND (:city = '' OR LOWER(city) = LOWER(:city))
+               AND (:city_filter = '' OR LOWER(city) = LOWER(:city_value))
              LIMIT 1"
         );
         $locationQuery->execute([
             'region_id' => (int) $region['id'],
             'name' => $row['location'],
-            'city' => $row['city'],
+            'city_filter' => $row['city'],
+            'city_value' => $row['city'],
         ]);
         $locationId = (int) ($locationQuery->fetchColumn() ?: 0);
         if ($locationId > 0) {
