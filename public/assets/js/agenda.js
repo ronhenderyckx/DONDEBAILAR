@@ -371,6 +371,31 @@ document.addEventListener('click', function (event) {
     });
 });
 
+// Laad uploadmedia per evenement pas wanneer de evenementkaart in de buurt van het scherm komt.
+// Zo worden niet alle mediabestanden van alle evenementen tegelijk aangevraagd.
+function loadAgendaCardMedia(card) {
+    card.querySelectorAll('[data-media-src]').forEach(function (media) {
+        if (media.hasAttribute('src')) return;
+        const source = media.getAttribute('data-media-src');
+        if (!source) return;
+        media.setAttribute('src', source);
+        media.removeAttribute('data-media-src');
+        if (media.tagName === 'VIDEO' && media.dataset.initialPriority !== '1') {
+            media.setAttribute('preload', 'none');
+        }
+    });
+}
+const agendaMediaCardObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        loadAgendaCardMedia(entry.target);
+        agendaMediaCardObserver.unobserve(entry.target);
+    });
+}, {rootMargin:'250px 0px', threshold:0});
+document.querySelectorAll('.agenda-feed .agenda-card').forEach(function (card) {
+    agendaMediaCardObserver.observe(card);
+});
+
 // Pauzeer video's zodra ze niet meer voldoende zichtbaar zijn.
 // Het starten gebeurt pas nadat het scrollen is gestopt.
 const agendaVideoObserver = new IntersectionObserver(function (entries) {
