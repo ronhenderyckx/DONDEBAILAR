@@ -19,6 +19,7 @@ if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
 }
 
 $pageTitle = 'DONDEBAILAR bijwerken';
+$platformAdminPage = true;
 $projectRoot = dirname(__DIR__, 2);
 $messages = [];
 $success = false;
