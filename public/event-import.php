@@ -34,6 +34,7 @@ if (isset($_GET['template'])) {
 
 function importNormalizeText(string $value): string
 {
+    $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     $value = trim(mb_strtolower($value, 'UTF-8'));
     $ascii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
     if ($ascii !== false) {
@@ -171,12 +172,24 @@ function resolveImportRow(PDO $db, array $raw, array $headerMap, array $region, 
         $wantedLocation = importNormalizeText($row['location']);
         $wantedCity = importNormalizeText($row['city']);
         $matchingLocations = [];
+        $fuzzyMatches = [];
+        $wantedTokens = preg_split('/[^a-z0-9]+/', strtolower(iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $row['location']) ?: $row['location']), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $wantedTokens = array_values(array_diff(array_unique($wantedTokens), ['bar', 'restaurante', 'restaurant', 'cafe', 'cafeteria']));
         foreach ($locationQuery->fetchAll(PDO::FETCH_ASSOC) as $candidate) {
-            if (importNormalizeText((string) $candidate['name']) === $wantedLocation) {
+            $candidateName = importNormalizeText((string) $candidate['name']);
+            if ($candidateName === $wantedLocation) {
                 $matchingLocations[] = $candidate;
+                continue;
+            }
+            $candidateTokens = preg_split('/[^a-z0-9]+/', strtolower(iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', (string) $candidate['name']) ?: (string) $candidate['name']), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+            $candidateTokens = array_values(array_diff(array_unique($candidateTokens), ['bar', 'restaurante', 'restaurant', 'cafe', 'cafeteria']));
+            $sharedTokens = array_intersect($wantedTokens, $candidateTokens);
+            if (count($sharedTokens) >= 2) {
+                $sameCity = $wantedCity !== '' && importNormalizeText((string) ($candidate['city'] ?? '')) === $wantedCity;
+                $fuzzyMatches[] = ['candidate' => $candidate, 'score' => count($sharedTokens) + ($sameCity ? 10 : 0)];
             }
         }
-        // Eerst naam + stad, daarna de naam alleen als die uniek is in de regio.
+        // Eerst exacte naam + stad, daarna een unieke naam; pas daarna een duidelijke, unieke naamvariatie.
         foreach ($matchingLocations as $candidate) {
             if ($wantedCity !== '' && importNormalizeText((string) ($candidate['city'] ?? '')) === $wantedCity) {
                 $locationId = (int) $candidate['id'];
@@ -185,6 +198,12 @@ function resolveImportRow(PDO $db, array $raw, array $headerMap, array $region, 
         }
         if ($locationId === 0 && count($matchingLocations) === 1) {
             $locationId = (int) $matchingLocations[0]['id'];
+        }
+        if ($locationId === 0 && count($fuzzyMatches) > 0) {
+            usort($fuzzyMatches, static fn(array $a, array $b): int => $b['score'] <=> $a['score']);
+            if (count($fuzzyMatches) === 1 || $fuzzyMatches[0]['score'] > $fuzzyMatches[1]['score']) {
+                $locationId = (int) $fuzzyMatches[0]['candidate']['id'];
+            }
         }
         if ($locationId > 0) {
             $row['location_id'] = $locationId;
