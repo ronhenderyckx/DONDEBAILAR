@@ -48,13 +48,20 @@ function storeFilterIconUpload(array $file, int $regionId, string $prefix): ?str
 }
 
 $db = Database::connection();
-$regionId = filter_input(INPUT_GET, 'region_id', FILTER_VALIDATE_INT);
+$embeddedRegionAppearanceEditor = !empty($embeddedRegionAppearanceEditor);
+if ($embeddedRegionAppearanceEditor) {
+    $regionId = (int) ($embeddedRegionId ?? 0);
+} else {
+    $regionId = filter_input(INPUT_GET, 'region_id', FILTER_VALIDATE_INT);
+}
 if (!$regionId || $regionId < 1) {
     http_response_code(400);
     exit('Ongeldig regionummer.');
 }
 
-requireRegionRole($regionId, ['region_admin']);
+if (!$embeddedRegionAppearanceEditor) {
+    requireRegionRole($regionId, ['region_admin']);
+}
 
 $regionQuery = $db->prepare("SELECT id, name, logo_path FROM regions WHERE id = :id LIMIT 1");
 $regionQuery->execute(['id' => $regionId]);
@@ -164,7 +171,7 @@ foreach (['cityIconPath', 'organizerIconPath', 'citySwitchIconPath'] as $iconPat
 $errorMessage = '';
 $successMessage = '';
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor || !empty($_POST['save_appearance']))) {
     if (!verifyCsrfToken(is_string($_POST['csrf_token'] ?? null) ? $_POST['csrf_token'] : null)) {
         $errorMessage = 'De beveiligingscontrole is verlopen. Vernieuw de pagina.';
     } else {
@@ -411,8 +418,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Kleuren en logo - ' . $region['name'];
-require dirname(__DIR__, 2) . '/app/views/header.php';
+if (!$embeddedRegionAppearanceEditor) {
+    require dirname(__DIR__, 2) . '/app/views/header.php';
+}
 ?>
+<?php if (!$embeddedRegionAppearanceEditor): ?>
 <section class="admin-page">
     <div class="admin-heading">
         <div>
@@ -422,11 +432,16 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         </div>
         <a class="button" href="/admin/regions.php">Terug naar regio's</a>
     </div>
+<?php endif; ?>
     <section class="admin-section">
+        <?php if ($embeddedRegionAppearanceEditor): ?>
+            <div class="section-heading"><div><h2>Regionale kleuren en logo</h2><p>Deze instellingen worden samen met de regio opgeslagen.</p></div></div>
+        <?php endif; ?>
         <?php if ($errorMessage !== ''): ?><div class="message message--error" role="alert"><?= escapeHtml($errorMessage) ?></div><?php endif; ?>
         <?php if ($successMessage !== ''): ?><div class="message message--success" role="status"><?= escapeHtml($successMessage) ?></div><?php endif; ?>
-        <form method="post" enctype="multipart/form-data" class="auth-form">
+        <form method="post" enctype="multipart/form-data" class="auth-form" action="<?= $embeddedRegionAppearanceEditor ? '/admin/region-edit.php?id=' . (int) $regionId : '/admin/region-colors.php?region_id=' . (int) $regionId ?>">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+            <?php if ($embeddedRegionAppearanceEditor): ?><input type="hidden" name="save_appearance" value="1"><?php endif; ?>
             <h2>Basiskleuren</h2>
             <div class="region-color-grid">
             <?php foreach ([
@@ -545,11 +560,14 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <input type="file" id="region_logo" name="region_logo" accept="image/png,image/jpeg,image/webp">
             <div class="form-actions">
                 <button type="submit" class="button button--primary">Kleuren en logo opslaan</button>
-                <a class="button" href="/admin/regions.php">Annuleren</a>
+                <a class="button" href="<?= $embeddedRegionAppearanceEditor ? '/admin/regions.php' : '/admin/regions.php' ?>">Annuleren</a>
             </div>
         </form>
     </section>
 </section>
+<?php if (!$embeddedRegionAppearanceEditor): ?>
+</section>
+<?php endif; ?>
 <style>
 .region-color-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin:14px 0 30px}
 .region-color-field{display:grid;grid-template-columns:minmax(0,1fr) 52px;align-items:center;gap:8px 12px;min-height:64px;padding:12px;border:1px solid #e1e5eb;border-radius:10px;background:#fff}
@@ -566,4 +584,4 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 .region-weekday-color code{font-size:12px;color:#596273}
 @media(max-width:520px){.region-color-grid,.region-weekday-grid{grid-template-columns:1fr}.region-color-field{grid-template-columns:minmax(0,1fr) 52px}}
 </style>
-<?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
+<?php if (!$embeddedRegionAppearanceEditor) require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
