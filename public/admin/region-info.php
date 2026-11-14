@@ -88,7 +88,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
                 <label for="info_body">Informatietekst</label>
                 <textarea id="info_body" name="body" rows="9" maxlength="30000"><?= escapeHtml($translation['body'] ?? '') ?></textarea>
             </fieldset>
-            <div class="form-actions"><button type="submit" class="button button--primary">Info-pagina opslaan</button><a class="button" href="/admin/region-colors.php?region_id=<?= (int) $regionId ?>">Terug</a></div>
+            <div class="form-actions"><button type="submit" class="button button--primary">Info-pagina opslaan</button><a class="button" href="<?= isPlatformAdmin(currentUser()) ? '/admin/region-edit.php?id=' . (int) $regionId : '/events.php' ?>">Terug</a></div>
         </form>
     </section>
 </section>
