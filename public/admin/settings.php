@@ -18,7 +18,7 @@ $logoSettingFile = $projectRoot . '/storage/platform-logo-path.txt';
 $logoPath = is_file($logoSettingFile) ? trim((string) file_get_contents($logoSettingFile)) : '';
 
 $platformMenuColorFile = $projectRoot . '/storage/platform-menu-color.txt';
-$platformAdminColors = {
+$platformAdminColors = [
     'primary' => '#0A4D9F',
     'primary_dark' => '#083B79',
     'accent' => '#00AFC5',
@@ -29,7 +29,7 @@ $platformAdminColors = {
     'text' => '#202B38',
     'muted' => '#687586',
     'border' => '#E7EAF0'
-};
+];
 $platformColorsFile = $projectRoot . '/storage/platform-admin-colors.json';
 if (is_file($platformColorsFile)) {
     $savedPlatformColors = json_decode((string) file_get_contents($platformColorsFile), true);
