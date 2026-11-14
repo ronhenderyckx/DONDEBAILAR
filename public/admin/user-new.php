@@ -9,6 +9,7 @@ $user = requirePlatformAdmin();
 $db = Database::connection();
 
 $pageTitle = 'Nieuwe gebruiker - DONDEBAILAR';
+$platformAdminPage = true;
 $errorMessage = '';
 
 $regions = $db->query(
