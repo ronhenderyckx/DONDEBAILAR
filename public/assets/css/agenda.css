@@ -2081,7 +2081,7 @@ body.has-agenda-footer .site-main > .agenda-page {
 }
 
 
-/* Subtitel op 'Waar ga ik dansen?' volgt de ingestelde evenement-tekstkleur. */
-.my-dance-events .my-dance-events__subtitle {
-    color: var(--db-event-title-color, var(--db-text));
+/* De beschrijvende tekst onder 'Waar ga ik dansen?' gebruikt de ingestelde regiotekstkleur. */
+.my-dance-events .agenda-heading p.my-dance-events__subtitle {
+    color: var(--db-text) !important;
 }
