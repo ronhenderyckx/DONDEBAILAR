@@ -351,6 +351,7 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                         <a href="/admin/users.php">Gebruikers</a>
                         <a href="/admin/regions.php">Regio's</a>
                         <?php if ($regionId > 0): ?><a href="/admin/region-info.php?region_id=<?= $regionId ?>">Info-pagina regio</a><?php endif; ?>
+                        <a href="/admin/update-center.php">Updates uitvoeren</a>
                         <a href="/admin/settings.php">Instellingen</a>
                     </details>
                 <?php elseif ($canManageRegion || $canManageLocations): ?>
