@@ -23,6 +23,10 @@ $eventCount = (int) $db->query(
     "SELECT COUNT(*) FROM events"
 )->fetchColumn();
 
+$organizerCount = (int) $db->query(
+    "SELECT COUNT(*) FROM organizers"
+)->fetchColumn();
+
 $regions = $db->query(
     "SELECT id, name, slug, subdomain, country_code,
             timezone, is_active
@@ -57,6 +61,11 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <article class="dashboard-card">
             <span>Evenementen</span>
             <strong><?= $eventCount ?></strong>
+        </article>
+
+        <article class="dashboard-card">
+            <span>Organisatoren</span>
+            <strong><?= $organizerCount ?></strong>
         </article>
     </div>
 
