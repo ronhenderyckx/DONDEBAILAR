@@ -16,6 +16,13 @@ $projectRoot = dirname(__DIR__, 2);
 $logoSettingFile = $projectRoot . '/storage/platform-logo-path.txt';
 $logoPath = is_file($logoSettingFile) ? trim((string) file_get_contents($logoSettingFile)) : '';
 
+$platformMenuColorFile = $projectRoot . '/storage/platform-menu-color.txt';
+$platformMenuColor = '#FFFFFF';
+if (is_file($platformMenuColorFile)) {
+    $storedMenuColor = strtoupper(trim((string) file_get_contents($platformMenuColorFile)));
+    if (preg_match('/^#[0-9A-F]{6}$/', $storedMenuColor)) $platformMenuColor = $storedMenuColor;
+}
+
 $agendaPageSizeFile = $projectRoot . '/storage/agenda-page-size.txt';
 $agendaPageSize = 20;
 if (is_file($agendaPageSizeFile)) {
@@ -34,6 +41,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!verifyCsrfToken(is_string($csrf) ? $csrf : null)) {
         $errorMessage = 'De beveiligingscontrole is verlopen. Vernieuw de pagina.';
+    } elseif (isset($_POST['save_platform_menu_color'])) {
+        $requestedMenuColor = strtoupper(trim((string) ($_POST['platform_menu_color'] ?? '')));
+        if (!preg_match('/^#[0-9A-F]{6}$/', $requestedMenuColor)) {
+            $errorMessage = 'Kies een geldige menukleur.';
+        } elseif (file_put_contents($platformMenuColorFile, $requestedMenuColor . PHP_EOL, LOCK_EX) === false) {
+            $errorMessage = 'De menukleur kon niet worden opgeslagen. Controleer de schrijfrechten van storage.';
+        } else {
+            $platformMenuColor = $requestedMenuColor;
+            $successMessage = 'De platformmenukleur is opgeslagen.';
+        }
     } elseif (isset($_POST['save_agenda_settings'])) {
         $requestedPageSize = filter_var($_POST['agenda_page_size'] ?? null, FILTER_VALIDATE_INT);
         if ($requestedPageSize === false || $requestedPageSize < 1 || $requestedPageSize > 100) {
@@ -112,6 +129,26 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     <?php if ($successMessage !== ''): ?>
         <div class="message message--success" role="status"><?= escapeHtml($successMessage) ?></div>
     <?php endif; ?>
+
+    <section class="admin-section">
+        <div class="section-heading">
+            <div>
+                <h2>Menukleur platformbeheer</h2>
+                <p>Deze kleur geldt voor het algemene dashboard en staat los van de menukleuren van de regio’s.</p>
+            </div>
+        </div>
+        <form method="post" action="/admin/settings.php" class="auth-form">
+            <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+            <label for="platform_menu_color">Achtergrondkleur van het menu</label>
+            <div style="display:flex;align-items:center;gap:12px;max-width:300px">
+                <input type="color" id="platform_menu_color" name="platform_menu_color" value="<?= escapeHtml($platformMenuColor) ?>" style="width:64px;height:42px;padding:3px">
+                <strong><?= escapeHtml($platformMenuColor) ?></strong>
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="button button--primary" name="save_platform_menu_color" value="1">Menukleur opslaan</button>
+            </div>
+        </form>
+    </section>
 
     <section class="admin-section">
         <div class="section-heading">
