@@ -344,7 +344,7 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                 <?php if ($isAdmin): ?>
                     <details class="site-menu__admin">
                         <summary>Platformbeheer</summary>
-                        <a href="/admin/">Dashboard</a>
+                        <a href="/admin/">Overzicht</a>
                         <a href="/events.php">Evenementen</a>
                         <a href="/admin/organizers.php">Organisatoren</a>
                         <a href="/admin/locations.php">Locaties</a>
@@ -412,7 +412,7 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                         <?php foreach ($organizers as $organizerOption): ?>
                             <?php
                             $logoFilename = basename((string) ($organizerOption['logo_path'] ?? ''));
-                            $hasOrganizerLogo = preg_match('/\\A[a-f0-9]{32}\\.(jpg|png|webp)\\z/', $logoFilename) === 1;
+                            $hasOrganizerLogo = preg_match('/\A[a-f0-9]{32}\.(jpg|png|webp)\z/', $logoFilename) === 1;
                             $organizerSelected = $organizerId === (int) $organizerOption['id'];
                             $organizerHref = $organizerSelected
                                 ? '/?region_id=' . $regionId . '&agenda_change=1&filter=organizer'
@@ -471,7 +471,9 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
 .site-brand__logo{display:block;max-width:135px;max-height:58px;width:auto;height:auto;object-fit:contain;flex:0 1 auto}
 /* Houd het regiologo zichtbaar tijdens volledige navigatie door agenda-filters. */
 .site-brand--region{padding-left:6px;border-left:1px solid var(--db-border)}
-.site-brand__region-name{max-width:110px;overflow:hidden;text-overflow:ellipsis;font-size:13px;font-weight:700;color:var(--db-text);white-space:nowrap}\n.site-brand__region-logo{max-width:52px;max-height:50px}\n.site-brand__region-mark{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:var(--db-primary);color:#fff;font-size:19px;font-weight:800;line-height:1}
+.site-brand__region-name{max-width:110px;overflow:hidden;text-overflow:ellipsis;font-size:13px;font-weight:700;color:var(--db-text);white-space:nowrap}
+.site-brand__region-logo{max-width:52px;max-height:50px}
+.site-brand__region-mark{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:var(--db-primary);color:#fff;font-size:19px;font-weight:800;line-height:1}
 .site-welcome{font-size:12px;white-space:nowrap;flex:0 1 auto}
 .site-notifications,.site-save-preferences{width:30px;height:30px}
 .site-menu__toggle{min-height:30px;padding:0 7px}
