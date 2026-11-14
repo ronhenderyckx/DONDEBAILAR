@@ -1539,9 +1539,15 @@ body.has-agenda-footer .site-main > .agenda-page {
     font-size:30px;
     line-height:1;
     cursor:pointer;
+    text-decoration:none;
     transition:filter .2s ease,transform .2s ease
 }
-.agenda-page-nav-icon:hover:not(:disabled) {
+.agenda-page-nav-icon[aria-disabled="true"] {
+    opacity:.35;
+    cursor:default;
+    pointer-events:none
+}
+.agenda-page-nav-icon:hover:not(:disabled):not([aria-disabled="true"]) {
     filter:brightness(.9);
     transform:scale(1.06)
 }
