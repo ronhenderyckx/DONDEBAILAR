@@ -380,8 +380,13 @@ function loadAgendaCardMedia(card) {
         if (!source) return;
         media.setAttribute('src', source);
         media.removeAttribute('data-media-src');
-        if (media.tagName === 'VIDEO' && media.dataset.initialPriority !== '1') {
-            media.setAttribute('preload', 'none');
+        if (media.tagName === 'VIDEO') {
+            if (media.dataset.initialPriority !== '1') {
+                media.setAttribute('preload', 'none');
+            }
+            // Forceer de browser om de nieuwe videobron te openen.
+            media.load();
+            media.addEventListener('loadeddata', scheduleVisibleAgendaVideo, {once:true});
         }
     });
 }
