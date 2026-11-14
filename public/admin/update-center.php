@@ -1,0 +1,38 @@
+<?php
+declare(strict_types=1);
+
+require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
+require_once dirname(__DIR__, 2) . '/app/Authorization.php';
+require_once dirname(__DIR__, 2) . '/app/Security.php';
+
+requirePlatformAdmin();
+
+$pageTitle = 'Updates uitvoeren - DONDEBAILAR';
+$platformAdminPage = true;
+
+require dirname(__DIR__, 2) . '/app/views/header.php';
+?>
+
+<section class="admin-page">
+    <div class="admin-heading">
+        <div>
+            <p class="eyebrow">PLATFORMBEHEER</p>
+            <h1>Updates uitvoeren</h1>
+            <p>Haal de nieuwste versie van DONDEBAILAR op vanaf GitHub en werk de database bij.</p>
+        </div>
+    </div>
+
+    <section class="admin-section">
+        <h2>DONDEBAILAR bijwerken</h2>
+        <p>De updater controleert eerst of de installatie op branch <strong>develop</strong> staat en of er geen lokale wijzigingen zijn. Daarna wordt de nieuwste versie opgehaald en worden de bijbehorende database-updates uitgevoerd.</p>
+        <p>Start de update alleen wanneer je klaar bent om de nieuwe versie te installeren.</p>
+
+        <form method="post" action="/admin/update.php"
+              onsubmit="return confirm('Wil je DONDEBAILAR nu bijwerken?');">
+            <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+            <button class="button button--primary" type="submit">UPDATE STARTEN</button>
+        </form>
+    </section>
+</section>
+
+<?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
