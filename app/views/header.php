@@ -10,6 +10,27 @@ $pageTitle = isset($pageTitle) && is_string($pageTitle)
 
 $region = isset($region) && is_array($region) ? $region : null;
 $headerUser = currentUser();
+if ($region === null && $headerUser !== null) {
+    $regionContextQuery = Database::connection()->prepare(
+        "SELECT r.*, ra.*
+         FROM regions r
+         LEFT JOIN region_appearance ra ON ra.region_id = r.id
+         WHERE r.is_active = 1
+           AND (:is_admin = 1 OR EXISTS (
+               SELECT 1 FROM user_region_roles urr
+               WHERE urr.region_id = r.id
+                 AND urr.user_id = :user_id
+                 AND urr.role IN ('region_admin', 'editor')
+           ))
+         ORDER BY r.name
+         LIMIT 1"
+    );
+    $regionContextQuery->execute([
+        'is_admin' => isPlatformAdmin($headerUser) ? 1 : 0,
+        'user_id' => (int) $headerUser['id'],
+    ]);
+    $region = $regionContextQuery->fetch() ?: null;
+}
 $headerDisplayName = $headerUser !== null
     ? trim((string) ($headerUser['display_name'] ?? $headerUser['username'] ?? ''))
     : '';
@@ -35,10 +56,9 @@ if ($headerUser !== null) {
 }
 
 $regionId = (int) ($region['id'] ?? 0);
-$canManageRegion = $regionId > 0
-    && userHasRegionRole($regionId, ['region_admin', 'editor'], $headerUser);
-
 $isAdmin = isPlatformAdmin($headerUser);
+$canManageRegion = $regionId > 0
+    && ($isAdmin || userHasRegionRole($regionId, ['region_admin', 'editor'], $headerUser));
 $canManageLocations = $isAdmin;
 if ($headerUser !== null && !$canManageLocations) {
     $locationAccess = Database::connection()->prepare(
@@ -330,12 +350,10 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                     <svg class="site-menu__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
                     <span>Agenda</span>
                 </a>
-                <?php if ($headerUser !== null): ?>
-                    <a href="/waar-ga-ik-dansen.php">
-                        <span class="site-menu__item-icon" aria-hidden="true">👠</span>
-                        <span>Waar ga ik dansen?</span>
-                    </a>
-                <?php endif; ?>
+                <a href="/waar-ga-ik-dansen.php">
+                    <span class="site-menu__item-icon" aria-hidden="true">👠</span>
+                    <span>Waar ga ik dansen</span>
+                </a>
                 <a href="/info.php<?= $regionId > 0 ? '?region_id=' . $regionId : '' ?>">
                     <svg class="site-menu__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>
                     <span>Info</span>
@@ -345,21 +363,26 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                     <details class="site-menu__admin site-menu__admin--region">
                         <summary>Regiobeheer</summary>
                         <a href="/events.php">Evenementen</a>
-                        <?php if ($regionId > 0 && userHasRegionRole($regionId, ['region_admin'], $headerUser)): ?>
-                            <a href="/admin/region-colors.php?region_id=<?= $regionId ?>">Kleuren en logo</a>
-                            <a href="/admin/region-info.php?region_id=<?= $regionId ?>">Info-pagina</a>
-                        <?php endif; ?>
-                        <a href="/admin/locations.php">Locaties</a>
                         <?php
-                        $organizerAccess = Database::connection()->prepare(
-                            "SELECT 1 FROM user_region_roles
-                             WHERE user_id = :user_id AND role = 'region_admin'
-                             LIMIT 1"
-                        );
-                        $organizerAccess->execute(['user_id' => (int) $headerUser['id']]);
-                        if ($organizerAccess->fetchColumn()):
+                        $organizerAccess = $isAdmin;
+                        if (!$organizerAccess && $headerUser !== null) {
+                            $organizerQuery = Database::connection()->prepare(
+                                "SELECT 1 FROM user_region_roles
+                                 WHERE user_id = :user_id AND role = 'region_admin'
+                                 LIMIT 1"
+                            );
+                            $organizerQuery->execute(['user_id' => (int) $headerUser['id']]);
+                            $organizerAccess = (bool) $organizerQuery->fetchColumn();
+                        }
+                        if ($organizerAccess):
                         ?>
                             <a href="/admin/organizers.php">Organisatoren</a>
+                        <?php endif; ?>
+                        <?php if ($canManageLocations): ?>
+                            <a href="/admin/locations.php">Locaties</a>
+                        <?php endif; ?>
+                        <?php if ($regionId > 0 && ($isAdmin || userHasRegionRole($regionId, ['region_admin'], $headerUser))): ?>
+                            <a href="/admin/region-info.php?region_id=<?= $regionId ?>">Info pagina regio</a>
                         <?php endif; ?>
                     </details>
                 <?php endif; ?>
@@ -370,8 +393,7 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                         <a href="/admin/">Overzicht</a>
                         <a href="/admin/users.php">Gebruikers</a>
                         <a href="/admin/regions.php">Regio's</a>
-                        <?php if ($regionId > 0): ?><a href="/admin/region-info.php?region_id=<?= $regionId ?>">Info-pagina regio</a><?php endif; ?>
-                        <a href="/admin/update-center.php">Updates uitvoeren</a>
+                        <a href="/admin/update-center.php">Updates</a>
                         <a href="/admin/settings.php">Instellingen</a>
                     </details>
                 <?php endif; ?>
