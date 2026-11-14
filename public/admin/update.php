@@ -152,6 +152,29 @@ function removeOrganizerRegionColumn(PDO $db): void
 }
 
 
+
+/**
+ * Organisator is optioneel voor evenementen, ook bij CSV-import.
+ * De bestaande organisator-koppeling blijft behouden waar die is ingevuld.
+ */
+function migrateOptionalEventOrganizer(PDO $db): void
+{
+    $column = $db->prepare(
+        "SELECT IS_NULLABLE FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'events'
+           AND COLUMN_NAME = 'organizer_id'"
+    );
+    $column->execute();
+    $nullable = $column->fetchColumn();
+    if ($nullable === false) {
+        throw new RuntimeException('Kolom events.organizer_id bestaat niet.');
+    }
+    if ($nullable !== 'YES') {
+        $db->exec("ALTER TABLE events MODIFY organizer_id BIGINT UNSIGNED NULL");
+    }
+}
+
 /**
  * Voeg het aparte hashtagveld aan evenementen toe.
  * De controle maakt de migratie veilig om bij iedere UPDATE uit te voeren.
@@ -540,6 +563,9 @@ try {
         CONSTRAINT fk_event_guest_attendance_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
     $messages[] = 'Database: anonieme dans-aanmeldingen zijn gecontroleerd.';
+
+    migrateOptionalEventOrganizer($db);
+    $messages[] = 'Database: organisator bij evenementen is optioneel gemaakt.';
 
     migrateEventHashtags($db);
     $messages[] = 'Database: apart hashtagveld voor evenementen is gecontroleerd.';
