@@ -652,8 +652,13 @@
     padding:20px;
     border-radius:14px;
     background:var(--db-attendance-day-color,var(--db-primary,#E23A2C));
-    color:#fff;
+    color:var(--db-attendance-day-text-color,#222222);
     box-shadow:0 12px 40px #0004
+}
+.agenda-attendance-list__panel h3,
+.agenda-attendance-list__panel p,
+.agenda-attendance-list__panel li {
+    color:var(--db-attendance-day-text-color,#222222)!important;
 }
 .agenda-attendance-list__panel h3 {
     margin:0 0 6px;
