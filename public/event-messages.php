@@ -257,10 +257,10 @@ $renderMessage = static function (string $message) use ($mentionNames, $escape):
     return nl2br($html);
 };
 ?>
-<section class="event-chat<?= $popupMode ? ' event-chat--popup' : '' ?>" id="messages" style="--db-chat-day-color:var(--db-weekday-<?= $eventWeekday ?>,var(--db-primary))">
-    <div class="event-chat__heading" style="display:block!important;width:100%;height:70px;min-height:70px;box-sizing:border-box;overflow:hidden;padding:0 12px;background:var(--db-chat-day-color,var(--db-primary,#1456a0));color:#fff">
-        <strong style="display:block!important;margin:0;padding:0;line-height:70px;color:#fff;font-size:16px;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis">
-            <svg aria-hidden="true" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:8px;color:#fff"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"></path></svg><?= $escape($event['title']) ?> <span style="display:inline;font-size:14px;font-weight:600;white-space:nowrap">· <?= $messageCount ?> <?= $messageCount === 1 ? 'bericht' : 'berichten' ?></span>
+<section class="event-chat<?= $popupMode ? ' event-chat--popup' : '' ?>" id="messages" style="--db-chat-day-color:var(--db-weekday-<?= $eventWeekday ?>,var(--db-primary));--db-chat-text-color:var(--db-weekday-text-<?= $eventWeekday ?>,#222222)">
+    <div class="event-chat__heading" style="display:block!important;width:100%;height:70px;min-height:70px;box-sizing:border-box;overflow:hidden;padding:0 12px;background:var(--db-chat-day-color,var(--db-primary,#1456a0));color:var(--db-chat-text-color,#222222)">
+        <strong style="display:block!important;margin:0;padding:0;line-height:70px;color:var(--db-chat-text-color,#222222);font-size:16px;white-space:nowrap!important;overflow:hidden;text-overflow:ellipsis">
+            <svg aria-hidden="true" viewBox="0 0 24 24" width="25" height="25" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:8px;color:var(--db-chat-text-color,#222222)"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"></path></svg><?= $escape($event['title']) ?> <span style="display:inline;font-size:14px;font-weight:600;white-space:nowrap">· <?= $messageCount ?> <?= $messageCount === 1 ? 'bericht' : 'berichten' ?></span>
         </strong>
     </div>
 
@@ -372,14 +372,14 @@ $renderMessage = static function (string $message) use ($mentionNames, $escape):
 html,body{height:100%;margin:0!important;padding:0!important;overflow:hidden!important}
 body:has(.event-chat--popup) .site-header,body:has(.event-chat--popup) footer{display:none!important}
 body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;margin:0!important;padding:0!important;overflow:hidden}
-.event-chat{height:100%;min-height:0;display:flex;flex-direction:column;background:var(--db-chat-day-color,var(--db-primary,#1456a0));color:#222;font:14px/1.45 system-ui,sans-serif}
+.event-chat{height:100%;min-height:0;display:flex;flex-direction:column;background:var(--db-chat-day-color,var(--db-primary,#1456a0));color:var(--db-chat-text-color,#222222);font:14px/1.45 system-ui,sans-serif}
 .event-chat__heading{display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;align-items:center!important;gap:8px;}
 *{scrollbar-width:none;-ms-overflow-style:none}*::-webkit-scrollbar{display:none;width:0;height:0}.event-chat__messages{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;padding:12px;display:flex;flex-direction:column;gap:10px;overscroll-behavior:contain}.event-chat__messages::-webkit-scrollbar{display:none;width:0;height:0}
-.event-chat__empty{margin:auto;color:#888;text-align:center}
+.event-chat__empty{margin:auto;color:var(--db-chat-text-color,#222222);text-align:center}
 .chat-message{max-width:88%;align-self:flex-start}.chat-message__bubble{position:relative;padding:9px 12px;border-radius:14px 14px 14px 4px;background:#f0f2f5;overflow-wrap:anywhere}
 .chat-message--highlight .chat-message__bubble{outline:3px solid var(--db-chat-day-color,var(--db-primary,#1456a0));outline-offset:2px;animation:chatMentionHighlight 2.5s ease-out forwards}
 @keyframes chatMentionHighlight{0%,55%{background:#fff4bd}100%{background:#f0f2f5}}
-.chat-message__meta{display:flex;gap:10px;align-items:center;margin-bottom:4px;font-size:11px;color:#777}.chat-message__meta strong{color:#444;font-size:12px}.chat-message__meta time{white-space:nowrap}
+.chat-message__meta{display:flex;gap:10px;align-items:center;margin-bottom:4px;font-size:11px;color:var(--db-chat-text-color,#222222)}.chat-message__meta strong{color:var(--db-chat-text-color,#222222);font-size:12px}.chat-message__meta time{white-space:nowrap}
 .chat-message__bubble p{margin:0;white-space:normal}.chat-message__bubble small{display:block;color:#888;font-size:10px}
 .chat-message__deleted{color:#888;font-style:italic}.chat-mention{color:var(--db-primary,#2878c8);font-weight:700;background:rgba(40,120,200,.09);border-radius:4px;padding:0 2px}
 .chat-message__reply-button{display:inline-block;margin-top:6px;padding:0;border:0;background:none;color:var(--db-primary,#2878c8);font:600 11px system-ui,sans-serif;cursor:pointer}
@@ -387,9 +387,9 @@ body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;mar
 .chat-message__reply-form[hidden]{display:none}
 .chat-message__reply-form textarea{flex:1;min-width:0;resize:vertical;border:1px solid #ddd;border-radius:10px;padding:7px 9px;font:12px/1.4 system-ui,sans-serif}
 .chat-message__reply-form button{border:0;border-radius:9px;padding:8px 10px;background:var(--db-primary,#2878c8);color:#fff;font-size:11px;font-weight:600;cursor:pointer}
-.chat-message__reply{margin:5px 0 0 16px;padding:7px 10px;border-left:2px solid #ddd;color:#555;font-size:12px;overflow-wrap:anywhere}
+.chat-message__reply{margin:5px 0 0 16px;padding:7px 10px;border-left:2px solid #ddd;color:var(--db-chat-text-color,#222222);font-size:12px;overflow-wrap:anywhere}
 .chat-message__reply strong{margin-right:6px}.chat-message__reply time{display:block;color:#999;font-size:10px}
-.chat-message__nested-reply{margin:6px 0 0 14px;padding:6px 9px;border-left:2px solid #c9d3df;background:#f8f9fb;color:#555;font-size:11px;overflow-wrap:anywhere}
+.chat-message__nested-reply{margin:6px 0 0 14px;padding:6px 9px;border-left:2px solid #c9d3df;background:#f8f9fb;color:var(--db-chat-text-color,#222222);font-size:11px;overflow-wrap:anywhere}
 .chat-message__nested-reply strong{margin-right:5px}.chat-message__nested-reply time{display:block;color:#999;font-size:10px}
 .chat-message__manage{margin-top:4px;font-size:11px}.chat-message__manage summary{cursor:pointer;color:#777}.chat-message__manage form{display:flex;gap:5px;margin-top:5px}.chat-message__manage textarea{min-width:0;width:100%;font:inherit}.chat-message__manage button{border:0;border-radius:6px;padding:5px 8px;background:#eee;cursor:pointer;white-space:nowrap}
 .event-chat__composer{flex:none;padding:9px 10px;padding-bottom:max(9px,env(safe-area-inset-bottom));border-top:1px solid #e5e5e5;background:#fff}
