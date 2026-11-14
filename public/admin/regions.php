@@ -8,6 +8,7 @@ require_once dirname(__DIR__, 2) . '/app/Security.php';
 requirePlatformAdmin();
 
 $pageTitle = "Regio's beheren - DONDEBAILAR";
+$platformAdminPage = true;
 $regions = Database::connection()->query(
     "SELECT id, name, slug, subdomain, country_code,
             timezone, default_language, is_active
