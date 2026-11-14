@@ -12,7 +12,14 @@ $region = isset($region) && is_array($region) ? $region : null;
 $headerUser = currentUser();
 if ($region === null && $headerUser !== null) {
     $regionContextQuery = Database::connection()->prepare(
-        "SELECT r.*, ra.*
+        "SELECT r.*,
+                ra.primary_color, ra.primary_dark, ra.accent_color,
+                ra.secondary_color, ra.tertiary_color, ra.header_color,
+                ra.menu_color, ra.organizer_color, ra.filter_hover_color,
+                ra.filter_bar_color, ra.filter_text_color, ra.search_button_color,
+                ra.back_top_color, ra.search_field_color, ra.search_text_color,
+                ra.footer_color, ra.background_color, ra.text_color, ra.weekday_colors,
+                COALESCE(ra.logo_path, r.logo_path) AS logo_path
          FROM regions r
          LEFT JOIN region_appearance ra ON ra.region_id = r.id
          WHERE r.is_active = 1
@@ -348,18 +355,18 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
             <nav class="site-menu__panel" aria-label="Hoofdnavigatie">
                 <a href="/<?= $regionId > 0 ? '?region_id=' . $regionId : '' ?>">
                     <svg class="site-menu__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"></rect><path d="M16 2v4M8 2v4M3 10h18"></path></svg>
-                    <span>Agenda</span>
+                    <span>AGENDA</span>
                 </a>
                 <a href="/waar-ga-ik-dansen.php">
                     <span class="site-menu__item-icon" aria-hidden="true">👠</span>
-                    <span>Waar ga ik dansen</span>
+                    <span>WAAR GA IK DANSEN</span>
                 </a>
                 <a href="/info.php<?= $regionId > 0 ? '?region_id=' . $regionId : '' ?>">
                     <svg class="site-menu__item-icon" aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v5M12 8h.01"></path></svg>
                     <span>Info</span>
                 </a>
 
-                <?php if ($canManageRegion): ?>
+                <?php if ($canManageRegion || $isAdmin): ?>
                     <details class="site-menu__admin site-menu__admin--region">
                         <summary>Regiobeheer</summary>
                         <a href="/events.php">Evenementen</a>
