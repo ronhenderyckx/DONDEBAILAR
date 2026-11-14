@@ -2079,3 +2079,9 @@ body.has-agenda-footer .site-main > .agenda-page {
         min-height:240px;
     }
 }
+
+
+/* Subtitel op 'Waar ga ik dansen?' volgt de ingestelde evenement-tekstkleur. */
+.my-dance-events .my-dance-events__subtitle {
+    color: var(--db-event-title-color, var(--db-text));
+}
