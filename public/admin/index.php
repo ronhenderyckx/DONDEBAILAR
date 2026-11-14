@@ -7,6 +7,7 @@ require_once dirname(__DIR__, 2) . '/app/Security.php';
 
 $user = requirePlatformAdmin();
 $pageTitle = 'Platformbeheer - DONDEBAILAR';
+$platformAdminPage = true;
 
 $db = Database::connection();
 
