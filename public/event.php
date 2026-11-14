@@ -65,6 +65,7 @@ $eventInfoTextColor = 'var(--db-weekday-text-' . $eventWeekday . ', #222222)';
         <p class="public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important">Locatie: <?= $escape($event['location_name']) ?><?= !empty($event['location_city']) ? ' — ' . $escape($event['location_city']) : '' ?></p>
     <?php endif; ?>
     <?php if (!empty($event['description'])): ?><div class="public-event-description public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important"><?= nl2br($escape($event['description'])) ?></div><?php endif; ?>
+    <?php if (!empty($event['extra_info'])): ?><section class="public-event-extra-info public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important"><h2>Extra info</h2><div><?= nl2br($escape($event['extra_info'])) ?></div></section><?php endif; ?>
     <?php
     $eventHashtags = preg_split('/[\s,]+/u', trim((string) ($event['hashtags'] ?? '')), -1, PREG_SPLIT_NO_EMPTY) ?: [];
     $eventHashtags = array_values(array_filter(array_map(static function (string $tag): string {
