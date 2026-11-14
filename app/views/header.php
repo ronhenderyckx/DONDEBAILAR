@@ -169,13 +169,48 @@ $themeStyle = '--db-primary:' . $primaryColor
 // Regiobeheer, openbare pagina's en gedeelde beheerpagina's behouden hun eigen kleur.
 $isPlatformAdminPage = !empty($platformAdminPage) && $isAdmin;
 if ($isPlatformAdminPage) {
-    $platformMenuColorFile = $projectRoot . '/storage/platform-menu-color.txt';
-    if (is_file($platformMenuColorFile)) {
-        $platformMenuColor = strtoupper(trim((string) file_get_contents($platformMenuColorFile)));
-        if (preg_match('/^#[0-9A-F]{6}$/', $platformMenuColor)) {
-            $themeStyle .= ';--db-menu-color:' . $platformMenuColor;
+    $platformColors = [
+        'primary' => '#0A4D9F',
+        'primary_dark' => '#083B79',
+        'accent' => '#00AFC5',
+        'header' => '#FFFFFF',
+        'menu' => '#FFFFFF',
+        'background' => '#F7F8FA',
+        'surface' => '#FFFFFF',
+        'text' => '#202B38',
+        'muted' => '#687586',
+        'border' => '#E7EAF0',
+    ];
+    $platformColorsFile = $projectRoot . '/storage/platform-admin-colors.json';
+    if (is_file($platformColorsFile)) {
+        $savedPlatformColors = json_decode((string) file_get_contents($platformColorsFile), true);
+        if (is_array($savedPlatformColors)) {
+            foreach ($platformColors as $colorKey => $fallbackColor) {
+                $candidateColor = strtoupper(trim((string) ($savedPlatformColors[$colorKey] ?? '')));
+                if (preg_match('/^#[0-9A-F]{6}$/', $candidateColor)) {
+                    $platformColors[$colorKey] = $candidateColor;
+                }
+            }
+        }
+    } else {
+        $legacyMenuColorFile = $projectRoot . '/storage/platform-menu-color.txt';
+        if (is_file($legacyMenuColorFile)) {
+            $legacyMenuColor = strtoupper(trim((string) file_get_contents($legacyMenuColorFile)));
+            if (preg_match('/^#[0-9A-F]{6}$/', $legacyMenuColor)) {
+                $platformColors['menu'] = $legacyMenuColor;
+            }
         }
     }
+    $themeStyle .= ';--db-primary:' . $platformColors['primary']
+        . ';--db-primary-dark:' . $platformColors['primary_dark']
+        . ';--db-accent:' . $platformColors['accent']
+        . ';--db-header-color:' . $platformColors['header']
+        . ';--db-menu-color:' . $platformColors['menu']
+        . ';--db-background:' . $platformColors['background']
+        . ';--db-surface:' . $platformColors['surface']
+        . ';--db-text:' . $platformColors['text']
+        . ';--db-muted:' . $platformColors['muted']
+        . ';--db-border:' . $platformColors['border'];
 }
 $appearancePalette = json_decode((string) ($region['weekday_colors'] ?? ''), true);
 $agendaArrowColor = is_array($appearancePalette) ? (string) ($appearancePalette['agenda_arrow_text'] ?? '#222222') : '#222222';
