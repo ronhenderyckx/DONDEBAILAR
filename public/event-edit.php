@@ -49,6 +49,7 @@ $canPublish = isPlatformAdmin($user)
 $errors = [];
 $title = (string) $event['title'];
 $description = (string) ($event['description'] ?? '');
+$extraInfo = (string) ($event['extra_info'] ?? '');
 $hashtags = (string) ($event['hashtags'] ?? '');
 $eventLanguage = (string) $event['event_language'];
 $organizerId = (int) $event['organizer_id'];
@@ -64,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $title = trim((string) ($_POST['title'] ?? ''));
     $description = trim((string) ($_POST['description'] ?? ''));
+    $extraInfo = trim((string) ($_POST['extra_info'] ?? ''));
     $hashtags = trim((string) ($_POST['hashtags'] ?? ''));
     $eventLanguage = (string) ($_POST['event_language'] ?? 'es');
     $organizerId = (int) ($_POST['organizer_id'] ?? 0);
@@ -100,7 +102,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $update = $db->prepare(
                 "UPDATE events SET organizer_id = :organizer_id, location_id = :location_id,
-                    category_id = :category_id, title = :title, description = :description,
+                    category_id = :category_id, title = :title, description = :description, extra_info = :extra_info,
                     hashtags = :hashtags, event_language = :event_language, starts_at = :starts_at, ends_at = :ends_at,
                     status = :status, updated_by = :updated_by,
                     published_at = CASE WHEN :published_check = 'published' AND published_at IS NULL
@@ -113,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'category_id' => $categoryId > 0 ? $categoryId : null,
                 'title' => $title,
                 'description' => $description !== '' ? $description : null,
+                'extra_info' => $extraInfo !== '' ? $extraInfo : null,
                 'hashtags' => $hashtags !== '' ? $hashtags : null,
                 'event_language' => $eventLanguage,
                 'starts_at' => $start->format('Y-m-d H:i:s'),
@@ -174,6 +177,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <label for="starts_at">Begint op *</label><input id="starts_at" type="datetime-local" name="starts_at" required value="<?= escapeHtml($startsAt) ?>">
             <label for="ends_at">Eindigt op</label><input id="ends_at" type="datetime-local" name="ends_at" value="<?= escapeHtml($endsAt) ?>">
             <label for="description">Beschrijving</label><textarea id="description" name="description" rows="8"><?= escapeHtml($description) ?></textarea>
+            <label for="extra_info">Extra info</label><textarea id="extra_info" name="extra_info" rows="4"><?= escapeHtml($extraInfo) ?></textarea>
             <label for="hashtags">Hashtags</label><input id="hashtags" name="hashtags" maxlength="500" value="<?= escapeHtml($hashtags) ?>" placeholder="#salsa #bachata #kizomba">
             <p class="event-form-note">Zet de hashtags apart van de beschrijving, gescheiden door spaties of komma's.</p>
             <?php if ($canPublish): ?>
