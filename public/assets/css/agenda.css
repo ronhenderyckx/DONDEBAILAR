@@ -2055,9 +2055,15 @@ body.has-agenda-footer .site-main > .agenda-page {
     font-weight:900!important;
 }
 
-/* SVG-actiepictogrammen volgen de ingestelde dagtekstkleur.
-   De oudere algemene regel voor alle kaartkinderen overschreef currentColor. */
-.agenda-card__details .agenda-icon-button svg {
+/* Deel-, locatie- en chatpictogrammen krijgen rechtstreeks de ingestelde dagtekstkleur.
+   Gebruik geen currentColor, zodat geen knop- of browserstijl de SVG-kleur kan vervangen. */
+.agenda-card__details .agenda-icon-button {
     color:var(--db-event-day-text-color,#222222)!important;
-    stroke:currentColor!important;
+    opacity:1!important;
+}
+.agenda-card__details .agenda-icon-button svg,
+.agenda-card__details .agenda-icon-button svg * {
+    color:var(--db-event-day-text-color,#222222)!important;
+    stroke:var(--db-event-day-text-color,#222222)!important;
+    opacity:1!important;
 }
