@@ -19,7 +19,7 @@ if ($regionIds !== []) {
                 e.created_by, r.name AS region_name, o.name AS organizer_name
          FROM events e
          INNER JOIN regions r ON r.id = e.region_id
-         INNER JOIN organizers o ON o.id = e.organizer_id
+         LEFT JOIN organizers o ON o.id = e.organizer_id
          WHERE e.region_id IN ($placeholders)
          ORDER BY e.starts_at DESC, e.id DESC
          LIMIT 200"
@@ -63,7 +63,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                             <td><?= escapeHtml(date('d-m-Y H:i', strtotime($event['starts_at']))) ?></td>
                             <td><strong><?php if ($event['status'] === 'published'): ?><a href="/event.php?id=<?= (int) $event['id'] ?>" target="_blank" rel="noopener noreferrer"><?= escapeHtml($event['title']) ?></a><?php else: ?><?= escapeHtml($event['title']) ?><?php endif; ?></strong></td>
                             <td><?= escapeHtml($event['region_name']) ?></td>
-                            <td><?= escapeHtml($event['organizer_name']) ?></td>
+                            <td><?= escapeHtml((string) ($event['organizer_name'] ?? 'Geen organisator')) ?></td>
                             <td><?= escapeHtml($event['status']) ?></td>
                             <td>
                                 <?php if (eventCanEdit($db, $event, $user)): ?>
