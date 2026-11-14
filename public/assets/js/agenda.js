@@ -390,8 +390,10 @@ const agendaVideoObserver = new IntersectionObserver(function (entries) {
 document.querySelectorAll('.agenda-card__video').forEach(function (video) {
     video.muted = agendaVideosMuted;
     video.removeAttribute('autoplay');
-    // Video's pas ophalen wanneer ze daadwerkelijk worden afgespeeld.
-    video.setAttribute('preload', 'none');
+    // Haal metadata van de eerste zichtbare video meteen op; overige video's blijven uitgesteld.
+    if (video.dataset.initialPriority !== '1') {
+        video.setAttribute('preload', 'none');
+    }
     video.setAttribute('muted', '');
     agendaVideoObserver.observe(video);
 });
