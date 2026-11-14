@@ -341,21 +341,6 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                     <span>Info</span>
                 </a>
 
-                <?php if ($isAdmin): ?>
-                    <details class="site-menu__admin site-menu__admin--platform">
-                        <summary>Platformbeheer</summary>
-                        <a href="/admin/">Overzicht</a>
-                        <a href="/events.php">Evenementen</a>
-                        <a href="/admin/organizers.php">Organisatoren</a>
-                        <a href="/admin/locations.php">Locaties</a>
-                        <a href="/admin/users.php">Gebruikers</a>
-                        <a href="/admin/regions.php">Regio's</a>
-                        <?php if ($regionId > 0): ?><a href="/admin/region-info.php?region_id=<?= $regionId ?>">Info-pagina regio</a><?php endif; ?>
-                        <a href="/admin/update-center.php">Updates uitvoeren</a>
-                        <a href="/admin/settings.php">Instellingen</a>
-                    </details>
-                <?php endif; ?>
-
                 <?php if ($canManageRegion): ?>
                     <details class="site-menu__admin site-menu__admin--region">
                         <summary>Regiobeheer</summary>
@@ -376,6 +361,21 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                         ?>
                             <a href="/admin/organizers.php">Organisatoren</a>
                         <?php endif; ?>
+                    </details>
+                <?php endif; ?>
+
+                <?php if ($isAdmin): ?>
+                    <details class="site-menu__admin site-menu__admin--platform">
+                        <summary>Platformbeheer</summary>
+                        <a href="/admin/">Overzicht</a>
+                        <a href="/events.php">Evenementen</a>
+                        <a href="/admin/organizers.php">Organisatoren</a>
+                        <a href="/admin/locations.php">Locaties</a>
+                        <a href="/admin/users.php">Gebruikers</a>
+                        <a href="/admin/regions.php">Regio's</a>
+                        <?php if ($regionId > 0): ?><a href="/admin/region-info.php?region_id=<?= $regionId ?>">Info-pagina regio</a><?php endif; ?>
+                        <a href="/admin/update-center.php">Updates uitvoeren</a>
+                        <a href="/admin/settings.php">Instellingen</a>
                     </details>
                 <?php endif; ?>
 
