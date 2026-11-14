@@ -575,7 +575,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <?php endforeach; ?>
 
         <p>
-            <a class="button button--primary" href="/admin/">
+            <a class="button button--primary" href="/admin/index.php">
                 Terug naar platformbeheer
             </a>
         </p>
