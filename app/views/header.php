@@ -62,7 +62,7 @@ if ($headerUser !== null) {
     }
 }
 
-$regionId = (int) ($region['id'] ?? 0);
+$regionId = (int) ($region['region_id'] ?? $region['id'] ?? 0);
 $isAdmin = isPlatformAdmin($headerUser);
 $canManageRegion = $regionId > 0
     && ($isAdmin || userHasRegionRole($regionId, ['region_admin', 'editor'], $headerUser));
