@@ -8,6 +8,7 @@ require_once dirname(__DIR__, 2) . '/app/Security.php';
 requirePlatformAdmin();
 
 $pageTitle = 'Gebruikers beheren - DONDEBAILAR';
+$platformAdminPage = true;
 $db = Database::connection();
 
 $users = $db->query(
