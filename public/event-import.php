@@ -212,10 +212,10 @@ function resolveImportRow(PDO $db, array $raw, array $headerMap, array $region, 
                 break;
             }
         }
+        // Een onbekende categorie blokkeert de import niet.
+        // Zonder bestaande categorie blijft category_id NULL.
         if ($categoryId > 0) {
             $row['category_id'] = $categoryId;
-        } else {
-            $row['errors'][] = 'Categorie niet gevonden: ' . $row['category'];
         }
     }
 
