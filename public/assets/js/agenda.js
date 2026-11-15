@@ -173,14 +173,23 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
     const slides = Array.from(track.querySelectorAll('.agenda-card__media-slide'));
     const updateCounter = function () {
         if (!slides.length) return;
-        const slideWidth = track.clientWidth || 1;
-        const currentIndex = Math.min(slides.length, Math.max(1, Math.round(track.scrollLeft / slideWidth) + 1));
-        counter.textContent = currentIndex + ' / ' + slides.length;
+        // Bepaal de actieve slide aan de hand van de werkelijke positie van de slides.
+        const currentIndex = slides.reduce(function (bestIndex, slide, index) {
+            return Math.abs(slide.offsetLeft - track.scrollLeft) <
+                Math.abs(slides[bestIndex].offsetLeft - track.scrollLeft) ? index : bestIndex;
+        }, 0);
+        counter.textContent = (currentIndex + 1) + ' / ' + slides.length;
 
-        // Pas de hoogte van de volledige kaart aan de momenteel zichtbare media-slide aan.
-        const activeSlide = slides[currentIndex - 1];
+        // Meet de eigen inhoud van de actieve slide, niet de oude hoogte van de galerij.
+        const activeSlide = slides[currentIndex];
         if (activeSlide) {
-            const activeHeight = Math.ceil(activeSlide.getBoundingClientRect().height);
+            track.style.height = 'auto';
+            gallery.style.height = 'auto';
+            const activeHeight = Math.ceil(Math.max(
+                activeSlide.scrollHeight,
+                activeSlide.getBoundingClientRect().height,
+                activeSlide.offsetHeight
+            ));
             if (activeHeight > 0) {
                 track.style.height = activeHeight + 'px';
                 gallery.style.height = activeHeight + 'px';
