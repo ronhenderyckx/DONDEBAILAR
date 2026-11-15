@@ -158,60 +158,37 @@ document.addEventListener('click', function (event) {
     playAgendaVideo(video);
 }, true);
 
-// Start pas een video nadat het scrollen even gestopt is.
+// Start een video zodra een deel ervan zichtbaar wordt.
+// Stop hem pas wanneer de video zelf volledig buiten het scherm valt.
 function scheduleVisibleAgendaVideo() {
     window.clearTimeout(agendaVideoIdleTimer);
     agendaVideoIdleTimer = window.setTimeout(function () {
-        // Laat de huidige video doorspelen zolang de bijbehorende evenementkaart
-        // nog geheel of gedeeltelijk in het browservenster zichtbaar is.
         if (activeAgendaVideo && !activeAgendaVideo.paused) {
-            const activeCard = activeAgendaVideo.closest('.agenda-card');
-            if (activeCard) {
-                const rect = activeCard.getBoundingClientRect();
-                const cardStillVisible = rect.bottom > 0 && rect.top < window.innerHeight &&
-                    rect.right > 0 && rect.left < window.innerWidth;
-                if (cardStillVisible) return;
-            }
+            const rect = activeAgendaVideo.getBoundingClientRect();
+            const videoStillVisible = rect.bottom > 0 && rect.top < window.innerHeight &&
+                rect.right > 0 && rect.left < window.innerWidth;
+            if (videoStillVisible) return;
             activeAgendaVideo.pause();
             activeAgendaVideo = null;
         }
 
-        // Er is geen zichtbare actieve video: kies een video uit de meest
-        // zichtbare evenementkaart.
-        let bestCard = null;
-        let bestCardRatio = 0;
-        document.querySelectorAll('.agenda-feed .agenda-card').forEach(function (card) {
-            const rect = card.getBoundingClientRect();
+        // Kies de meest zichtbare video over alle evenementkaarten.
+        // Ook een klein zichtbaar deel is voldoende om het afspelen te starten.
+        let bestVideo = null;
+        let bestVideoArea = 0;
+        document.querySelectorAll('.agenda-feed .agenda-card__video').forEach(function (video) {
+            const rect = video.getBoundingClientRect();
             const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
             const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
-            const ratio = rect.width > 0 && rect.height > 0
-                ? (visibleWidth * visibleHeight) / (rect.width * rect.height)
-                : 0;
-            if (ratio > bestCardRatio) {
-                bestCardRatio = ratio;
-                bestCard = card;
+            const visibleArea = visibleWidth * visibleHeight;
+            if (visibleArea > bestVideoArea) {
+                bestVideoArea = visibleArea;
+                bestVideo = video;
             }
         });
 
-        let bestVideo = null;
-        let bestVideoRatio = 0;
-        if (bestCard && bestCardRatio > 0) {
-            bestCard.querySelectorAll('.agenda-card__video').forEach(function (video) {
-                const rect = video.getBoundingClientRect();
-                const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
-                const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
-                const ratio = rect.width > 0 && rect.height > 0
-                    ? (visibleWidth * visibleHeight) / (rect.width * rect.height)
-                    : 0;
-                if (ratio > bestVideoRatio) {
-                    bestVideoRatio = ratio;
-                    bestVideo = video;
-                }
-            });
-        }
-
-        if (bestVideo && bestVideoRatio >= 0.2) playAgendaVideo(bestVideo);
-    }, 50);
+        if (bestVideo && bestVideoArea > 0) playAgendaVideo(bestVideo);
+    }, 0);
 }
 window.addEventListener('scroll', scheduleVisibleAgendaVideo, {passive:true});
 window.addEventListener('resize', scheduleVisibleAgendaVideo, {passive:true});
@@ -463,6 +440,7 @@ const agendaMediaCardObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
         if (!entry.isIntersecting) return;
         loadAgendaCardMedia(entry.target);
+        scheduleVisibleAgendaVideo();
         agendaMediaCardObserver.unobserve(entry.target);
     });
 }, {rootMargin:'250px 0px', threshold:0});
@@ -475,14 +453,12 @@ document.querySelectorAll('.agenda-feed .agenda-card').forEach(function (card) {
 const agendaVideoObserver = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
         const video = entry.target;
-        if (entry.isIntersecting) {
-            // Laad alvast de metadata van video's die op het scherm komen.
-            // Zo kan de eerste frame sneller verschijnen zonder alle video's vooraf te downloaden.
+        if (entry.isIntersecting && entry.intersectionRatio > 0) {
+            // Laad metadata en start zodra de video in beeld komt.
             video.setAttribute('preload', 'metadata');
-        }
-        // Laat de video doorspelen zolang ook maar een deel zichtbaar is.
-        // Pauzeer uitsluitend wanneer de video volledig uit beeld is.
-        if (!entry.isIntersecting || entry.intersectionRatio <= 0) {
+            scheduleVisibleAgendaVideo();
+        } else {
+            // Een video die volledig uit beeld is, mag stoppen.
             video.pause();
             if (activeAgendaVideo === video) activeAgendaVideo = null;
         }
