@@ -368,6 +368,5 @@ require dirname(__DIR__) . '/app/views/header.php';
             });
         });
     });
-})();
 </script>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
