@@ -2243,3 +2243,9 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-card > .agenda-card__details {
     padding-top:4px!important;
 }
+
+/* Verticaal swipen over een video moet de pagina gewoon laten scrollen. */
+.agenda-card__video {
+    touch-action:pan-y!important;
+    pointer-events:auto;
+}
