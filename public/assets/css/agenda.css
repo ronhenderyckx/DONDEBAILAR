@@ -2249,3 +2249,10 @@ body.has-agenda-footer .site-main > .agenda-page {
     touch-action:pan-y!important;
     pointer-events:auto;
 }
+
+/* Voorkom het lang indrukken-contextmenu en selectie op agenda-video's. */
+.agenda-card__video {
+    -webkit-touch-callout:none!important;
+    -webkit-user-select:none!important;
+    user-select:none!important;
+}
