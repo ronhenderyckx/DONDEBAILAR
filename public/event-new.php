@@ -193,7 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            storeEventMedia($db, $eventId, (int) $user['id'], $_FILES);
+            storeEventMedia($db, $eventId, (int) $user['id'], $_FILES, (array) ($_POST['media_captions'] ?? []));
 
             // Geef iedere editie eigen mediabestanden en eigen event_media-records.
             if (count($occurrences) > 1) {
@@ -324,11 +324,11 @@ require dirname(__DIR__) . '/app/views/header.php';
             <p class="event-form-note">Zet de hashtags apart van de beschrijving, gescheiden door spaties of komma's.</p>
             <h2>Media bij dit evenement</h2>
             <label for="photos">Foto's (meerdere mogelijk, JPG/PNG/WebP, max. 15 MB per foto; worden automatisch verkleind en als WebP opgeslagen)</label>
-            <input id="photos" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple>
+            <input id="photos" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple><div data-caption-list="photo"></div>
             <label for="videos">Video's (meerdere mogelijk, MP4/WebM/MOV, max. 80 MB per video)</label>
-            <input id="videos" type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime" multiple>
+            <input id="videos" type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime" multiple><div data-caption-list="video"></div>
             <label for="reels">Reels (meerdere mogelijk, MP4/WebM/MOV, max. 80 MB per reel)</label>
-            <input id="reels" type="file" name="reels[]" accept="video/mp4,video/webm,video/quicktime" multiple>
+            <input id="reels" type="file" name="reels[]" accept="video/mp4,video/webm,video/quicktime" multiple><div data-caption-list="reel"></div>
             <p class="event-form-note">De gebruiker die dit formulier opslaat, wordt geregistreerd als aanmaker. De organisator is de persoon of organisatie die het evenement organiseert.</p>
             <div class="form-actions"><button class="button button--primary" type="submit">Evenement opslaan als concept</button><a class="button" href="/events.php">Annuleren</a></div>
         </form>
@@ -336,7 +336,7 @@ require dirname(__DIR__) . '/app/views/header.php';
     <?php endif; ?>
 </section>
 <style>
-.event-form-section{max-width:900px}.event-form-section .auth-form{max-width:760px}.event-form-section input[type=file]{padding:8px}.event-form-section h2{margin:24px 0 0;padding-top:20px;border-top:1px solid #E7EAF0}.event-form-note{color:var(--db-muted);font-size:13px}
+.event-form-section{max-width:900px}.event-form-section .auth-form{max-width:760px}.event-form-section input[type=file]{padding:8px}.event-form-section h2{margin:24px 0 0;padding-top:20px;border-top:1px solid #E7EAF0}.event-form-note{color:var(--db-muted);font-size:13px}.event-media-caption{display:block;margin:8px 0;font-size:13px}.event-media-caption textarea{display:block;width:100%;max-width:600px;margin-top:4px;box-sizing:border-box}
 </style>
 <script>
 (() => {
@@ -352,6 +352,22 @@ require dirname(__DIR__) . '/app/views/header.php';
         select.addEventListener('change', sync);
         sync();
     }
+})();
+    document.querySelectorAll('input[type=file][multiple]').forEach(input => {
+        const type = input.id === 'photos' ? 'photo' : (input.id === 'videos' ? 'video' : (input.id === 'reels' ? 'reel' : ''));
+        const list = type ? document.querySelector('[data-caption-list="' + type + '"]') : null;
+        if (!list) return;
+        input.addEventListener('change', () => {
+            list.replaceChildren();
+            Array.from(input.files).forEach((file, index) => {
+                const label = document.createElement('label'); label.className = 'event-media-caption';
+                label.textContent = file.name + ' — tekst onder media';
+                const area = document.createElement('textarea'); area.name = 'media_captions[' + type + '][' + index + ']';
+                area.rows = 2; area.maxLength = 500; area.placeholder = 'Geen tekst laten zien als dit leeg blijft';
+                label.appendChild(area); list.appendChild(label);
+            });
+        });
+    });
 })();
 </script>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
