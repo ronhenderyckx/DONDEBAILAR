@@ -48,7 +48,7 @@ function eventCanEdit(PDO $db, array $event, array $user): bool
 }
 
 /** Bewaar meerdere foto's, video's of reels bij een bestaand evenement. */
-function storeEventMedia(PDO $db, int $eventId, int $userId, array $fileGroups): array
+function storeEventMedia(PDO $db, int $eventId, int $userId, array $fileGroups, array $captions = []): array
 {
     $baseDirectory = dirname(__DIR__) . '/uploads/events/' . $eventId;
     if (!is_dir($baseDirectory) && !mkdir($baseDirectory, 0755, true) && !is_dir($baseDirectory)) {
@@ -128,13 +128,14 @@ function storeEventMedia(PDO $db, int $eventId, int $userId, array $fileGroups):
                 $relativePath = 'uploads/events/' . $eventId . '/' . $filename;
                 $insert = $db->prepare(
                     "INSERT INTO event_media
-                        (event_id, media_context, media_type, file_path, uploaded_by)
-                     VALUES (:event_id, 'event', :media_type, :file_path, :uploaded_by)"
+                        (event_id, media_context, media_type, file_path, caption, uploaded_by)
+                     VALUES (:event_id, 'event', :media_type, :file_path, :caption, :uploaded_by)"
                 );
                 $insert->execute([
                     'event_id' => $eventId,
                     'media_type' => $type === 'photo' ? 'image' : $type,
                     'file_path' => $relativePath,
+                    'caption' => trim((string) ($captions[$type][$i] ?? '')) !== '' ? trim((string) $captions[$type][$i]) : null,
                     'uploaded_by' => $userId,
                 ]);
                 $saved[] = ['id' => (int) $db->lastInsertId(), 'path' => $relativePath];
