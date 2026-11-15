@@ -208,6 +208,7 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
                 Math.abs(slides[bestIndex].offsetLeft - track.scrollLeft) ? index : bestIndex;
         }, 0);
         counter.textContent = (currentIndex + 1) + ' / ' + slides.length;
+        loadAgendaCardMedia(slides[currentIndex]);
 
         // Meet de eigen inhoud van de actieve slide, niet de oude hoogte van de galerij.
         const activeSlide = slides[currentIndex];
@@ -227,7 +228,7 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
 
         // Stop video's zodra een andere foto, video of Reel actief wordt.
         slides.forEach(function (slide, index) {
-            const isActive = index === currentIndex - 1;
+            const isActive = index === currentIndex;
             slide.querySelectorAll('video.agenda-card__video').forEach(function (video) {
                 if (!isActive) {
                     video.pause();
@@ -419,16 +420,30 @@ document.addEventListener('click', function (event) {
 
 // Laad uploadmedia per evenement pas wanneer de evenementkaart in de buurt van het scherm komt.
 // Zo worden niet alle mediabestanden van alle evenementen tegelijk aangevraagd.
-function loadAgendaCardMedia(card) {
-    card.querySelectorAll('[data-media-src]').forEach(function (media) {
+function loadAgendaCardMedia(container) {
+    if (!container) return;
+    // Laad bij een galerij alleen de actieve slide. De overige video's blijven
+    // buiten het netwerk- en geheugengebruik totdat de bezoeker ernaartoe swipet.
+    const gallery = container.matches('[data-gallery]') ? container : container.closest('[data-gallery]');
+    let mediaContainer = container;
+    if (gallery) {
+        const track = gallery.querySelector('[data-gallery-track]');
+        if (!track) return;
+        const slides = Array.from(track.querySelectorAll('.agenda-card__media-slide'));
+        if (!slides.length) return;
+        const currentIndex = slides.reduce(function (bestIndex, slide, index) {
+            return Math.abs(slide.offsetLeft - track.scrollLeft) <
+                Math.abs(slides[bestIndex].offsetLeft - track.scrollLeft) ? index : bestIndex;
+        }, 0);
+        mediaContainer = slides[currentIndex];
+    }
+    mediaContainer.querySelectorAll('[data-media-src]').forEach(function (media) {
         if (media.hasAttribute('src')) return;
         const source = media.getAttribute('data-media-src');
         if (!source) return;
         media.setAttribute('src', source);
         media.removeAttribute('data-media-src');
         if (media.tagName === 'VIDEO') {
-            // Laad alvast de metadata van media in de eerstvolgende kaarten.
-            // De gekozen zichtbare video krijgt daarna automatisch preload="auto".
             media.setAttribute('preload', media.dataset.initialPriority === '1' ? 'auto' : 'metadata');
             media.load();
             media.addEventListener('loadedmetadata', scheduleVisibleAgendaVideo, {once:true});
