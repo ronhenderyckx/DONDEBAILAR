@@ -2331,3 +2331,18 @@ body.has-agenda-footer .site-main > .agenda-page {
     }
 }
 
+/* De iconenbalk krijgt dezelfde zijmarges als de media erboven. */
+.agenda-card > .agenda-card__quick {
+    box-sizing:border-box!important;
+    width:calc(100% - 24px)!important;
+    max-width:calc(100% - 24px)!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+}
+@media(max-width:700px) {
+    .agenda-card > .agenda-card__quick {
+        width:calc(100% - 32px)!important;
+        max-width:calc(100% - 32px)!important;
+    }
+}
+
