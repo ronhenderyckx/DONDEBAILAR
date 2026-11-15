@@ -2247,7 +2247,8 @@ body.has-agenda-footer .site-main > .agenda-page {
 /* Verticaal swipen over een video moet de pagina gewoon laten scrollen. */
 .agenda-card__video {
     touch-action:pan-y!important;
-    pointer-events:auto;
+    /* Laat verticale veegbewegingen door naar de pagina, niet naar de videospeler. */
+    pointer-events:none!important;
 }
 
 /* Voorkom het lang indrukken-contextmenu en selectie op agenda-video's. */
