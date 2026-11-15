@@ -2290,3 +2290,44 @@ body.has-agenda-footer .site-main > .agenda-page {
     overflow:hidden!important;
     border-radius:18px!important;
 }
+
+/* Laat de media iets lager beginnen en geef foto's dezelfde breedte als video's. */
+.agenda-card__media-wrap {
+    padding-top:8px!important;
+}
+.agenda-card__media-slide > .agenda-card__image-link,
+.agenda-card__media-slide .agenda-card__media-wrap > .agenda-card__image-link,
+.agenda-card__media-wrap > .agenda-card__image-link,
+.agenda-card__media-slide > .agenda-card__video,
+.agenda-card__media-slide .agenda-card__media-wrap > .agenda-card__video,
+.agenda-card__media-wrap > .agenda-card__video {
+    box-sizing:border-box!important;
+    width:calc(100% - 24px)!important;
+    max-width:calc(100% - 24px)!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+}
+.agenda-card__image-link .agenda-card__image {
+    display:block;
+    width:100%!important;
+    max-width:100%!important;
+    height:auto;
+}
+.agenda-card__media-slide > .agenda-card__image-link {
+    flex:0 0 calc(100% - 24px)!important;
+}
+@media(max-width:700px) {
+    .agenda-card__media-slide > .agenda-card__image-link,
+    .agenda-card__media-slide .agenda-card__media-wrap > .agenda-card__image-link,
+    .agenda-card__media-wrap > .agenda-card__image-link,
+    .agenda-card__media-slide > .agenda-card__video,
+    .agenda-card__media-slide .agenda-card__media-wrap > .agenda-card__video,
+    .agenda-card__media-wrap > .agenda-card__video {
+        width:calc(100% - 32px)!important;
+        max-width:calc(100% - 32px)!important;
+    }
+    .agenda-card__media-slide > .agenda-card__image-link {
+        flex-basis:calc(100% - 32px)!important;
+    }
+}
+
