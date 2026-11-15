@@ -2284,3 +2284,9 @@ body.has-agenda-footer .site-main > .agenda-page {
         max-width:calc(100% - 32px)!important;
     }
 }
+
+/* Rond ook de bovenste hoeken van de volledige evenementkaart af. */
+.agenda-card {
+    overflow:hidden!important;
+    border-radius:18px!important;
+}
