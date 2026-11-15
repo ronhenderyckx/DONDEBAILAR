@@ -2244,10 +2244,17 @@ body.has-agenda-footer .site-main > .agenda-page {
     padding-top:4px!important;
 }
 
-/* Verticaal swipen over een video moet de pagina gewoon laten scrollen. */
+/* Laat zowel verticaal paginascrollen als horizontaal bladeren toe
+   wanneer een veegbeweging op een video of media-slide begint. */
+.agenda-card__gallery-track,
+.agenda-card__media-slide,
+.agenda-card__media-wrap,
 .agenda-card__video {
-    touch-action:pan-y!important;
-    /* Laat verticale veegbewegingen door naar de pagina, niet naar de videospeler. */
+    touch-action:pan-x pan-y pinch-zoom!important;
+}
+
+/* De videospeler zelf vangt geen aanrakingen; de website verwerkt de veegbeweging. */
+.agenda-card__video {
     pointer-events:none!important;
 }
 
