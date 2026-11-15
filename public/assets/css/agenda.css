@@ -2267,3 +2267,20 @@ body.has-agenda-footer .site-main > .agenda-page {
 
 /* Horizontale mediavegen blijven door de galerij zelf afgehandeld. */
 
+/* Iets bredere zijranden naast video's geven meer ruimte om de mediaveeg te starten. */
+.agenda-card__media-slide > .agenda-card__video,
+.agenda-card__media-slide .agenda-card__media-wrap > .agenda-card__video,
+.agenda-card__media-wrap > .agenda-card__video {
+    width:calc(100% - 24px)!important;
+    max-width:calc(100% - 24px)!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+}
+@media(max-width:700px) {
+    .agenda-card__media-slide > .agenda-card__video,
+    .agenda-card__media-slide .agenda-card__media-wrap > .agenda-card__video,
+    .agenda-card__media-wrap > .agenda-card__video {
+        width:calc(100% - 32px)!important;
+        max-width:calc(100% - 32px)!important;
+    }
+}
