@@ -124,6 +124,21 @@ function playAgendaVideo(video) {
             video.addEventListener('loadeddata', function () {
                 delete video.dataset.waitingForFrame;
                 scheduleVisibleAgendaVideo();
+
+// Een tik op een videovlak mag de video nooit pauzeren.
+// De video heeft geen bediening; na een gewone tik hervatten we hem.
+document.addEventListener('click', function (event) {
+    const target = event.target instanceof Element ? event.target : null;
+    if (!target) return;
+    const slide = target.closest('.agenda-card__media-slide');
+    if (!slide) return;
+    const video = slide.querySelector('video.agenda-card__video');
+    if (!video) return;
+    event.preventDefault();
+    event.stopPropagation();
+    playAgendaVideo(video);
+}, true);
+
             }, {once:true});
             // Start één laadpoging. Tijdens het wachten op het eerste frame
             // mag een scroll- of resize-event de videobron niet opnieuw resetten.
