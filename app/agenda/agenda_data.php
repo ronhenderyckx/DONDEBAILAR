@@ -269,7 +269,7 @@ if ($regionId > 0) {
         $eventIds = array_map(static fn(array $event): int => (int) $event['id'], $events);
         $eventPlaceholders = implode(',', array_fill(0, count($eventIds), '?'));
         $mediaQuery = $db->prepare(
-            "SELECT id, event_id, media_type, media_source, external_url, file_path, is_cover
+            "SELECT id, event_id, media_type, media_source, external_url, file_path, caption, is_cover
              FROM event_media
              WHERE event_id IN ($eventPlaceholders)
                AND media_context = 'event'
@@ -294,6 +294,7 @@ if ($regionId > 0) {
                 'type' => $mediaType,
                 'source' => $mediaSource,
                 'external_url' => $hasExternal ? $externalUrl : '',
+                'caption' => trim((string) ($mediaItem['caption'] ?? '')),
             ];
         }
 
