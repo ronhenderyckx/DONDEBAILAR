@@ -340,6 +340,15 @@
 }
 .agenda-card__video {
     display:block;
+    visibility:hidden;
+    width:100%;
+}
+.agenda-card__video.is-frame-ready {
+    visibility:visible;
+}
+.agenda-card__video {
+    display:block;
+    visibility:hidden;
     width:100%;
     max-width:100%;
     height:auto;
