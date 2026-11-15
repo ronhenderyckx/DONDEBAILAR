@@ -2126,3 +2126,8 @@ body.has-agenda-footer .site-main > .agenda-page {
         grid-template-columns: minmax(0, 1fr);
     }
 }
+
+
+/* Bijschrift per afzonderlijke foto of video */
+.agenda-card__media-caption{margin:8px 0 12px;padding:0 12px;color:var(--db-text,#222);font-size:14px;line-height:1.45;text-align:left;overflow-wrap:anywhere}
+.agenda-card__media-slide .agenda-card__media-caption{flex:0 0 100%;box-sizing:border-box}
