@@ -138,8 +138,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $removedMediaPaths[] = (string) $item['file_path'];
             }
 
+            $captionUpdate = $db->prepare("UPDATE event_media SET caption = :caption WHERE id = :media_id AND event_id = :event_id AND media_context = 'event'");
+            foreach ((array) ($_POST['media_caption_existing'] ?? []) as $mediaIdRaw => $captionRaw) {
+                $mediaId = filter_var($mediaIdRaw, FILTER_VALIDATE_INT);
+                if (!$mediaId || $mediaId < 1) continue;
+                $caption = trim((string) $captionRaw);
+                $captionUpdate->execute(['caption' => $caption !== '' ? mb_substr($caption, 0, 500) : null, 'media_id' => $mediaId, 'event_id' => $id]);
+            }
             storeEventSocialMedia($db, (int) $id, (int) $user['id'], $_POST);
-            storeEventMedia($db, (int) $id, (int) $user['id'], $_FILES);
+            storeEventMedia($db, (int) $id, (int) $user['id'], $_FILES, (array) ($_POST['media_captions'] ?? []));
             $db->commit();
 
             // Verwijder bestanden pas nadat de databasewijzigingen definitief zijn.
@@ -200,6 +207,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                             <video src="/event-media.php?id=<?= (int) $item['id'] ?>" controls preload="metadata"></video>
                         <?php endif; ?>
                         <span><?= escapeHtml($item['media_type'] === 'reel' ? 'Reel' : ($item['media_type'] === 'video' ? 'Video' : ($item['media_type'] === 'social_post' ? 'Bericht op sociale media' : 'Foto'))) ?></span>
+                        <label class="event-media-caption">Tekst onder media<textarea name="media_caption_existing[<?= (int) $item['id'] ?>]" rows="2" maxlength="500" placeholder="Geen tekst laten zien als dit leeg blijft"><?= escapeHtml((string) ($item['caption'] ?? '')) ?></textarea></label>
                         <span><input type="checkbox" name="delete_media[]" value="<?= (int) $item['id'] ?>"> Verwijderen</span>
                     </label>
                 <?php endforeach; ?>
@@ -220,15 +228,35 @@ require dirname(__DIR__) . '/app/views/header.php';
             <label for="social_url">Link naar het openbare bericht</label>
             <input id="social_url" type="url" name="social_url" maxlength="1000" placeholder="https://www.instagram.com/reel/...">
             <p class="event-form-note">Je kunt per keer één link toevoegen. Sla de wijzigingen op om deze aan het evenement te koppelen.</p>
-            <label for="photos">Foto's toevoegen (JPG/PNG/WebP, max. 15 MB per foto; worden automatisch verkleind en als WebP opgeslagen)</label><input id="photos" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple>
-            <label for="videos">Video's toevoegen (MP4/WebM/MOV, max. 80 MB per video)</label><input id="videos" type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime" multiple>
-            <label for="reels">Reels toevoegen (MP4/WebM/MOV, max. 80 MB per reel)</label><input id="reels" type="file" name="reels[]" accept="video/mp4,video/webm,video/quicktime" multiple>
+            <label for="photos">Foto's toevoegen (JPG/PNG/WebP, max. 15 MB per foto; worden automatisch verkleind en als WebP opgeslagen)</label><input id="photos" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple><div data-caption-list="photo"></div>
+            <label for="videos">Video's toevoegen (MP4/WebM/MOV, max. 80 MB per video)</label><input id="videos" type="file" name="videos[]" accept="video/mp4,video/webm,video/quicktime" multiple><div data-caption-list="video"></div>
+            <label for="reels">Reels toevoegen (MP4/WebM/MOV, max. 80 MB per reel)</label><input id="reels" type="file" name="reels[]" accept="video/mp4,video/webm,video/quicktime" multiple><div data-caption-list="reel"></div>
             <p class="event-form-note">De organisator is de persoon of organisatie die het evenement organiseert. De ingelogde gebruiker blijft geregistreerd als aanmaker.</p>
             <div class="form-actions"><button class="button button--primary" type="submit">Wijzigingen opslaan</button><a class="button" href="/events.php">Terug</a></div>
         </form>
     </section>
 </section>
 <style>
-.event-form-section{max-width:900px}.event-form-section .auth-form{max-width:760px}.event-form-section input[type=file]{padding:8px}.event-form-section h2{margin:24px 0 0;padding-top:20px;border-top:1px solid #E7EAF0}.event-media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}.event-media-item{padding:10px;border:1px solid #E7EAF0;border-radius:9px;background:#fff}.event-media-item img,.event-media-item video{width:100%;height:120px;object-fit:cover;border-radius:6px;background:#111}.event-social-placeholder{min-height:120px;display:flex;flex-direction:column;justify-content:center;gap:12px;overflow-wrap:anywhere}.event-social-placeholder a{font-size:13px}.event-media-item span{display:block;margin-top:7px;font-size:12px}.event-form-note{color:var(--db-muted);font-size:13px}
+.event-form-section{max-width:900px}.event-form-section .auth-form{max-width:760px}.event-form-section input[type=file]{padding:8px}.event-form-section h2{margin:24px 0 0;padding-top:20px;border-top:1px solid #E7EAF0}.event-media-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}.event-media-item{padding:10px;border:1px solid #E7EAF0;border-radius:9px;background:#fff}.event-media-item img,.event-media-item video{width:100%;height:120px;object-fit:cover;border-radius:6px;background:#111}.event-social-placeholder{min-height:120px;display:flex;flex-direction:column;justify-content:center;gap:12px;overflow-wrap:anywhere}.event-social-placeholder a{font-size:13px}.event-media-item span{display:block;margin-top:7px;font-size:12px}.event-media-caption{display:block;margin-top:10px;font-size:12px}.event-media-caption textarea{width:100%;min-height:54px;margin-top:4px;box-sizing:border-box}.event-form-note{color:var(--db-muted);font-size:13px}
 </style>
+<script>
+document.querySelectorAll('input[type=file][multiple]').forEach(input => {
+    const type = input.id === 'photos' ? 'photo' : (input.id === 'videos' ? 'video' : (input.id === 'reels' ? 'reel' : ''));
+    const list = type ? document.querySelector('[data-caption-list="' + type + '"]') : null;
+    if (!list) return;
+    input.addEventListener('change', () => {
+        list.replaceChildren();
+        Array.from(input.files).forEach((file, index) => {
+            const label = document.createElement('label');
+            label.className = 'event-media-caption';
+            label.textContent = file.name + ' — tekst onder media';
+            const area = document.createElement('textarea');
+            area.name = 'media_captions[' + type + '][' + index + ']';
+            area.rows = 2; area.maxLength = 500;
+            area.placeholder = 'Geen tekst laten zien als dit leeg blijft';
+            label.appendChild(area); list.appendChild(label);
+        });
+    });
+});
+</script>
 <?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
