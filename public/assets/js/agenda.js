@@ -201,11 +201,16 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
     if (!track || !counter) return;
     const slides = Array.from(track.querySelectorAll('.agenda-card__media-slide'));
     let releaseInactiveMediaTimer = null;
-    const releaseInactiveVideos = function (activeIndex) {
+    const releaseInactiveVideos = function () {
         window.clearTimeout(releaseInactiveMediaTimer);
         releaseInactiveMediaTimer = window.setTimeout(function () {
-            // Geef de swipe eerst tijd om af te ronden. Ontkoppel daarna alle
-            // niet-actieve videobronnen zodat gedecodeerde frames/geheugen vrijkomen.
+            // Bepaal na afloop van de swipe opnieuw welke slide actief is.
+            // Zo kan een vertraagde timer nooit de video verwijderen die intussen
+            // de actieve slide is geworden.
+            const activeIndex = slides.reduce(function (bestIndex, slide, index) {
+                return Math.abs(slide.offsetLeft - track.scrollLeft) <
+                    Math.abs(slides[bestIndex].offsetLeft - track.scrollLeft) ? index : bestIndex;
+            }, 0);
             slides.forEach(function (slide, index) {
                 if (index === activeIndex) return;
                 slide.querySelectorAll('video.agenda-card__video').forEach(function (video) {
@@ -232,7 +237,7 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
         }, 0);
         counter.textContent = (currentIndex + 1) + ' / ' + slides.length;
         loadAgendaCardMedia(slides[currentIndex]);
-        releaseInactiveVideos(currentIndex);
+        releaseInactiveVideos();
 
         // Meet de eigen inhoud van de actieve slide, niet de oude hoogte van de galerij.
         const activeSlide = slides[currentIndex];
