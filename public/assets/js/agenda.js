@@ -177,6 +177,16 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
         const currentIndex = Math.min(slides.length, Math.max(1, Math.round(track.scrollLeft / slideWidth) + 1));
         counter.textContent = currentIndex + ' / ' + slides.length;
 
+        // Pas de hoogte van de volledige kaart aan de momenteel zichtbare media-slide aan.
+        const activeSlide = slides[currentIndex - 1];
+        if (activeSlide) {
+            const activeHeight = Math.ceil(activeSlide.getBoundingClientRect().height);
+            if (activeHeight > 0) {
+                track.style.height = activeHeight + 'px';
+                gallery.style.height = activeHeight + 'px';
+            }
+        }
+
         // Stop video's zodra een andere foto, video of Reel actief wordt.
         slides.forEach(function (slide, index) {
             const isActive = index === currentIndex - 1;
@@ -209,6 +219,22 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
                     behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
                 });
             });
+        });
+    });
+    // Herbereken ook wanneer afbeeldingen, video's of ingesloten reels hun formaat krijgen.
+    if ('ResizeObserver' in window) {
+        const slideObserver = new ResizeObserver(function () {
+            updateCounter();
+        });
+        slides.forEach(function (slide) {
+            slideObserver.observe(slide);
+        });
+    }
+    slides.forEach(function (slide) {
+        slide.querySelectorAll('img, video, iframe').forEach(function (media) {
+            media.addEventListener('load', updateCounter, { passive: true });
+            media.addEventListener('loadedmetadata', updateCounter, { passive: true });
+            media.addEventListener('loadeddata', updateCounter, { passive: true });
         });
     });
     track.addEventListener('scroll', updateCounter, { passive: true });
