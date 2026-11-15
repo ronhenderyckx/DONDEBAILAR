@@ -400,6 +400,14 @@ const agendaVideoObserver = new IntersectionObserver(function (entries) {
     });
 }, {threshold:[0, 0.6]});
 document.querySelectorAll('.agenda-card__video').forEach(function (video) {
+    // Toon de videoplayer pas zodra het eerste echte videobeeld beschikbaar is.
+    // Tot die tijd blijft de gekleurde achtergrond van de mediakaart zichtbaar.
+    video.addEventListener('loadeddata', function () {
+        video.classList.add('is-frame-ready');
+    }, {once:true});
+    if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
+        video.classList.add('is-frame-ready');
+    }
     video.muted = agendaVideosMuted;
     video.removeAttribute('autoplay');
     // Haal metadata van de eerste zichtbare video meteen op; overige video's blijven uitgesteld.
