@@ -2140,3 +2140,9 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-card__media-slide{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start}
 .agenda-card__media-slide .agenda-card__media-caption{display:block;flex:0 0 auto;width:100%;box-sizing:border-box;margin:0;padding:12px 14px 14px;color:#fff;font-size:14px;line-height:1.5;white-space:normal;overflow-wrap:anywhere;background:var(--db-event-day-color,var(--db-primary,#333))}
 .agenda-card__media-wrap>.agenda-card__media-caption{display:block;position:relative;margin:0;padding:12px 14px 14px;color:#fff;font-size:14px;line-height:1.5;white-space:normal;overflow-wrap:anywhere;background:var(--db-event-day-color,var(--db-primary,#333))}
+
+/* Bijschriften onder foto's en video's volgen de ingestelde dagtekstkleur. */
+.agenda-card__media-slide .agenda-card__media-caption,
+.agenda-card__media-wrap > .agenda-card__media-caption {
+    color:var(--db-event-day-text-color,#222222)!important;
+}
