@@ -125,10 +125,10 @@ function playAgendaVideo(video) {
                 delete video.dataset.waitingForFrame;
                 scheduleVisibleAgendaVideo();
             }, {once:true});
+            // Start één laadpoging. Tijdens het wachten op het eerste frame
+            // mag een scroll- of resize-event de videobron niet opnieuw resetten.
+            video.load();
         }
-        // load() opnieuw aanroepen nadat preload is verhoogd, zodat ook de
-        // eerste zichtbare video daadwerkelijk een frame kan ophalen.
-        video.load();
         return;
     }
 
