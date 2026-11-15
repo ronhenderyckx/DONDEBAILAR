@@ -214,14 +214,14 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
             slides.forEach(function (slide, index) {
                 if (index === activeIndex) return;
                 slide.querySelectorAll('video.agenda-card__video').forEach(function (video) {
-                    const source = video.getAttribute('src');
-                    if (!source) return;
+                    if (!video.hasAttribute('src') || video.dataset.mediaReleased === '1') return;
                     video.pause();
                     if (activeAgendaVideo === video) activeAgendaVideo = null;
-                    video.removeAttribute('src');
-                    video.removeAttribute('srcset');
+                    // Behoud de bron-URL. Alleen de decoder/buffer wordt vrijgegeven;
+                    // bij terugkeer op deze slide wordt dezelfde video opnieuw geladen.
+                    video.setAttribute('preload', 'none');
                     video.load();
-                    video.setAttribute('data-media-src', source);
+                    video.dataset.mediaReleased = '1';
                     video.classList.remove('is-frame-ready');
                     delete video.dataset.waitingForFrame;
                 });
@@ -466,7 +466,17 @@ function loadAgendaCardMedia(container) {
         }, 0);
         mediaContainer = slides[currentIndex];
     }
-    mediaContainer.querySelectorAll('[data-media-src]').forEach(function (media) {
+    mediaContainer.querySelectorAll('video.agenda-card__video, [data-media-src]').forEach(function (media) {
+        if (media.tagName === 'VIDEO' && media.dataset.mediaReleased === '1' && media.hasAttribute('src')) {
+            // De bron blijft aan het element gekoppeld; laad de video opnieuw
+            // zodra deze slide weer actief wordt.
+            delete media.dataset.mediaReleased;
+            media.setAttribute('preload', 'auto');
+            media.load();
+            media.addEventListener('loadedmetadata', scheduleVisibleAgendaVideo, {once:true});
+            media.addEventListener('loadeddata', scheduleVisibleAgendaVideo, {once:true});
+            return;
+        }
         if (media.hasAttribute('src')) return;
         const source = media.getAttribute('data-media-src');
         if (!source) return;
