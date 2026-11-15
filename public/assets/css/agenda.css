@@ -342,14 +342,7 @@
     display:block;
     visibility:hidden;
     width:100%;
-}
-.agenda-card__video.is-frame-ready {
-    visibility:visible;
-}
-.agenda-card__video {
-    display:block;
-    visibility:hidden;
-    width:100%;
+    max-width:100%;
     max-width:100%;
     height:auto;
     max-height:none;
@@ -357,6 +350,9 @@
     aspect-ratio:auto;
     object-fit:contain;
     background:var(--db-event-day-color,var(--db-primary,#f78d19))
+}
+.agenda-card__video.is-frame-ready {
+    visibility:visible;
 }
 .agenda-card__external-media {
     display:flex;
