@@ -200,6 +200,29 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
     const counter = gallery.querySelector('[data-gallery-count]');
     if (!track || !counter) return;
     const slides = Array.from(track.querySelectorAll('.agenda-card__media-slide'));
+    let releaseInactiveMediaTimer = null;
+    const releaseInactiveVideos = function (activeIndex) {
+        window.clearTimeout(releaseInactiveMediaTimer);
+        releaseInactiveMediaTimer = window.setTimeout(function () {
+            // Geef de swipe eerst tijd om af te ronden. Ontkoppel daarna alle
+            // niet-actieve videobronnen zodat gedecodeerde frames/geheugen vrijkomen.
+            slides.forEach(function (slide, index) {
+                if (index === activeIndex) return;
+                slide.querySelectorAll('video.agenda-card__video').forEach(function (video) {
+                    const source = video.getAttribute('src');
+                    if (!source) return;
+                    video.pause();
+                    if (activeAgendaVideo === video) activeAgendaVideo = null;
+                    video.removeAttribute('src');
+                    video.removeAttribute('srcset');
+                    video.load();
+                    video.setAttribute('data-media-src', source);
+                    video.classList.remove('is-frame-ready');
+                    delete video.dataset.waitingForFrame;
+                });
+            });
+        }, 450);
+    };
     const updateCounter = function () {
         if (!slides.length) return;
         // Bepaal de actieve slide aan de hand van de werkelijke positie van de slides.
@@ -209,6 +232,7 @@ document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
         }, 0);
         counter.textContent = (currentIndex + 1) + ' / ' + slides.length;
         loadAgendaCardMedia(slides[currentIndex]);
+        releaseInactiveVideos(currentIndex);
 
         // Meet de eigen inhoud van de actieve slide, niet de oude hoogte van de galerij.
         const activeSlide = slides[currentIndex];
