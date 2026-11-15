@@ -125,20 +125,6 @@ function playAgendaVideo(video) {
                 delete video.dataset.waitingForFrame;
                 scheduleVisibleAgendaVideo();
 
-// Een tik op een videovlak mag de video nooit pauzeren.
-// De video heeft geen bediening; na een gewone tik hervatten we hem.
-document.addEventListener('click', function (event) {
-    const target = event.target instanceof Element ? event.target : null;
-    if (!target) return;
-    const slide = target.closest('.agenda-card__media-slide');
-    if (!slide) return;
-    const video = slide.querySelector('video.agenda-card__video');
-    if (!video) return;
-    event.preventDefault();
-    event.stopPropagation();
-    playAgendaVideo(video);
-}, true);
-
             }, {once:true});
             // Start één laadpoging. Tijdens het wachten op het eerste frame
             // mag een scroll- of resize-event de videobron niet opnieuw resetten.
@@ -157,6 +143,20 @@ document.addEventListener('click', function (event) {
         playPromise.catch(function () {});
     }
 }
+
+// Een tik op een videovlak mag de video nooit pauzeren.
+// De video heeft geen bediening; na een gewone tik hervatten we hem.
+document.addEventListener('click', function (event) {
+    const target = event.target instanceof Element ? event.target : null;
+    if (!target) return;
+    const slide = target.closest('.agenda-card__media-slide');
+    if (!slide) return;
+    const video = slide.querySelector('video.agenda-card__video');
+    if (!video) return;
+    event.preventDefault();
+    event.stopPropagation();
+    playAgendaVideo(video);
+}, true);
 
 // Start pas een video nadat het scrollen even gestopt is.
 function scheduleVisibleAgendaVideo() {
@@ -450,11 +450,11 @@ function loadAgendaCardMedia(card) {
         media.setAttribute('src', source);
         media.removeAttribute('data-media-src');
         if (media.tagName === 'VIDEO') {
-            if (media.dataset.initialPriority !== '1') {
-                media.setAttribute('preload', 'none');
-            }
-            // Forceer de browser om de nieuwe videobron te openen.
+            // Laad alvast de metadata van media in de eerstvolgende kaarten.
+            // De gekozen zichtbare video krijgt daarna automatisch preload="auto".
+            media.setAttribute('preload', media.dataset.initialPriority === '1' ? 'auto' : 'metadata');
             media.load();
+            media.addEventListener('loadedmetadata', scheduleVisibleAgendaVideo, {once:true});
             media.addEventListener('loadeddata', scheduleVisibleAgendaVideo, {once:true});
         }
     });
