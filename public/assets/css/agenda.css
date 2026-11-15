@@ -2234,3 +2234,12 @@ body.has-agenda-footer .site-main > .agenda-page {
     height:auto!important;
     min-height:0!important;
 }
+
+/* Tekstblok direct onder de actie-iconen plaatsen. */
+.agenda-card > .agenda-card__quick {
+    margin:0!important;
+    padding-bottom:4px!important;
+}
+.agenda-card > .agenda-card__details {
+    padding-top:4px!important;
+}
