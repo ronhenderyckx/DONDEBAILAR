@@ -27,6 +27,9 @@
                                                     <strong>Bekijk externe media</strong>
                                                 </a>
                                             <?php endif; ?>
+                                            <?php if (trim((string) ($mediaItem['caption'] ?? '')) !== ''): ?>
+                                                <p class="agenda-card__media-caption"><?= nl2br($escape($mediaItem['caption'])) ?></p>
+                                            <?php endif; ?>
                                         </div>
                                     <?php endforeach; ?>
                                 </div>
@@ -48,6 +51,9 @@
                                 </div>
                             <?php else: ?>
                                 <a class="agenda-card__external-media" href="<?= $escape($mediaItem['external_url']) ?>" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">↗</span><strong>Bekijk externe media</strong></a>
+                            <?php endif; ?>
+                            <?php if (trim((string) ($mediaItem['caption'] ?? '')) !== ''): ?>
+                                <p class="agenda-card__media-caption"><?= nl2br($escape($mediaItem['caption'])) ?></p>
                             <?php endif; ?>
                         <?php else: ?>
                             <a class="agenda-card__image-link" href="<?= $eventUrl ?>" aria-label="Bekijk <?= $escape($event['title']) ?>">
