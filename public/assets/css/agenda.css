@@ -2258,10 +2258,5 @@ body.has-agenda-footer .site-main > .agenda-page {
     user-select:none!important;
 }
 
-/* De video ontvangt geen aanrakingen; geef verticale veegbewegingen
-   daarom ook expliciet door vanaf de omringende media-elementen. */
-.agenda-card__media-wrap,
-.agenda-card__media-slide {
-    touch-action:pan-y!important;
-}
+/* Horizontale mediavegen blijven door de galerij zelf afgehandeld. */
 
