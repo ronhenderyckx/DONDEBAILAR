@@ -428,12 +428,14 @@ const agendaVideoObserver = new IntersectionObserver(function (entries) {
             // Zo kan de eerste frame sneller verschijnen zonder alle video's vooraf te downloaden.
             video.setAttribute('preload', 'metadata');
         }
-        if (!entry.isIntersecting || entry.intersectionRatio < 0.6) {
+        // Laat de video doorspelen tijdens een gewone veegbeweging.
+        // Pauzeer pas wanneer de video vrijwel uit beeld verdwenen is.
+        if (!entry.isIntersecting || entry.intersectionRatio < 0.05) {
             video.pause();
             if (activeAgendaVideo === video) activeAgendaVideo = null;
         }
     });
-}, {threshold:[0, 0.6]});
+}, {threshold:[0, 0.05]});
 document.querySelectorAll('.agenda-card__video').forEach(function (video) {
     // Toon de videoplayer pas nadat de browser het eerste videobeeld
     // daadwerkelijk heeft weergegeven. loadeddata alleen kan nog een zwart
