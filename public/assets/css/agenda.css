@@ -2189,3 +2189,48 @@ body.has-agenda-footer .site-main > .agenda-page {
     height:auto;
     min-height:0;
 }
+
+/* Correctie: kaart en mediablok volgen hun eigen inhoud, zonder vaste rijhoogte. */
+.agenda-feed {
+    align-items:start!important;
+    align-content:start!important;
+    grid-auto-rows:max-content!important;
+}
+.agenda-feed > .agenda-card {
+    display:flex!important;
+    flex-direction:column!important;
+    align-self:start!important;
+    height:auto!important;
+    min-height:0!important;
+}
+.agenda-card > .agenda-card__media-wrap {
+    flex:0 0 auto!important;
+    height:auto!important;
+    min-height:0!important;
+}
+.agenda-card > .agenda-card__quick {
+    position:relative!important;
+    top:auto!important;
+    flex:0 0 auto!important;
+    width:100%;
+    box-sizing:border-box;
+    background:var(--db-event-day-color,var(--db-primary,#f78d19))!important;
+    color:var(--db-event-day-text-color,#222222)!important;
+}
+.agenda-card__quick .agenda-icon-button,
+.agenda-card__quick .agenda-icon-button:hover,
+.agenda-card__quick .agenda-attendance,
+.agenda-card__quick .agenda-attendance b,
+.agenda-card__quick .agenda-message-count {
+    color:var(--db-event-day-text-color,#222222)!important;
+}
+.agenda-card__quick .agenda-icon-button svg,
+.agenda-card__quick .agenda-icon-button svg * {
+    stroke:var(--db-event-day-text-color,#222222)!important;
+    color:var(--db-event-day-text-color,#222222)!important;
+}
+.agenda-card > .agenda-card__details {
+    flex:0 0 auto!important;
+    height:auto!important;
+    min-height:0!important;
+}
