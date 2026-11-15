@@ -215,6 +215,9 @@ function scheduleVisibleAgendaVideo() {
 }
 window.addEventListener('scroll', scheduleVisibleAgendaVideo, {passive:true});
 window.addEventListener('resize', scheduleVisibleAgendaVideo, {passive:true});
+document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'visible') scheduleVisibleAgendaVideo();
+});
 document.querySelectorAll('[data-gallery]').forEach(function (gallery) {
     const track = gallery.querySelector('[data-gallery-track]');
     const counter = gallery.querySelector('[data-gallery-count]');
@@ -509,6 +512,34 @@ document.querySelectorAll('.agenda-card__video').forEach(function (video) {
     }
     video.setAttribute('muted', '');
     agendaVideoObserver.observe(video);
+
+    // Sommige browsers pauzeren een video incidenteel zelf.
+    // Hervat die alleen als de pagina zichtbaar is, de evenementkaart nog
+    // in beeld staat én deze video-slide nog de actieve galerij-slide is.
+    video.addEventListener('pause', function () {
+        window.setTimeout(function () {
+            if (document.visibilityState !== 'visible' || !video.paused) return;
+            const card = video.closest('.agenda-card');
+            if (!card) return;
+            const cardRect = card.getBoundingClientRect();
+            const cardVisible = cardRect.bottom > 0 && cardRect.top < window.innerHeight &&
+                cardRect.right > 0 && cardRect.left < window.innerWidth;
+            if (!cardVisible) return;
+
+            const gallery = video.closest('[data-gallery]');
+            const track = gallery?.querySelector('[data-gallery-track]');
+            if (track) {
+                const slides = Array.from(track.querySelectorAll('.agenda-card__media-slide'));
+                const currentIndex = slides.reduce(function (bestIndex, slide, index) {
+                    return Math.abs(slide.offsetLeft - track.scrollLeft) <
+                        Math.abs(slides[bestIndex].offsetLeft - track.scrollLeft) ? index : bestIndex;
+                }, 0);
+                if (slides[currentIndex] !== video.closest('.agenda-card__media-slide')) return;
+            }
+
+            playAgendaVideo(video);
+        }, 120);
+    });
 });
 scheduleVisibleAgendaVideo();
 
