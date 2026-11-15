@@ -162,21 +162,48 @@ document.addEventListener('click', function (event) {
 function scheduleVisibleAgendaVideo() {
     window.clearTimeout(agendaVideoIdleTimer);
     agendaVideoIdleTimer = window.setTimeout(function () {
-        let bestVideo = null;
-        let bestRatio = 0;
-        document.querySelectorAll('.agenda-card__video').forEach(function (video) {
-            const rect = video.getBoundingClientRect();
+        // Bepaal eerst welke evenementkaart op dit moment het meest in beeld is.
+        let bestCard = null;
+        let bestCardRatio = 0;
+        document.querySelectorAll('.agenda-feed .agenda-card').forEach(function (card) {
+            const rect = card.getBoundingClientRect();
             const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
             const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
             const ratio = rect.width > 0 && rect.height > 0
                 ? (visibleWidth * visibleHeight) / (rect.width * rect.height)
                 : 0;
-            if (ratio > bestRatio) {
-                bestRatio = ratio;
-                bestVideo = video;
+            if (ratio > bestCardRatio) {
+                bestCardRatio = ratio;
+                bestCard = card;
             }
         });
-        if (bestVideo && bestRatio >= 0.2) playAgendaVideo(bestVideo);
+
+        // Alleen een video van de meest zichtbare evenementkaart mag spelen.
+        let bestVideo = null;
+        let bestVideoRatio = 0;
+        if (bestCard && bestCardRatio > 0) {
+            bestCard.querySelectorAll('.agenda-card__video').forEach(function (video) {
+                const rect = video.getBoundingClientRect();
+                const visibleWidth = Math.max(0, Math.min(rect.right, window.innerWidth) - Math.max(rect.left, 0));
+                const visibleHeight = Math.max(0, Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0));
+                const ratio = rect.width > 0 && rect.height > 0
+                    ? (visibleWidth * visibleHeight) / (rect.width * rect.height)
+                    : 0;
+                if (ratio > bestVideoRatio) {
+                    bestVideoRatio = ratio;
+                    bestVideo = video;
+                }
+            });
+        }
+
+        if (bestVideo && bestVideoRatio >= 0.2) {
+            playAgendaVideo(bestVideo);
+        } else {
+            document.querySelectorAll('.agenda-card__video').forEach(function (video) {
+                if (!video.paused) video.pause();
+            });
+            activeAgendaVideo = null;
+        }
     }, 50);
 }
 window.addEventListener('scroll', scheduleVisibleAgendaVideo, {passive:true});
