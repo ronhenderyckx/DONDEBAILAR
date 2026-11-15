@@ -2146,3 +2146,31 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-card__media-wrap > .agenda-card__media-caption {
     color:var(--db-event-day-text-color,#222222)!important;
 }
+
+/* Elk bijschrift blijft direct onder zijn eigen media-item, ook bij verschillende hoogtes. */
+.agenda-card__gallery-track {
+    align-items:flex-start!important;
+}
+.agenda-card__media-slide {
+    align-self:flex-start!important;
+    height:auto!important;
+    min-height:0!important;
+}
+.agenda-card__media-slide .agenda-card__image-link {
+    flex:0 0 auto!important;
+    height:auto!important;
+    min-height:0!important;
+}
+.agenda-card__media-slide .agenda-card__image,
+.agenda-card__media-slide .agenda-card__video {
+    display:block!important;
+    height:auto!important;
+    max-height:none!important;
+}
+.agenda-card__media-slide .agenda-card__media-caption {
+    flex:0 0 auto!important;
+    margin-top:0!important;
+}
+.agenda-card__media-wrap > .agenda-card__media-caption {
+    margin-top:0!important;
+}
