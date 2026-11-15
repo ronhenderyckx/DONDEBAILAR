@@ -162,7 +162,22 @@ document.addEventListener('click', function (event) {
 function scheduleVisibleAgendaVideo() {
     window.clearTimeout(agendaVideoIdleTimer);
     agendaVideoIdleTimer = window.setTimeout(function () {
-        // Bepaal eerst welke evenementkaart op dit moment het meest in beeld is.
+        // Laat de huidige video doorspelen zolang de bijbehorende evenementkaart
+        // nog geheel of gedeeltelijk in het browservenster zichtbaar is.
+        if (activeAgendaVideo && !activeAgendaVideo.paused) {
+            const activeCard = activeAgendaVideo.closest('.agenda-card');
+            if (activeCard) {
+                const rect = activeCard.getBoundingClientRect();
+                const cardStillVisible = rect.bottom > 0 && rect.top < window.innerHeight &&
+                    rect.right > 0 && rect.left < window.innerWidth;
+                if (cardStillVisible) return;
+            }
+            activeAgendaVideo.pause();
+            activeAgendaVideo = null;
+        }
+
+        // Er is geen zichtbare actieve video: kies een video uit de meest
+        // zichtbare evenementkaart.
         let bestCard = null;
         let bestCardRatio = 0;
         document.querySelectorAll('.agenda-feed .agenda-card').forEach(function (card) {
@@ -178,7 +193,6 @@ function scheduleVisibleAgendaVideo() {
             }
         });
 
-        // Alleen een video van de meest zichtbare evenementkaart mag spelen.
         let bestVideo = null;
         let bestVideoRatio = 0;
         if (bestCard && bestCardRatio > 0) {
@@ -196,14 +210,7 @@ function scheduleVisibleAgendaVideo() {
             });
         }
 
-        if (bestVideo && bestVideoRatio >= 0.2) {
-            playAgendaVideo(bestVideo);
-        } else {
-            document.querySelectorAll('.agenda-card__video').forEach(function (video) {
-                if (!video.paused) video.pause();
-            });
-            activeAgendaVideo = null;
-        }
+        if (bestVideo && bestVideoRatio >= 0.2) playAgendaVideo(bestVideo);
     }, 50);
 }
 window.addEventListener('scroll', scheduleVisibleAgendaVideo, {passive:true});
