@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $errors[] = 'Een evenement mag maximaal ' . $maxEventDurationHours . ' uur duren.';
         }
         if ($startsAt !== '' && $end === null) {
-            $end = $start->modify('+' . $maxEventDurationHours . ' hours');
+            $end = $start->modify('tomorrow')->setTime(0, 0);
         }
         $until = null;
         if ($recurrence !== 'none') {
@@ -309,7 +309,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <input id="starts_at" type="datetime-local" name="starts_at" required value="<?= escapeHtml($startsAt) ?>">
             <label for="ends_at">Eindigt op</label>
             <input id="ends_at" type="datetime-local" name="ends_at" value="<?= escapeHtml($endsAt) ?>">
-            <p class="event-form-note">Maximale duur: <?= (int) $maxEventDurationHours ?> uur. Laat leeg om automatisch deze duur te gebruiken.</p>
+            <p class="event-form-note">Maximale duur: <?= (int) $maxEventDurationHours ?> uur. Laat leeg om het evenement automatisch om 24:00 uur (middernacht) te laten eindigen.</p>
             <h2>Herhaling</h2>
             <label for="recurrence">Herhaal dit evenement</label>
             <select id="recurrence" name="recurrence">
