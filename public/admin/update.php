@@ -1,633 +1,212 @@
 <?php
-declare(strict_types=1);
-
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
-
-requirePlatformAdmin();
-
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    http_response_code(405);
-    header('Allow: POST');
-    exit('Gebruik de UPDATE-knop in het platformbeheer.');
-}
-
-if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
-    http_response_code(419);
-    exit('De beveiligingscontrole is verlopen. Vernieuw de pagina en probeer opnieuw.');
-}
-
-$pageTitle = 'DONDEBAILAR bijwerken';
-$platformAdminPage = true;
-$projectRoot = dirname(__DIR__, 2);
-$messages = [];
-$success = false;
-
-function runUpdateGit(array $arguments, string $workingDirectory): array
-{
-    if (!function_exists('proc_open')) {
-        throw new RuntimeException('PHP proc_open is niet beschikbaar op de server.');
-    }
-
-    // Gebruik op de Raspberry Pi de bestaande repository-deploysleutel.
-    // Deze sleutel werkt zonder interactieve passphrase en heeft alleen toegang
-    // tot deze repository. De persoonlijke schrijfsleutel blijft ongemoeid.
-    $deployKey = '/home/pi/.ssh/dondebailar_deploy';
-    if (is_file($deployKey)) {
-        $sshCommand = 'ssh -i ' . escapeshellarg($deployKey)
-            . ' -o IdentitiesOnly=yes -o BatchMode=yes';
-        $command = array_merge(
-            ['git', '-c', 'core.sshCommand=' . $sshCommand],
-            $arguments
-        );
-    } else {
-        $command = array_merge(['git'], $arguments);
-    }
-    $descriptors = [
-        0 => ['pipe', 'r'],
-        1 => ['pipe', 'w'],
-        2 => ['pipe', 'w'],
-    ];
-
-    $process = proc_open($command, $descriptors, $pipes, $workingDirectory);
-    if (!is_resource($process)) {
-        throw new RuntimeException('Git kon niet worden gestart.');
-    }
-
-    fclose($pipes[0]);
-    $stdout = stream_get_contents($pipes[1]) ?: '';
-    fclose($pipes[1]);
-    $stderr = stream_get_contents($pipes[2]) ?: '';
-    fclose($pipes[2]);
-    $exitCode = proc_close($process);
-
-    return [
-        'code' => $exitCode,
-        'output' => trim($stdout . ($stderr !== '' ? "\n" . $stderr : '')),
-    ];
-}
-
-function runRequiredGit(array $arguments, string $workingDirectory): string
-{
-    $result = runUpdateGit($arguments, $workingDirectory);
-    if ($result['code'] !== 0) {
-        throw new RuntimeException(
-            $result['output'] !== ''
-                ? $result['output']
-                : 'Git-opdracht is mislukt.'
-        );
-    }
-
-    return $result['output'];
-}
-
-/**
- * Laat testaccounts hetzelfde e-mailadres delen.
- * Verwijdert uitsluitend een enkelvoudige UNIQUE-index op users.email.
- */
-function migrateDuplicateUserEmails(PDO $db): void
-{
-    // SHOW INDEX leest de daadwerkelijke indexdefinitie van de actieve database.
-    $rows = $db->query('SHOW INDEX FROM `users`')->fetchAll(PDO::FETCH_ASSOC);
-    $indexes = [];
-
-    foreach ($rows as $row) {
-        $name = (string) ($row['Key_name'] ?? '');
-        if ($name === '' || !isset($row['Column_name'])) {
-            continue;
-        }
-
-        $indexes[$name][] = [
-            'column' => (string) $row['Column_name'],
-            'unique' => (int) ($row['Non_unique'] ?? 1) === 0,
-        ];
-    }
-
-    foreach ($indexes as $indexName => $columns) {
-        // Alleen een UNIQUE-index die uitsluitend uit users.email bestaat verwijderen.
-        if (
-            count($columns) !== 1
-            || $columns[0]['column'] !== 'email'
-            || !$columns[0]['unique']
-            || !preg_match('/^[A-Za-z0-9_]+$/', $indexName)
-        ) {
-            continue;
-        }
-
-        $db->exec('ALTER TABLE `users` DROP INDEX `' . $indexName . '`');
-    }
-}
-
-
-/**
- * Organisatoren zijn platformbreed en hebben geen eigen regio.
- * Verwijder de eerder toegevoegde, foutieve region_id-kolom indien aanwezig.
- */
-function removeOrganizerRegionColumn(PDO $db): void
-{
-    $column = $db->query(
-        "SELECT COUNT(*) FROM information_schema.COLUMNS
-         WHERE TABLE_SCHEMA = DATABASE()
-           AND TABLE_NAME = 'organizers'
-           AND COLUMN_NAME = 'region_id'"
-    )->fetchColumn();
-
-    if ((int) $column === 0) {
-        return;
-    }
-
-    $index = $db->query(
-        "SELECT COUNT(*) FROM information_schema.STATISTICS
-         WHERE TABLE_SCHEMA = DATABASE()
-           AND TABLE_NAME = 'organizers'
-           AND INDEX_NAME = 'idx_organizers_region_id'"
-    )->fetchColumn();
-
-    if ((int) $index > 0) {
-        $db->exec("DROP INDEX idx_organizers_region_id ON organizers");
-    }
-
-    $db->exec("ALTER TABLE organizers DROP COLUMN region_id");
-}
-
-
-
-/**
- * Organisator is optioneel voor evenementen, ook bij CSV-import.
- * De bestaande organisator-koppeling blijft behouden waar die is ingevuld.
- */
-function migrateOptionalEventOrganizer(PDO $db): void
-{
-    $column = $db->prepare(
-        "SELECT IS_NULLABLE FROM information_schema.COLUMNS
-         WHERE TABLE_SCHEMA = DATABASE()
-           AND TABLE_NAME = 'events'
-           AND COLUMN_NAME = 'organizer_id'"
-    );
-    $column->execute();
-    $nullable = $column->fetchColumn();
-    if ($nullable === false) {
-        throw new RuntimeException('Kolom events.organizer_id bestaat niet.');
-    }
-    if ($nullable !== 'YES') {
-        $db->exec("ALTER TABLE events MODIFY organizer_id BIGINT UNSIGNED NULL");
-    }
-}
-
-/**
- * Voeg het aparte hashtagveld aan evenementen toe.
- * De controle maakt de migratie veilig om bij iedere UPDATE uit te voeren.
- */
-function migrateEventHashtags(PDO $db): void
-{
-    $column = $db->prepare(
-        "SELECT COUNT(*) FROM information_schema.COLUMNS
-         WHERE TABLE_SCHEMA = DATABASE()
-           AND TABLE_NAME = 'events'
-           AND COLUMN_NAME = 'hashtags'"
-    );
-    $column->execute();
-    if ((int) $column->fetchColumn() === 0) {
-        $db->exec("ALTER TABLE events ADD COLUMN hashtags VARCHAR(500) NULL AFTER description");
-    }
-}
-
-
-/**
- * Voeg het afzonderlijke veld Extra info aan evenementen toe.
- * Idempotent: veilig bij iedere platformupdate uit te voeren.
- */
-function migrateEventExtraInfo(PDO $db): void
-{
-    $check = $db->prepare(
-        "SELECT COUNT(*) FROM information_schema.COLUMNS
-         WHERE TABLE_SCHEMA = DATABASE()
-           AND TABLE_NAME = 'events'
-           AND COLUMN_NAME = 'extra_info'"
-    );
-    $check->execute();
-    if ((int) $check->fetchColumn() === 0) {
-        $db->exec("ALTER TABLE events ADD COLUMN extra_info MEDIUMTEXT NULL AFTER description");
-    }
-}
-
-
-/**
- * Bewaar herhalingen als een reeks met afzonderlijke evenementrecords.
- * De migratie is idempotent en wordt door de website-UPDATE uitgevoerd.
- */
-function migrateEventRecurrence(PDO $db): void
-{
-    $db->exec("CREATE TABLE IF NOT EXISTS event_recurrence_series (
-        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        frequency ENUM('weekly','monthly') NOT NULL,
-        ends_on DATE NOT NULL,
-        created_by INT UNSIGNED NULL,
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        KEY idx_event_recurrence_created_by (created_by)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
-    $columns = $db->query(
-        "SELECT COLUMN_NAME FROM information_schema.COLUMNS
-         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'events'"
-    )->fetchAll(PDO::FETCH_COLUMN);
-    if (!in_array('recurrence_series_id', $columns, true)) {
-        $db->exec("ALTER TABLE events ADD COLUMN recurrence_series_id BIGINT UNSIGNED NULL");
-    }
-    if (!in_array('recurrence_number', $columns, true)) {
-        $db->exec("ALTER TABLE events ADD COLUMN recurrence_number INT UNSIGNED NULL");
-    }
-
-    $index = $db->query(
-        "SELECT COUNT(*) FROM information_schema.STATISTICS
-         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'events'
-           AND INDEX_NAME = 'idx_events_recurrence_series'"
-    )->fetchColumn();
-    if ((int) $index === 0) {
-        $db->exec("CREATE INDEX idx_events_recurrence_series ON events (recurrence_series_id, recurrence_number)");
-    }
-
-    $constraint = $db->query(
-        "SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
-         WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'events'
-           AND CONSTRAINT_NAME = 'fk_events_recurrence_series'
-           AND CONSTRAINT_TYPE = 'FOREIGN KEY'"
-    )->fetchColumn();
-    if ((int) $constraint === 0) {
-        $db->exec("ALTER TABLE events
-            ADD CONSTRAINT fk_events_recurrence_series
-            FOREIGN KEY (recurrence_series_id) REFERENCES event_recurrence_series(id)
-            ON DELETE SET NULL");
-    }
-}
-
-
-/**
- * Maak de berichtenfunctie per evenement aan.
- * De controle maakt deze database-upgrade veilig om bij iedere UPDATE uit te voeren.
- */
-function migrateEventMessages(PDO $db): void
-{
-    $db->exec("CREATE TABLE IF NOT EXISTS event_messages (
-        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        event_id BIGINT UNSIGNED NOT NULL,
-        user_id INT UNSIGNED NOT NULL,
-        parent_id BIGINT UNSIGNED NULL,
-        message TEXT NOT NULL,
-        is_deleted TINYINT(1) NOT NULL DEFAULT 0,
-        deleted_by INT UNSIGNED NULL,
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        updated_at DATETIME NULL,
-        PRIMARY KEY (id),
-        KEY idx_event_messages_event (event_id, created_at),
-        KEY idx_event_messages_parent (parent_id),
-        KEY idx_event_messages_user (user_id),
-        CONSTRAINT fk_event_messages_event FOREIGN KEY (event_id)
-            REFERENCES events(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-}
-
-
-/**
- * Meldingen voor gebruikers die in evenementberichten worden genoemd.
- */
-function migrateUserNotifications(PDO $db): void
-{
-    $db->exec("CREATE TABLE IF NOT EXISTS user_notifications (
-        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        user_id INT UNSIGNED NOT NULL,
-        actor_user_id INT UNSIGNED NOT NULL,
-        event_id BIGINT UNSIGNED NOT NULL,
-        message_id BIGINT UNSIGNED NOT NULL,
-        notification_type VARCHAR(40) NOT NULL DEFAULT 'mention',
-        is_read TINYINT(1) NOT NULL DEFAULT 0,
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        UNIQUE KEY uq_user_notification_message (user_id, message_id),
-        KEY idx_user_notifications_unread (user_id, is_read, created_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-}
-
-
-/**
- * Eenmalige, tijdelijke tokens voor wachtwoordherstel.
- */
-function migrateRegionAppearance(PDO $db): void
-{
-    $db->exec("CREATE TABLE IF NOT EXISTS region_appearance (
-        region_id BIGINT UNSIGNED NOT NULL,
-        primary_color CHAR(7) NOT NULL DEFAULT '#E23A2C',
-        primary_dark CHAR(7) NOT NULL DEFAULT '#8F211B',
-        accent_color CHAR(7) NOT NULL DEFAULT '#F6B22E',
-        secondary_color CHAR(7) NOT NULL DEFAULT '#1FA898',
-        tertiary_color CHAR(7) NOT NULL DEFAULT '#F4802A',
-        header_color CHAR(7) NOT NULL DEFAULT '#222222',
-        background_color CHAR(7) NOT NULL DEFAULT '#FFFFFF',
-        text_color CHAR(7) NOT NULL DEFAULT '#222222',
-        weekday_colors TEXT NULL,
-        logo_path VARCHAR(255) NULL,
-        PRIMARY KEY (region_id),
-        CONSTRAINT fk_region_appearance_region FOREIGN KEY (region_id)
-            REFERENCES regions(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-
-    // CREATE TABLE IF NOT EXISTS wijzigt een reeds bestaande tabel niet.
-    // Voeg daarom ontbrekende kolommen ook bij bestaande installaties toe.
-    $columns = [
-        'primary_color' => "CHAR(7) NOT NULL DEFAULT '#E23A2C'",
-        'primary_dark' => "CHAR(7) NOT NULL DEFAULT '#8F211B'",
-        'accent_color' => "CHAR(7) NOT NULL DEFAULT '#F6B22E'",
-        'secondary_color' => "CHAR(7) NOT NULL DEFAULT '#1FA898'",
-        'tertiary_color' => "CHAR(7) NOT NULL DEFAULT '#F4802A'",
-        'header_color' => "CHAR(7) NOT NULL DEFAULT '#222222'",
-        'menu_color' => "CHAR(7) NOT NULL DEFAULT '#FFFFFF'",
-        'organizer_color' => "CHAR(7) NOT NULL DEFAULT '#E23A2C'",
-        'filter_hover_color' => "CHAR(7) NOT NULL DEFAULT '#E23A2C'",
-        'filter_bar_color' => "CHAR(7) NOT NULL DEFAULT '#FFFFFF'",
-        'filter_text_color' => "CHAR(7) NOT NULL DEFAULT '#222222'",
-        'search_button_color' => "CHAR(7) NOT NULL DEFAULT '#E23A2C'",
-        'back_top_color' => "CHAR(7) NOT NULL DEFAULT '#E23A2C'",
-        'search_field_color' => "CHAR(7) NOT NULL DEFAULT '#FFFFFF'",
-        'search_text_color' => "CHAR(7) NOT NULL DEFAULT '#222222'",
-        'footer_color' => "CHAR(7) NOT NULL DEFAULT '#FFFFFF'",
-        'background_color' => "CHAR(7) NOT NULL DEFAULT '#FFFFFF'",
-        'text_color' => "CHAR(7) NOT NULL DEFAULT '#222222'",
-        'weekday_colors' => "TEXT NULL",
-        'logo_path' => "VARCHAR(255) NULL",
-    ];
-
-    $check = $db->prepare(
-        "SELECT COUNT(*) FROM information_schema.COLUMNS
-         WHERE TABLE_SCHEMA = DATABASE()
-           AND TABLE_NAME = 'region_appearance'
-           AND COLUMN_NAME = :column_name"
-    );
-
-    foreach ($columns as $name => $definition) {
-        $check->execute(['column_name' => $name]);
-        if ((int) $check->fetchColumn() === 0) {
-            $db->exec("ALTER TABLE region_appearance ADD COLUMN `{$name}` {$definition}");
-        }
-    }
-}
-
-function migrateUserAgendaPreferences(PDO $db): void
-{
-    // Gebruik bewust geen foreign keys: de ID-kolommen van bestaande
-    // installaties kunnen verschillende integergroottes hebben.
-    $db->exec("CREATE TABLE IF NOT EXISTS user_agenda_preferences (
-        user_id BIGINT UNSIGNED NOT NULL,
-        region_id BIGINT UNSIGNED NULL,
-        active_filter ENUM('organizer','city') NOT NULL DEFAULT 'organizer',
-        organizer_id BIGINT UNSIGNED NULL,
-        city VARCHAR(120) NULL,
-        sound_muted TINYINT(1) NOT NULL DEFAULT 1,
-        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        PRIMARY KEY (user_id),
-        KEY idx_user_agenda_preferences_region (region_id)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-}
-
-function migrateUserEmailVerificationTokens(PDO $db): void
-{
-    $db->exec("CREATE TABLE IF NOT EXISTS user_email_verification_tokens (
-        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        user_id BIGINT UNSIGNED NOT NULL,
-        token_hash CHAR(64) NOT NULL,
-        expires_at DATETIME NOT NULL,
-        used_at DATETIME NULL,
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        UNIQUE KEY uq_user_email_verification_hash (token_hash),
-        KEY idx_user_email_verification_user (user_id),
-        KEY idx_user_email_verification_expiry (expires_at),
-        CONSTRAINT fk_user_email_verification_user FOREIGN KEY (user_id)
-            REFERENCES users(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-}
-
-function migratePasswordResetTokens(PDO $db): void
-{
-    $db->exec("CREATE TABLE IF NOT EXISTS password_reset_tokens (
-        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        email VARCHAR(190) NOT NULL,
-        token_hash CHAR(64) NOT NULL,
-        expires_at DATETIME NOT NULL,
-        used_at DATETIME NULL,
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        UNIQUE KEY uq_password_reset_token_hash (token_hash),
-        KEY idx_password_reset_email_created (email, created_at),
-        KEY idx_password_reset_expiry (expires_at)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-}
-
-
-/**
- * Universele registratie van aanmaak en laatste wijziging.
- * Alle applicatietabellen krijgen dezelfde vier auditvelden. Database-triggers
- * vullen ze automatisch, zodat ook bestaande formulieren en API-acties gevolgd worden.
- */
-function migrateAuditTracking(PDO $db): void
-{
-    $tables = $db->query(
-        "SELECT TABLE_NAME
-         FROM information_schema.TABLES
-         WHERE TABLE_SCHEMA = DATABASE()
-           AND TABLE_TYPE = 'BASE TABLE'
-         ORDER BY TABLE_NAME"
-    )->fetchAll(PDO::FETCH_COLUMN);
-
-    foreach ($tables as $tableName) {
-        $tableName = (string) $tableName;
-        if (!preg_match('/^[A-Za-z0-9_]+$/', $tableName)) {
-            continue;
-        }
-
-        $columns = $db->prepare(
-            "SELECT COLUMN_NAME
-             FROM information_schema.COLUMNS
-             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table_name"
-        );
-        $columns->execute(['table_name' => $tableName]);
-        $existing = array_fill_keys($columns->fetchAll(PDO::FETCH_COLUMN), true);
-
-        $quotedTable = '`' . $tableName . '`';
-        $definitions = [
-            'created_at' => 'DATETIME NULL',
-            'created_by' => 'INT UNSIGNED NULL',
-            'updated_at' => 'DATETIME NULL',
-            'updated_by' => 'INT UNSIGNED NULL',
-        ];
-
-        foreach ($definitions as $columnName => $definition) {
-            if (!isset($existing[$columnName])) {
-                $db->exec(
-                    'ALTER TABLE ' . $quotedTable .
-                    ' ADD COLUMN `' . $columnName . '` ' . $definition
-                );
-            }
-        }
-
-        $suffix = substr(hash('sha256', $tableName), 0, 12);
-        $insertTrigger = 'db_audit_bi_' . $suffix;
-        $updateTrigger = 'db_audit_bu_' . $suffix;
-
-        // Verwijder eerst onze eigen triggers, zodat het eenmalig aanvullen
-        // van oude datums niet als een gebruikerswijziging wordt geregistreerd.
-        $db->exec('DROP TRIGGER IF EXISTS `' . $insertTrigger . '`');
-        $db->exec('DROP TRIGGER IF EXISTS `' . $updateTrigger . '`');
-
-        $db->exec(
-            'UPDATE ' . $quotedTable .
-            ' SET `created_at` = COALESCE(`created_at`, NOW()),' .
-            ' `updated_at` = COALESCE(`updated_at`, `created_at`, NOW())' .
-            ' WHERE `created_at` IS NULL OR `updated_at` IS NULL'
-        );
-
-        $db->exec(
-            'CREATE TRIGGER `' . $insertTrigger . '` BEFORE INSERT ON ' . $quotedTable .
-            ' FOR EACH ROW SET' .
-            ' NEW.created_at = COALESCE(NEW.created_at, NOW()),' .
-            ' NEW.created_by = COALESCE(NEW.created_by, @dondebailar_user_id),' .
-            ' NEW.updated_at = COALESCE(NEW.updated_at, NOW()),' .
-            ' NEW.updated_by = COALESCE(NEW.updated_by, @dondebailar_user_id)'
-        );
-
-        $db->exec(
-            'CREATE TRIGGER `' . $updateTrigger . '` BEFORE UPDATE ON ' . $quotedTable .
-            ' FOR EACH ROW SET' .
-            ' NEW.updated_at = NOW(),' .
-            ' NEW.updated_by = COALESCE(@dondebailar_user_id, NEW.updated_by)'
-        );
-    }
-}
-
-try {
-    set_time_limit(180);
-
-    if (!is_dir($projectRoot . '/.git')) {
-        throw new RuntimeException('Deze installatie is geen Git-checkout. Automatisch bijwerken is hier niet mogelijk.');
-    }
-
-    $branch = runRequiredGit(['branch', '--show-current'], $projectRoot);
-    if ($branch !== 'develop') {
-        throw new RuntimeException(
-            'De actieve Git-branch is "' . $branch . '". De updater werkt uitsluitend op branch develop.'
-        );
-    }
-
-    $changes = runRequiredGit(
-        ['status', '--porcelain', '--untracked-files=normal'],
-        $projectRoot
-    );
-    if ($changes !== '') {
-        throw new RuntimeException(
-            'Er staan lokale wijzigingen of niet-gevolgde bestanden op de Pi. Om te voorkomen dat werk verloren gaat, is de update gestopt.'
-        );
-    }
-
-    runRequiredGit(['fetch', '--prune', 'origin', 'develop'], $projectRoot);
-
-    $currentCommit = runRequiredGit(['rev-parse', 'HEAD'], $projectRoot);
-    $availableCommit = runRequiredGit(['rev-parse', 'FETCH_HEAD'], $projectRoot);
-
-    if (!hash_equals($currentCommit, $availableCommit)) {
-        runRequiredGit(['merge-base', '--is-ancestor', 'HEAD', 'FETCH_HEAD'], $projectRoot);
-        runRequiredGit(['pull', '--ff-only', 'origin', 'develop'], $projectRoot);
-
-        $success = true;
-        $messages[] = 'DONDEBAILAR is bijgewerkt naar de nieuwste versie van develop.';
-    } else {
-        $messages[] = 'DONDEBAILAR is al up-to-date. Er was geen nieuwe versie beschikbaar.';
-        $success = true;
-    }
-
-    // Ook uitvoeren wanneer de code al up-to-date is, bijvoorbeeld na een
-    // eerdere update waarbij de database-aanpassing nog niet kon worden afgerond.
-    $db = Database::connection();
-
-    removeOrganizerRegionColumn($db);
-    $messages[] = 'Database: organisatoren zijn platformbreed; foutieve regio-koppeling verwijderd indien aanwezig.';
-
-    $db->exec("CREATE TABLE IF NOT EXISTS event_guest_attendances (
-        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        event_id BIGINT UNSIGNED NOT NULL,
-        visitor_hash CHAR(64) NOT NULL,
-        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY (id),
-        UNIQUE KEY uq_event_guest_attendance (event_id, visitor_hash),
-        KEY idx_event_guest_attendance_event (event_id),
-        CONSTRAINT fk_event_guest_attendance_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-    $messages[] = 'Database: anonieme dans-aanmeldingen zijn gecontroleerd.';
-
-    migrateOptionalEventOrganizer($db);
-    $messages[] = 'Database: organisator bij evenementen is optioneel gemaakt.';
-
-    migrateEventHashtags($db);
-    $messages[] = 'Database: apart hashtagveld voor evenementen is gecontroleerd.';
-
-    migrateEventExtraInfo($db);
-    $messages[] = 'Database: apart veld Extra info voor evenementen is gecontroleerd.';
-
-    migrateEventMessages($db);
-    $messages[] = 'Database: berichten per evenement zijn gecontroleerd.';
-
-    migrateEventRecurrence($db);
-    $messages[] = 'Database: wekelijkse en maandelijkse evenementreeksen zijn gecontroleerd.';
-
-    migrateUserNotifications($db);
-    $messages[] = 'Database: meldingen bij @vermeldingen zijn gecontroleerd.';
-
-    migrateUserEmailVerificationTokens($db);
-    $messages[] = 'Database: e-mailbevestiging bij nieuwe registraties is gecontroleerd.';
-
-    migratePasswordResetTokens($db);
-    $messages[] = 'Database: wachtwoordherstel is gecontroleerd.';
-
-    migrateRegionAppearance($db);
-    $messages[] = 'Database: kleuren en logo per regio zijn gecontroleerd.';
-
-    migrateUserAgendaPreferences($db);
-    $messages[] = 'Database: persoonlijke agenda-instellingen voor gebruikers zijn gecontroleerd.';
-
-    migrateDuplicateUserEmails($db);
-    migrateAuditTracking($db);
-    $messages[] = 'Database: aanmaak- en wijzigingsregistratie is gecontroleerd voor alle tabellen.';
-
-    $shortCommit = runRequiredGit(['rev-parse', '--short', 'HEAD'], $projectRoot);
-    $messages[] = 'Geïnstalleerde versie: ' . $shortCommit;
-} catch (Throwable $exception) {
-    http_response_code(500);
-    $messages[] = 'UPDATE NIET UITGEVOERD';
-    $messages[] = $exception->getMessage();
-}
-
-require dirname(__DIR__, 2) . '/app/views/header.php';
+// Agenda view. Variables are prepared by app/agenda/agenda_data.php.
 ?>
-
-<section class="admin-page">
-    <div class="admin-heading">
-        <div>
-            <p class="eyebrow">DONDEBAILAR</p>
-            <h1>Platformupdate</h1>
+<section class="agenda-page">
+    <?php if ($regions === []): ?>
+        <section class="agenda-empty"><h2>De agenda wordt voorbereid</h2><p>Er zijn nog geen actieve regio's beschikbaar.</p></section>
+    <?php else: ?>
+        
+        <?php if ($events === []): ?>
+            <section class="agenda-empty"><h2>Geen evenementen gevonden</h2><p>Er zijn momenteel geen toekomstige gepubliceerde evenementen met deze filters.</p></section>
+        <?php else: ?>
+            <div class="agenda-feed">
+                <?php foreach ($events as $eventIndex => $event): ?>
+                    <?php
+                    $start = new DateTimeImmutable((string) $event['starts_at'], $timezone);
+                    $eventUrl = '/event.php?id=' . (int) $event['id'];
+                    $locationLabel = trim((string) ($event['location_city'] ?? ''));
+                    $mapUrl = (string) ($event['google_maps_url'] ?? '');
+                    if ($mapUrl === '' && $event['latitude'] !== null && $event['longitude'] !== null) {
+                        $mapUrl = 'https://www.google.com/maps?q=' . rawurlencode((string) $event['latitude'] . ',' . (string) $event['longitude']);
+                    }
+                    $shareScheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+                    $shareUrl = $shareScheme . ($_SERVER['HTTP_HOST'] ?? '') . $eventUrl;
+                    ?>
+                    <article class="agenda-card"<?= $eventIndex >= $agendaPageSize ? ' hidden' : '' ?> style="--db-event-day-color:var(--db-weekday-<?= (int) $start->format('N') ?>,var(--db-primary));">
+                        <div class="agenda-card__media-wrap">
+                        <?php $eventMediaItems = $event['media_items'] ?? []; ?>
+                        <?php if (count($eventMediaItems) > 1): ?>
+                            <div class="agenda-card__gallery" data-gallery>
+                                <div class="agenda-card__gallery-track" data-gallery-track>
+                                    <?php foreach ($eventMediaItems as $mediaIndex => $mediaItem): ?>
+                                        <div class="agenda-card__media-slide<?= $mediaItem['type'] === 'reel' && $mediaItem['source'] === 'instagram' ? ' agenda-card__media-slide--instagram' : '' ?>" data-gallery-slide>
+                                            <?php if ($mediaItem['type'] === 'image' && $mediaItem['source'] === 'upload'): ?>
+                                                <div class="agenda-card__image-link">
+                                                    <img class="agenda-card__image" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" alt="<?= $escape($event['title']) ?> — foto <?= (int) ($mediaIndex + 1) ?>" loading="lazy">
+                                                </div>
+                                            <?php elseif ($mediaItem['type'] === 'video' && $mediaItem['source'] === 'upload'): ?>
+                                                <video class="agenda-card__video" playsinline preload="metadata" controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" controls></video>
+                                            <?php elseif ($mediaItem['type'] === 'reel' && $mediaItem['source'] === 'instagram'): ?>
+                                                <div class="agenda-card__instagram">
+                                                    <blockquote class="instagram-media" data-instgrm-permalink="<?= $escape($mediaItem['external_url']) ?>" data-instgrm-version="14">
+                                                        <a href="<?= $escape($mediaItem['external_url']) ?>" target="_blank" rel="noopener noreferrer">Bekijk deze Reel op Instagram</a>
+                                                    </blockquote>
+                                                </div>
+                                            <?php else: ?>
+                                                <a class="agenda-card__external-media" href="<?= $escape($mediaItem['external_url']) ?>" target="_blank" rel="noopener noreferrer">
+                                                    <span aria-hidden="true">↗</span>
+                                                    <strong>Bekijk externe media</strong>
+                                                </a>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                                <span class="agenda-card__media-count" data-gallery-count>1 / <?= count($eventMediaItems) ?></span>
+                            </div>
+                        <?php elseif (count($eventMediaItems) === 1): ?>
+                            <?php $mediaItem = $eventMediaItems[0]; ?>
+                            <?php if ($mediaItem['type'] === 'image' && $mediaItem['source'] === 'upload'): ?>
+                                <div class="agenda-card__image-link">
+                                    <img class="agenda-card__image" src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" alt="<?= $escape($event['title']) ?>" loading="lazy">
+                                </div>
+                            <?php elseif ($mediaItem['type'] === 'video' && $mediaItem['source'] === 'upload'): ?>
+                                <video class="agenda-card__video" playsinline preload="metadata" controlslist="nodownload noremoteplayback" disablepictureinpicture disableremoteplayback src="/event-media.php?id=<?= (int) $mediaItem['id'] ?>" controls></video>
+                            <?php elseif ($mediaItem['type'] === 'reel' && $mediaItem['source'] === 'instagram'): ?>
+                                <div class="agenda-card__instagram">
+                                    <blockquote class="instagram-media" data-instgrm-permalink="<?= $escape($mediaItem['external_url']) ?>" data-instgrm-version="14">
+                                        <a href="<?= $escape($mediaItem['external_url']) ?>" target="_blank" rel="noopener noreferrer">Bekijk deze Reel op Instagram</a>
+                                    </blockquote>
+                                </div>
+                            <?php else: ?>
+                                <a class="agenda-card__external-media" href="<?= $escape($mediaItem['external_url']) ?>" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">↗</span><strong>Bekijk externe media</strong></a>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <a class="agenda-card__image-link" href="<?= $eventUrl ?>" aria-label="Bekijk <?= $escape($event['title']) ?>">
+                                <div class="agenda-card__placeholder"><span>SALSA · BACHATA · KIZOMBA</span><strong><?= $escape($event['title']) ?></strong></div>
+                            </a>
+                        <?php endif; ?>
+                        </div>
+                        <div class="agenda-card__details" data-event-info>
+                            <div class="agenda-card__quick">
+                                <button type="button" class="agenda-attendance<?= !empty($event['is_attending']) ? ' is-attending' : '' ?>" data-event-id="<?= (int) $event['id'] ?>" data-event-title="<?= $escape($event['title']) ?>" aria-label="Bewaar evenement <?= $escape($event['title']) ?>">
+                                    <span aria-hidden="true">✓</span>
+                                </button>
+                                <button type="button" class="agenda-icon-button agenda-share" data-share-title="<?= $escape($event['title']) ?>" data-share-url="<?= $escape($shareUrl) ?>" aria-label="Deel evenement <?= $escape($event['title']) ?>">↗</button>
+                                <?php if ($mapUrl !== ''): ?><a class="agenda-icon-button agenda-location" href="<?= $escape($mapUrl) ?>" target="_blank" rel="noopener noreferrer" aria-label="Toon locatie voor <?= $escape($event['title']) ?>">⌖</a><?php endif; ?>
+                                <button type="button" class="agenda-icon-button agenda-messages" data-event-messages data-url="/event-messages.php?id=<?= (int) $event['id'] ?>" aria-label="Berichten bij <?= $escape($event['title']) ?>">✉</button>
+                            </div>
+                            <h2><a href="<?= $eventUrl ?>"><?= $escape($event['title']) ?></a></h2>
+                            <?php
+                            $hashtagText = trim((string) ($event['hashtags'] ?? ''));
+                            $hashtagItems = preg_split('/[\\s,]+/u', $hashtagText, -1, PREG_SPLIT_NO_EMPTY) ?: [];
+                            $hashtagItems = array_values(array_filter(array_map(
+                                static fn(string $tag): string => ltrim($tag, '#'),
+                                $hashtagItems
+                            ), static fn(string $tag): bool => preg_match('/^[\\p{L}\\p{N}_]+$/u', $tag) === 1));
+                            ?>
+                            <p class="agenda-card__date-line"><?= $escape(strtoupper($start->format('l, d M Y'))) ?> <span>◷</span> <?= $escape($start->format('H:i')) ?><?php if (!empty($event['ends_at'])): ?> <span>–</span> <?= $escape((new DateTimeImmutable((string) $event['ends_at'], $timezone))->format('H:i')) ?><?php endif; ?></p>
+                            <?php
+                            $displayTags = array_map(static fn(string $tag): string => '#' . $tag, $hashtagItems);
+                            if ($locationLabel !== '') {
+                                $displayTags[] = '#' . $locationLabel;
+                            }
+                            ?>
+                            <?php if ($displayTags !== []): ?>
+                                <p class="agenda-card__hashtags"><?= $escape(implode(' ', $displayTags)) ?></p>
+                            <?php endif; ?>
+                            <?php
+                            $eventDescription = trim((string) ($event['description'] ?? ''));
+                            $locationName = trim((string) ($event['location_name'] ?? ''));
+                            $locationStreet = trim((string) ($event['location_street'] ?? ''));
+                            $locationHouseNumber = trim((string) ($event['location_house_number'] ?? ''));
+                            $locationPostalCode = trim((string) ($event['location_postal_code'] ?? ''));
+                            $locationAddressLine = trim($locationStreet . ' ' . $locationHouseNumber);
+                            $locationPostalCity = trim($locationPostalCode . ' ' . $locationLabel);
+                            $locationPhone = trim((string) ($event['location_phone'] ?? ''));
+                            $locationLogo = basename((string) ($event['location_logo_path'] ?? ''));
+                            $hasLocationLogo = preg_match('/\A[a-f0-9]{32}\.(jpg|png|webp)\z/', $locationLogo) === 1;
+                            $organizerName = trim((string) ($event['organizer_name'] ?? ''));
+                            $organizerPhone = trim((string) ($event['organizer_phone'] ?? ''));
+                            $organizerLogo = basename((string) ($event['organizer_logo_path'] ?? ''));
+                            $hasOrganizerLogo = preg_match('/\A[a-f0-9]{32}\.(jpg|png|webp)\z/', $organizerLogo) === 1;
+                            $hasMoreInfo = $eventDescription !== '' || $locationName !== '' || $locationAddressLine !== '' || $locationPhone !== '' || $organizerName !== '' || $organizerPhone !== '';
+                            ?>
+                            <?php if ($hasMoreInfo): ?>
+                                <div class="agenda-card__description" data-event-description aria-hidden="true">
+                                    <div class="agenda-card__description-inner">
+                                        <?php if ($locationName !== '' || $locationAddressLine !== '' || $locationPostalCity !== '' || $locationPhone !== ''): ?>
+                                            <div class="agenda-card__info-block">
+                                                <h3 class="agenda-card__section-label">LOCATIE</h3>
+                                                <?php if ($locationName !== ''): ?>
+                                                    <div class="agenda-card__venue">
+                                                        <?php if ($hasLocationLogo): ?>
+                                                            <img class="agenda-card__venue-logo" src="/location-logo.php?file=<?= rawurlencode($locationLogo) ?>" alt="<?= $escape($locationName) ?>" loading="lazy">
+                                                        <?php endif; ?>
+                                                        <strong><?= $escape($locationName) ?></strong>
+                                                    </div>
+                                                <?php endif; ?>
+                                                <?php if ($locationAddressLine !== '' || $locationPostalCity !== ''): ?>
+                                                    <p class="agenda-card__venue-address">⌖ <?= $escape(implode(', ', array_filter([$locationAddressLine, $locationPostalCity]))) ?></p>
+                                                <?php endif; ?>
+                                                <?php if ($locationPhone !== ''): ?>
+                                                    <p class="agenda-card__venue-phone">☎ <a href="tel:<?= $escape(preg_replace('/[^0-9+*#]/', '', $locationPhone)) ?>"><?= $escape($locationPhone) ?></a></p>
+                                                <?php endif; ?>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if ($organizerName !== '' || $organizerPhone !== ''): ?>
+                                            <div class="agenda-card__info-block agenda-card__info-block--organizer">
+                                                <h3 class="agenda-card__section-label">ORGANISATOR</h3>
+                                                <div class="agenda-card__organizer">
+                                                    <?php if ($hasOrganizerLogo): ?>
+                                                        <img class="agenda-card__organizer-logo" src="/organizer-logo.php?file=<?= rawurlencode($organizerLogo) ?>" alt="<?= $escape($organizerName) ?>" loading="lazy">
+                                                    <?php endif; ?>
+                                                    <div class="agenda-card__organizer-info">
+                                                        <?php if ($organizerName !== ''): ?><strong><?= $escape($organizerName) ?></strong><?php endif; ?>
+                                                        <?php if ($organizerPhone !== ''): ?><span>☎ <a href="tel:<?= $escape(preg_replace('/[^0-9+*#]/', '', $organizerPhone)) ?>"><?= $escape($organizerPhone) ?></a></span><?php endif; ?>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php endif; ?>
+                                        <?php if ($eventDescription !== ''): ?>
+                                            <div class="agenda-card__description-text"><?= nl2br($escape($eventDescription)) ?></div>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                            <p class="agenda-card__swipe-hint" data-swipe-hint>→ Swipe voor meer info</p>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+            <div class="agenda-page-navigation" aria-label="Navigatie tussen evenementreeksen">
+                    <button type="button" class="agenda-page-nav-icon" id="agenda-page-previous" aria-label="Vorige reeks" title="Vorige reeks">‹</button>
+                    <span id="agenda-page-range">1–<?= min($agendaPageSize, count($events)) ?> van <?= count($events) ?></span>
+                    <button type="button" class="agenda-page-nav-icon" id="agenda-page-next" aria-label="Volgende reeks" title="Volgende reeks">›</button>
+            </div>
+        <?php endif; ?>
+    <?php endif; ?>
+    <div class="agenda-message-modal" id="agenda-message-modal" hidden>
+        <div class="agenda-message-modal__panel" role="dialog" aria-modal="true" aria-labelledby="agenda-message-modal-title">
+            <div class="agenda-message-modal__top"><button type="button" class="agenda-message-modal__close" aria-label="Sluiten">×</button></div>
+            <iframe title="Berichten bij evenement" src="about:blank" scrolling="no"></iframe>
         </div>
     </div>
 
-    <section class="admin-section">
-        <?php foreach ($messages as $message): ?>
-            <p><?= escapeHtml($message) ?></p>
-        <?php endforeach; ?>
-
-        <p>
-            <a class="button button--primary" href="/admin/index.php">
-                Terug naar platformbeheer
-            </a>
-        </p>
-    </section>
 </section>
 
+
+<?php
+$hasInstagramReels = false;
+foreach ($events as $instagramCheckEvent) {
+    foreach (($instagramCheckEvent['media_items'] ?? []) as $instagramCheckMedia) {
+        if (($instagramCheckMedia['type'] ?? '') === 'reel' && ($instagramCheckMedia['source'] ?? '') === 'instagram') {
+            $hasInstagramReels = true;
+            break 2;
+        }
+    }
+}
+?>
+<?php if ($hasInstagramReels): ?><script async src="https://www.instagram.com/embed.js"></script><?php endif; ?>
+<script>
+window.DONDEBAILAR_AGENDA_CONFIG = <?= json_encode([
+    'pageSize' => (int) $agendaPageSize,
+    'activeFilterIndex' => $activeFilter === 'city' ? 1 : 0,
+    'soundMuted' => (bool) $savedSoundMuted,
+    'csrfToken' => csrfToken(),
+    'regionId' => (int) $regionId,
+], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+</script>
+<script src="/assets/js/agenda.js"></script>
+<script>window.DONDEBAILAR_AGENDA_PAGE_SIZE = <?= (int) $agendaPageSize ?>;</script>
+<script src="/assets/js/agenda-filters.js"></script>
 <?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>

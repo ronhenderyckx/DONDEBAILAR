@@ -2,373 +2,617 @@
 declare(strict_types=1);
 
 require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
 require_once dirname(__DIR__, 2) . '/app/Authorization.php';
+require_once dirname(__DIR__, 2) . '/app/Security.php';
 
-$db = Database::connection();
-$currentUser = currentUser();
-// De sessie is een directe fallback; de database blijft de permanente opslag.
-$savedAgendaPreferences = $currentUser !== null
-    && is_array($_SESSION['agenda_preferences'] ?? null)
-    ? $_SESSION['agenda_preferences']
-    : null;
-if ($currentUser !== null) {
-    try {
-        $preferencesTableExists = (int) $db->query(
-            "SELECT COUNT(*) FROM information_schema.TABLES
-             WHERE TABLE_SCHEMA = DATABASE()
-               AND TABLE_NAME = 'user_agenda_preferences'
-               AND TABLE_TYPE = 'BASE TABLE'"
-        )->fetchColumn() > 0;
-        if ($preferencesTableExists) {
-            $preferenceQuery = $db->prepare(
-                "SELECT region_id, active_filter, organizer_id, city, sound_muted
-                 FROM user_agenda_preferences WHERE user_id = :user_id"
-            );
-            $preferenceQuery->execute(['user_id' => (int) $currentUser['id']]);
-            $databaseAgendaPreferences = $preferenceQuery->fetch() ?: null;
-            if ($databaseAgendaPreferences !== null) {
-                $savedAgendaPreferences = $databaseAgendaPreferences;
-                $_SESSION['agenda_preferences'] = $databaseAgendaPreferences;
-            }
-        }
-    } catch (Throwable $exception) {
-        $savedAgendaPreferences = null;
-    }
-}
-$visitorToken = '';
-if ($currentUser === null) {
-    $visitorToken = (string) ($_COOKIE['dondebailar_visitor'] ?? '');
-    if (!preg_match('/\\A[a-f0-9]{64}\\z/', $visitorToken)) {
-        $visitorToken = bin2hex(random_bytes(32));
-        setcookie('dondebailar_visitor', $visitorToken, [
-            'expires' => time() + 31536000, 'path' => '/',
-            'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
-            'httponly' => true, 'samesite' => 'Lax',
-        ]);
-        $_COOKIE['dondebailar_visitor'] = $visitorToken;
-    }
-}
-$visitorHash = $visitorToken !== '' ? hash('sha256', $visitorToken) : '';
-$regions = $db->query(
-    "SELECT r.id, r.name, r.timezone,
-            CASE WHEN a.region_id IS NOT NULL THEN a.logo_path ELSE r.logo_path END AS logo_path,
-            a.primary_color, a.primary_dark, a.accent_color,
-            a.secondary_color, a.tertiary_color, a.header_color, a.menu_color, a.organizer_color, a.filter_hover_color,
-            a.filter_bar_color, a.filter_text_color, a.search_button_color, a.back_top_color,
-             a.search_field_color, a.search_text_color, a.footer_color, a.background_color, a.text_color, a.weekday_colors
-     FROM regions r
-     LEFT JOIN region_appearance a ON a.region_id = r.id
-     WHERE r.is_active = 1 ORDER BY r.id"
-)->fetchAll();
+requirePlatformAdmin();
 
-$regionIds = array_map(static fn(array $item): int => (int) $item['id'], $regions);
-
-// Herstel persoonlijke voorkeuren alleen wanneer de URL geen expliciete
-// regio- of filterkeuze bevat. Zo blijft een gekozen organisator ook na
-// scrollen, verversen of terugkeren naar de pagina geselecteerd.
-$hasExplicitAgendaChoice = array_key_exists('region_id', $_GET)
-    || array_key_exists('filter', $_GET)
-    || array_key_exists('organizer_id', $_GET)
-    || array_key_exists('city', $_GET);
-$restoreSavedAgendaPreferences = $currentUser !== null
-    && $savedAgendaPreferences !== null
-    && !$hasExplicitAgendaChoice;
-
-$requestedRegion = $restoreSavedAgendaPreferences
-    ? (int) ($savedAgendaPreferences['region_id'] ?? 0)
-    : (filter_input(INPUT_GET, 'region_id', FILTER_VALIDATE_INT) ?: 0);
-$regionId = $requestedRegion && in_array((int) $requestedRegion, $regionIds, true)
-    ? (int) $requestedRegion
-    : (int) ($regionIds[0] ?? 0);
-$regionById = [];
-foreach ($regions as $item) {
-    $regionById[(int) $item['id']] = $item;
-}
-$region = $regionById[$regionId] ?? null;
-
-// Regiospecifieke tekst voor evenementen zonder media.
-$eventFallbackText = 'SALSA · BACHATA · KIZOMBA';
-if ($regionId > 0) {
-    $fallbackTextFile = dirname(__DIR__, 2) . '/storage/region-event-fallback-text/' . $regionId . '.txt';
-    if (is_file($fallbackTextFile)) {
-        $configuredFallbackText = trim((string) file_get_contents($fallbackTextFile));
-        if ($configuredFallbackText !== '') {
-            $eventFallbackText = mb_substr($configuredFallbackText, 0, 100);
-        }
-    }
-}
-$timezoneName = (string) ($region['timezone'] ?? 'Europe/Madrid');
-try {
-    $timezone = new DateTimeZone($timezoneName);
-} catch (Throwable $exception) {
-    $timezone = new DateTimeZone('Europe/Madrid');
-}
-date_default_timezone_set($timezone->getName());
-
-$now = new DateTimeImmutable('now', $timezone);
-// Een evenement blijft zichtbaar tot zijn einde. De ondergrens op starts_at houdt
-// idx_events_region_feed bruikbaar als bereikindex; zonder die grens leest MariaDB
-// alle voorbije evenementen van de regio. Evenementen die langer dan dit aantal
-// dagen duren verdwijnen dus eerder uit de agenda.
-$agendaMaxEventDays = 31;
-$windowStart = $now->modify('-' . $agendaMaxEventDays . ' days')->format('Y-m-d H:i:s');
-$organizerId = $restoreSavedAgendaPreferences
-    ? (int) ($savedAgendaPreferences['organizer_id'] ?? 0)
-    : (filter_input(INPUT_GET, 'organizer_id', FILTER_VALIDATE_INT) ?: 0);
-$city = $restoreSavedAgendaPreferences
-    ? trim((string) ($savedAgendaPreferences['city'] ?? ''))
-    : trim((string) ($_GET['city'] ?? ''));
-$activeFilter = $restoreSavedAgendaPreferences
-    ? ((($savedAgendaPreferences['active_filter'] ?? '') === 'city') ? 'city' : 'organizer')
-    : ((($_GET['filter'] ?? '') === 'city') ? 'city' : 'organizer');
-
-// Alleen het filtertype dat actief is mag de agenda beperken.
-// Zo kan een eerder gekozen organisator geen stadsfilter blokkeren, en omgekeerd.
-if ($activeFilter === 'city') {
-    $organizerId = 0;
-} else {
-    $city = '';
-}
-$savedSoundMuted = !empty($savedAgendaPreferences['sound_muted']);
-if (mb_strlen($city) > 120) {
-    $city = mb_substr($city, 0, 120);
-}
-$agendaSearch = trim((string) ($_GET['q'] ?? ''));
-if (mb_strlen($agendaSearch) > 120) {
-    $agendaSearch = mb_substr($agendaSearch, 0, 120);
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    http_response_code(405);
+    header('Allow: POST');
+    exit('Gebruik de UPDATE-knop in het platformbeheer.');
 }
 
-$organizers = [];
-$cities = [];
-$events = [];
-$agendaPageSizeFile = dirname(__DIR__, 2) . '/storage/agenda-page-size.txt';
-$agendaPageSize = 20;
-if (is_file($agendaPageSizeFile)) {
-    $storedPageSize = (int) trim((string) file_get_contents($agendaPageSizeFile));
-    if ($storedPageSize >= 1 && $storedPageSize <= 100) $agendaPageSize = $storedPageSize;
+if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
+    http_response_code(419);
+    exit('De beveiligingscontrole is verlopen. Vernieuw de pagina en probeer opnieuw.');
 }
-$agendaPage = max(1, (int) ($_GET['page'] ?? 1));
-$totalEvents = 0;
 
-if ($regionId > 0) {
-    $organizerQuery = $db->prepare(
-        "SELECT DISTINCT o.id, o.name, o.logo_path
-         FROM organizers o
-         INNER JOIN events e ON e.organizer_id = o.id
-         WHERE o.is_active = 1 AND e.region_id = :region_id
-           AND e.status = 'published' AND e.starts_at >= :window_start
-           AND COALESCE(e.ends_at, e.starts_at) >= :now
-         ORDER BY o.name"
-    );
-    $organizerQuery->execute([
-        'region_id' => $regionId,
-        'window_start' => $windowStart,
-        'now' => $now->format('Y-m-d H:i:s'),
-    ]);
-    $organizers = $organizerQuery->fetchAll();
-    $organizerIds = array_map(static fn(array $item): int => (int) $item['id'], $organizers);
-    if ($organizerId > 0 && !in_array($organizerId, $organizerIds, true)) {
-        $organizerId = 0;
+$pageTitle = 'DONDEBAILAR bijwerken';
+$platformAdminPage = true;
+$projectRoot = dirname(__DIR__, 2);
+$messages = [];
+$success = false;
+
+function acquireUpdateLock(string $projectRoot): resource
+{
+    $lockFile = $projectRoot . '/storage/update.lock';
+    if (!is_dir(dirname($lockFile))) {
+        mkdir(dirname($lockFile), 0775, true);
     }
 
-    $cityQuery = $db->prepare(
-        "SELECT DISTINCT l.city
-         FROM locations l
-         INNER JOIN events e ON e.location_id = l.id
-         WHERE l.region_id = :region_id AND l.is_active = 1 AND l.city <> ''
-           AND e.region_id = :event_region_id AND e.status = 'published'
-           AND e.starts_at >= :window_start
-           AND COALESCE(e.ends_at, e.starts_at) >= :now
-         ORDER BY l.city"
-    );
-    $cityQuery->execute([
-        'region_id' => $regionId,
-        'event_region_id' => $regionId,
-        'window_start' => $windowStart,
-        'now' => $now->format('Y-m-d H:i:s'),
-    ]);
-    $cities = $cityQuery->fetchAll();
-    $cityNames = array_column($cities, 'city');
-    if ($city !== '' && !in_array($city, $cityNames, true)) {
-        $city = '';
+    $handle = fopen($lockFile, 'c');
+    if ($handle === false) {
+        throw new RuntimeException('Kon de update-lock niet aanmaken.');
     }
 
-    $sql = "SELECT e.id, e.title, e.description, e.hashtags, e.starts_at, e.ends_at,
-                   e.event_language, c.name AS category_name,
-                   o.name AS organizer_name, o.phone AS organizer_phone, o.logo_path AS organizer_logo_path,
-                   l.name AS location_name,
-                   l.city AS location_city, l.street AS location_street,
-                   l.house_number AS location_house_number, l.postal_code AS location_postal_code,
-                   l.phone AS location_phone, l.logo_path AS location_logo_path,
-                   l.latitude, l.longitude, l.google_maps_url,
-                   cover.id AS cover_media_id
-            FROM events e
-            LEFT JOIN organizers o ON o.id = e.organizer_id
-            LEFT JOIN categories c ON c.id = e.category_id
-            LEFT JOIN locations l ON l.id = e.location_id
-            LEFT JOIN event_media cover ON cover.id = COALESCE(
-                e.cover_media_id,
-                (SELECT em.id FROM event_media em
-                 WHERE em.event_id = e.id AND em.media_context = 'event'
-                   AND em.media_type = 'image' AND em.media_source = 'upload'
-                 ORDER BY em.is_cover DESC, em.sort_order, em.id LIMIT 1)
-            )
-            WHERE e.region_id = :region_id
-              AND e.status = 'published'
-              AND e.starts_at >= :window_start
-              AND COALESCE(e.ends_at, e.starts_at) >= :now";
-    $params = [
-        'region_id' => $regionId,
-        'window_start' => $windowStart,
-        'now' => $now->format('Y-m-d H:i:s'),
+    if (!flock($handle, LOCK_EX | LOCK_NB)) {
+        fclose($handle);
+        throw new RuntimeException('Een update wordt al uitgevoerd. Wacht even en probeer opnieuw.');
+    }
+
+    return $handle;
+}
+
+function runUpdateGit(array $arguments, string $workingDirectory): array
+{
+    if (!function_exists('proc_open')) {
+        throw new RuntimeException('PHP proc_open is niet beschikbaar op de server.');
+    }
+
+    $deployKey = '/home/pi/.ssh/dondebailar_deploy';
+    if (is_file($deployKey)) {
+        $sshCommand = 'ssh -i ' . escapeshellarg($deployKey)
+            . ' -o IdentitiesOnly=yes -o BatchMode=yes';
+        $command = array_merge(
+            ['git', '-c', 'core.sshCommand=' . $sshCommand],
+            $arguments
+        );
+    } else {
+        $command = array_merge(['git'], $arguments);
+    }
+    $descriptors = [
+        0 => ['pipe', 'r'],
+        1 => ['pipe', 'w'],
+        2 => ['pipe', 'w'],
     ];
-    if ($organizerId > 0) {
-        $sql .= " AND e.organizer_id = :organizer_id";
-        $params['organizer_id'] = $organizerId;
-    }
-    if ($city !== '') {
-        $sql .= " AND l.city = :city";
-        $params['city'] = $city;
-    }
-    if ($agendaSearch !== '') {
-        $sql .= " AND (
-            e.title LIKE :search_title
-            OR e.description LIKE :search_description
-            OR e.hashtags LIKE :search_hashtags
-            OR o.name LIKE :search_organizer
-            OR l.name LIKE :search_location
-            OR l.city LIKE :search_city
-            OR c.name LIKE :search_category
-        )";
-        $searchTerm = '%' . $agendaSearch . '%';
-        $params['search_title'] = $searchTerm;
-        $params['search_description'] = $searchTerm;
-        $params['search_hashtags'] = $searchTerm;
-        $params['search_organizer'] = $searchTerm;
-        $params['search_location'] = $searchTerm;
-        $params['search_city'] = $searchTerm;
-        $params['search_category'] = $searchTerm;
-    }
-    $fromPosition = strpos($sql, ' FROM ');
-    if ($fromPosition !== false) {
-        // Voor de telling is de cover-afbeelding niet nodig. Laat de
-        // bijbehorende subquery weg, zodat de telling licht blijft.
-        $countFromSql = substr($sql, $fromPosition);
-        $countFromSql = preg_replace(
-            '/\\s+LEFT JOIN event_media cover ON cover\\.id = COALESCE\\([\\s\\S]*?\\)\\s+WHERE/',
-            ' WHERE',
-            $countFromSql,
-            1
-        );
-        $countSql = 'SELECT COUNT(*)' . $countFromSql;
-        $countQuery = $db->prepare($countSql);
-        $countQuery->execute($params);
-        $totalEvents = (int) $countQuery->fetchColumn();
+
+    $process = proc_open($command, $descriptors, $pipes, $workingDirectory);
+    if (!is_resource($process)) {
+        throw new RuntimeException('Git kon niet worden gestart.');
     }
 
-    $totalPages = max(1, (int) ceil($totalEvents / $agendaPageSize));
-    $agendaPage = min($agendaPage, $totalPages);
-    $agendaOffset = ($agendaPage - 1) * $agendaPageSize;
+    fclose($pipes[0]);
+    $stdout = stream_get_contents($pipes[1]) ?: '';
+    fclose($pipes[1]);
+    $stderr = stream_get_contents($pipes[2]) ?: '';
+    fclose($pipes[2]);
+    $exitCode = proc_close($process);
 
-    $sql .= " ORDER BY e.starts_at ASC, e.id ASC
-              LIMIT " . (int) $agendaPageSize . " OFFSET " . (int) $agendaOffset;
-    $eventQuery = $db->prepare($sql);
-    $eventQuery->execute($params);
-    $events = $eventQuery->fetchAll();
+    return [
+        'code' => $exitCode,
+        'output' => trim($stdout . ($stderr !== '' ? "\n" . $stderr : '')),
+    ];
+}
 
-    if ($events !== []) {
-        $eventIds = array_map(static fn(array $event): int => (int) $event['id'], $events);
-        $eventPlaceholders = implode(',', array_fill(0, count($eventIds), '?'));
-        $mediaQuery = $db->prepare(
-            "SELECT id, event_id, media_type, media_source, external_url, file_path, caption, is_cover
-             FROM event_media
-             WHERE event_id IN ($eventPlaceholders)
-               AND media_context = 'event'
-             ORDER BY is_cover DESC, sort_order ASC, id ASC"
+function runRequiredGit(array $arguments, string $workingDirectory): string
+{
+    $result = runUpdateGit($arguments, $workingDirectory);
+    if ($result['code'] !== 0) {
+        throw new RuntimeException(
+            $result['output'] !== ''
+                ? $result['output']
+                : 'Git-opdracht is mislukt.'
         );
-        $mediaQuery->execute($eventIds);
-        $mediaByEvent = [];
-        foreach ($mediaQuery->fetchAll() as $mediaItem) {
-            $mediaType = (string) $mediaItem['media_type'];
-            $mediaSource = (string) $mediaItem['media_source'];
-            $filePath = trim((string) ($mediaItem['file_path'] ?? ''));
-            $externalUrl = trim((string) ($mediaItem['external_url'] ?? ''));
-            $hasUpload = $mediaSource === 'upload' && $filePath !== '';
-            $hasExternal = $externalUrl !== ''
-                && filter_var($externalUrl, FILTER_VALIDATE_URL)
-                && in_array((string) parse_url($externalUrl, PHP_URL_SCHEME), ['http', 'https'], true);
-            if (!$hasUpload && !$hasExternal) {
-                continue;
-            }
-            $mediaByEvent[(int) $mediaItem['event_id']][] = [
-                'id' => (int) $mediaItem['id'],
-                'type' => $mediaType,
-                'source' => $mediaSource,
-                'external_url' => $hasExternal ? $externalUrl : '',
-                'caption' => trim((string) ($mediaItem['caption'] ?? '')),
-            ];
+    }
+
+    return $result['output'];
+}
+
+/**
+ * Laat testaccounts hetzelfde e-mailadres delen.
+ * Verwijdert uitsluitend een enkelvoudige UNIQUE-index op users.email.
+ */
+function migrateDuplicateUserEmails(PDO $db): void
+{
+    $rows = $db->query('SHOW INDEX FROM `users`')->fetchAll(PDO::FETCH_ASSOC);
+    $indexes = [];
+
+    foreach ($rows as $row) {
+        $name = (string) ($row['Key_name'] ?? '');
+        if ($name === '' || !isset($row['Column_name'])) {
+            continue;
         }
 
-        foreach ($events as &$eventItem) {
-            $eventKey = (int) $eventItem['id'];
-            $eventItem['media_items'] = $mediaByEvent[$eventKey] ?? [];
-        }
-        unset($eventItem);
+        $indexes[$name][] = [
+            'column' => (string) $row['Column_name'],
+            'unique' => (int) ($row['Non_unique'] ?? 1) === 0,
+        ];
+    }
 
-        $attendanceQuery = $db->prepare(
-            "SELECT event_id, COUNT(*) AS total FROM (
-                SELECT event_id FROM event_attendances WHERE status = 'attending' AND event_id IN ($eventPlaceholders)
-                UNION ALL
-                SELECT event_id FROM event_guest_attendances WHERE event_id IN ($eventPlaceholders)
-            ) attendance_rows GROUP BY event_id"
-        );
-        $attendanceQuery->execute(array_merge($eventIds, $eventIds));
-        $attendanceCounts = [];
-        foreach ($attendanceQuery->fetchAll() as $attendanceRow) {
-            $attendanceCounts[(int) $attendanceRow['event_id']] = (int) $attendanceRow['total'];
+    foreach ($indexes as $indexName => $columns) {
+        if (
+            count($columns) !== 1
+            || $columns[0]['column'] !== 'email'
+            || !$columns[0]['unique']
+            || !preg_match('/^[A-Za-z0-9_]+$/', $indexName)
+        ) {
+            continue;
         }
-        if ($currentUser !== null) {
-            $mine = $db->prepare("SELECT event_id FROM event_attendances WHERE user_id = ? AND status = 'attending' AND event_id IN ($eventPlaceholders)");
-            $mine->execute(array_merge([(int) $currentUser['id']], $eventIds));
-        } else {
-            $mine = $db->prepare("SELECT event_id FROM event_guest_attendances WHERE visitor_hash = ? AND event_id IN ($eventPlaceholders)");
-            $mine->execute(array_merge([$visitorHash], $eventIds));
-        }
-        $myAttendanceIds = array_map('intval', $mine->fetchAll(PDO::FETCH_COLUMN));
-        foreach ($events as &$eventItem) {
-            $eventKey = (int) $eventItem['id'];
-            $eventItem['attendance_count'] = $attendanceCounts[$eventKey] ?? 0;
-            $eventItem['is_attending'] = in_array($eventKey, $myAttendanceIds, true);
-        }
-        unset($eventItem);
 
-        $messageCountsQuery = $db->prepare(
-            "SELECT event_id, COUNT(*) AS total FROM event_messages
-             WHERE is_deleted = 0 AND event_id IN ($eventPlaceholders)
-             GROUP BY event_id"
-        );
-        $messageCountsQuery->execute($eventIds);
-        $messageCounts = [];
-        foreach ($messageCountsQuery->fetchAll() as $messageCountRow) {
-            $messageCounts[(int) $messageCountRow['event_id']] = (int) $messageCountRow['total'];
-        }
-        foreach ($events as &$eventItem) {
-            $eventItem['message_count'] = $messageCounts[(int) $eventItem['id']] ?? 0;
-        }
-        unset($eventItem);
+        $db->exec('ALTER TABLE `users` DROP INDEX `' . $indexName . '`');
     }
 }
 
-$regionAppearanceSettings = json_decode((string) ($region['weekday_colors'] ?? ''), true);
-if (!is_array($regionAppearanceSettings)) $regionAppearanceSettings = [];
-$agendaArrowBackground = (string) ($regionAppearanceSettings['agenda_arrow_background'] ?? '#F6B22E');
-$agendaArrowText = (string) ($regionAppearanceSettings['agenda_arrow_text'] ?? '#222222');
-if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowBackground)) $agendaArrowBackground = '#F6B22E';
-if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowText)) $agendaArrowText = '#222222';
-$escape = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-$isAgendaPage = true;
-$pageTitle = 'Agenda' . ($region ? ' — ' . $region['name'] : '') . ' — DONDEBAILAR';
-$pageRobots = 'index, follow';
+function removeOrganizerRegionColumn(PDO $db): void
+{
+    $column = $db->query(
+        "SELECT COUNT(*) FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'organizers'
+           AND COLUMN_NAME = 'region_id'"
+    )->fetchColumn();
+
+    if ((int) $column === 0) {
+        return;
+    }
+
+    $index = $db->query(
+        "SELECT COUNT(*) FROM information_schema.STATISTICS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'organizers'
+           AND INDEX_NAME = 'idx_organizers_region_id'"
+    )->fetchColumn();
+
+    if ((int) $index > 0) {
+        $db->exec("DROP INDEX idx_organizers_region_id ON organizers");
+    }
+
+    $db->exec("ALTER TABLE organizers DROP COLUMN region_id");
+}
+
+function migrateOptionalEventOrganizer(PDO $db): void
+{
+    $column = $db->prepare(
+        "SELECT IS_NULLABLE FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'events'
+           AND COLUMN_NAME = 'organizer_id'"
+    );
+    $column->execute();
+    $nullable = $column->fetchColumn();
+    if ($nullable === false) {
+        throw new RuntimeException('Kolom events.organizer_id bestaat niet.');
+    }
+    if ($nullable !== 'YES') {
+        $db->exec("ALTER TABLE events MODIFY organizer_id BIGINT UNSIGNED NULL");
+    }
+}
+
+function migrateEventHashtags(PDO $db): void
+{
+    $column = $db->prepare(
+        "SELECT COUNT(*) FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'events'
+           AND COLUMN_NAME = 'hashtags'"
+    );
+    $column->execute();
+    if ((int) $column->fetchColumn() === 0) {
+        $db->exec("ALTER TABLE events ADD COLUMN hashtags VARCHAR(500) NULL AFTER description");
+    }
+}
+
+function migrateEventExtraInfo(PDO $db): void
+{
+    $check = $db->prepare(
+        "SELECT COUNT(*) FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'events'
+           AND COLUMN_NAME = 'extra_info'"
+    );
+    $check->execute();
+    if ((int) $check->fetchColumn() === 0) {
+        $db->exec("ALTER TABLE events ADD COLUMN extra_info MEDIUMTEXT NULL AFTER description");
+    }
+}
+
+function migrateEventRecurrence(PDO $db): void
+{
+    $db->exec("CREATE TABLE IF NOT EXISTS event_recurrence_series (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        frequency ENUM('weekly','monthly') NOT NULL,
+        ends_on DATE NOT NULL,
+        created_by INT UNSIGNED NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        KEY idx_event_recurrence_created_by (created_by)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    $columns = $db->query(
+        "SELECT COLUMN_NAME FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'events'"
+    )->fetchAll(PDO::FETCH_COLUMN);
+    if (!in_array('recurrence_series_id', $columns, true)) {
+        $db->exec("ALTER TABLE events ADD COLUMN recurrence_series_id BIGINT UNSIGNED NULL");
+    }
+    if (!in_array('recurrence_number', $columns, true)) {
+        $db->exec("ALTER TABLE events ADD COLUMN recurrence_number INT UNSIGNED NULL");
+    }
+
+    $index = $db->query(
+        "SELECT COUNT(*) FROM information_schema.STATISTICS
+         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'events'
+           AND INDEX_NAME = 'idx_events_recurrence_series'"
+    )->fetchColumn();
+    if ((int) $index === 0) {
+        $db->exec("CREATE INDEX idx_events_recurrence_series ON events (recurrence_series_id, recurrence_number)");
+    }
+
+    $constraint = $db->query(
+        "SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS
+         WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = 'events'
+           AND CONSTRAINT_NAME = 'fk_events_recurrence_series'
+           AND CONSTRAINT_TYPE = 'FOREIGN KEY'"
+    )->fetchColumn();
+    if ((int) $constraint === 0) {
+        $db->exec("ALTER TABLE events
+            ADD CONSTRAINT fk_events_recurrence_series
+            FOREIGN KEY (recurrence_series_id) REFERENCES event_recurrence_series(id)
+            ON DELETE SET NULL");
+    }
+}
+
+function migrateEventMessages(PDO $db): void
+{
+    $db->exec("CREATE TABLE IF NOT EXISTS event_messages (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        event_id BIGINT UNSIGNED NOT NULL,
+        user_id INT UNSIGNED NOT NULL,
+        parent_id BIGINT UNSIGNED NULL,
+        message TEXT NOT NULL,
+        is_deleted TINYINT(1) NOT NULL DEFAULT 0,
+        deleted_by INT UNSIGNED NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME NULL,
+        PRIMARY KEY (id),
+        KEY idx_event_messages_event (event_id, created_at),
+        KEY idx_event_messages_parent (parent_id),
+        KEY idx_event_messages_user (user_id),
+        CONSTRAINT fk_event_messages_event FOREIGN KEY (event_id)
+            REFERENCES events(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+function migrateUserNotifications(PDO $db): void
+{
+    $db->exec("CREATE TABLE IF NOT EXISTS user_notifications (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id INT UNSIGNED NOT NULL,
+        actor_user_id INT UNSIGNED NOT NULL,
+        event_id BIGINT UNSIGNED NOT NULL,
+        message_id BIGINT UNSIGNED NOT NULL,
+        notification_type VARCHAR(40) NOT NULL DEFAULT 'mention',
+        is_read TINYINT(1) NOT NULL DEFAULT 0,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_user_notification_message (user_id, message_id),
+        KEY idx_user_notifications_unread (user_id, is_read, created_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+function migrateRegionAppearance(PDO $db): void
+{
+    $db->exec("CREATE TABLE IF NOT EXISTS region_appearance (
+        region_id BIGINT UNSIGNED NOT NULL,
+        primary_color CHAR(7) NOT NULL DEFAULT '#E23A2C',
+        primary_dark CHAR(7) NOT NULL DEFAULT '#8F211B',
+        accent_color CHAR(7) NOT NULL DEFAULT '#F6B22E',
+        secondary_color CHAR(7) NOT NULL DEFAULT '#1FA898',
+        tertiary_color CHAR(7) NOT NULL DEFAULT '#F4802A',
+        header_color CHAR(7) NOT NULL DEFAULT '#222222',
+        background_color CHAR(7) NOT NULL DEFAULT '#FFFFFF',
+        text_color CHAR(7) NOT NULL DEFAULT '#222222',
+        weekday_colors TEXT NULL,
+        logo_path VARCHAR(255) NULL,
+        PRIMARY KEY (region_id),
+        CONSTRAINT fk_region_appearance_region FOREIGN KEY (region_id)
+            REFERENCES regions(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+
+    $columns = [
+        'primary_color' => "CHAR(7) NOT NULL DEFAULT '#E23A2C'",
+        'primary_dark' => "CHAR(7) NOT NULL DEFAULT '#8F211B'",
+        'accent_color' => "CHAR(7) NOT NULL DEFAULT '#F6B22E'",
+        'secondary_color' => "CHAR(7) NOT NULL DEFAULT '#1FA898'",
+        'tertiary_color' => "CHAR(7) NOT NULL DEFAULT '#F4802A'",
+        'header_color' => "CHAR(7) NOT NULL DEFAULT '#222222'",
+        'menu_color' => "CHAR(7) NOT NULL DEFAULT '#FFFFFF'",
+        'organizer_color' => "CHAR(7) NOT NULL DEFAULT '#E23A2C'",
+        'filter_hover_color' => "CHAR(7) NOT NULL DEFAULT '#E23A2C'",
+        'filter_bar_color' => "CHAR(7) NOT NULL DEFAULT '#FFFFFF'",
+        'filter_text_color' => "CHAR(7) NOT NULL DEFAULT '#222222'",
+        'search_button_color' => "CHAR(7) NOT NULL DEFAULT '#E23A2C'",
+        'back_top_color' => "CHAR(7) NOT NULL DEFAULT '#E23A2C'",
+        'search_field_color' => "CHAR(7) NOT NULL DEFAULT '#FFFFFF'",
+        'search_text_color' => "CHAR(7) NOT NULL DEFAULT '#222222'",
+        'footer_color' => "CHAR(7) NOT NULL DEFAULT '#FFFFFF'",
+        'background_color' => "CHAR(7) NOT NULL DEFAULT '#FFFFFF'",
+        'text_color' => "CHAR(7) NOT NULL DEFAULT '#222222'",
+        'weekday_colors' => "TEXT NULL",
+        'logo_path' => "VARCHAR(255) NULL",
+    ];
+
+    $check = $db->prepare(
+        "SELECT COUNT(*) FROM information_schema.COLUMNS
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_NAME = 'region_appearance'
+           AND COLUMN_NAME = :column_name"
+    );
+
+    foreach ($columns as $name => $definition) {
+        $check->execute(['column_name' => $name]);
+        if ((int) $check->fetchColumn() === 0) {
+            $db->exec("ALTER TABLE region_appearance ADD COLUMN `{$name}` {$definition}");
+        }
+    }
+}
+
+function migrateUserAgendaPreferences(PDO $db): void
+{
+    $db->exec("CREATE TABLE IF NOT EXISTS user_agenda_preferences (
+        user_id BIGINT UNSIGNED NOT NULL,
+        region_id BIGINT UNSIGNED NULL,
+        active_filter ENUM('organizer','city') NOT NULL DEFAULT 'organizer',
+        organizer_id BIGINT UNSIGNED NULL,
+        city VARCHAR(120) NULL,
+        sound_muted TINYINT(1) NOT NULL DEFAULT 1,
+        updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        PRIMARY KEY (user_id),
+        KEY idx_user_agenda_preferences_region (region_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+function migrateUserEmailVerificationTokens(PDO $db): void
+{
+    $db->exec("CREATE TABLE IF NOT EXISTS user_email_verification_tokens (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id BIGINT UNSIGNED NOT NULL,
+        token_hash CHAR(64) NOT NULL,
+        expires_at DATETIME NOT NULL,
+        used_at DATETIME NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_user_email_verification_hash (token_hash),
+        KEY idx_user_email_verification_user (user_id),
+        KEY idx_user_email_verification_expiry (expires_at),
+        CONSTRAINT fk_user_email_verification_user FOREIGN KEY (user_id)
+            REFERENCES users(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+function migratePasswordResetTokens(PDO $db): void
+{
+    $db->exec("CREATE TABLE IF NOT EXISTS password_reset_tokens (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        email VARCHAR(190) NOT NULL,
+        token_hash CHAR(64) NOT NULL,
+        expires_at DATETIME NOT NULL,
+        used_at DATETIME NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_password_reset_token_hash (token_hash),
+        KEY idx_password_reset_email_created (email, created_at),
+        KEY idx_password_reset_expiry (expires_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+}
+
+function migrateAuditTracking(PDO $db): void
+{
+    $tables = $db->query(
+        "SELECT TABLE_NAME
+         FROM information_schema.TABLES
+         WHERE TABLE_SCHEMA = DATABASE()
+           AND TABLE_TYPE = 'BASE TABLE'
+         ORDER BY TABLE_NAME"
+    )->fetchAll(PDO::FETCH_COLUMN);
+
+    foreach ($tables as $tableName) {
+        $tableName = (string) $tableName;
+        if (!preg_match('/^[A-Za-z0-9_]+$/', $tableName)) {
+            continue;
+        }
+
+        $columns = $db->prepare(
+            "SELECT COLUMN_NAME
+             FROM information_schema.COLUMNS
+             WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table_name"
+        );
+        $columns->execute(['table_name' => $tableName]);
+        $existing = array_fill_keys($columns->fetchAll(PDO::FETCH_COLUMN), true);
+
+        $quotedTable = '`' . $tableName . '`';
+        $definitions = [
+            'created_at' => 'DATETIME NULL',
+            'created_by' => 'INT UNSIGNED NULL',
+            'updated_at' => 'DATETIME NULL',
+            'updated_by' => 'INT UNSIGNED NULL',
+        ];
+
+        foreach ($definitions as $columnName => $definition) {
+            if (!isset($existing[$columnName])) {
+                $db->exec(
+                    'ALTER TABLE ' . $quotedTable .
+                    ' ADD COLUMN `' . $columnName . '` ' . $definition
+                );
+            }
+        }
+
+        $suffix = substr(hash('sha256', $tableName), 0, 12);
+        $insertTrigger = 'db_audit_bi_' . $suffix;
+        $updateTrigger = 'db_audit_bu_' . $suffix;
+
+        $db->exec('DROP TRIGGER IF EXISTS `' . $insertTrigger . '`');
+        $db->exec('DROP TRIGGER IF EXISTS `' . $updateTrigger . '`');
+
+        $db->exec(
+            'UPDATE ' . $quotedTable .
+            ' SET `created_at` = COALESCE(`created_at`, NOW()),' .
+            ' `updated_at` = COALESCE(`updated_at`, `created_at`, NOW())' .
+            ' WHERE `created_at` IS NULL OR `updated_at` IS NULL'
+        );
+
+        $db->exec(
+            'CREATE TRIGGER `' . $insertTrigger . '` BEFORE INSERT ON ' . $quotedTable .
+            ' FOR EACH ROW SET' .
+            ' NEW.created_at = COALESCE(NEW.created_at, NOW()),' .
+            ' NEW.created_by = COALESCE(NEW.created_by, @dondebailar_user_id),' .
+            ' NEW.updated_at = COALESCE(NEW.updated_at, NOW()),' .
+            ' NEW.updated_by = COALESCE(NEW.updated_by, @dondebailar_user_id)'
+        );
+
+        $db->exec(
+            'CREATE TRIGGER `' . $updateTrigger . '` BEFORE UPDATE ON ' . $quotedTable .
+            ' FOR EACH ROW SET' .
+            ' NEW.updated_at = NOW(),' .
+            ' NEW.updated_by = COALESCE(@dondebailar_user_id, NEW.updated_by)'
+        );
+    }
+}
+
+try {
+    set_time_limit(180);
+
+    $lockHandle = acquireUpdateLock($projectRoot);
+
+    if (!is_dir($projectRoot . '/.git')) {
+        throw new RuntimeException('Deze installatie is geen Git-checkout. Automatisch bijwerken is hier niet mogelijk.');
+    }
+
+    $branch = runRequiredGit(['branch', '--show-current'], $projectRoot);
+    if ($branch !== 'develop') {
+        throw new RuntimeException(
+            'De actieve Git-branch is "' . $branch . '". De updater werkt uitsluitend op branch develop.'
+        );
+    }
+
+    $changes = runRequiredGit(
+        ['status', '--porcelain', '--untracked-files=normal'],
+        $projectRoot
+    );
+    if ($changes !== '') {
+        throw new RuntimeException(
+            'Er staan lokale wijzigingen of niet-gevolgde bestanden op de Pi. Om te voorkomen dat werk verloren gaat, is de update gestopt.'
+        );
+    }
+
+    $backupDir = $projectRoot . '/storage/update-backups';
+    if (!is_dir($backupDir)) {
+        mkdir($backupDir, 0775, true);
+    }
+    $backupStamp = date('Ymd-His');
+    $bundlePath = $backupDir . '/dondebailar-' . $backupStamp . '.bundle';
+    $bundleResult = runUpdateGit(['bundle', 'create', $bundlePath, '--all'], $projectRoot);
+    if ($bundleResult['code'] !== 0) {
+        throw new RuntimeException('Backup maken van de repository is mislukt: ' . $bundleResult['output']);
+    }
+    $messages[] = 'Git-backup gemaakt: ' . basename($bundlePath);
+
+    runRequiredGit(['fetch', '--prune', 'origin', 'develop'], $projectRoot);
+
+    $currentCommit = runRequiredGit(['rev-parse', 'HEAD'], $projectRoot);
+    $availableCommit = runRequiredGit(['rev-parse', 'FETCH_HEAD'], $projectRoot);
+
+    if (!hash_equals($currentCommit, $availableCommit)) {
+        runRequiredGit(['merge-base', '--is-ancestor', 'HEAD', 'FETCH_HEAD'], $projectRoot);
+        runRequiredGit(['pull', '--ff-only', 'origin', 'develop'], $projectRoot);
+
+        $success = true;
+        $messages[] = 'DONDEBAILAR is bijgewerkt naar de nieuwste versie van develop.';
+    } else {
+        $messages[] = 'DONDEBAILAR is al up-to-date. Er was geen nieuwe versie beschikbaar.';
+        $success = true;
+    }
+
+    $db = Database::connection();
+
+    removeOrganizerRegionColumn($db);
+    $messages[] = 'Database: organisatoren zijn platformbreed; foutieve regio-koppeling verwijderd indien aanwezig.';
+
+    $db->exec("CREATE TABLE IF NOT EXISTS event_guest_attendances (
+        id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        event_id BIGINT UNSIGNED NOT NULL,
+        visitor_hash CHAR(64) NOT NULL,
+        created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        PRIMARY KEY (id),
+        UNIQUE KEY uq_event_guest_attendance (event_id, visitor_hash),
+        KEY idx_event_guest_attendance_event (event_id),
+        CONSTRAINT fk_event_guest_attendance_event FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
+    $messages[] = 'Database: anonieme dans-aanmeldingen zijn gecontroleerd.';
+
+    migrateOptionalEventOrganizer($db);
+    $messages[] = 'Database: organisator bij evenementen is optioneel gemaakt.';
+
+    migrateEventHashtags($db);
+    $messages[] = 'Database: apart hashtagveld voor evenementen is gecontroleerd.';
+
+    migrateEventExtraInfo($db);
+    $messages[] = 'Database: apart veld Extra info voor evenementen is gecontroleerd.';
+
+    migrateEventMessages($db);
+    $messages[] = 'Database: berichten per evenement zijn gecontroleerd.';
+
+    migrateEventRecurrence($db);
+    $messages[] = 'Database: wekelijkse en maandelijkse evenementreeksen zijn gecontroleerd.';
+
+    migrateUserNotifications($db);
+    $messages[] = 'Database: meldingen bij @vermeldingen zijn gecontroleerd.';
+
+    migrateUserEmailVerificationTokens($db);
+    $messages[] = 'Database: e-mailbevestiging bij nieuwe registraties is gecontroleerd.';
+
+    migratePasswordResetTokens($db);
+    $messages[] = 'Database: wachtwoordherstel is gecontroleerd.';
+
+    migrateRegionAppearance($db);
+    $messages[] = 'Database: kleuren en logo per regio zijn gecontroleerd.';
+
+    migrateUserAgendaPreferences($db);
+    $messages[] = 'Database: persoonlijke agenda-instellingen voor gebruikers zijn gecontroleerd.';
+
+    migrateDuplicateUserEmails($db);
+    migrateAuditTracking($db);
+    $messages[] = 'Database: aanmaak- en wijzigingsregistratie is gecontroleerd voor alle tabellen.';
+
+    $shortCommit = runRequiredGit(['rev-parse', '--short', 'HEAD'], $projectRoot);
+    $messages[] = 'Geïnstalleerde versie: ' . $shortCommit;
+} catch (Throwable $exception) {
+    http_response_code(500);
+    $messages[] = 'UPDATE NIET UITGEVOERD';
+    $messages[] = $exception->getMessage();
+} finally {
+    if (isset($lockHandle) && is_resource($lockHandle)) {
+        flock($lockHandle, LOCK_UN);
+        fclose($lockHandle);
+    }
+}
+
 require dirname(__DIR__, 2) . '/app/views/header.php';
 ?>
+
+<section class="admin-page">
+    <div class="admin-heading">
+        <div>
+            <p class="eyebrow">DONDEBAILAR</p>
+            <h1>Platformupdate</h1>
+        </div>
+    </div>
+
+    <section class="admin-section">
+        <?php foreach ($messages as $message): ?>
+            <p><?= escapeHtml($message) ?></p>
+        <?php endforeach; ?>
+
+        <p>
+            <a class="button button--primary" href="/admin/index.php">
+                Terug naar platformbeheer
+            </a>
+        </p>
+    </section>
+</section>
+
+<?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
+
+
+Message: apply reviewed PHP fixes for repo path issues and safer update lock, commit this update.
