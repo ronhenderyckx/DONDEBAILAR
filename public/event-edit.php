@@ -8,6 +8,7 @@ require_once dirname(__DIR__) . '/app/Events.php';
 
 $user = requireLogin();
 $db = Database::connection();
+$maxEventDurationHours = platformMaxEventDurationHours();
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id || $id < 1) {
     http_response_code(400);
@@ -90,7 +91,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $timezone = new DateTimeZone((string) $event['timezone']);
         $start = new DateTimeImmutable($startsAt, $timezone);
         $end = $endsAt !== '' ? new DateTimeImmutable($endsAt, $timezone) : null;
-        if ($startsAt === '' || ($end !== null && $end < $start)) $errors[] = 'Controleer de start- en einddatum.';
+        if ($startsAt === '' || ($end !== null && $end < $start)) {
+            $errors[] = 'Controleer de start- en einddatum.';
+        } elseif ($end !== null && ($end->getTimestamp() - $start->getTimestamp()) > ($maxEventDurationHours * 3600)) {
+            $errors[] = 'Een evenement mag maximaal ' . $maxEventDurationHours . ' uur duren.';
+        }
+        if ($startsAt !== '' && $end === null) {
+            $end = $start->modify('+' . $maxEventDurationHours . ' hours');
+        }
     } catch (Throwable $exception) {
         $errors[] = 'De datum of tijd is ongeldig.';
         $start = null;
@@ -183,6 +191,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <label for="event_language">Taal van de evenementinhoud *</label><select id="event_language" name="event_language"><?php foreach (['nl'=>'Nederlands','en'=>'English','es'=>'Español','fr'=>'Français'] as $code=>$label): ?><option value="<?= $code ?>" <?= $eventLanguage === $code ? 'selected' : '' ?>><?= $label ?></option><?php endforeach; ?></select>
             <label for="starts_at">Begint op *</label><input id="starts_at" type="datetime-local" name="starts_at" required value="<?= escapeHtml($startsAt) ?>">
             <label for="ends_at">Eindigt op</label><input id="ends_at" type="datetime-local" name="ends_at" value="<?= escapeHtml($endsAt) ?>">
+            <p class="event-form-note">Maximale duur: <?= (int) $maxEventDurationHours ?> uur. Laat leeg om automatisch deze duur te gebruiken.</p>
             <label for="description">Beschrijving</label><textarea id="description" name="description" rows="8"><?= escapeHtml($description) ?></textarea>
             <label for="extra_info">Extra info</label><textarea id="extra_info" name="extra_info" rows="4"><?= escapeHtml($extraInfo) ?></textarea>
             <label for="hashtags">Hashtags</label><input id="hashtags" name="hashtags" maxlength="500" value="<?= escapeHtml($hashtags) ?>" placeholder="#salsa #bachata #kizomba">

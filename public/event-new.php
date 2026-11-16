@@ -8,6 +8,7 @@ require_once dirname(__DIR__) . '/app/Events.php';
 
 $user = requireLogin();
 $db = Database::connection();
+$maxEventDurationHours = platformMaxEventDurationHours();
 $regions = eventManageableRegions($db, $user);
 $errors = [];
 $selectedRegionId = (int) ($_POST['region_id'] ?? $_GET['region_id'] ?? ($regions[0]['id'] ?? 0));
@@ -93,6 +94,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $end = $endsAt !== '' ? new DateTimeImmutable($endsAt, $timezone) : null;
         if ($startsAt === '' || ($end !== null && $end < $start)) {
             $errors[] = 'Vul een geldige startdatum in en controleer de einddatum.';
+        } elseif ($end !== null && ($end->getTimestamp() - $start->getTimestamp()) > ($maxEventDurationHours * 3600)) {
+            $errors[] = 'Een evenement mag maximaal ' . $maxEventDurationHours . ' uur duren.';
+        }
+        if ($startsAt !== '' && $end === null) {
+            $end = $start->modify('+' . $maxEventDurationHours . ' hours');
         }
         $until = null;
         if ($recurrence !== 'none') {
@@ -303,6 +309,7 @@ require dirname(__DIR__) . '/app/views/header.php';
             <input id="starts_at" type="datetime-local" name="starts_at" required value="<?= escapeHtml($startsAt) ?>">
             <label for="ends_at">Eindigt op</label>
             <input id="ends_at" type="datetime-local" name="ends_at" value="<?= escapeHtml($endsAt) ?>">
+            <p class="event-form-note">Maximale duur: <?= (int) $maxEventDurationHours ?> uur. Laat leeg om automatisch deze duur te gebruiken.</p>
             <h2>Herhaling</h2>
             <label for="recurrence">Herhaal dit evenement</label>
             <select id="recurrence" name="recurrence">

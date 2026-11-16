@@ -80,6 +80,15 @@ if (is_file($agendaPageSizeFile)) {
     }
 }
 
+$maxEventDurationFile = $projectRoot . '/storage/platform-max-event-duration-hours.txt';
+$maxEventDurationHours = 10;
+if (is_file($maxEventDurationFile)) {
+    $storedMaxEventDuration = (int) trim((string) file_get_contents($maxEventDurationFile));
+    if ($storedMaxEventDuration >= 1 && $storedMaxEventDuration <= 168) {
+        $maxEventDurationHours = $storedMaxEventDuration;
+    }
+}
+
 if ($logoPath !== '' && !preg_match('#^/uploads/platform/[a-zA-Z0-9._-]+$#', $logoPath)) {
     $logoPath = '';
 }
@@ -119,6 +128,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             $agendaPageSize = $requestedPageSize;
             $successMessage = 'De agenda-instellingen zijn opgeslagen.';
+        }
+    } elseif (isset($_POST['save_event_duration'])) {
+        $requestedMaxEventDuration = filter_var($_POST['max_event_duration_hours'] ?? null, FILTER_VALIDATE_INT);
+        if ($requestedMaxEventDuration === false || $requestedMaxEventDuration < 1 || $requestedMaxEventDuration > 168) {
+            $errorMessage = 'Kies een maximale evenementduur tussen 1 en 168 uur.';
+        } elseif (file_put_contents($maxEventDurationFile, (string) $requestedMaxEventDuration . PHP_EOL, LOCK_EX) === false) {
+            $errorMessage = 'De maximale evenementduur kon niet worden opgeslagen. Controleer de schrijfrechten van storage.';
+        } else {
+            $maxEventDurationHours = $requestedMaxEventDuration;
+            $successMessage = 'De maximale evenementduur is opgeslagen.';
         }
     } elseif (isset($_POST['remove_logo'])) {
         if ($logoPath !== '') {
@@ -277,6 +296,25 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             </div>
             <div class="form-actions">
                 <button type="submit" class="button button--primary" name="save_agenda_settings" value="1">Agenda-instelling opslaan</button>
+            </div>
+        </form>
+    </section>
+
+    <section class="admin-section">
+        <div class="section-heading">
+            <div>
+                <h2>Maximale evenementduur</h2>
+                <p>Deze limiet geldt voor nieuwe en gewijzigde evenementen in alle regio's. Als geen eindtijd wordt ingevuld, wordt automatisch de maximale duur gebruikt.</p>
+            </div>
+        </div>
+        <form method="post" action="/admin/settings.php" class="auth-form">
+            <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+            <label for="max_event_duration_hours">Maximale duur (1–168 uur)</label>
+            <div style="max-width:180px">
+                <input type="number" id="max_event_duration_hours" name="max_event_duration_hours" min="1" max="168" step="1" value="<?= (int) $maxEventDurationHours ?>" required style="text-align:center;margin:0">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="button button--primary" name="save_event_duration" value="1">Maximale duur opslaan</button>
             </div>
         </form>
     </section>

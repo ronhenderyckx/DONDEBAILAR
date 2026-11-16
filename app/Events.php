@@ -5,6 +5,18 @@ require_once __DIR__ . '/Authorization.php';
 require_once __DIR__ . '/Security.php';
 require_once __DIR__ . '/ImageOptimization.php';
 
+/** Lees de platformbrede maximale evenementduur in uren. */
+function platformMaxEventDurationHours(): int
+{
+    $settingFile = dirname(__DIR__) . '/storage/platform-max-event-duration-hours.txt';
+    if (!is_file($settingFile)) {
+        return 10;
+    }
+
+    $hours = filter_var(trim((string) file_get_contents($settingFile)), FILTER_VALIDATE_INT);
+    return $hours !== false && $hours >= 1 && $hours <= 168 ? $hours : 10;
+}
+
 /** Regio's waarin de gebruiker evenementen mag aanmaken. */
 function eventManageableRegions(PDO $db, array $user): array
 {
