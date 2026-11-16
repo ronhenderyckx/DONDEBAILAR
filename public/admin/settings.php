@@ -304,7 +304,7 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
         <div class="section-heading">
             <div>
                 <h2>Maximale evenementduur</h2>
-                <p>Deze limiet geldt voor nieuwe en gewijzigde evenementen in alle regio's. Als geen eindtijd wordt ingevuld, wordt automatisch de maximale duur gebruikt.</p>
+                <p>Deze limiet geldt voor nieuwe en gewijzigde evenementen in alle regio's. Een einde om 24:00 (middernacht) op de startdag valt buiten deze limiet. Als geen eindtijd wordt ingevuld, eindigt het evenement automatisch om 24:00.</p>
             </div>
         </div>
         <form method="post" action="/admin/settings.php" class="auth-form">

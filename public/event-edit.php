@@ -93,7 +93,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $end = $endsAt !== '' ? new DateTimeImmutable($endsAt, $timezone) : null;
         if ($startsAt === '' || ($end !== null && $end < $start)) {
             $errors[] = 'Controleer de start- en einddatum.';
-        } elseif ($end !== null && ($end->getTimestamp() - $start->getTimestamp()) > ($maxEventDurationHours * 3600)) {
+        } elseif ($end !== null
+            && ($end->getTimestamp() - $start->getTimestamp()) > ($maxEventDurationHours * 3600)
+            && $end->getTimestamp() !== $start->modify('tomorrow')->setTime(0, 0)->getTimestamp()
+        ) {
             $errors[] = 'Een evenement mag maximaal ' . $maxEventDurationHours . ' uur duren.';
         }
         if ($startsAt !== '' && $end === null) {
