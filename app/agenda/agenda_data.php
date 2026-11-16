@@ -107,6 +107,12 @@ try {
 date_default_timezone_set($timezone->getName());
 
 $now = new DateTimeImmutable('now', $timezone);
+// Een evenement blijft zichtbaar tot zijn einde. De ondergrens op starts_at houdt
+// idx_events_region_feed bruikbaar als bereikindex; zonder die grens leest MariaDB
+// alle voorbije evenementen van de regio. Evenementen die langer dan dit aantal
+// dagen duren verdwijnen dus eerder uit de agenda.
+$agendaMaxEventDays = 31;
+$windowStart = $now->modify('-' . $agendaMaxEventDays . ' days')->format('Y-m-d H:i:s');
 $organizerId = $restoreSavedAgendaPreferences
     ? (int) ($savedAgendaPreferences['organizer_id'] ?? 0)
     : (filter_input(INPUT_GET, 'organizer_id', FILTER_VALIDATE_INT) ?: 0);
@@ -151,11 +157,13 @@ if ($regionId > 0) {
          FROM organizers o
          INNER JOIN events e ON e.organizer_id = o.id
          WHERE o.is_active = 1 AND e.region_id = :region_id
-           AND e.status = 'published' AND e.starts_at >= :now
+           AND e.status = 'published' AND e.starts_at >= :window_start
+           AND COALESCE(e.ends_at, e.starts_at) >= :now
          ORDER BY o.name"
     );
     $organizerQuery->execute([
         'region_id' => $regionId,
+        'window_start' => $windowStart,
         'now' => $now->format('Y-m-d H:i:s'),
     ]);
     $organizers = $organizerQuery->fetchAll();
@@ -170,12 +178,14 @@ if ($regionId > 0) {
          INNER JOIN events e ON e.location_id = l.id
          WHERE l.region_id = :region_id AND l.is_active = 1 AND l.city <> ''
            AND e.region_id = :event_region_id AND e.status = 'published'
-           AND e.starts_at >= :now
+           AND e.starts_at >= :window_start
+           AND COALESCE(e.ends_at, e.starts_at) >= :now
          ORDER BY l.city"
     );
     $cityQuery->execute([
         'region_id' => $regionId,
         'event_region_id' => $regionId,
+        'window_start' => $windowStart,
         'now' => $now->format('Y-m-d H:i:s'),
     ]);
     $cities = $cityQuery->fetchAll();
@@ -206,9 +216,11 @@ if ($regionId > 0) {
             )
             WHERE e.region_id = :region_id
               AND e.status = 'published'
-              AND e.starts_at >= :now";
+              AND e.starts_at >= :window_start
+              AND COALESCE(e.ends_at, e.starts_at) >= :now";
     $params = [
         'region_id' => $regionId,
+        'window_start' => $windowStart,
         'now' => $now->format('Y-m-d H:i:s'),
     ];
     if ($organizerId > 0) {
