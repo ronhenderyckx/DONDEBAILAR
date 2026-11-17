@@ -85,7 +85,7 @@ document.querySelectorAll('[data-event-info]').forEach(function (info) {
         const dy = touch.clientY - start.y;
         start = null;
         if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.25) return;
-        setEventDescription(info, dx > 0);
+        setEventDescription(info, dx < 0);
     }, {passive:true});
     info.addEventListener('touchcancel', function () { start = null; }, {passive:true});
 });
@@ -103,7 +103,7 @@ document.addEventListener('pointerup', function (event) {
     const dx = event.clientX - start.x;
     const dy = event.clientY - start.y;
     if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.25) return;
-    setEventDescription(start.info, dx > 0);
+    setEventDescription(start.info, dx < 0);
 }, {passive:true});
 document.addEventListener('pointercancel', function () { eventInfoPointerStart = null; }, {passive:true});
 
