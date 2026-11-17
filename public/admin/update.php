@@ -83,84 +83,9 @@ function runRequiredGit(array $arguments, string $workingDirectory): string
 }
 
 /**
- * Laat testaccounts hetzelfde e-mailadres delen.
- * Verwijdert uitsluitend een enkelvoudige UNIQUE-index op users.email.
+ * De unieke index op users.email blijft behouden: elk account heeft een
+ * eigen e-mailadres en login-identiteit. Testaccounts gebruiken unieke adressen.
  */
-/**
- * Houd alle verwijzingen naar users.id gelijk aan BIGINT UNSIGNED.
- * Deze functie repareert ook bestaande installaties waarin oudere
- * uitbreidingen nog INT UNSIGNED gebruiken.
- */
-function migrateConsistentUserIdTypes(PDO $db): void
-{
-    $columns = [
-        'event_messages' => [
-            'user_id' => 'BIGINT UNSIGNED NOT NULL',
-            'deleted_by' => 'BIGINT UNSIGNED NULL',
-        ],
-        'user_notifications' => [
-            'user_id' => 'BIGINT UNSIGNED NOT NULL',
-            'actor_user_id' => 'BIGINT UNSIGNED NOT NULL',
-        ],
-        'event_recurrence_series' => [
-            'created_by' => 'BIGINT UNSIGNED NULL',
-        ],
-    ];
-
-    foreach ($columns as $table => $definitions) {
-        foreach ($definitions as $column => $definition) {
-            $check = $db->prepare(
-                "SELECT COUNT(*) FROM information_schema.COLUMNS
-                 WHERE TABLE_SCHEMA = DATABASE()
-                   AND TABLE_NAME = :table_name
-                   AND COLUMN_NAME = :column_name"
-            );
-            $check->execute([
-                'table_name' => $table,
-                'column_name' => $column,
-            ]);
-            if ((int) $check->fetchColumn() > 0) {
-                $db->exec("ALTER TABLE `{$table}` MODIFY COLUMN `{$column}` {$definition}");
-            }
-        }
-    }
-}
-
-/**
- * Verwijder uitsluitend een enkelvoudige unieke index op users.email.
- */
-function migrateDuplicateUserEmails(PDO $db): void
-{
-    // SHOW INDEX leest de daadwerkelijke indexdefinitie van de actieve database.
-    $rows = $db->query('SHOW INDEX FROM `users`')->fetchAll(PDO::FETCH_ASSOC);
-    $indexes = [];
-
-    foreach ($rows as $row) {
-        $name = (string) ($row['Key_name'] ?? '');
-        if ($name === '' || !isset($row['Column_name'])) {
-            continue;
-        }
-
-        $indexes[$name][] = [
-            'column' => (string) $row['Column_name'],
-            'unique' => (int) ($row['Non_unique'] ?? 1) === 0,
-        ];
-    }
-
-    foreach ($indexes as $indexName => $columns) {
-        // Alleen een UNIQUE-index die uitsluitend uit users.email bestaat verwijderen.
-        if (
-            count($columns) !== 1
-            || $columns[0]['column'] !== 'email'
-            || !$columns[0]['unique']
-            || !preg_match('/^[A-Za-z0-9_]+$/', $indexName)
-        ) {
-            continue;
-        }
-
-        $db->exec('ALTER TABLE `users` DROP INDEX `' . $indexName . '`');
-    }
-}
 
 
 /**
@@ -812,7 +737,7 @@ try {
     migrateConsistentUserIdTypes($db);
     $messages[] = 'Database: alle gebruikers-ID-kolommen zijn gelijkgetrokken met users.id.';
 
-    migrateDuplicateUserEmails($db);
+    // uq_users_email blijft behouden om dubbele accountidentiteiten te voorkomen.
     migrateAuditTracking($db);
     $messages[] = 'Database: aanmaak- en wijzigingsregistratie is gecontroleerd voor alle tabellen.';
 
