@@ -1,324 +1,85 @@
 <?php
-declare(strict_types=1);
-
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
-
-$db = Database::connection();
-$currentUser = currentUser();
-// De sessie is een directe fallback; de database blijft de permanente opslag.
-$savedAgendaPreferences = $currentUser !== null
-    && is_array($_SESSION['agenda_preferences'] ?? null)
-    ? $_SESSION['agenda_preferences']
-    : null;
-if ($currentUser !== null) {
-    try {
-        $preferencesTableExists = (int) $db->query(
-            "SELECT COUNT(*) FROM information_schema.TABLES
-             WHERE TABLE_SCHEMA = DATABASE()
-               AND TABLE_NAME = 'user_agenda_preferences'
-               AND TABLE_TYPE = 'BASE TABLE'"
-        )->fetchColumn() > 0;
-        if ($preferencesTableExists) {
-            $preferenceQuery = $db->prepare(
-                "SELECT region_id, active_filter, organizer_id, city, sound_muted
-                 FROM user_agenda_preferences WHERE user_id = :user_id"
-            );
-            $preferenceQuery->execute(['user_id' => (int) $currentUser['id']]);
-            $databaseAgendaPreferences = $preferenceQuery->fetch() ?: null;
-            if ($databaseAgendaPreferences !== null) {
-                $savedAgendaPreferences = $databaseAgendaPreferences;
-                $_SESSION['agenda_preferences'] = $databaseAgendaPreferences;
-            }
-        }
-    } catch (Throwable $exception) {
-        $savedAgendaPreferences = null;
-    }
-}
-$visitorToken = '';
-if ($currentUser === null) {
-    $visitorToken = (string) ($_COOKIE['dondebailar_visitor'] ?? '');
-    if (!preg_match('/\A[a-f0-9]{64}\z/', $visitorToken)) {
-        $visitorToken = bin2hex(random_bytes(32));
-        setcookie('dondebailar_visitor', $visitorToken, [
-            'expires' => time() + 31536000, 'path' => '/',
-            'secure' => (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off'),
-            'httponly' => true, 'samesite' => 'Lax',
-        ]);
-        $_COOKIE['dondebailar_visitor'] = $visitorToken;
-    }
-}
-$visitorHash = $visitorToken !== '' ? hash('sha256', $visitorToken) : '';
-$regions = $db->query(
-    "SELECT r.id, r.name, r.timezone,
-            CASE WHEN a.region_id IS NOT NULL THEN a.logo_path ELSE r.logo_path END AS logo_path,
-            a.primary_color, a.primary_dark, a.accent_color,
-            a.secondary_color, a.tertiary_color, a.header_color, a.menu_color, a.organizer_color,
-            a.filter_bar_color, a.filter_text_color, a.search_button_color, a.back_top_color,
-             a.search_field_color, a.search_text_color, a.footer_color, a.background_color, a.text_color, a.weekday_colors
-     FROM regions r
-     LEFT JOIN region_appearance a ON a.region_id = r.id
-     WHERE r.is_active = 1 ORDER BY r.id"
-)->fetchAll();
-
-$regionIds = array_map(static fn(array $item): int => (int) $item['id'], $regions);
-
-// Herstel persoonlijke voorkeuren alleen wanneer de URL geen expliciete
-// regio- of filterkeuze bevat. Zo blijft een gekozen organisator ook na
-// scrollen, verversen of terugkeren naar de pagina geselecteerd.
-$hasExplicitAgendaChoice = array_key_exists('region_id', $_GET)
-    || array_key_exists('filter', $_GET)
-    || array_key_exists('organizer_id', $_GET)
-    || array_key_exists('city', $_GET);
-$restoreSavedAgendaPreferences = $currentUser !== null
-    && $savedAgendaPreferences !== null
-    && !$hasExplicitAgendaChoice;
-
-$requestedRegion = $restoreSavedAgendaPreferences
-    ? (int) ($savedAgendaPreferences['region_id'] ?? 0)
-    : (filter_input(INPUT_GET, 'region_id', FILTER_VALIDATE_INT) ?: 0);
-$regionId = $requestedRegion && in_array((int) $requestedRegion, $regionIds, true)
-    ? (int) $requestedRegion
-    : (int) ($regionIds[0] ?? 0);
-$regionById = [];
-foreach ($regions as $item) {
-    $regionById[(int) $item['id']] = $item;
-}
-$region = $regionById[$regionId] ?? null;
-$timezoneName = (string) ($region['timezone'] ?? 'Europe/Madrid');
-try {
-    $timezone = new DateTimeZone($timezoneName);
-} catch (Throwable $exception) {
-    $timezone = new DateTimeZone('Europe/Madrid');
-}
-date_default_timezone_set($timezone->getName());
-
-$now = new DateTimeImmutable('now', $timezone);
-$organizerId = $restoreSavedAgendaPreferences
-    ? (int) ($savedAgendaPreferences['organizer_id'] ?? 0)
-    : (filter_input(INPUT_GET, 'organizer_id', FILTER_VALIDATE_INT) ?: 0);
-$city = $restoreSavedAgendaPreferences
-    ? trim((string) ($savedAgendaPreferences['city'] ?? ''))
-    : trim((string) ($_GET['city'] ?? ''));
-$activeFilter = $restoreSavedAgendaPreferences
-    ? ((($savedAgendaPreferences['active_filter'] ?? '') === 'city') ? 'city' : 'organizer')
-    : ((($_GET['filter'] ?? '') === 'city') ? 'city' : 'organizer');
-
-// Alleen het filtertype dat actief is mag de agenda beperken.
-// Zo kan een eerder gekozen organisator geen stadsfilter blokkeren, en omgekeerd.
-if ($activeFilter === 'city') {
-    $organizerId = 0;
-} else {
-    $city = '';
-}
-$savedSoundMuted = !empty($savedAgendaPreferences['sound_muted']);
-if (mb_strlen($city) > 120) {
-    $city = mb_substr($city, 0, 120);
-}
-$agendaSearch = trim((string) ($_GET['q'] ?? ''));
-if (mb_strlen($agendaSearch) > 120) {
-    $agendaSearch = mb_substr($agendaSearch, 0, 120);
-}
-
-$organizers = [];
-$cities = [];
-$events = [];
-if ($regionId > 0) {
-    $organizerQuery = $db->prepare(
-        "SELECT DISTINCT o.id, o.name, o.logo_path
-         FROM organizers o
-         INNER JOIN events e ON e.organizer_id = o.id
-         WHERE o.is_active = 1 AND e.region_id = :region_id
-           AND e.status = 'published' AND e.starts_at >= :now
-         ORDER BY o.name"
-    );
-    $organizerQuery->execute([
-        'region_id' => $regionId,
-        'now' => $now->format('Y-m-d H:i:s'),
-    ]);
-    $organizers = $organizerQuery->fetchAll();
-    $organizerIds = array_map(static fn(array $item): int => (int) $item['id'], $organizers);
-    if ($organizerId > 0 && !in_array($organizerId, $organizerIds, true)) {
-        $organizerId = 0;
-    }
-
-    $cityQuery = $db->prepare(
-        "SELECT DISTINCT l.city
-         FROM locations l
-         INNER JOIN events e ON e.location_id = l.id
-         WHERE l.region_id = :region_id AND l.is_active = 1 AND l.city <> ''
-           AND e.region_id = :event_region_id AND e.status = 'published'
-           AND e.starts_at >= :now
-         ORDER BY l.city"
-    );
-    $cityQuery->execute([
-        'region_id' => $regionId,
-        'event_region_id' => $regionId,
-        'now' => $now->format('Y-m-d H:i:s'),
-    ]);
-    $cities = $cityQuery->fetchAll();
-    $cityNames = array_column($cities, 'city');
-    if ($city !== '' && !in_array($city, $cityNames, true)) {
-        $city = '';
-    }
-
-    $sql = "SELECT e.id, e.title, e.description, e.hashtags, e.starts_at, e.ends_at,
-                   e.event_language, c.name AS category_name,
-                   o.name AS organizer_name, o.phone AS organizer_phone, o.logo_path AS organizer_logo_path,
-                   l.name AS location_name,
-                   l.city AS location_city, l.street AS location_street,
-                   l.house_number AS location_house_number, l.postal_code AS location_postal_code,
-                   l.phone AS location_phone, l.logo_path AS location_logo_path,
-                   l.latitude, l.longitude, l.google_maps_url,
-                   cover.id AS cover_media_id
-            FROM events e
-            INNER JOIN organizers o ON o.id = e.organizer_id
-            LEFT JOIN categories c ON c.id = e.category_id
-            LEFT JOIN locations l ON l.id = e.location_id
-            LEFT JOIN event_media cover ON cover.id = COALESCE(
-                e.cover_media_id,
-                (SELECT em.id FROM event_media em
-                 WHERE em.event_id = e.id AND em.media_context = 'event'
-                   AND em.media_type = 'image' AND em.media_source = 'upload'
-                 ORDER BY em.is_cover DESC, em.sort_order, em.id LIMIT 1)
-            )
-            WHERE e.region_id = :region_id
-              AND e.status = 'published'
-              AND e.starts_at >= :now";
-    $params = [
-        'region_id' => $regionId,
-        'now' => $now->format('Y-m-d H:i:s'),
-    ];
-    if ($organizerId > 0) {
-        $sql .= " AND e.organizer_id = :organizer_id";
-        $params['organizer_id'] = $organizerId;
-    }
-    if ($city !== '') {
-        $sql .= " AND l.city = :city";
-        $params['city'] = $city;
-    }
-    if ($agendaSearch !== '') {
-        $sql .= " AND (
-            e.title LIKE :search_title
-            OR e.description LIKE :search_description
-            OR e.hashtags LIKE :search_hashtags
-            OR o.name LIKE :search_organizer
-            OR l.name LIKE :search_location
-            OR l.city LIKE :search_city
-            OR c.name LIKE :search_category
-        )";
-        $searchTerm = '%' . $agendaSearch . '%';
-        $params['search_title'] = $searchTerm;
-        $params['search_description'] = $searchTerm;
-        $params['search_hashtags'] = $searchTerm;
-        $params['search_organizer'] = $searchTerm;
-        $params['search_location'] = $searchTerm;
-        $params['search_city'] = $searchTerm;
-        $params['search_category'] = $searchTerm;
-    }
-    $sql .= " ORDER BY e.starts_at ASC, e.id ASC";
-    $eventQuery = $db->prepare($sql);
-    $eventQuery->execute($params);
-    $events = $eventQuery->fetchAll();
-
-    if ($events !== []) {
-        $eventIds = array_map(static fn(array $event): int => (int) $event['id'], $events);
-        $eventPlaceholders = implode(',', array_fill(0, count($eventIds), '?'));
-        $mediaQuery = $db->prepare(
-            "SELECT id, event_id, media_type, media_source, external_url, file_path, is_cover
-             FROM event_media
-             WHERE event_id IN ($eventPlaceholders)
-               AND media_context = 'event'
-             ORDER BY is_cover DESC, sort_order ASC, id ASC"
-        );
-        $mediaQuery->execute($eventIds);
-        $mediaByEvent = [];
-        foreach ($mediaQuery->fetchAll() as $mediaItem) {
-            $mediaType = (string) $mediaItem['media_type'];
-            $mediaSource = (string) $mediaItem['media_source'];
-            $filePath = trim((string) ($mediaItem['file_path'] ?? ''));
-            $externalUrl = trim((string) ($mediaItem['external_url'] ?? ''));
-            $hasUpload = $mediaSource === 'upload' && $filePath !== '';
-            $hasExternal = $externalUrl !== ''
-                && filter_var($externalUrl, FILTER_VALIDATE_URL)
-                && in_array((string) parse_url($externalUrl, PHP_URL_SCHEME), ['http', 'https'], true);
-            if (!$hasUpload && !$hasExternal) {
-                continue;
-            }
-            $mediaByEvent[(int) $mediaItem['event_id']][] = [
-                'id' => (int) $mediaItem['id'],
-                'type' => $mediaType,
-                'source' => $mediaSource,
-                'external_url' => $hasExternal ? $externalUrl : '',
-            ];
-        }
-
-        foreach ($events as &$eventItem) {
-            $eventKey = (int) $eventItem['id'];
-            $eventItem['media_items'] = $mediaByEvent[$eventKey] ?? [];
-        }
-        unset($eventItem);
-
-        $attendanceQuery = $db->prepare(
-            "SELECT event_id, COUNT(*) AS total FROM (
-                SELECT event_id FROM event_attendances WHERE status = 'attending' AND event_id IN ($eventPlaceholders)
-                UNION ALL
-                SELECT event_id FROM event_guest_attendances WHERE event_id IN ($eventPlaceholders)
-            ) attendance_rows GROUP BY event_id"
-        );
-        $attendanceQuery->execute(array_merge($eventIds, $eventIds));
-        $attendanceCounts = [];
-        foreach ($attendanceQuery->fetchAll() as $attendanceRow) {
-            $attendanceCounts[(int) $attendanceRow['event_id']] = (int) $attendanceRow['total'];
-        }
-        if ($currentUser !== null) {
-            $mine = $db->prepare("SELECT event_id FROM event_attendances WHERE user_id = ? AND status = 'attending' AND event_id IN ($eventPlaceholders)");
-            $mine->execute(array_merge([(int) $currentUser['id']], $eventIds));
-        } else {
-            $mine = $db->prepare("SELECT event_id FROM event_guest_attendances WHERE visitor_hash = ? AND event_id IN ($eventPlaceholders)");
-            $mine->execute(array_merge([$visitorHash], $eventIds));
-        }
-        $myAttendanceIds = array_map('intval', $mine->fetchAll(PDO::FETCH_COLUMN));
-        foreach ($events as &$eventItem) {
-            $eventKey = (int) $eventItem['id'];
-            $eventItem['attendance_count'] = $attendanceCounts[$eventKey] ?? 0;
-            $eventItem['is_attending'] = in_array($eventKey, $myAttendanceIds, true);
-        }
-        unset($eventItem);
-
-        $messageCountsQuery = $db->prepare(
-            "SELECT event_id, COUNT(*) AS total FROM event_messages
-             WHERE is_deleted = 0 AND event_id IN ($eventPlaceholders)
-             GROUP BY event_id"
-        );
-        $messageCountsQuery->execute($eventIds);
-        $messageCounts = [];
-        foreach ($messageCountsQuery->fetchAll() as $messageCountRow) {
-            $messageCounts[(int) $messageCountRow['event_id']] = (int) $messageCountRow['total'];
-        }
-        foreach ($events as &$eventItem) {
-            $eventItem['message_count'] = $messageCounts[(int) $eventItem['id']] ?? 0;
-        }
-        unset($eventItem);
-    }
-}
-
-$agendaPageSizeFile = dirname(__DIR__, 2) . '/storage/agenda-page-size.txt';
-$regionAppearanceSettings = json_decode((string) ($region['weekday_colors'] ?? ''), true);
-if (!is_array($regionAppearanceSettings)) $regionAppearanceSettings = [];
-$agendaArrowBackground = (string) ($regionAppearanceSettings['agenda_arrow_background'] ?? '#F6B22E');
-$agendaArrowText = (string) ($regionAppearanceSettings['agenda_arrow_text'] ?? '#222222');
-if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowBackground)) $agendaArrowBackground = '#F6B22E';
-if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowText)) $agendaArrowText = '#222222';
-$agendaPageSize = 20;
-if (is_file($agendaPageSizeFile)) {
-    $storedPageSize = (int) trim((string) file_get_contents($agendaPageSizeFile));
-    if ($storedPageSize >= 1 && $storedPageSize <= 100) $agendaPageSize = $storedPageSize;
-}
-$escape = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-$isAgendaPage = true;
-$pageTitle = 'Agenda' . ($region ? ' — ' . $region['name'] : '') . ' — DONDEBAILAR';
-$pageRobots = 'index, follow';
-require dirname(__DIR__, 2) . '/app/views/header.php';
+// Agenda view. Variables are prepared by app/agenda/agenda_data.php.
 ?>
+<section class="agenda-page">
+    <?php if ($regions === []): ?>
+        <section class="agenda-empty"><h2>De agenda wordt voorbereid</h2><p>Er zijn nog geen actieve regio's beschikbaar.</p></section>
+    <?php else: ?>
+        
+        <?php if ($events === []): ?>
+            <section class="agenda-empty"><h2>Geen evenementen gevonden</h2><p>Er zijn momenteel geen toekomstige gepubliceerde evenementen met deze filters.</p></section>
+        <?php else: ?>
+            <div class="agenda-feed">
+                <?php foreach ($events as $eventIndex => $event): ?>
+                    <?php
+                    $start = new DateTimeImmutable((string) $event['starts_at'], $timezone);
+                    $eventUrl = '/event.php?id=' . (int) $event['id'];
+                    $locationLabel = trim((string) ($event['location_city'] ?? ''));
+                    $mapUrl = (string) ($event['google_maps_url'] ?? '');
+                    if ($mapUrl === '' && $event['latitude'] !== null && $event['longitude'] !== null) {
+                        $mapUrl = 'https://www.google.com/maps?q=' . rawurlencode((string) $event['latitude'] . ',' . (string) $event['longitude']);
+                    }
+                    $shareScheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
+                    $shareUrl = $shareScheme . ($_SERVER['HTTP_HOST'] ?? '') . $eventUrl;
+                    ?>
+                    <?php require __DIR__ . '/event-card.php'; ?>
+                <?php endforeach; ?>
+            </div>
+            <?php if ($totalEvents > $agendaPageSize): ?>
+                <?php
+                $previousPageUrl = '?' . http_build_query(array_merge($_GET, ['page' => max(1, $agendaPage - 1)]));
+                $nextPageUrl = '?' . http_build_query(array_merge($_GET, ['page' => min((int) ceil($totalEvents / $agendaPageSize), $agendaPage + 1)]));
+                $firstEventNumber = (($agendaPage - 1) * $agendaPageSize) + 1;
+                $lastEventNumber = min($agendaPage * $agendaPageSize, $totalEvents);
+                ?>
+                <nav class="agenda-page-navigation" aria-label="Navigatie tussen evenementreeksen">
+                    <?php if ($agendaPage > 1): ?>
+                        <a class="agenda-page-nav-icon" href="<?= $escape($previousPageUrl) ?>" aria-label="Vorige reeks" title="Vorige reeks">‹</a>
+                    <?php else: ?>
+                        <span class="agenda-page-nav-icon" aria-disabled="true">‹</span>
+                    <?php endif; ?>
+                    <span><?= $firstEventNumber ?>–<?= $lastEventNumber ?> van <?= $totalEvents ?></span>
+                    <?php if ($lastEventNumber < $totalEvents): ?>
+                        <a class="agenda-page-nav-icon" href="<?= $escape($nextPageUrl) ?>" aria-label="Volgende reeks" title="Volgende reeks">›</a>
+                    <?php else: ?>
+                        <span class="agenda-page-nav-icon" aria-disabled="true">›</span>
+                    <?php endif; ?>
+                </nav>
+            <?php endif; ?>
+        <?php endif; ?>
+    <?php endif; ?>
+    <div class="agenda-message-modal" id="agenda-message-modal" hidden>
+        <div class="agenda-message-modal__panel" role="dialog" aria-modal="true" aria-labelledby="agenda-message-modal-title">
+            <div class="agenda-message-modal__top"><button type="button" class="agenda-message-modal__close" aria-label="Sluiten">×</button></div>
+            <iframe title="Berichten bij evenement" src="about:blank" scrolling="no"></iframe>
+        </div>
+    </div>
+
+</section>
+
+
+<?php
+$hasInstagramReels = false;
+foreach ($events as $instagramCheckEvent) {
+    foreach (($instagramCheckEvent['media_items'] ?? []) as $instagramCheckMedia) {
+        if (($instagramCheckMedia['type'] ?? '') === 'reel' && ($instagramCheckMedia['source'] ?? '') === 'instagram') {
+            $hasInstagramReels = true;
+            break 2;
+        }
+    }
+}
+?>
+<?php if ($hasInstagramReels): ?><script async src="https://www.instagram.com/embed.js"></script><?php endif; ?>
+<script>
+window.DONDEBAILAR_AGENDA_CONFIG = <?= json_encode([
+    'pageSize' => (int) $agendaPageSize,
+    'activeFilterIndex' => $activeFilter === 'city' ? 1 : 0,
+    'soundMuted' => (bool) $savedSoundMuted,
+    'csrfToken' => csrfToken(),
+    'regionId' => (int) $regionId,
+], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
+</script>
+<script src="/assets/js/agenda.js"></script>
+<script>window.DONDEBAILAR_AGENDA_PAGE_SIZE = <?= (int) $agendaPageSize ?>;</script>
+<script src="/assets/js/agenda-filters.js"></script>
+<?php require dirname(__DIR__, 3) . '/app/views/footer.php'; ?>
