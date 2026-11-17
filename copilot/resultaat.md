@@ -3,7 +3,7 @@
 ## Algemene status
 NIET UITGEVOERD
 
-Copilot moet deze opdracht nog uitvoeren.
+Copilot moet de actieve opdracht nog uitvoeren.
 
 ## Repository en branch
 - Repository: `ronhenderyckx/DONDEBAILAR`
@@ -12,45 +12,58 @@ Copilot moet deze opdracht nog uitvoeren.
 - Remote branch-tip:
 - Lokale werkkopie gecontroleerd:
 
-## Wijzigingen
-- `public/assets/js/agenda.js`:
-- `public/assets/js/agenda-filters.js`:
-- Bevestiging dat geen andere applicatiebestanden zijn gewijzigd:
+## Analyse en aanpak
+- Oorzaak van het swipeprobleem:
+- Relevante onderdelen onderzocht:
+- Verklaring waarom eventuele wijzigingen buiten de twee oorspronkelijke JavaScript-bestanden noodzakelijk waren:
 
-## Gedrag
-- Swipe naar links opent de extra evenementinformatie:
-- Swipe naar rechts sluit de extra evenementinformatie:
+## Gewijzigde bestanden
+Vermeld ieder gewijzigd bestand met reden:
+- Bestand:
+- Reden:
+
+## Gewenst gedrag en behoud
+- Swipe naar links opent extra evenementinformatie:
+- Swipe naar rechts sluit extra evenementinformatie:
 - Gedrag na AJAX-filterverversing:
-- Media-galerij ongewijzigd:
+- Drempel van 45 px behouden:
+- Verticale-scroll-bescherming/verhouding 1,25 behouden:
+- Mediagalerij ongewijzigd:
+- Overige bestaande functionaliteit behouden:
 
-## Behouden bestaande bescherming
-- Horizontale drempel van 45 px:
-- Verticale-scroll-bescherming (verhouding 1,25):
-- Bestaande listeners, cleanup en overige functionaliteit:
+## Database en migraties
+- Databasewijziging noodzakelijk: JA/NEE
+- Migratiebestanden toegevoegd/aangepast:
+- Lokale/niet-productie database aangepast:
+- Backup gemaakt en gecontroleerd (locatie en methode):
+- Migratiecommando en resultaat:
+- Productiedatabase aangeraakt: NEE
+- Raspberry Pi-database aangeraakt: NEE
+- Handmatige migratiestappen voor gebruiker op de Pi:
 
 ## Controles en tests
-Vermeld per controle het exacte commando en de echte uitkomst. Gebruik uitsluitend de afgesproken statuswaarden.
+Vermeld exacte commando's, status en echte uitkomsten:
 - Branch, lokale HEAD en remote-tip:
 - Schone werkkopie:
-- `git diff --check`:
 - Volledige diff en gewijzigde bestanden:
-- JavaScript-syntaxcontrole:
-- Overige tests:
+- `git diff --check`:
+- JavaScript/PHP syntaxcontroles:
+- Bestaande tests:
 - Browser-/touch-/mobiele tests:
 
 ## Commit
 - Codecommit:
-- Gecontroleerde bestanden in codecommit:
+- Bestanden in codecommit:
 - Rapportagecommit:
 
-## Raspberry Pi
-- Pi bijgewerkt: NEE
-- Toelichting: de update naar de Raspberry Pi wordt later handmatig door de gebruiker uitgevoerd. Copilot heeft geen verbinding gemaakt met de Pi en heeft daar niets geïnstalleerd, gesynchroniseerd of herstart.
+## Raspberry Pi – handmatige update
+- Pi bijgewerkt door Copilot: NEE
+- De gebruiker voert de update later handmatig uit.
+- Benodigde handmatige bestanden, commando's en migratiestappen:
 
 ## Veiligheid
 - `main` of `develop` gewijzigd: NEE
-- Database of migraties aangeraakt: NEE
-- Productie/deployment uitgevoerd: NEE
+- Productie/hosting/deployment aangeraakt: NEE
 - Raspberry Pi benaderd of gewijzigd: NEE
 - PR/merge uitgevoerd: NEE
 
