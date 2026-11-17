@@ -86,6 +86,49 @@ function runRequiredGit(array $arguments, string $workingDirectory): string
  * Laat testaccounts hetzelfde e-mailadres delen.
  * Verwijdert uitsluitend een enkelvoudige UNIQUE-index op users.email.
  */
+/**
+ * Houd alle verwijzingen naar users.id gelijk aan BIGINT UNSIGNED.
+ * Deze functie repareert ook bestaande installaties waarin oudere
+ * uitbreidingen nog INT UNSIGNED gebruiken.
+ */
+function migrateConsistentUserIdTypes(PDO $db): void
+{
+    $columns = [
+        'event_messages' => [
+            'user_id' => 'BIGINT UNSIGNED NOT NULL',
+            'deleted_by' => 'BIGINT UNSIGNED NULL',
+        ],
+        'user_notifications' => [
+            'user_id' => 'BIGINT UNSIGNED NOT NULL',
+            'actor_user_id' => 'BIGINT UNSIGNED NOT NULL',
+        ],
+        'event_recurrence_series' => [
+            'created_by' => 'BIGINT UNSIGNED NULL',
+        ],
+    ];
+
+    foreach ($columns as $table => $definitions) {
+        foreach ($definitions as $column => $definition) {
+            $check = $db->prepare(
+                "SELECT COUNT(*) FROM information_schema.COLUMNS
+                 WHERE TABLE_SCHEMA = DATABASE()
+                   AND TABLE_NAME = :table_name
+                   AND COLUMN_NAME = :column_name"
+            );
+            $check->execute([
+                'table_name' => $table,
+                'column_name' => $column,
+            ]);
+            if ((int) $check->fetchColumn() > 0) {
+                $db->exec("ALTER TABLE `{$table}` MODIFY COLUMN `{$column}` {$definition}");
+            }
+        }
+    }
+}
+
+/**
+ * Verwijder uitsluitend een enkelvoudige unieke index op users.email.
+ */
 function migrateDuplicateUserEmails(PDO $db): void
 {
     // SHOW INDEX leest de daadwerkelijke indexdefinitie van de actieve database.
@@ -223,7 +266,7 @@ function migrateEventRecurrence(PDO $db): void
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         frequency ENUM('weekly','monthly') NOT NULL,
         ends_on DATE NOT NULL,
-        created_by INT UNSIGNED NULL,
+        created_by BIGINT UNSIGNED NULL,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         PRIMARY KEY (id),
         KEY idx_event_recurrence_created_by (created_by)
@@ -273,11 +316,11 @@ function migrateEventMessages(PDO $db): void
     $db->exec("CREATE TABLE IF NOT EXISTS event_messages (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         event_id BIGINT UNSIGNED NOT NULL,
-        user_id INT UNSIGNED NOT NULL,
+        user_id BIGINT UNSIGNED NOT NULL,
         parent_id BIGINT UNSIGNED NULL,
         message TEXT NOT NULL,
         is_deleted TINYINT(1) NOT NULL DEFAULT 0,
-        deleted_by INT UNSIGNED NULL,
+        deleted_by BIGINT UNSIGNED NULL,
         created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         updated_at DATETIME NULL,
         PRIMARY KEY (id),
@@ -297,8 +340,8 @@ function migrateUserNotifications(PDO $db): void
 {
     $db->exec("CREATE TABLE IF NOT EXISTS user_notifications (
         id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
-        user_id INT UNSIGNED NOT NULL,
-        actor_user_id INT UNSIGNED NOT NULL,
+        user_id BIGINT UNSIGNED NOT NULL,
+        actor_user_id BIGINT UNSIGNED NOT NULL,
         event_id BIGINT UNSIGNED NOT NULL,
         message_id BIGINT UNSIGNED NOT NULL,
         notification_type VARCHAR(40) NOT NULL DEFAULT 'mention',
@@ -457,9 +500,9 @@ function migrateAuditTracking(PDO $db): void
         $quotedTable = '`' . $tableName . '`';
         $definitions = [
             'created_at' => 'DATETIME NULL',
-            'created_by' => 'INT UNSIGNED NULL',
+            'created_by' => 'BIGINT UNSIGNED NULL',
             'updated_at' => 'DATETIME NULL',
-            'updated_by' => 'INT UNSIGNED NULL',
+            'updated_by' => 'BIGINT UNSIGNED NULL',
         ];
 
         foreach ($definitions as $columnName => $definition) {
@@ -765,6 +808,9 @@ try {
 
     migrateUserAgendaPreferences($db);
     $messages[] = 'Database: persoonlijke agenda-instellingen voor gebruikers zijn gecontroleerd.';
+
+    migrateConsistentUserIdTypes($db);
+    $messages[] = 'Database: alle gebruikers-ID-kolommen zijn gelijkgetrokken met users.id.';
 
     migrateDuplicateUserEmails($db);
     migrateAuditTracking($db);
