@@ -31,6 +31,8 @@ Deze map bevat de gecontroleerde, handmatige workflow voor opdrachten tussen Cha
 - Voer geen destructieve operaties uit, zoals bestanden of data verwijderen, tenzij dit expliciet is opgedragen en veilig afgebakend.
 - Wijzig geen applicatiecode, configuratie, secrets, uploads of gebruikersdata tenzij dit expliciet in de opdracht staat.
 - Maak geen commits, branches of tags tenzij de opdracht dit expliciet toestaat.
+- **Beperkte committoestemming voor workflowadministratie:** een opdracht mag uitdrukkelijk toestemming geven voor commits die uitsluitend nodig zijn om `copilot/opdracht.md`, `copilot/resultaat.md` en bestanden onder `copilot/archive/` bij te werken. Deze toestemming geldt alleen op de branch die in die opdracht staat en alleen voor de genoemde workflowbestanden. Ze geeft geen toestemming om applicatiecode of andere bestanden te wijzigen, branches of tags te maken, te mergen of productie-, database- of migratiehandelingen uit te voeren.
+- Als de opdracht deze beperkte committoestemming niet uitdrukkelijk geeft, maak dan geen commit. Als de beschikbare omgeving een bestand alleen kan opslaan door automatisch een commit te maken, stop dan en rapporteer `GEBLOKKEERD`.
 - Verzin geen testresultaten, uitgevoerde acties, foutmeldingen of bevindingen.
 - Bij onduidelijke instructies, ontbrekende rechten, onverwachte branchstatus of risico: stop en rapporteer `GEBLOKKEERD`. Ga niet zelf de opdracht uitbreiden.
 
