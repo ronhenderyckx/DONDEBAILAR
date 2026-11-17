@@ -1,68 +1,51 @@
 # Resultaat – Swipe-richting evenementinformatie via lokale patch
 
 ## Algemene status
-NIET UITGEVOERD
+GEBLOKKEERD
+
+De opdracht vereist uitvoering vanuit een lokale Git-werkkopie met terminal en gerichte patch-/diffmogelijkheden, en verbiedt GitHub Contents API of volledige-bestandsvervanging voor app-code. Deze sessie heeft alleen GitHub-bestandslees- en Contents API-bewerkingshulpmiddelen; er is geen lokale checkout of terminal beschikbaar. Daarom zijn de verplichte lokale prechecks niet uitvoerbaar en is geen applicatiecode gewijzigd.
 
 ## Repository, branch en begincommit
 - Repository: `ronhenderyckx/DONDEBAILAR`
 - Verplichte branch: `copilot/php-review-fixes`
-- Lokale werkkopie en repositorypad: NIET GECONTROLEERD
-- Actieve branch: NIET GECONTROLEERD
-- Lokale begincommit: NIET VASTGESTELD
-- Remote branch-tip: NIET VASTGESTELD
-- Lokale werkkopie schoon en gelijk aan remote: NIET GECONTROLEERD
+- Branchcontrole: GESLAAGD — de opgegeven branch is aanwezig.
+- Branch-tip gezien in GitHub branchlijst: `38da9aee03b27cea561a0315e3070e13f6748b1a`
+- Lokale werkkopie/repositorypad: GEBLOKKEERD — niet beschikbaar in deze sessie.
+- Lokale actieve branch, HEAD, schone status en gelijkheid met origin: NIET UITGEVOERD — hiervoor zijn lokale terminalcommando's vereist; `git ls-remote` is niet uitgevoerd.
 
-## Patchwerkwijze
-- Lokale terminal/patchondersteuning beschikbaar: NIET GECONTROLEERD
-- Gerichte patch gebruikt: NIET UITGEVOERD
-- Volledige bestanden overschreven: NIET UITGEVOERD
+## Instructies en bronbestanden
+- `copilot/README.md` en de volledige actuele `copilot/opdracht.md` zijn geraadpleegd vanaf de opgegeven branch.
+- `public/assets/js/agenda.js` en `public/assets/js/agenda-filters.js` zijn via GitHub gelezen; de opdracht verbiedt die route voor codewijzigingen.
+- Statistisch zichtbaar in de opgehaalde bron: de gewone touch- en pointer-handlers roepen `setEventDescription(..., dx > 0)` aan; de AJAX-touch-handler doet hetzelfde. Dat betekent dat swipe naar rechts nu de informatie toont.
+- De vereiste gewenste aanpassing is `dx < 0` als show-conditie voor alle relevante informatiehandlers; swipe naar rechts moet sluiten. De bestaande drempel van 45 px en verticale verhouding 1,25 moeten ongewijzigd blijven.
+- Omdat de verplichte lokale volledige broncontrole niet kon plaatsvinden, zijn dit uitsluitend waarnemingen uit de GitHub-weergave en geen vervanging van de verplichte lokale voorbereiding.
 
-## Vooraf gelezen code en gevonden handlers
-NIET UITGEVOERD
-
-## Codewijzigingen en gewenst gedrag
-- `public/assets/js/agenda.js`: NIET UITGEVOERD
-- `public/assets/js/agenda-filters.js`: NIET UITGEVOERD
-- Gewone agenda: links opent/toont; rechts sluit/verbergt: NIET GECONTROLEERD
-- Na AJAX-filterverversing: links opent/toont; rechts sluit/verbergt: NIET GECONTROLEERD
-
-## Behouden bestaande werking
-- Swipe-drempel (eerder vastgesteld op 45 pixels): NIET GECONTROLEERD
-- Verticale-scroll-bescherming (eerder vastgesteld op verhouding 1,25): NIET GECONTROLEERD
-- Event-listeners, cleanup en navigatiegrenzen: NIET GECONTROLEERD
-- Mediagalerij ongemoeid: NIET GECONTROLEERD
+## Wijzigingen
+- `public/assets/js/agenda.js`: NIET GEWIJZIGD.
+- `public/assets/js/agenda-filters.js`: NIET GEWIJZIGD.
+- `copilot/resultaat.md`: bijgewerkt met dit resultaat.
+- Geen ander bestand gewijzigd.
 
 ## Controles en tests
-| Controle | Status | Exact commando/werkwijze en uitkomst |
+| Controle | Status | Werkwijze en uitkomst |
 |---|---|---|
-| Repository en actieve branch | NIET UITGEVOERD | |
-| Lokale HEAD gelijk aan remote-tip | NIET UITGEVOERD | |
-| Lokale werkkopie schoon | NIET UITGEVOERD | |
-| Volledige bronbestanden gelezen | NIET UITGEVOERD | |
-| Gerichte patch en volledige diff gecontroleerd | NIET UITGEVOERD | |
-| `git diff --check` | NIET UITGEVOERD | |
-| JavaScript-syntax `agenda.js` | NIET UITGEVOERD | |
-| JavaScript-syntax `agenda-filters.js` | NIET UITGEVOERD | |
-| Gewone swipe-richting | NIET UITGEVOERD | |
-| AJAX-swipe-richting | NIET UITGEVOERD | |
-| Drempel en verticale-scroll-bescherming behouden | NIET UITGEVOERD | |
-| Relevante bestaande tests | NIET UITGEVOERD | |
-| Browser-/touch-/mobiele test | NIET UITGEVOERD | |
-| Raspberry Pi-test | NIET UITGEVOERD | |
-| Commit bevat uitsluitend de twee toegestane bestanden | NIET UITGEVOERD | |
+| Opgegeven branch bestaat | GESLAAGD | GitHub branchlijst geraadpleegd; `copilot/php-review-fixes` bestaat met tip `38da9aee03b27cea561a0315e3070e13f6748b1a`. |
+| Opdracht en README geraadpleegd | GESLAAGD | Actuele workflowbestanden op de opgegeven branch opgehaald. |
+| Lokale repository-root, actieve branch, status en HEAD | GEBLOKKEERD | Geen lokale checkout of terminal in deze sessie. |
+| `git ls-remote origin refs/heads/copilot/php-review-fixes` | NIET UITGEVOERD | Geen terminal beschikbaar; branchlijsttip is geen vervanging voor het gevraagde commando. |
+| Volledige lokale JavaScript-bronbestanden gelezen | GEBLOKKEERD | Geen lokale werkkopie; GitHub-bestandsweergave is niet de door de opdracht vereiste lokale werkwijze. |
+| Gerichte patch, `git diff`, `git status` en `git diff --check` | GEBLOKKEERD | Geen lokale checkout/patchmogelijkheden. |
+| JavaScript-syntaxcontroles en tests | NIET UITGEVOERD | Geen runtime, shell of test runner beschikbaar. |
+| Browser-, touch-, mobiele en Raspberry Pi-tests | NIET UITGEVOERD | Niet uitgevoerd; geen gekoppelde testomgeving. |
+| Applicatiecodecommit | NIET UITGEVOERD | Geen code gewijzigd; de vereiste diff- en bestandscontroles konden niet slagen/worden uitgevoerd. |
 
-## Commit
-- Applicatiecodecommit: NIET UITGEVOERD
-- Commit-ID: NIET VASTGESTELD
-- Geverifieerde bestanden in codecommit: NIET VASTGESTELD
-- Rapportagecommit: NIET UITGEVOERD
-
-## Veiligheid
-- `main` en `develop`: NIET AANGEPAST; controleer en rapporteer de werkelijk uitgevoerde verificatie.
-- Database, backup en migraties: NIET UITGEVOERD.
-- Productie, hosting, deployment en release: NIET UITGEVOERD.
-- PR, merge, rebase, cherry-pick, branch en tag: NIET UITGEVOERD.
-- Andere bestanden dan de twee toegestane JS-bestanden en dit rapport: NIET WIJZIGEN.
+## Commit en veiligheid
+- Applicatiecodecommit: NIET GEMAAKT.
+- Rapportagecommit: dit rapport is toegestaan om afzonderlijk op de opgegeven branch vast te leggen.
+- Geen wijziging aan `main` of `develop`.
+- Geen branch, tag, pull request, merge, rebase of cherry-pick.
+- Geen database-, backup-, migratie-, productie-, hosting-, deployment- of releasehandeling.
+- Geen bestanden buiten de expliciet toegestane rapportage gewijzigd.
 
 ## Eindconclusie
-NIET UITGEVOERD
+GEBLOKKEERD — branch is gecontroleerd en de richtingstegenstelling is zichtbaar in de via GitHub gelezen handlers, maar de actieve opdracht vereist een lokale werkkopie met terminal en een gerichte patch. Die omgeving is niet beschikbaar. Geen codewijziging of codecommit is uitgevoerd. Voer deze opdracht uit in de lokale Copilot-werkkopie die de opdracht vereist.
