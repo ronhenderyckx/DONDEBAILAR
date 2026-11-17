@@ -554,7 +554,9 @@ function createUpdateDatabaseBackup(array $config, string $projectRoot, string $
     if (!is_dir($backupDirectory) && !mkdir($backupDirectory, 0700, true) && !is_dir($backupDirectory)) {
         throw new RuntimeException('De map voor databaseback-ups kon niet worden aangemaakt.');
     }
-    @chmod($backupDirectory, 0700);
+    if (!chmod($backupDirectory, 0700)) {
+        throw new RuntimeException('De map voor back-ups kon niet veilig worden afgeschermd.');
+    }
 
     $backupFile = $backupDirectory . '/dondebailar-db-' . $stamp . '.sql';
     $defaultsFile = tempnam(sys_get_temp_dir(), 'db-update-');
@@ -647,7 +649,9 @@ function createUpdateGitBackup(string $projectRoot, string $backupDirectory, str
     if (!is_dir($backupDirectory) && !mkdir($backupDirectory, 0700, true) && !is_dir($backupDirectory)) {
         throw new RuntimeException('De map voor Git-back-ups kon niet worden aangemaakt.');
     }
-    @chmod($backupDirectory, 0700);
+    if (!chmod($backupDirectory, 0700)) {
+        throw new RuntimeException('De map voor back-ups kon niet veilig worden afgeschermd.');
+    }
 
     $bundle = $backupDirectory . '/dondebailar-code-' . $stamp . '.bundle';
     runRequiredGit(['bundle', 'create', $bundle, '--all'], $projectRoot);
@@ -657,7 +661,10 @@ function createUpdateGitBackup(string $projectRoot, string $backupDirectory, str
         throw new RuntimeException('Git-back-up kon niet worden gecontroleerd; de update is niet gestart.');
     }
 
-    @chmod($bundle, 0600);
+    if (!chmod($bundle, 0600)) {
+        @unlink($bundle);
+        throw new RuntimeException('Git-back-up kon niet veilig worden afgeschermd; de update is niet gestart.');
+    }
     return $bundle;
 }
 
