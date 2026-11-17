@@ -1,9 +1,7 @@
-# Resultaat – Swipe-richting informatie gelijk aan media
+# Resultaat – Swipe evenementinformatie
 
 ## Algemene status
 NIET UITGEVOERD
-
-Copilot moet dit rapport na uitvoering volledig invullen. Verzin geen uitgevoerde controles of resultaten.
 
 ## Repository en branch
 - Repository: `ronhenderyckx/DONDEBAILAR`
@@ -11,37 +9,45 @@ Copilot moet dit rapport na uitvoering volledig invullen. Verzin geen uitgevoerd
 - Begincommit:
 - Eindcommit:
 
-## Onderzoek bestaande werking
-- Media links:
-- Informatie rechts:
-- Gewone pagina-handler:
-- AJAX-handler:
+## Vooraf onderzocht
+- `public/assets/js/agenda.js`:
+- `public/assets/js/agenda-filters.js`:
+- Gewone informatie-handler:
+- AJAX-informatie-handler:
 
-## Wijzigingen
+## Uitgevoerde wijziging
 - Gewijzigde bestanden:
-- Gewenste swipe-richting gerealiseerd:
+- Swipe links opent/toont informatie:
+- Swipe rechts sluit/verbergt informatie:
+- Gedrag na AJAX-filterverversing:
+- Bestaande swipe-drempel behouden:
+- Bescherming tegen verticale scroll behouden:
+- Mediagalerij en overige functionaliteit ongewijzigd:
 
-## Tests en controles
-| Controle | Status | Resultaat |
+## Controles en tests
+| Controle | Status | Exacte werkwijze/uitkomst |
 |---|---|---|
 | Branchcontrole | NIET UITGEVOERD | |
-| JavaScript-syntaxcontrole agenda.js | NIET UITGEVOERD | |
-| JavaScript-syntaxcontrole agenda-filters.js | NIET UITGEVOERD | |
-| Controle beide informatie-handlers | NIET UITGEVOERD | |
-| Controle mediagalerij ongewijzigd | NIET UITGEVOERD | |
-| Bestaande relevante tests | NIET UITGEVOERD | |
-| Browser-/touch-/apparaat-test | NIET UITGEVOERD | |
+| JavaScript-syntax agenda.js | NIET UITGEVOERD | |
+| JavaScript-syntax agenda-filters.js | NIET UITGEVOERD | |
+| Gewone informatie-handler | NIET UITGEVOERD | |
+| AJAX-handler na filterverversing | NIET UITGEVOERD | |
+| Swipe-drempel en verticale-scrollbescherming | NIET UITGEVOERD | |
+| Geen andere bestanden gewijzigd | NIET UITGEVOERD | |
+| Browser-/touch-/mobiele/Raspberry Pi-test | NIET UITGEVOERD | |
 
 ## Commit
-- Applicatiecodecommit gemaakt: 
-- Commit-ID:
-- Bevat exact de twee toegestane JS-bestanden: 
+- Applicatiecodecommit toegestaan: JA, maximaal één op `copilot/php-review-fixes`, uitsluitend de twee genoemde JS-bestanden.
+- Codecommit gemaakt:
+- Codecommit-ID:
+- Bevat exact `public/assets/js/agenda.js` en `public/assets/js/agenda-filters.js`:
 - Rapportagecommit:
 
 ## Veiligheid
-- Geen wijzigingen aan main/develop:
-- Geen PR of merge:
-- Geen database-, productie- of deploymenthandeling:
+- `main` en `develop` niet gewijzigd:
+- Geen andere applicatiebestanden gewijzigd:
+- Geen database-, productie-, hosting-, deployment- of releasehandeling:
+- Geen PR, merge, rebase of cherry-pick:
 
 ## Eindconclusie
 NIET UITGEVOERD
