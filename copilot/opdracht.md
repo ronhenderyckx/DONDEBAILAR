@@ -67,3 +67,9 @@ Vul `copilot/resultaat.md` volledig in met:
 10. algemene status: `GESLAAGD`, `MISLUKT`, `NIET UITGEVOERD` of `GEBLOKKEERD`.
 
 Stop na het bijwerken van `copilot/resultaat.md`.
+
+
+## Startcommando voor Copilot
+Gebruik deze instructie als startcommando voor deze opdracht:
+
+> Lees de volledige actuele `copilot/README.md` en `copilot/opdracht.md` op branch `copilot/php-review-fixes`. Voer de nieuwe gerichte vervolgopdracht uit. Corrigeer de twee resterende swipe-richtingen in `public/assets/js/agenda.js`. Behoud alle bestaande veiligheidsafspraken. Controleer de volledige diff, maak maximaal één toegestane codecommit en vul `copilot/resultaat.md` volledig in. Stop daarna en wacht op controle.
