@@ -1,38 +1,46 @@
-# Opdracht voor Copilot
+# Eerste opdracht – Controle van de handmatige Copilot-workflow
 
-Gebruik deze opdracht als initiële handmatige taak voor de file-based workflow.
+## Repository
+`ronhenderyckx/DONDEBAILAR`
+
+## Verplichte branch
+`copilot/php-review-fixes`
 
 ## Doel
-Onderzoek hoe deze repository het beste kan worden ingericht voor communicatie tussen ChatGPT en GitHub Copilot via bestanden in GitHub.
+Controleer uitsluitend of de handmatige ChatGPT-Copilot-workflow correct en veilig is ingericht.
 
-## Gebruik
-- Lees eerst dit bestand volledig.
-- Werk uitsluitend op de branch die expliciet in de opdracht wordt genoemd.
-- Maak geen productiehandelingen, geen merges, geen databasewijzigingen en geen release-installaties zonder duidelijke toestemming.
-- Documenteer elke stap in `copilot/resultaat.md`.
+## Verplichte voorbereiding
+1. Lees dit volledige bestand voordat je begint.
+2. Lees daarna `copilot/README.md` volledig.
+3. Controleer dat de actieve branch exact `copilot/php-review-fixes` is. Als dat niet zo is, stop dan onmiddellijk en rapporteer `GEBLOKKEERD`.
+4. Controleer de aanwezigheid en inhoud van de workflowbestanden en archiefmap.
 
-## Beschikbare context
-- Repository: `ronhenderyckx/DONDEBAILAR`
-- Doel: veilige, traceerbare communicatie via bestanden
-- Geen applicatiecodewijzigingen zonder expliciete opdracht
+## Gevraagde controles
+- `copilot/README.md` bestaat en beschrijft de workflow en veiligheidsregels.
+- `copilot/opdracht.md` bestaat en bevat deze opdracht.
+- `copilot/resultaat.md` bestaat als resultatenbestand.
+- `copilot/archive/` bestaat.
+- De werkwijze maakt duidelijk dat Copilot de opdracht eerst volledig leest, uitsluitend op de opgegeven branch werkt en alleen gevraagde acties uitvoert.
+- De statuswaarden en de regels voor rapportage zijn duidelijk.
 
-## Te leveren output
-Rapporteer:
-- hoe Copilot `copilot/opdracht.md` en `copilot/resultaat.md` kan lezen en schrijven
-- hoe ChatGPT resultaten direct uit GitHub kan uitlezen
-- welke branch- en repositoryregels moeten gelden
-- welke GitHub-machtigingen of Actions nodig zijn (indien later geautomatiseerd)
-- wat voor de eerste versie veilig is als handmatige workflow
+## Toegestane wijzigingen
+Voor deze eerste controle zijn geen wijzigingen nodig. Als een workflowbestand ontbreekt of onjuist is, rapporteer dit dan in `copilot/resultaat.md` en stop. Wacht op een nieuwe opdracht om bestanden te herstellen.
 
-## Beperkingen
-- Werk niet op `main` of `develop` zonder toestemming.
-- Wijzig geen applicatiecode zonder uitdrukkelijke opdracht.
-- Gebruik geen destructieve operaties.
-- Vermeld wanneer een controle niet is uitgevoerd.
+## Strikte beperkingen
+- Wijzig uitsluitend het bestand `copilot/resultaat.md` om je bevindingen te rapporteren.
+- Wijzig geen applicatiecode.
+- Wijzig `main` of `develop` niet.
+- Maak geen branch, commit, tag, merge of pull request.
+- Voer geen productiehandelingen, deployment of installatie uit.
+- Voer geen database-, backup- of migratieacties uit.
+- Verwijder of overschrijf geen bestanden.
+- Voer geen andere acties uit dan de hierboven genoemde controles en rapportage.
 
-## Status bij afronding
-Schrijf alle bevindingen naar `copilot/resultaat.md` met een duidelijke status:
+## Rapportage
+Schrijf de uitkomst naar `copilot/resultaat.md`. Gebruik uitsluitend deze statuswaarden:
 - GESLAAGD
 - MISLUKT
 - NIET UITGEVOERD
 - GEBLOKKEERD
+
+Vermeld per controle wat je daadwerkelijk hebt vastgesteld. Vermeld ook expliciet dat applicatiecode, database en productie niet zijn gewijzigd of aangeraakt.
