@@ -1,83 +1,98 @@
-# Opdracht – Maak swipe-richting informatie gelijk aan media
+# Opdracht – Swipe naar links opent evenementinformatie, swipe naar rechts sluit
 
-## Repository en branch
+## Repository en verplichte branch
 - Repository: `ronhenderyckx/DONDEBAILAR`
-- Werk uitsluitend op branch: `copilot/php-review-fixes`
+- Werk uitsluitend op branch: `copilot/php-review-fixes`.
+- Controleer de actieve branch vóór je bestanden wijzigt. Bij een andere branch: stop en rapporteer `GEBLOKKEERD`.
 
-## Doel
-Pas de horizontale swipe-bediening van de informatie rechts in de agenda aan, zodat die dezelfde richting en betekenis heeft als de mediagalerij links.
+## Doel en exact gewenst gedrag
+Pas uitsluitend de swipe-bediening van de extra evenementinformatie aan:
+- **Swipe naar links:** opent/toont de extra evenementinformatie.
+- **Swipe naar rechts:** sluit/verbergt de extra evenementinformatie.
 
-## Gewenste bediening
-Voor media én informatie geldt:
-- Swipe naar links = vooruit / volgend item of volgende informatiepagina.
-- Swipe naar rechts = terug / vorig item of informatie sluiten/teruggaan.
-
-De mediawerking is al de referentie en mag niet onbedoeld veranderen. De informatie rechts moet dezelfde richting volgen.
+Dit gedrag moet identiek werken:
+1. bij de gewone agendaweergave;
+2. na een AJAX-filterverversing.
 
 ## Verplichte voorbereiding
-1. Lees dit volledige bestand en de volledige `copilot/README.md`.
-2. Controleer dat je daadwerkelijk op `copilot/php-review-fixes` werkt. Zo niet: stop met status `GEBLOKKEERD`.
-3. Controleer de actuele branch-head en noteer de begincommit.
-4. Lees de actuele versies van:
+1. Lees dit volledige bestand en lees `copilot/README.md` volledig.
+2. Controleer en noteer repository, actieve branch en begincommit.
+3. Lees de actuele volledige inhoud van:
    - `public/assets/js/agenda.js`
    - `public/assets/js/agenda-filters.js`
-5. Controleer de bestaande handlers opnieuw; vertrouw niet blind op het vorige rapport. Let op gewone paginaweergave én AJAX-vernieuwde agenda-inhoud.
-6. Controleer dat de twee bestanden nog steeds de enige noodzakelijke applicatiebestanden zijn. Als meer bestanden nodig lijken, stop en leg eerst uit waarom in `copilot/resultaat.md`; breid de opdracht niet zelfstandig uit.
+4. Zoek en begrijp eerst alle relevante handlers voor de extra evenementinformatie, zowel de gewone pagina-handler als de AJAX-handler.
+5. Controleer hoe de bestaande swipe-drempel en bescherming tegen verticale scroll zijn geïmplementeerd.
+6. Voer pas daarna de minimale codewijziging uit. Ga niet af op een eerder rapport als de actuele broncode daarvan afwijkt.
 
-## Uit te voeren wijziging
-1. Pas uitsluitend deze bestanden aan:
-   - `public/assets/js/agenda.js`
-   - `public/assets/js/agenda-filters.js`
-2. Zorg dat in beide informatie-handlers:
-   - een horizontale swipe naar links de informatie opent/toont of vooruitgaat;
-   - een horizontale swipe naar rechts de informatie sluit/verbergt of teruggaat.
-3. Houd de mediagalerijbediening ongewijzigd: links = volgende media, rechts = vorige media.
-4. Houd bestaande swipe-drempels, verticale-scrollbescherming, navigatiegrenzen, event-cleanup en overige functionaliteit intact, tenzij een minimale aanpassing aantoonbaar noodzakelijk is.
-5. Voorkom dubbele verwerking van één gebaar en ongewenste overlap tussen touch- en muisbediening.
-6. Gebruik waar mogelijk één consistente interpretatie van de swipe-richting; introduceer geen onnodige nieuwe architectuur.
-7. Wijzig geen PHP-bestanden, CSS, HTML, database, configuratie of andere applicatiebestanden.
+## Toegestane bestanden
+Je mag uitsluitend deze twee applicatiebestanden aanpassen:
+- `public/assets/js/agenda.js`
+- `public/assets/js/agenda-filters.js`
 
-## Tests en controles
-- Voer beschikbare JavaScript-syntaxcontroles uit op beide gewijzigde bestanden.
+Wijzig geen enkel ander applicatiebestand. Als je vaststelt dat de opdracht niet uitsluitend met deze twee bestanden veilig kan worden uitgevoerd, stop dan en rapporteer `GEBLOKKEERD` met de reden. Breid de toegestane bestanden niet zelf uit.
+
+## Uitvoering en behoud van bestaande werking
+1. Pas de richting van de relevante informatie-swipe-handler(s) aan zodat links opent/toont en rechts sluit/verbergt.
+2. Zorg dat dezelfde logica blijft gelden nadat de agenda via AJAX opnieuw is opgebouwd of ververst.
+3. Behoud de bestaande swipe-drempel exact.
+4. Behoud de bestaande bescherming tegen verticale scroll exact.
+5. Behoud bestaande event-listeners, cleanup, navigatiegrenzen en overige agenda-functionaliteit.
+6. Laat de mediagalerijbediening ongewijzigd.
+7. Pas geen vormgeving, afmetingen, inhoud of andere functionaliteit aan.
+8. Voorkom dubbele verwerking van hetzelfde gebaar; wijzig dit alleen als de bestaande code anders niet correct kan werken en motiveer de minimale ingreep.
+
+## Controles en tests
+Voer alleen controles uit die in jouw omgeving werkelijk beschikbaar zijn. Rapporteer per controle de exacte opdracht/werkwijze en de echte uitkomst.
+- Controleer de syntax van beide gewijzigde JavaScript-bestanden met een beschikbare JavaScript-runtime of syntaxchecker.
+- Controleer de gewone informatie-handler op links-openen/rechts-sluiten.
+- Controleer de AJAX-handler op hetzelfde gedrag na filterverversing.
+- Controleer dat swipe-drempel en verticale-scrollbescherming behouden zijn.
+- Controleer dat geen andere functionaliteit of bestanden zijn gewijzigd.
 - Voer relevante bestaande tests uit als die beschikbaar zijn.
-- Controleer statisch beide informatie-handlers, inclusief de AJAX-handler, op de gewenste richting.
-- Controleer dat de mediagalerijcode niet onbedoeld is gewijzigd.
-- Browser-, touch- en apparaattests alleen als je die daadwerkelijk kunt uitvoeren. Anders duidelijk `NIET UITGEVOERD vermelden.
-- Rapporteer exacte commando's en resultaten; verzin geen tests of uitkomsten.
+- Een browser-, touch-, mobiele-apparaat- of Raspberry Pi-test mag uitsluitend als uitgevoerd worden gerapporteerd wanneer die daadwerkelijk is uitgevoerd. Anders noteer je `NIET UITGEVOERD`.
 
-## Committoestemming – expliciete beperkte uitzondering
-De vorige opdracht blokkeerde een codecommit. Voor deze vervolgopdracht geef ik nu uitdrukkelijk toestemming voor:
-- maximaal één applicatiecodecommit op `copilot/php-review-fixes`;
-- die commit mag uitsluitend de twee hierboven genoemde bestanden bevatten:
-  - `public/assets/js/agenda.js`
-  - `public/assets/js/agenda-filters.js`
-- commit alleen nadat de wijzigingen en beschikbare controles zijn afgerond;
-- geen andere applicatiebestanden of workflowbestanden in deze codecommit opnemen.
+## Committoestemming – expliciet
+**JA, een applicatiecodecommit op branch `copilot/php-review-fixes` is toegestaan.**
 
-Je mag daarnaast maximaal één afzonderlijke commit maken die uitsluitend `copilot/resultaat.md` bijwerkt. De vorige opdracht en het vorige resultaat zijn al gearchiveerd; wijzig of verwijder niets onder `copilot/archive/`.
+Omdat de beschikbare GitHub-bestandsbewerking bij opslaan automatisch een commit maakt, geef ik uitdrukkelijk toestemming voor:
+- maximaal één applicatiecodecommit;
+- uitsluitend de twee toegestane bestanden `public/assets/js/agenda.js` en `public/assets/js/agenda-filters.js` in die commit;
+- geen andere bestanden in die codecommit.
 
-Als de omgeving geen veilige commit met exact deze twee applicatiebestanden kan maken, voer dan geen codecommit uit en rapporteer `GEBLOKKEERD`. Maak in dat geval geen alternatieve commit.
+Controleer vóór het committen dat de wijziging uitsluitend deze twee bestanden raakt. Als je niet kunt garanderen dat de commit exact deze twee bestanden bevat, maak dan geen codecommit en rapporteer `GEBLOKKEERD`.
+
+Een afzonderlijke rapportagecommit voor uitsluitend `copilot/resultaat.md` is eveneens toegestaan (maximaal één).
+
+De vorige opdracht en het vorige resultaat zijn door ChatGPT gearchiveerd. Wijzig of verwijder niets onder `copilot/archive/`.
 
 ## Strikte beperkingen
-- Geen wijzigingen aan `main` of `develop`.
+- Werk uitsluitend op `copilot/php-review-fixes`.
+- Raak `main` en `develop` niet aan.
 - Geen branches of tags maken.
 - Geen pull request, merge, rebase of cherry-pick.
-- Geen deployment, release of productie-installatie.
 - Geen database-, backup- of migratieacties.
-- Geen bestanden verwijderen.
-- Geen herstel van de eerder gemelde PHP-bestandsindeling in deze opdracht; dat is afzonderlijk werk.
-- Stop bij onverwachte branchstatus, conflicten, onduidelijke code of veiligheidsrisico's en rapporteer `GEBLOKKEERD`.
+- Geen productie-, hosting-, deployment- of releasehandelingen.
+- Geen wijzigingen aan PHP, CSS, HTML, configuratie, database of andere bestanden.
+- Verwijder geen bestanden.
+- Stop bij conflicten, onverwachte wijzigingen of veiligheidsrisico's en rapporteer `GEBLOKKEERD`.
 
-## Rapportage in copilot/resultaat.md
-Vul het volledige resultaat in. Gebruik uitsluitend deze statuswaarden: `GESLAAGD`, `MISLUKT`, `NIET UITGEVOERD`, `GEBLOKKEERD`.
+## Rapportage
+Schrijf de volledige uitkomst naar `copilot/resultaat.md`. Gebruik voor algemene status en controles uitsluitend:
+- `GESLAAGD`
+- `MISLUKT`
+- `NIET UITGEVOERD`
+- `GEBLOKKEERD`
 
-Vermeld:
-- branch en begincommit;
-- bevestiging van de bestaande handlers;
-- exacte gewijzigde bestanden;
-- hoe links/rechts nu werkt voor media en informatie;
-- syntaxcontroles en andere uitgevoerde tests met resultaten;
-- commit-ID van de codecommit, indien gemaakt, en bevestiging dat die exact de twee toegestane bestanden bevat;
-- eventuele niet-uitgevoerde browser-/apparaatcontroles;
-- expliciet dat geen PR, merge, database- of productiehandeling is uitgevoerd;
-- algemene eindstatus en resterende aandachtspunten.
+Vermeld minimaal:
+1. repository, gecontroleerde branch en begincommit;
+2. welke handlers en bestanden vooraf zijn onderzocht;
+3. welke exacte codewijzigingen zijn aangebracht;
+4. bevestiging dat links de informatie opent en rechts sluit, zowel normaal als na AJAX-filterverversing;
+5. bevestiging dat swipe-drempel en verticale-scrollbescherming behouden zijn;
+6. alle werkelijk uitgevoerde syntaxcontroles/tests, inclusief commando's en uitkomsten;
+7. browser-/touch-/Raspberry Pi-tests die niet zijn uitgevoerd expliciet als `NIET UITGEVOERD`;
+8. codecommit-ID en bevestiging dat die commit exact de twee toegestane JS-bestanden bevat, of waarom geen codecommit is gemaakt;
+9. bevestiging dat geen andere applicatiebestanden, `main`, `develop`, database of productie zijn aangeraakt;
+10. algemene eindstatus en eventuele resterende aandachtspunten.
+
+Stop na het invullen van het resultaatbestand. Wacht op verdere instructies.
