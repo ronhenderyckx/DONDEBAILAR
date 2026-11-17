@@ -1,4 +1,4 @@
-# Resultaat – Swipe-richting evenementinformatie
+# Resultaat – resterende swipe-richtingen in gewone agenda
 
 ## Algemene status
 NIET UITGEVOERD
@@ -8,70 +8,46 @@ NIET UITGEVOERD
 - Branch:
 - Begincommit:
 - Eindcommit:
-- Branchcontrole:
 
 ## Werkomgeving en methode
-- Gebruikte omgeving:
+- Gebruikte werkomgeving:
 - Wijzigingsmethode:
-- Volledige bronbestanden/diffs betrouwbaar gecontroleerd:
+- Volledige actuele bron en diff gecontroleerd:
 
-## Oorzaak en oplossing
-- Vastgestelde oorzaak:
-- Gewijzigde codepaden:
-- Swipe naar links opent:
-- Swipe naar rechts sluit:
-- Werking na AJAX-filterverversing:
+## Uitgevoerde correcties
+- Touch-handler: van welke voorwaarde naar welke voorwaarde:
+- Pointer-handler: van welke voorwaarde naar welke voorwaarde:
+- Swipe naar links opent extra informatie:
+- Swipe naar rechts sluit extra informatie:
+- Andere tegengestelde handlers gevonden:
 
 ## Gewijzigde bestanden
-Vermeld ieder bestand en de concrete reden:
-- Bestand:
-- Reden:
+- Volledige lijst:
+- Bevestiging dat uitsluitend public/assets/js/agenda.js is gewijzigd:
 
 ## Behouden functionaliteit
-- Horizontale drempel 45 px:
-- Verticale-scroll-bescherming/verhouding 1,25:
-- Event-listeners en cleanup:
-- Navigatiegrenzen:
+- AJAX-handler in agenda-filters.js ongewijzigd en dx < 0:
+- Swipe-drempel 45 pixels:
+- Verticale-scrollbescherming 1,25:
+- Event-listeners/cleanup:
 - Mediagalerij ongewijzigd:
 
-## Database en migraties
-- Databasewijziging noodzakelijk:
-- Migratiebestanden:
-- Lokale/testdatabase gewijzigd:
-- Backup gemaakt en gecontroleerd (methode/locatie):
-- Migratie uitgevoerd (commando/resultaat):
-- Productie/hosting/Pi-database aangeraakt: NEE
-- Handmatige migratiestappen voor gebruiker:
-
 ## Tests en controles
-Noteer exacte commando's/handelingen, status en resultaten:
-- Repository/branch:
-- Volledige diff en gewijzigde bestanden:
-- git diff --check:
-- JavaScript-syntax:
-- PHP-syntax:
-- Bestaande tests:
-- Gewone agenda:
-- AJAX-filter:
-- Browser/touch/mobiel:
+- Volledige diff:
+- JavaScript-syntaxcontrole (exact commando en resultaat):
+- Andere tests:
+- Browser-/mobiele test:
 - Niet-uitgevoerde controles en reden:
 
 ## Commit
-- Codecommit:
-- Bestanden in codecommit:
-- Rapportagecommit:
+- Codecommit-ID:
+- Rapportagecommit-ID:
 
-## Raspberry Pi – handmatige update
-- Pi benaderd of bijgewerkt door Copilot: NEE
-- Benodigde bestanden:
-- Handmatige updatevolgorde:
-- Eventuele migratiecommando's en backupwaarschuwingen:
-
-## Veiligheid
-- main/develop gewijzigd: NEE
-- Productie/hosting/deployment aangeraakt: NEE
-- Raspberry Pi benaderd/gewijzigd: NEE
-- PR/merge/rebase/cherry-pick uitgevoerd: NEE
+## Veiligheid en handmatige Pi-update
+- Database gewijzigd: NEE
+- Productie/hosting aangeraakt: NEE
+- Raspberry Pi benaderd of bijgewerkt: NEE
+- Handmatig door gebruiker bij te werken bestand: public/assets/js/agenda.js
 
 ## Eindconclusie
 NIET UITGEVOERD
