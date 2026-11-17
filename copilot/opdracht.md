@@ -77,7 +77,18 @@ Commit alleen als alle controles van de diff en bestandslijst slagen. Als niet e
 
 Een afzonderlijke rapportagecommit voor uitsluitend `copilot/resultaat.md` is toegestaan. Geen commits met andere bestanden.
 
+## Handmatige update naar de Raspberry Pi
+
+- De update naar de Raspberry Pi gebeurt **uitsluitend handmatig door de gebruiker** nadat de codewijziging op GitHub is gecontroleerd en goedgekeurd.
+- Copilot mag de Raspberry Pi niet benaderen of aanpassen.
+- Voer geen SSH-, SCP-, SFTP-, rsync- of andere overdrachtsactie naar de Pi uit.
+- Voer geen installatie, synchronisatie, configuratiewijziging, serviceherstart of deployment op de Pi uit.
+- Maak geen automatische of handmatige productie-/Pi-release.
+- Vermeld in `copilot/resultaat.md` expliciet dat de Pi niet is bijgewerkt en dat de gebruiker de update later handmatig uitvoert.
+- Stop na de codewijziging (indien veilig), de toegestane commit en het invullen van `copilot/resultaat.md`.
+
 ## Verboden handelingen
+- Geen verbinding maken met of wijzigingen uitvoeren op de Raspberry Pi; de Pi-update is handmatig door de gebruiker.
 - Geen wijzigingen aan `main` of `develop`.
 - Geen branch/tag, pull request, merge, rebase of cherry-pick.
 - Geen database-, backup- of migratieacties.
