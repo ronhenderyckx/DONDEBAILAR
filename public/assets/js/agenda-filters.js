@@ -132,7 +132,7 @@
                 const dy = touch.clientY - touchStart.y;
                 touchStart = null;
                 if (Math.abs(dx) >= 45 && Math.abs(dx) >= Math.abs(dy) * 1.25) {
-                    setEventDescription(info, dx > 0);
+                    setEventDescription(info, dx < 0);
                 }
             }, {passive:true});
         });
