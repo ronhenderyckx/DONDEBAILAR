@@ -1,46 +1,59 @@
 # Resultaat – Swipe evenementinformatie
 
 ## Algemene status
-GEBLOKKEERD
+NIET UITGEVOERD
 
-## Repository en branch
+## Repository, branch en begincommit
 - Repository: `ronhenderyckx/DONDEBAILAR`
 - Verplichte branch: `copilot/php-review-fixes`
-- De branch is gecontroleerd en de huidige branch komt overeen met de opdracht.
+- Actieve branch gecontroleerd: NIET UITGEVOERD
+- Begincommit: NIET VASTGESTELD
 
-## Opdracht gelezen
-De actieve opdracht vraagt alleen de swipe-richting te wijzigen in `public/assets/js/agenda.js` en `public/assets/js/agenda-filters.js`, de bestaande drempel en bescherming tegen verticale scroll te behouden en alleen `copilot/resultaat.md` te wijzigen. Ook staat erin dat geen applicatiecodecommit is toegestaan.
+## Vooraf gelezen code en gevonden handlers
+NIET UITGEVOERD
 
-## Uitgevoerde controle
-De twee JavaScript-bestanden zijn statisch gelezen. Beide informatie-handlers gebruiken momenteel `dx > 0` om informatie te tonen. De hoofdpagina-handler staat in `agenda.js`; de AJAX-herinitialisatie staat in `agenda-filters.js`. Voor het gewenste gedrag moeten beide handlers dezelfde richting gebruiken: `dx < 0` toont informatie, `dx > 0` verbergt informatie. De bestaande drempel (`45px`) en verhouding ten opzichte van verticale beweging kunnen behouden blijven.
+## Uitgevoerde codewijzigingen
+NIET UITGEVOERD
 
-## Uitgevoerde wijziging
-Geen applicatiecode gewijzigd. De gevraagde richting-fix is niet uitgevoerd.
+## Gewenst gedrag
+- Gewone agenda: NIET GECONTROLEERD
+- Na AJAX-filterverversing: NIET GECONTROLEERD
+- Swipe links opent/toont extra evenementinformatie; swipe rechts sluit/verbergt: NIET GECONTROLEERD
+
+## Behouden bestaande werking
+- Swipe-drempel: NIET GECONTROLEERD
+- Verticale-scroll-bescherming: NIET GECONTROLEERD
+- Event-listeners, cleanup en overige functionaliteit: NIET GECONTROLEERD
+- Mediagalerij ongewijzigd: NIET GECONTROLEERD
 
 ## Controles en tests
-| Controle | Status | Exacte werkwijze/uitkomst |
-|---|---|---|
-| Branchcontrole | GESLAAGD | Branchlijst gecontroleerd; `copilot/php-review-fixes` is de actieve doelbranch. |
-| JavaScript-syntax `agenda.js` | NIET UITGEVOERD | Geen JavaScript-runtime of shell beschikbaar in deze GitHub-bestandsreview. |
-| JavaScript-syntax `agenda-filters.js` | NIET UITGEVOERD | Geen JavaScript-runtime of shell beschikbaar in deze GitHub-bestandsreview. |
-| Gewone informatie-handler | GESLAAGD | Statisch gelezen; `dx > 0` toont momenteel de informatie. |
-| AJAX-handler na filterverversing | GESLAAGD | Statisch gelezen; ook hier toont `dx > 0` momenteel de informatie. |
-| Swipe-drempel en verticale-scrollbescherming | GESLAAGD | Beide handlers controleren de horizontale afstand en vergelijken die met de verticale beweging. |
-| Browser-/touch-/mobiele/Raspberry Pi-test | NIET UITGEVOERD | De site/Pi is niet toegankelijk vanuit deze omgeving; geen browser-test uitgevoerd. |
-| Geen andere bestanden gewijzigd | GESLAAGD | Alleen dit rapportbestand wordt aangepast. |
+Vul per controle uitsluitend de echte status, exacte opdracht/werkwijze en concrete uitkomst in. Verzin geen testresultaten.
 
-## Blokkade
-De opdracht verbiedt expliciet een applicatiecodecommit en staat alleen een rapportagewijziging toe. De beschikbare GitHub-bestandsbewerking kan alleen opslaan door een commit te maken; zij kan geen ongecommitted werkboomwijzigingen achterlaten. Daarom kan ik de twee JS-bestanden niet aanpassen zonder de opdrachtbeperking te schenden.
+| Controle | Status | Exacte opdracht/werkwijze en uitkomst |
+|---|---|---|
+| Branch en begincommit | NIET UITGEVOERD | |
+| JavaScript-syntax `agenda.js` | NIET UITGEVOERD | |
+| JavaScript-syntax `agenda-filters.js` | NIET UITGEVOERD | |
+| Gewone informatie-handler | NIET UITGEVOERD | |
+| AJAX-informatie-handler | NIET UITGEVOERD | |
+| Swipe-drempel behouden | NIET UITGEVOERD | |
+| Verticale-scroll-bescherming behouden | NIET UITGEVOERD | |
+| Diff bevat uitsluitend toegestane bestanden | NIET UITGEVOERD | |
+| Overige beschikbare tests | NIET UITGEVOERD | |
+| Browser-/touch-/mobiele test | NIET UITGEVOERD | |
+| Raspberry Pi-test | NIET UITGEVOERD | |
 
 ## Commit
-- Applicatiecodecommit: NIET UITGEVOERD — niet toegestaan door de actieve opdracht.
-- Rapportagecommit: wordt aangemaakt door het opslaan van dit resultaatbestand.
+- Applicatiecodecommit: NIET UITGEVOERD
+- Commit-ID: NIET VASTGESTELD
+- Geverifieerde bestanden in codecommit: NIET VASTGESTELD
+- Rapportagecommit: NIET UITGEVOERD
 
 ## Veiligheid
-- Geen wijzigingen aan `main` of `develop`.
-- Geen applicatiecodewijzigingen.
-- Geen database-, productie-, hosting-, deployment- of releasehandeling.
-- Geen PR, merge, rebase of cherry-pick.
+Vermeld alleen wat daadwerkelijk is gecontroleerd:
+- `main` en `develop`: NIET GECONTROLEERD
+- Database en productie: NIET GECONTROLEERD
+- PR, merge, deployment en release: NIET UITGEVOERD
 
 ## Eindconclusie
-GEBLOKKEERD — de defecte swipe-richting en de twee relevante handlers zijn vastgesteld, maar de fix kan niet worden opgeslagen zonder een niet-toegestane applicatiecodecommit. Geef een nieuwe opdracht die expliciet één codecommit op `copilot/php-review-fixes` toestaat, of laat de codewijziging uitvoeren in een werkruimte die oncommitted wijzigingen kan bewaren.
+NIET UITGEVOERD
