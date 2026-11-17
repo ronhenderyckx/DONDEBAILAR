@@ -563,13 +563,13 @@ function createUpdateDatabaseBackup(array $config, string $projectRoot, string $
     }
 
     $escapeOption = static function ($value): string {
-        return str_replace(
-            ["\\\\", '"', "\n", "\r"],
-            ["\\\\\\\\", '\\"', '\\n', '\\r'],
-            (string) $value
-        );
+        return strtr((string) $value, [
+            "\\" => "\\\\",
+            '"' => '\\"',
+            "\n" => '\\n',
+            "\r" => '\\r',
+        ]);
     };
-
     $defaults = "[client]\n"
         . 'host="' . $escapeOption($database['host']) . "\"\n"
         . 'port="' . $escapeOption($database['port']) . "\"\n"
@@ -591,6 +591,7 @@ function createUpdateDatabaseBackup(array $config, string $projectRoot, string $
             '--single-transaction',
             '--quick',
             '--triggers',
+            '--no-tablespaces',
             '--hex-blob',
             '--default-character-set=utf8mb4',
             '--result-file=' . $backupFile,
@@ -628,7 +629,10 @@ function createUpdateDatabaseBackup(array $config, string $projectRoot, string $
             throw new RuntimeException('Database-back-up is leeg of onvolledig; de update is niet gestart.');
         }
 
-        @chmod($backupFile, 0600);
+        if (!chmod($backupFile, 0600)) {
+            @unlink($backupFile);
+            throw new RuntimeException('Database-back-up kon niet veilig worden afgeschermd; de update is niet gestart.');
+        }
         return $backupFile;
     } finally {
         @unlink($defaultsFile);
@@ -692,7 +696,7 @@ try {
     $gitBackup = createUpdateGitBackup($projectRoot, $backupDirectory, $backupStamp);
     $messages[] = 'Codeback-up gecontroleerd: ' . basename($gitBackup);
 
-        runRequiredGit(['fetch', '--prune', 'origin', 'develop'], $projectRoot);
+    runRequiredGit(['fetch', '--prune', 'origin', 'develop'], $projectRoot);
 
     $currentCommit = runRequiredGit(['rev-parse', 'HEAD'], $projectRoot);
     $availableCommit = runRequiredGit(['rev-parse', 'FETCH_HEAD'], $projectRoot);
