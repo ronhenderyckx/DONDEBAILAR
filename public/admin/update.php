@@ -505,8 +505,161 @@ function migrateAuditTracking(PDO $db): void
     }
 }
 
+/**
+ * Voorkom dat twee beheerders gelijktijdig een update starten.
+ */
+function acquireUpdateLock()
+{
+    $lockPath = sys_get_temp_dir() . '/dondebailar-update.lock';
+    $handle = fopen($lockPath, 'c');
+    if ($handle === false || !flock($handle, LOCK_EX | LOCK_NB)) {
+        if (is_resource($handle)) {
+            fclose($handle);
+        }
+        throw new RuntimeException('Er loopt al een DONDEBAILAR-update. Probeer het straks opnieuw.');
+    }
+
+    return $handle;
+}
+
+/**
+ * Maak vóór codewijzigingen en database-migraties een afgeschermde SQL-back-up.
+ * Databasewachtwoorden worden alleen in een tijdelijk bestand met rechten 0600 gezet.
+ */
+function createUpdateDatabaseBackup(array $config, string $projectRoot, string $stamp): string
+{
+    $database = $config['database'] ?? null;
+    if (!is_array($database)) {
+        throw new RuntimeException('Databaseconfiguratie ontbreekt; update afgebroken zonder wijzigingen.');
+    }
+
+    foreach (['host', 'port', 'name', 'username', 'password'] as $key) {
+        if (!array_key_exists($key, $database)) {
+            throw new RuntimeException('Databaseconfiguratie is onvolledig; update afgebroken zonder wijzigingen.');
+        }
+    }
+
+    $dumpBinary = null;
+    foreach (['/usr/bin/mysqldump', '/usr/local/bin/mysqldump', '/bin/mysqldump'] as $candidate) {
+        if (is_executable($candidate)) {
+            $dumpBinary = $candidate;
+            break;
+        }
+    }
+    if ($dumpBinary === null) {
+        throw new RuntimeException('mysqldump is niet beschikbaar. Installeer de MySQL-client voordat je bijwerkt.');
+    }
+
+    $backupDirectory = $projectRoot . '/storage/backups/updates';
+    if (!is_dir($backupDirectory) && !mkdir($backupDirectory, 0700, true) && !is_dir($backupDirectory)) {
+        throw new RuntimeException('De map voor databaseback-ups kon niet worden aangemaakt.');
+    }
+    @chmod($backupDirectory, 0700);
+
+    $backupFile = $backupDirectory . '/dondebailar-db-' . $stamp . '.sql';
+    $defaultsFile = tempnam(sys_get_temp_dir(), 'db-update-');
+    if ($defaultsFile === false) {
+        throw new RuntimeException('Tijdelijk database-instellingenbestand kon niet worden aangemaakt.');
+    }
+
+    $escapeOption = static function ($value): string {
+        return str_replace(
+            ["\\\\", '"', "\n", "\r"],
+            ["\\\\\\\\", '\\"', '\\n', '\\r'],
+            (string) $value
+        );
+    };
+
+    $defaults = "[client]\n"
+        . 'host="' . $escapeOption($database['host']) . "\"\n"
+        . 'port="' . $escapeOption($database['port']) . "\"\n"
+        . 'user="' . $escapeOption($database['username']) . "\"\n"
+        . 'password="' . $escapeOption($database['password']) . "\"\n"
+        . "default-character-set=utf8mb4\n";
+
+    try {
+        if (file_put_contents($defaultsFile, $defaults, LOCK_EX) === false) {
+            throw new RuntimeException('Tijdelijke database-instellingen konden niet worden geschreven.');
+        }
+        if (!chmod($defaultsFile, 0600)) {
+            throw new RuntimeException('Tijdelijke database-instellingen konden niet veilig worden afgeschermd.');
+        }
+
+        $command = [
+            $dumpBinary,
+            '--defaults-extra-file=' . $defaultsFile,
+            '--single-transaction',
+            '--quick',
+            '--triggers',
+            '--hex-blob',
+            '--default-character-set=utf8mb4',
+            '--result-file=' . $backupFile,
+            (string) $database['name'],
+        ];
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+        $process = proc_open($command, $descriptors, $pipes, $projectRoot);
+        if (!is_resource($process)) {
+            throw new RuntimeException('mysqldump kon niet worden gestart.');
+        }
+
+        fclose($pipes[0]);
+        $stdout = stream_get_contents($pipes[1]) ?: '';
+        fclose($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]) ?: '';
+        fclose($pipes[2]);
+        $exitCode = proc_close($process);
+
+        if ($exitCode !== 0) {
+            @unlink($backupFile);
+            $detail = trim($stdout . ($stderr !== '' ? "\n" . $stderr : ''));
+            throw new RuntimeException(
+                'Database-back-up mislukt; de update is niet gestart.'
+                . ($detail !== '' ? ' ' . $detail : '')
+            );
+        }
+
+        clearstatcache(true, $backupFile);
+        if (!is_file($backupFile) || filesize($backupFile) < 128) {
+            @unlink($backupFile);
+            throw new RuntimeException('Database-back-up is leeg of onvolledig; de update is niet gestart.');
+        }
+
+        @chmod($backupFile, 0600);
+        return $backupFile;
+    } finally {
+        @unlink($defaultsFile);
+    }
+}
+
+/**
+ * Bewaar ook de huidige Git-toestand vóór de fast-forward-update.
+ */
+function createUpdateGitBackup(string $projectRoot, string $backupDirectory, string $stamp): string
+{
+    if (!is_dir($backupDirectory) && !mkdir($backupDirectory, 0700, true) && !is_dir($backupDirectory)) {
+        throw new RuntimeException('De map voor Git-back-ups kon niet worden aangemaakt.');
+    }
+    @chmod($backupDirectory, 0700);
+
+    $bundle = $backupDirectory . '/dondebailar-code-' . $stamp . '.bundle';
+    runRequiredGit(['bundle', 'create', $bundle, '--all'], $projectRoot);
+    clearstatcache(true, $bundle);
+    if (!is_file($bundle) || filesize($bundle) < 128) {
+        @unlink($bundle);
+        throw new RuntimeException('Git-back-up kon niet worden gecontroleerd; de update is niet gestart.');
+    }
+
+    @chmod($bundle, 0600);
+    return $bundle;
+}
+
 try {
-    set_time_limit(180);
+    set_time_limit(600);
+    $updateLock = acquireUpdateLock();
 
     if (!is_dir($projectRoot . '/.git')) {
         throw new RuntimeException('Deze installatie is geen Git-checkout. Automatisch bijwerken is hier niet mogelijk.');
@@ -529,7 +682,17 @@ try {
         );
     }
 
-    runRequiredGit(['fetch', '--prune', 'origin', 'develop'], $projectRoot);
+    // Test eerst de databaseverbinding en maak beide back-ups vóór git pull of migraties.
+    $db = Database::connection();
+    $backupStamp = date('Ymd-His');
+    $backupDirectory = $projectRoot . '/storage/backups/updates';
+    $databaseBackup = createUpdateDatabaseBackup($GLOBALS['config'], $projectRoot, $backupStamp);
+    $messages[] = 'Databaseback-up gecontroleerd: ' . basename($databaseBackup);
+
+    $gitBackup = createUpdateGitBackup($projectRoot, $backupDirectory, $backupStamp);
+    $messages[] = 'Codeback-up gecontroleerd: ' . basename($gitBackup);
+
+        runRequiredGit(['fetch', '--prune', 'origin', 'develop'], $projectRoot);
 
     $currentCommit = runRequiredGit(['rev-parse', 'HEAD'], $projectRoot);
     $availableCommit = runRequiredGit(['rev-parse', 'FETCH_HEAD'], $projectRoot);
@@ -547,8 +710,6 @@ try {
 
     // Ook uitvoeren wanneer de code al up-to-date is, bijvoorbeeld na een
     // eerdere update waarbij de database-aanpassing nog niet kon worden afgerond.
-    $db = Database::connection();
-
     removeOrganizerRegionColumn($db);
     $messages[] = 'Database: organisatoren zijn platformbreed; foutieve regio-koppeling verwijderd indien aanwezig.';
 
@@ -601,9 +762,15 @@ try {
     $shortCommit = runRequiredGit(['rev-parse', '--short', 'HEAD'], $projectRoot);
     $messages[] = 'Geïnstalleerde versie: ' . $shortCommit;
 } catch (Throwable $exception) {
+    $success = false;
     http_response_code(500);
-    $messages[] = 'UPDATE NIET UITGEVOERD';
+    $messages[] = 'UPDATE NIET VOLLEDIG UITGEVOERD';
     $messages[] = $exception->getMessage();
+} finally {
+    if (isset($updateLock) && is_resource($updateLock)) {
+        flock($updateLock, LOCK_UN);
+        fclose($updateLock);
+    }
 }
 
 require dirname(__DIR__, 2) . '/app/views/header.php';
