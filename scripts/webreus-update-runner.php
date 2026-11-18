@@ -74,6 +74,7 @@ if (!function_exists('dondebailar_webreus_run')) {
         }
 
         $results = [];
+        $results[] = 'Runner-versie: webreus-test-diagnostic-20261118-1';
 
         $curlGet = static function (string $url, string $accept = 'application/vnd.github+json'): string {
             $ch = curl_init($url);
