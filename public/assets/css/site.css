@@ -1107,3 +1107,11 @@ body.has-agenda-footer .site-footer--agenda .agenda-footer-tools form.agenda-foo
 .agenda-calendar__weekday:nth-child(5){color:var(--db-weekday-text-5,#222222)!important}
 .agenda-calendar__weekday:nth-child(6){color:var(--db-weekday-text-6,#222222)!important}
 .agenda-calendar__weekday:nth-child(7){color:var(--db-weekday-text-7,#222222)!important}
+
+
+/* DONDEBAILAR-logo linksboven in de gedeelde kopbalk, zonder tekstlabel. */
+.site-brand-group{display:flex;align-items:center;gap:10px;min-width:0;margin-right:auto}
+.site-brand--platform,.site-brand--region{display:inline-flex;align-items:center;justify-content:flex-start;gap:0;min-width:0;text-decoration:none}
+.site-brand__logo{width:auto;max-width:140px;max-height:38px;object-fit:contain}
+.site-brand__region-logo{max-width:110px;max-height:34px}
+.site-brand__region-name{display:none!important}
