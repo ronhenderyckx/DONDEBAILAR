@@ -23,7 +23,6 @@ if ($regionIds !== []) {
                  FROM event_media em
                  WHERE em.event_id = e.id
                    AND em.media_context = 'event'
-                   AND em.media_type = 'image'
                    AND em.file_path IS NOT NULL
                  ORDER BY em.id ASC
                  LIMIT 1) AS first_media_id,
@@ -73,22 +72,20 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
         <?php else: ?>
             <div class="table-wrapper">
                 <table class="admin-table">
-                    <thead><tr><th>Media</th><th>Datum</th><th>Evenement</th><th>Regio</th><th>Organisator</th><th>Status</th><th>Actie</th></tr></thead>
+                    <thead><tr><th></th><th>Datum</th><th>Evenement</th><th>Regio</th><th>Organisator</th><th>Status</th><th>Actie</th></tr></thead>
                     <tbody>
                     <?php foreach ($events as $event): ?>
                         <tr>
                             <td class="event-list-media">
                                 <?php if (!empty($event['first_media_id']) && $event['first_media_type'] === 'image'): ?>
                                     <img src="/event-media.php?id=<?= (int) $event['first_media_id'] ?>"
-                                         alt="Eerste foto van <?= escapeHtml($event['title']) ?>"
+                                         alt=""
                                          loading="lazy"
-                                         style="display:block;width:76px;height:56px;object-fit:cover;border-radius:6px;">
+                                         style="display:block;width:180px;height:120px;object-fit:cover;border-radius:8px;">
                                 <?php elseif (!empty($event['first_media_id'])): ?>
-                                    <span style="display:inline-flex;align-items:center;justify-content:center;width:76px;height:56px;border-radius:6px;background:#eeeeee;font-size:11px;font-weight:700;">
-                                        <?= $event['first_media_type'] === 'reel' ? 'REEL' : 'VIDEO' ?>
-                                    </span>
-                                <?php else: ?>
-                                    <span aria-label="Geen media">—</span>
+                                    <video src="/event-media.php?id=<?= (int) $event['first_media_id'] ?>"
+                                           muted playsinline preload="metadata"
+                                           style="display:block;width:180px;height:120px;object-fit:cover;border-radius:8px;"></video>
                                 <?php endif; ?>
                             </td>
                             <td><?= escapeHtml(date('d-m-Y H:i', strtotime($event['starts_at']))) ?></td>
