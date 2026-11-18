@@ -666,7 +666,11 @@ window.scrollToAgendaStart = function () {
         ? todayTarget
         : (visibleCards.length ? visibleCards[visibleCards.length - 1] : null);
     if (target) {
-        target.scrollIntoView({behavior:reduceMotion ? 'auto' : 'smooth', block:'start'});
+        // Houd de volledige eerste kaart onder de vaste/kleverige kopbalk.
+        const header = document.querySelector('.site-header');
+        const headerOffset = header ? Math.ceil(header.getBoundingClientRect().height) + 12 : 12;
+        const targetTop = window.scrollY + target.getBoundingClientRect().top - headerOffset;
+        window.scrollTo({top:Math.max(0, targetTop), behavior:reduceMotion ? 'auto' : 'smooth'});
     } else {
         window.scrollTo({top:0, behavior:reduceMotion ? 'auto' : 'smooth'});
     }
