@@ -52,8 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $logoPath = saveOrganizerLogo($_FILES['logo'] ?? []);
             $statement = $db->prepare(
-                "INSERT INTO organizers (name, phone, website, logo_path, notes, is_active)
-                 VALUES (:name, :phone, :website, :logo_path, :notes, :is_active)"
+                "INSERT INTO organizers (name, phone, website, logo_path, notes, is_active, created_by)
+                 VALUES (:name, :phone, :website, :logo_path, :notes, :is_active, :created_by)"
             );
             $statement->execute([
                 'name' => $name,
@@ -62,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'logo_path' => $logoPath,
                 'notes' => $notes !== '' ? $notes : null,
                 'is_active' => $isActive ? 1 : 0,
+                'created_by' => (int) $user['id'],
             ]);
             header('Location: /admin/organizers.php?created=1');
             exit;
