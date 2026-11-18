@@ -1,9 +1,21 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/app/bootstrap.php';
-require_once dirname(__DIR__) . '/app/Security.php';
-require_once dirname(__DIR__) . '/app/SmtpMailer.php';
+$host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+$host = preg_replace('/:\\d+$/', '', $host) ?? '';
+if ($host !== 'test.dondebailar.eu') {
+    http_response_code(404);
+    exit('Deze pagina is niet beschikbaar op deze website.');
+}
+$privateRoot = dirname(__DIR__) . '/private/DONDEBAILAR-TEST';
+if (!is_file($privateRoot . '/app/bootstrap.php')) {
+    http_response_code(503);
+    exit('De private applicatiebestanden zijn niet beschikbaar.');
+}
+
+require_once $privateRoot . '/app/bootstrap.php';
+require_once $privateRoot . '/app/Security.php';
+require_once $privateRoot . '/app/SmtpMailer.php';
 
 $pageTitle = 'Wachtwoord vergeten - DONDEBAILAR';
 $errorMessage = '';
@@ -97,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         if (!is_string($packed) || strlen($packed) <= $nonceLength) {
                             throw new RuntimeException('Het opgeslagen SMTP-wachtwoord is ongeldig.');
                         }
-                        $keyFile = dirname(__DIR__) . '/storage/mail-settings.key';
+                        $keyFile = $privateRoot . '/storage/mail-settings.key';
                         $key = is_file($keyFile) ? file_get_contents($keyFile) : false;
                         if (!is_string($key) || strlen($key) !== SODIUM_CRYPTO_SECRETBOX_KEYBYTES) {
                             throw new RuntimeException('De SMTP-versleutelingssleutel ontbreekt.');
@@ -143,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-require dirname(__DIR__) . '/app/views/header.php';
+require $privateRoot . '/app/views/header.php';
 ?>
 
 <section class="auth-card">
@@ -168,4 +180,4 @@ require dirname(__DIR__) . '/app/views/header.php';
     <p><a href="/login.php">Terug naar inloggen</a></p>
 </section>
 
-<?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
+<?php require $privateRoot . '/app/views/footer.php'; ?>
