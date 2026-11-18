@@ -652,12 +652,30 @@ document.addEventListener('click', function (event) {
     });
 }, true);
 
+// Breng de agenda na een bediening terug naar vandaag.
+window.scrollToAgendaStart = function () {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const todayTarget = document.getElementById('agenda-today-start');
+    const visibleCards = Array.from(document.querySelectorAll('.agenda-feed .agenda-card'))
+        .filter(function (card) { return !card.hidden; });
+    const target = todayTarget && !todayTarget.hidden ? todayTarget : (visibleCards[0] || null);
+    if (target) {
+        target.scrollIntoView({behavior:reduceMotion ? 'auto' : 'smooth', block:'start'});
+    } else {
+        window.scrollTo({top:0, behavior:reduceMotion ? 'auto' : 'smooth'});
+    }
+};
+
+document.addEventListener('DOMContentLoaded', function () {
+    window.scrollToAgendaStart();
+});
+
 document.addEventListener('click', function (event) {
-    const backToTopButton = event.target.closest('#agenda-back-to-top');
+    const backToTopButton = event.target instanceof Element
+        ? event.target.closest('#agenda-back-to-top') : null;
     if (!backToTopButton) return;
     event.preventDefault();
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    window.scrollTo({top:0, behavior:reduceMotion ? 'auto' : 'smooth'});
+    window.scrollToAgendaStart();
 });
 
 // Deelvenster voor evenementen: WhatsApp, Facebook, kopiëren en de native deeloptie.
