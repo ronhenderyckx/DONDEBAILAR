@@ -327,7 +327,6 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                     <?php else: ?>
                         <span class="site-brand__region-mark" aria-hidden="true">⌖</span>
                     <?php endif; ?>
-                    <span class="site-brand__region-name"><?= $escape($brandName) ?></span>
                 </a>
             <?php endif; ?>
 
