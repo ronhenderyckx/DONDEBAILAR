@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
+require_once dirname(__DIR__) . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
 
 $db = Database::connection();
 $regionId = filter_input(INPUT_GET, 'region_id', FILTER_VALIDATE_INT);
@@ -28,7 +30,7 @@ if (!$region) { http_response_code(404); exit('Actieve regio niet gevonden.'); }
 $languages = ['nl'=>'Nederlands','es'=>'Spaans','en'=>'Engels','fr'=>'Frans'];
 $defaultLanguage = strtolower((string) ($region['default_language'] ?? 'nl'));
 if (!isset($languages[$defaultLanguage])) $defaultLanguage = 'nl';
-$storageDirectory = dirname(__DIR__, 2) . '/storage/region-info';
+$storageDirectory = DONDEBAILAR_PRIVATE_ROOT . '/storage/region-info';
 $storageFile = $storageDirectory . '/' . $regionId . '.json';
 $translations = [];
 if (is_file($storageFile)) {
@@ -67,7 +69,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 $pageTitle = 'Info-pagina - ' . $region['name'];
-require dirname(__DIR__, 2) . '/app/views/header.php';
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 <section class="admin-page">
     <div class="admin-heading">
@@ -98,4 +100,4 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 .region-info-editor textarea{width:100%;min-height:180px;resize:vertical}
 .region-info-editor input[type=text],.region-info-editor textarea{box-sizing:border-box;padding:11px;border:1px solid #cbd2dc;border-radius:8px;font:inherit}
 </style>
-<?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
