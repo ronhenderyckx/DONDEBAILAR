@@ -268,50 +268,6 @@ if (!function_exists('dondebailar_webreus_run')) {
         }
 
 
-        $ensureDirectory = static function (string $path, string $label) use (&$results): void {
-            if (is_link($path)) {
-                throw new RuntimeException($label . ': symbolische links zijn niet toegestaan.');
-            }
-            if (!is_dir($path) && !mkdir($path, 0755, true) && !is_dir($path)) {
-                throw new RuntimeException($label . ': map kon niet worden aangemaakt.');
-            }
-            $results[] = $label . ': OK';
-        };
-
-        $ensureDirectory($privateParent, 'Private-hoofdmap');
-
-        $executedDirectoryStep = false;
-        foreach ($manifest['steps'] as $step) {
-            if (!is_array($step) || ($step['type'] ?? '') !== 'create_directories') {
-                continue;
-            }
-            if (!is_array($step['directories'] ?? null)
-                || $step['directories'] === []) {
-                throw new RuntimeException('De opdracht voor private TEST-mappen is ongeldig.');
-            }
-
-            foreach ($step['directories'] as $relativePath) {
-                if (!is_string($relativePath)
-                    || ($relativePath !== 'private/DONDEBAILAR-TEST'
-                        && !str_starts_with($relativePath, 'private/DONDEBAILAR-TEST/'))) {
-                    throw new RuntimeException('Een mapopdracht valt buiten private/DONDEBAILAR-TEST.');
-                }
-                $segments = explode('/', $relativePath);
-                foreach ($segments as $segment) {
-                    if ($segment === '' || $segment === '.' || $segment === '..') {
-                        throw new RuntimeException('Ongeldig pad in de mapopdracht.');
-                    }
-                }
-                $absolutePath = $accountRoot . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relativePath);
-                $ensureDirectory($absolutePath, $relativePath);
-            }
-            $executedDirectoryStep = true;
-        }
-
-        if (!$executedDirectoryStep) {
-            throw new RuntimeException('Geen geldige create_directories-opdracht gevonden in update-commands.json.');
-        }
-
         $results[] = 'GitHub-bronversie: ' . $sourceRef;
         $results[] = 'GitHub-opdrachtenbestand gelezen: ' . (string) ($manifest['release'] ?? 'onbekende release');
         $results[] = 'Publieke map test is niet gewijzigd.';
