@@ -59,13 +59,42 @@ function eventCanEdit(PDO $db, array $event, array $user): bool
     return userHasRegionRole($regionId, ['editor', 'region_admin'], $user);
 }
 
+/**
+ * Geeft de private mediamap voor een evenement terug en herstelt waar mogelijk
+ * de schrijfrechten van de eigen uploadmappen.
+ */
+function eventMediaDirectory(int $eventId): string
+{
+    if ($eventId < 1) {
+        throw new InvalidArgumentException('Ongeldig evenement voor mediaopslag.');
+    }
+
+    $uploadsRoot = dirname(__DIR__) . '/uploads';
+    $eventsRoot = $uploadsRoot . '/events';
+    $eventDirectory = $eventsRoot . '/' . $eventId;
+
+    foreach ([$uploadsRoot, $eventsRoot, $eventDirectory] as $directory) {
+        if (is_link($directory)) {
+            throw new RuntimeException('De mediamap is ongeldig ingesteld.');
+        }
+        if (!is_dir($directory) && !@mkdir($directory, 0775, true) && !is_dir($directory)) {
+            throw new RuntimeException('WebReus kan de mediamap niet aanmaken. Controleer de schrijfrechten van private/uploads.');
+        }
+        if (!is_writable($directory)) {
+            @chmod($directory, 0775);
+        }
+        if (!is_writable($directory)) {
+            throw new RuntimeException('WebReus heeft geen schrijfrechten op de mediamap: ' . basename($directory) . '. De hostingrechten moeten worden hersteld.');
+        }
+    }
+
+    return $eventDirectory;
+}
+
 /** Bewaar meerdere foto's, video's of reels bij een bestaand evenement. */
 function storeEventMedia(PDO $db, int $eventId, int $userId, array $fileGroups, array $captions = []): array
 {
-    $baseDirectory = dirname(__DIR__) . '/uploads/events/' . $eventId;
-    if (!is_dir($baseDirectory) && !mkdir($baseDirectory, 0755, true) && !is_dir($baseDirectory)) {
-        throw new RuntimeException('De mediamap kon niet worden aangemaakt.');
-    }
+    $baseDirectory = eventMediaDirectory($eventId);
 
     $rules = [
         'photo' => [
