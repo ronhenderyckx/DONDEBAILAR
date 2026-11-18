@@ -320,16 +320,6 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                 <?php endif; ?>
             </a>
 
-            <?php if ($nextRegionId > 0): ?>
-                <a class="site-brand site-brand--region" href="/?region_id=<?= $nextRegionId ?>&amp;agenda_change=1&amp;filter=<?= $escape($activeFilter ?? 'organizer') ?>" aria-label="Wissel naar volgende regio" title="Wissel regio">
-                    <?php if ($regionLogoPath !== ''): ?>
-                        <img src="<?= $escape($regionLogoPath) ?>" alt="" class="site-brand__logo site-brand__region-logo">
-                    <?php else: ?>
-                        <span class="site-brand__region-mark" aria-hidden="true">⌖</span>
-                    <?php endif; ?>
-                </a>
-            <?php endif; ?>
-
         </div>
 
         <?php if ($headerUser !== null): ?>
@@ -489,21 +479,12 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
 .agenda-region-selector{display:flex;align-items:center;margin:0 0 7px}
 .agenda-region-selector select{width:100%;min-height:34px;padding:5px 32px 5px 10px;border:1px solid var(--db-border,#ddd);border-radius:9px;background:var(--db-surface,#fff);color:var(--db-text);font:inherit;font-size:13px;font-weight:700}
 .agenda-city-filter-icon{display:block;width:38px;height:38px;flex:none;object-fit:contain;background:transparent}
-.site-header__inner{display:flex;align-items:center;gap:6px}
-.site-brand-group{display:flex;align-items:center;gap:5px;min-width:0;flex:1 1 auto}
-.site-brand{display:flex;align-items:center;gap:4px;text-decoration:none;min-width:0;flex:0 1 auto}
-.site-brand--platform,.site-brand--region{min-height:30px}
-.site-brand__domain{font-size:14px;font-weight:800;color:var(--db-text);white-space:nowrap;letter-spacing:-.02em}
-/* Iets hogere header zodat het bestaande platformlogo beter zichtbaar is. */
-.site-header__inner{min-height:76px!important}
-.site-brand--platform,.site-brand--region{min-height:58px}
-.site-brand__logo{display:block;max-width:135px;max-height:58px;width:auto;height:auto;object-fit:contain;flex:0 1 auto}
-/* Houd het regiologo zichtbaar tijdens volledige navigatie door agenda-filters. */
-.site-brand--region{padding-left:6px;border-left:1px solid var(--db-border)}
-.site-brand__region-name{max-width:110px;overflow:hidden;text-overflow:ellipsis;font-size:13px;font-weight:700;color:var(--db-text);white-space:nowrap}
-.site-brand__region-logo{max-width:52px;max-height:50px}
-.site-brand__region-mark{display:grid;place-items:center;width:27px;height:27px;border-radius:50%;background:var(--db-primary);color:#fff;font-size:19px;font-weight:800;line-height:1}
-.site-welcome{font-size:12px;white-space:nowrap;flex:0 1 auto}
+.site-header__inner{display:flex;align-items:center;justify-content:flex-start;gap:8px;min-height:44px!important}
+.site-brand-group{display:flex;align-items:center;gap:0;min-width:0;flex:0 0 auto;margin-right:auto}
+.site-brand--platform{display:flex;align-items:center;justify-content:flex-start;min-height:40px;min-width:0;flex:0 0 auto;padding:0;border:0;text-decoration:none}
+.site-brand__logo{display:block;width:auto;max-width:160px;max-height:38px;height:auto;object-fit:contain;flex:0 1 auto}
+.site-brand__mark{width:34px;height:34px;flex:0 0 34px}
+.site-welcome{font-size:12px;white-space:nowrap;flex:0 1 auto;margin-left:auto}
 .site-notifications,.site-save-preferences{width:30px;height:30px}
 .site-menu__toggle{min-height:30px;padding:0 7px}
 .site-notifications{position:relative;display:grid;place-items:center;width:30px;height:30px;flex:none;color:var(--db-text);text-decoration:none;border-radius:10px}
@@ -513,7 +494,7 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
 .site-notifications:hover{background:var(--db-surface,#f2f4f7)}
 .site-notifications span{position:absolute;top:0;right:-2px;display:grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#dc3545;color:#fff;font-size:10px;font-weight:800;line-height:1}
 .site-menu{margin-left:0}
-@media(max-width:600px){.site-header__inner{gap:3px;width:calc(100% - 16px);min-height:68px!important}.site-brand-group{gap:3px}.site-brand{gap:3px}.site-brand--region{padding-left:4px}.site-brand--platform,.site-brand--region{min-height:50px}.site-brand__logo{max-width:82px;max-height:50px}.site-brand__domain{font-size:11px}.site-brand__region-name{max-width:68px;font-size:11px}.site-brand__region-logo{max-width:40px;max-height:42px}.site-brand__region-mark{width:24px;height:24px;font-size:17px}.site-welcome{font-size:10px}.site-notifications,.site-save-preferences{width:26px;height:28px}.site-notifications svg,.site-save-preferences svg{width:19px;height:19px}.site-menu__toggle{min-height:28px;padding:0 6px}}
+@media(max-width:600px){.site-header__inner{gap:5px;width:calc(100% - 16px);min-height:42px!important}.site-brand--platform{min-height:38px}.site-brand__logo{max-width:120px;max-height:34px}.site-welcome{font-size:10px;max-width:30vw}.site-notifications,.site-save-preferences{width:26px;height:28px}.site-notifications svg,.site-save-preferences svg{width:19px;height:19px}.site-menu__toggle{min-height:28px;padding:0 6px}}
 </style>
 </header>
 
