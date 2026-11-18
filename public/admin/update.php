@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
+require_once dirname(__DIR__) . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
 
 requirePlatformAdmin();
 
@@ -20,7 +22,7 @@ if (!verifyCsrfToken($_POST['csrf_token'] ?? null)) {
 
 $pageTitle = 'DONDEBAILAR bijwerken';
 $platformAdminPage = true;
-$projectRoot = dirname(__DIR__, 2);
+$projectRoot = DONDEBAILAR_PRIVATE_ROOT;
 $messages = [];
 $success = false;
 
@@ -755,7 +757,7 @@ try {
     }
 }
 
-require dirname(__DIR__, 2) . '/app/views/header.php';
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 
 <section class="admin-page">
@@ -779,4 +781,4 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     </section>
 </section>
 
-<?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
