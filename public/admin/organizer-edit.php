@@ -1,11 +1,13 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
-require_once dirname(__DIR__, 2) . '/app/Organizers.php';
-require_once dirname(__DIR__, 2) . '/app/ImageOptimization.php';
+require_once dirname(__DIR__) . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Organizers.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/ImageOptimization.php';
 
 $user = requireOrganizerManagement();
 $db = Database::connection();
@@ -42,7 +44,7 @@ function deleteManagedOrganizerLogo(?string $path): void
         return;
     }
 
-    $file = dirname(__DIR__, 2) . '/' . $path;
+    $file = DONDEBAILAR_PRIVATE_ROOT . '/' . $path;
     if (is_file($file)) {
         @unlink($file);
     }
@@ -133,7 +135,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-require dirname(__DIR__, 2) . '/app/views/header.php';
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 
 <section class="admin-page">
@@ -204,4 +206,4 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 .current-organizer-logo img { max-width:180px; max-height:110px; object-fit:contain; }
 </style>
 
-<?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
