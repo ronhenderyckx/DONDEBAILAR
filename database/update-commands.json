@@ -2,7 +2,7 @@
   "format_version": 1,
   "project": "DONDEBAILAR",
   "environment": "test",
-  "release": "webreus-test-bootstrap",
+  "release": "webreus-test-private-setup",
   "source_ref": "95013fa7324e87966d8518bbc9e4afa0305a84ef",
   "deployment": {
     "strategy": "separate_private_and_public_roots",
@@ -35,11 +35,6 @@
     ]
   },
   "steps": [
-    {
-      "id": "prepare_test_roots",
-      "type": "prepare_test_roots",
-      "description": "Maakt de private TEST-map en de benodigde applicatiemappen aan. Wijzigt geen publieke bestanden, preview of productie."
-    },
     {
       "id": "create_test_private_directories",
       "type": "create_directories",
