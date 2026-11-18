@@ -46,7 +46,7 @@ if ($expectedToken === '' || $postedToken === '' || !hash_equals($expectedToken,
     updatePage('Beveiligingscontrole mislukt', 'De beveiligingstoken ontbreekt of is ongeldig. Open de updater opnieuw en probeer nogmaals.');
 }
 
-$runnerUrl = 'https://raw.githubusercontent.com/ronhenderyckx/DONDEBAILAR/92669a9f26360d6d467e158e525286da628af9b9/scripts/webreus-update-runner.php';
+$runnerUrl = 'https://raw.githubusercontent.com/ronhenderyckx/DONDEBAILAR/develop/scripts/webreus-update-runner.php';
 $ch = curl_init($runnerUrl);
 if ($ch === false) {
     updatePage('Updaterfout', 'De verbinding met GitHub kon niet worden gestart.');
