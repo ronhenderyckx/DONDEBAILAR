@@ -1,10 +1,12 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/app/bootstrap.php';
-require_once dirname(__DIR__) . '/app/Authorization.php';
-require_once dirname(__DIR__) . '/app/Security.php';
-require_once dirname(__DIR__) . '/app/Events.php';
+require_once __DIR__ . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Events.php';
 
 http_response_code(403);
 exit('Evenementen importeren is tijdelijk uitgeschakeld.');
@@ -400,7 +402,7 @@ if ($preview === [] && isset($_SESSION['event_import_stage'])
 }
 
 $pageTitle = 'Evenementen importeren - DONDEBAILAR';
-require dirname(__DIR__) . '/app/views/header.php';
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 <section class="admin-page">
     <div class="admin-heading">
@@ -471,4 +473,4 @@ require dirname(__DIR__) . '/app/views/header.php';
 <style>
 .event-import-section{max-width:900px}.event-import-section .auth-form{max-width:700px}.event-import-section input[type=file]{padding:8px}.event-import-section p{margin:10px 0}
 </style>
-<?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
