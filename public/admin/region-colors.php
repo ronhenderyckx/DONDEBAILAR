@@ -233,6 +233,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
             }
         }
 
+        $pastEventCandidate = strtoupper(trim((string) ($_POST['past_event_color'] ?? $pastEventColor)));
+        if (!preg_match('/^#[0-9A-F]{6}$/', $pastEventCandidate)) {
+            $errorMessage = 'De kleur van afgelopen evenementen is ongeldig.';
+        } else {
+            $pastEventColor = $pastEventCandidate;
+        }
+
         foreach ($defaults as $key => $default) {
             $value = strtoupper(trim((string) ($_POST[$key] ?? $default)));
             if (!preg_match('/^#[0-9A-F]{6}$/', $value)) {
@@ -306,10 +313,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
             if ($errorMessage === '') {
                 $upsert = $db->prepare("INSERT INTO region_appearance
                     (region_id, primary_color, primary_dark, accent_color, secondary_color,
-                     tertiary_color, header_color, menu_color, organizer_color, filter_hover_color, filter_bar_color, filter_text_color,
+                     tertiary_color, header_color, menu_color, organizer_color, filter_hover_color, filter_bar_color, filter_text_color, past_event_color,
                      search_button_color, back_top_color, search_field_color, search_text_color, footer_color, background_color, text_color, weekday_colors, logo_path)
                     VALUES (:region_id, :primary_color, :primary_dark, :accent_color, :secondary_color,
-                     :tertiary_color, :header_color, :menu_color, :organizer_color, :filter_hover_color, :filter_bar_color, :filter_text_color,
+                     :tertiary_color, :header_color, :menu_color, :organizer_color, :filter_hover_color, :filter_bar_color, :filter_text_color, :past_event_color,
                      :search_button_color, :back_top_color, :search_field_color, :search_text_color, :footer_color, :background_color, :text_color, :weekday_colors, :logo_path)
                     ON DUPLICATE KEY UPDATE primary_color=VALUES(primary_color),
                      primary_dark=VALUES(primary_dark), accent_color=VALUES(accent_color),
@@ -317,6 +324,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
                      header_color=VALUES(header_color), menu_color=VALUES(menu_color),
                      organizer_color=VALUES(organizer_color), filter_hover_color=VALUES(filter_hover_color),
                      filter_bar_color=VALUES(filter_bar_color), filter_text_color=VALUES(filter_text_color),
+                     past_event_color=VALUES(past_event_color),
                      search_button_color=VALUES(search_button_color), back_top_color=VALUES(back_top_color),
                      search_field_color=VALUES(search_field_color), search_text_color=VALUES(search_text_color),
                      footer_color=VALUES(footer_color), background_color=VALUES(background_color),
@@ -335,6 +343,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
                     'filter_hover_color' => $colors['filter_hover_color'],
                     'filter_bar_color' => $colors['filter_bar_color'],
                     'filter_text_color' => $colors['filter_text_color'],
+                    'past_event_color' => $pastEventColor,
                     'search_button_color' => $colors['search_button_color'],
                     'back_top_color' => $colors['back_top_color'],
                     'search_field_color' => $colors['search_field_color'],
@@ -471,6 +480,11 @@ if (!$embeddedRegionAppearanceEditor) {
                     <code><?= escapeHtml($colors[$key]) ?></code>
                 </label>
             <?php endforeach; ?>
+            </div>
+            <h2>Afgelopen evenementen</h2>
+            <p>Deze achtergrondkleur wordt gebruikt voor evenementen waarvan de einddatum en -tijd voorbij zijn.</p>
+            <div class="region-color-grid">
+                <label class="region-color-field" for="past_event_color"><span>Kleur afgelopen evenementen</span><input type="color" id="past_event_color" name="past_event_color" value="<?= escapeHtml($pastEventColor) ?>"><code><?= escapeHtml($pastEventColor) ?></code></label>
             </div>
             <h2>Weekdagen</h2>
             <p>Stel per weekdag de achtergrondkleur, de dagtekstkleur en de tekstkleur van de evenementtitel afzonderlijk in.</p>
