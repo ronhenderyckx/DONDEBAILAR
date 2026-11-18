@@ -1,7 +1,9 @@
 -- DONDEBAILAR — Migration 008
--- Add the user responsible for the latest organizer change.
--- Existing organizers remain valid; their updated_by value is NULL.
+-- Track which user created or last changed each organizer.
+-- Existing rows remain valid and receive NULL audit values.
 
 ALTER TABLE organizers
-    ADD COLUMN updated_by BIGINT UNSIGNED NULL AFTER created_by,
+    ADD COLUMN created_by BIGINT UNSIGNED NULL,
+    ADD COLUMN updated_by BIGINT UNSIGNED NULL,
+    ADD KEY idx_organizers_created_by (created_by),
     ADD KEY idx_organizers_updated_by (updated_by);
