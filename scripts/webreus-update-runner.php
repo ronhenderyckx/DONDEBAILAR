@@ -74,7 +74,7 @@ if (!function_exists('dondebailar_webreus_run')) {
         }
 
         $results = [];
-        $results[] = 'Runner-versie: webreus-test-admin-account-20261118-1';
+        $results[] = 'Runner-versie: webreus-test-private-paths-20261118-2';
 
         $curlGet = static function (string $url, string $accept = 'application/vnd.github+json'): string {
             $ch = curl_init($url);
