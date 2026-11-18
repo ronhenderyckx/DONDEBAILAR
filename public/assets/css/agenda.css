@@ -294,8 +294,10 @@
     max-width:1200px;
     margin:0 auto
 }
-/* Houd het eerste actuele/komende evenement vrij van de vaste kopbalk. */
+/* Laat het eerste actuele/komende evenement op een nieuwe rij beginnen.
+   Zo staat er op brede schermen geen afgelopen kaart naast het startpunt. */
 #agenda-today-start {
+    grid-column:1;
     scroll-margin-top:0;
 }
 
