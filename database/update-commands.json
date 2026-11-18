@@ -1,0 +1,16 @@
+{
+  "format_version": 1,
+  "project": "DONDEBAILAR",
+  "environment": "test",
+  "release": "initial-test-install",
+  "source_ref": "95013fa7324e87966d8518bbc9e4afa0305a84ef",
+  "steps": [
+    {
+      "id": "install_empty_database",
+      "type": "sql_file",
+      "path": "database/install_test.sql",
+      "requires_empty_database": true,
+      "description": "Installeert de volledige DONDEBAILAR-databasestructuur op een lege testdatabase."
+    }
+  ]
+}
