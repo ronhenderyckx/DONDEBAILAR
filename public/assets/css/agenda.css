@@ -2370,6 +2370,23 @@ body.has-agenda-footer .site-main > .agenda-page {
     background-color:var(--db-event-day-color,#777777)!important;
 }
 
+/* Eén instelbare tekstkleur voor ALLE tekst en pictogrammen van afgelopen evenementen. */
+.agenda-feed > .agenda-card.agenda-card--past,
+.agenda-feed > .agenda-card.agenda-card--past :where(*) {
+    color:var(--db-event-day-text-color,#FFFFFF)!important;
+}
+.agenda-feed > .agenda-card.agenda-card--past svg,
+.agenda-feed > .agenda-card.agenda-card--past svg :where(*) {
+    color:var(--db-event-day-text-color,#FFFFFF)!important;
+    stroke:var(--db-event-day-text-color,#FFFFFF)!important;
+}
+.agenda-feed > .agenda-card.agenda-card--past .agenda-icon-button,
+.agenda-feed > .agenda-card.agenda-card--past .agenda-icon-button svg,
+.agenda-feed > .agenda-card.agenda-card--past .agenda-attendance,
+.agenda-feed > .agenda-card.agenda-card--past .agenda-message-count {
+    opacity:1!important;
+}
+
 /* De ingestelde achtergrondkleur wordt op alle zichtbare kaartdelen toegepast. */
 .agenda-feed > .agenda-card.agenda-card--past,
 .agenda-feed > .agenda-card.agenda-card--past > .agenda-card__media-wrap,
