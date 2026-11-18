@@ -91,8 +91,7 @@ if (!function_exists('dondebailar_webreus_run')) {
             if (!is_array($step) || ($step['type'] ?? '') !== 'create_directories') {
                 continue;
             }
-            if (($step['id'] ?? '') !== 'create_test_private_directories'
-                || !is_array($step['directories'] ?? null)
+            if (!is_array($step['directories'] ?? null)
                 || $step['directories'] === []) {
                 throw new RuntimeException('De opdracht voor private TEST-mappen is ongeldig.');
             }
