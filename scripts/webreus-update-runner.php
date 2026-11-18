@@ -117,6 +117,7 @@ if (!function_exists('dondebailar_webreus_run')) {
         $executedPublicDeployStep = false;
         $executedPlaceholderCleanup = false;
         $executedAdminStep = false;
+        $executedOrganizerAuditStep = false;
         foreach ($manifest['steps'] as $step) {
             if (!is_array($step)) {
                 throw new RuntimeException('Ongeldige opdracht in update-commands.json.');
@@ -277,6 +278,56 @@ if (!function_exists('dondebailar_webreus_run')) {
                 $results[] = 'install-update.php en update-result.php zijn beschermd en niet overschreven.';
                 $results[] = 'Publieke GitHub-bronversie: ' . $publicSourceCommit;
                 $executedPublicDeployStep = true;
+                continue;
+            }
+
+            if (($step['type'] ?? '') === 'ensure_organizer_audit_columns') {
+                $bootstrapFile = $privateRoot . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'bootstrap.php';
+                if (!is_file($bootstrapFile)) {
+                    throw new RuntimeException('De applicatie-bootstrap ontbreekt; organisatormigratie afgebroken.');
+                }
+                require_once $bootstrapFile;
+                if (!class_exists('Database') || !method_exists('Database', 'connection')) {
+                    throw new RuntimeException('De databaseverbinding is niet beschikbaar voor de organisatormigratie.');
+                }
+
+                $pdo = Database::connection();
+                $columnExists = static function (PDO $pdo, string $column): bool {
+                    $query = $pdo->prepare(
+                        'SELECT COUNT(*) FROM information_schema.COLUMNS
+                         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table_name AND COLUMN_NAME = :column_name'
+                    );
+                    $query->execute(['table_name' => 'organizers', 'column_name' => $column]);
+                    return (int) $query->fetchColumn() > 0;
+                };
+                $indexExists = static function (PDO $pdo, string $index): bool {
+                    $query = $pdo->prepare(
+                        'SELECT COUNT(*) FROM information_schema.STATISTICS
+                         WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table_name AND INDEX_NAME = :index_name'
+                    );
+                    $query->execute(['table_name' => 'organizers', 'index_name' => $index]);
+                    return (int) $query->fetchColumn() > 0;
+                };
+
+                if (!$columnExists($pdo, 'created_by')) {
+                    $pdo->exec('ALTER TABLE organizers ADD COLUMN created_by BIGINT UNSIGNED NULL AFTER notes');
+                    $results[] = 'Database: kolom organizers.created_by toegevoegd.';
+                } else {
+                    $results[] = 'Database: organizers.created_by bestond al.';
+                }
+                if (!$columnExists($pdo, 'updated_by')) {
+                    $pdo->exec('ALTER TABLE organizers ADD COLUMN updated_by BIGINT UNSIGNED NULL AFTER created_by');
+                    $results[] = 'Database: kolom organizers.updated_by toegevoegd.';
+                } else {
+                    $results[] = 'Database: organizers.updated_by bestond al.';
+                }
+                if (!$indexExists($pdo, 'idx_organizers_created_by')) {
+                    $pdo->exec('ALTER TABLE organizers ADD KEY idx_organizers_created_by (created_by)');
+                }
+                if (!$indexExists($pdo, 'idx_organizers_updated_by')) {
+                    $pdo->exec('ALTER TABLE organizers ADD KEY idx_organizers_updated_by (updated_by)');
+                }
+                $executedOrganizerAuditStep = true;
                 continue;
             }
 
@@ -496,6 +547,9 @@ if (!function_exists('dondebailar_webreus_run')) {
         }
         if (!$executedPlaceholderCleanup) {
             throw new RuntimeException('Geen controle-opdracht voor de tijdelijke publieke index.html gevonden.');
+        }
+        if (!$executedOrganizerAuditStep) {
+            throw new RuntimeException('Geen opdracht gevonden om de organisatorauditkolommen te controleren.');
         }
         if (!$executedAdminStep) {
             throw new RuntimeException('Geen opdracht gevonden om de platform-admin te controleren of aan te maken.');
