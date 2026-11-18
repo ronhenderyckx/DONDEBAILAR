@@ -10,12 +10,15 @@
             <section class="agenda-empty"><h2>Geen evenementen gevonden</h2><p>Er zijn momenteel geen gepubliceerde evenementen met deze filters.</p></section>
         <?php else: ?>
             <div class="agenda-feed">
+                <?php $agendaStartFound = false; ?>
                 <?php foreach ($events as $eventIndex => $event): ?>
                     <?php
                     $start = new DateTimeImmutable((string) $event['starts_at'], $timezone);
                     $eventEndValue = trim((string) ($event['ends_at'] ?? ''));
                     $eventEnd = new DateTimeImmutable($eventEndValue !== '' ? $eventEndValue : (string) $event['starts_at'], $timezone);
                     $eventIsPast = $eventEnd < $now;
+                    $eventIsAgendaStart = !$agendaStartFound && !$eventIsPast;
+                    if ($eventIsAgendaStart) $agendaStartFound = true;
                     $eventUrl = '/event.php?id=' . (int) $event['id'];
                     $locationLabel = trim((string) ($event['location_city'] ?? ''));
                     $mapUrl = (string) ($event['google_maps_url'] ?? '');
