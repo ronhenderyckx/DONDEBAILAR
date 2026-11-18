@@ -114,6 +114,7 @@ if (!function_exists('dondebailar_webreus_run')) {
 
         $executedDirectoryStep = false;
         $executedDeployStep = false;
+        $executedPublicDeployStep = false;
         foreach ($manifest['steps'] as $step) {
             if (!is_array($step)) {
                 throw new RuntimeException('Ongeldige opdracht in update-commands.json.');
@@ -140,6 +141,104 @@ if (!function_exists('dondebailar_webreus_run')) {
                     $ensureDirectory($absolutePath, $relativePath);
                 }
                 $executedDirectoryStep = true;
+                continue;
+            }
+
+            if (($step['type'] ?? '') === 'deploy_public_repository_tree') {
+                $sourceRef = (string) ($manifest['source_ref'] ?? '');
+                if ($sourceRef === '' || !preg_match('/^[A-Za-z0-9._\/-]{1,100}$/', $sourceRef)) {
+                    throw new RuntimeException('De GitHub source_ref is ongeldig voor de publieke deployment.');
+                }
+                $requestedPrefix = (string) ($step['source_path'] ?? '');
+                if ($requestedPrefix !== 'public/') {
+                    throw new RuntimeException('De publieke bronmap moet exact public/ zijn.');
+                }
+
+                $branchUrl = 'https://api.github.com/repos/ronhenderyckx/DONDEBAILAR/branches/' . rawurlencode($sourceRef);
+                $publicBranchData = json_decode($curlGet($branchUrl), true, 128, JSON_THROW_ON_ERROR);
+                $publicSourceCommit = (string) ($publicBranchData['commit']['sha'] ?? '');
+                $publicTreeSha = (string) ($publicBranchData['commit']['commit']['tree']['sha'] ?? '');
+                if (!preg_match('/^[a-f0-9]{40}$/', $publicSourceCommit) || !preg_match('/^[a-f0-9]{40}$/', $publicTreeSha)) {
+                    throw new RuntimeException('GitHub leverde geen geldige bronversie voor de publieke deployment.');
+                }
+                $publicTreeUrl = 'https://api.github.com/repos/ronhenderyckx/DONDEBAILAR/git/trees/' . rawurlencode($publicTreeSha) . '?recursive=1';
+                $publicTreeData = json_decode($curlGet($publicTreeUrl), true, 128, JSON_THROW_ON_ERROR);
+                if (!empty($publicTreeData['truncated']) || !is_array($publicTreeData['tree'] ?? null)) {
+                    throw new RuntimeException('GitHub kon de volledige publieke bestandslijst niet leveren.');
+                }
+
+                $publicDeployedCount = 0;
+                $protectedPublicFiles = ['install-update.php', 'update-result.php'];
+                foreach ($publicTreeData['tree'] as $entry) {
+                    if (!is_array($entry) || ($entry['type'] ?? '') !== 'blob') {
+                        continue;
+                    }
+                    $sourcePath = (string) ($entry['path'] ?? '');
+                    if (!str_starts_with($sourcePath, 'public/')) {
+                        continue;
+                    }
+                    $relativePath = substr($sourcePath, strlen('public/'));
+                    if ($relativePath === '' || in_array($relativePath, $protectedPublicFiles, true)) {
+                        continue;
+                    }
+                    if (str_contains($relativePath, "\0")
+                        || str_starts_with($relativePath, '/')
+                        || preg_match('~(^|/)\.\.?(/|$)~', $relativePath)
+                        || preg_match('~(^|/)(vendor|uploads|storage)(/|$)~i', $relativePath)) {
+                        throw new RuntimeException('Onveilig publiek bronpad: ' . $sourcePath);
+                    }
+                    $size = (int) ($entry['size'] ?? 0);
+                    if ($size < 0 || $size > 2097152) {
+                        throw new RuntimeException('Publiek bronbestand is groter dan 2 MB of ongeldig: ' . $sourcePath);
+                    }
+                    $segments = explode('/', $relativePath);
+                    foreach ($segments as $segment) {
+                        if ($segment === '' || $segment === '.' || $segment === '..') {
+                            throw new RuntimeException('Ongeldig publiek bestandspad: ' . $sourcePath);
+                        }
+                    }
+
+                    $destination = $documentRoot . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relativePath);
+                    $parentSegments = count($segments) > 1 ? array_slice($segments, 0, -1) : [];
+                    $walk = $documentRoot;
+                    foreach ($parentSegments as $segment) {
+                        $walk .= DIRECTORY_SEPARATOR . $segment;
+                        if (is_link($walk)) {
+                            throw new RuntimeException('Symbolische link in publieke doelmap: ' . $relativePath);
+                        }
+                        if (!is_dir($walk) && !mkdir($walk, 0755) && !is_dir($walk)) {
+                            throw new RuntimeException('Publieke doelmap kon niet worden aangemaakt: ' . $relativePath);
+                        }
+                    }
+                    if (is_link($destination)) {
+                        throw new RuntimeException('Publiek doelbestand is een symbolische link: ' . $relativePath);
+                    }
+
+                    $encodedPath = implode('/', array_map('rawurlencode', explode('/', $sourcePath)));
+                    $rawUrl = 'https://raw.githubusercontent.com/ronhenderyckx/DONDEBAILAR/' . rawurlencode($publicSourceCommit) . '/' . $encodedPath;
+                    $fileBody = $curlGet($rawUrl, 'text/plain');
+                    if (strlen($fileBody) !== $size) {
+                        throw new RuntimeException('Publieke bestandsgrootte komt niet overeen: ' . $relativePath);
+                    }
+
+                    $temporary = $destination . '.db-update-' . bin2hex(random_bytes(6));
+                    if (file_put_contents($temporary, $fileBody, LOCK_EX) === false) {
+                        throw new RuntimeException('Tijdelijk publiek bestand kon niet worden geschreven: ' . $relativePath);
+                    }
+                    @chmod($temporary, 0644);
+                    if (!rename($temporary, $destination)) {
+                        @unlink($temporary);
+                        throw new RuntimeException('Publiek bestand kon niet veilig worden geplaatst: ' . $relativePath);
+                    }
+                    $publicDeployedCount++;
+                }
+                if ($publicDeployedCount === 0) {
+                    throw new RuntimeException('Geen bestanden gevonden in de GitHub-map public/.');
+                }
+                $results[] = 'Publieke TEST-bestanden bijgewerkt: ' . $publicDeployedCount . ' bestanden.';
+                $results[] = 'install-update.php en update-result.php zijn beschermd en niet overschreven.';
+                $results[] = 'Publieke GitHub-bronversie: ' . $publicSourceCommit;
+                $executedPublicDeployStep = true;
                 continue;
             }
 
@@ -273,6 +372,9 @@ if (!function_exists('dondebailar_webreus_run')) {
         }
         if (!$executedDeployStep) {
             throw new RuntimeException('Geen deploy_repository_tree-opdracht gevonden in update-commands.json.');
+        }
+        if (!$executedPublicDeployStep) {
+            throw new RuntimeException('Geen deploy_public_repository_tree-opdracht gevonden in update-commands.json.');
         }
 
 
