@@ -2358,21 +2358,11 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-card--past{background:var(--db-event-day-color,#777777);border-color:var(--db-event-day-color,#777777)}
 
 
-/* Duidelijke, instelbare scheidingslijn tussen kaarten. */
+/* De ingestelde weekdagkleur of verleden-kleur vult de volledige kaart.
+   De scheidingslijn is een echte onderrand en blijft daardoor zichtbaar. */
 .agenda-feed > .agenda-card {
-    position:relative!important;
-}
-.agenda-feed > .agenda-card::after {
-    content:"";
-    display:block!important;
-    position:absolute!important;
-    z-index:20!important;
-    left:0!important;
-    right:0!important;
-    bottom:0!important;
-    height:5px!important;
-    background:var(--db-event-separator-color,#D0D0D0)!important;
-    pointer-events:none!important;
+    background:var(--db-event-day-color,var(--db-primary,#f78d19))!important;
+    border-bottom:5px solid var(--db-event-separator-color,#D0D0D0)!important;
 }
 
 /* De ingestelde achtergrondkleur wordt op alle zichtbare kaartdelen toegepast. */
