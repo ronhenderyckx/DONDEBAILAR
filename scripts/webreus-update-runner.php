@@ -39,6 +39,50 @@ if (!function_exists('dondebailar_webreus_run')) {
         $privateRoot = $accountRoot . DIRECTORY_SEPARATOR . 'private' . DIRECTORY_SEPARATOR . 'DONDEBAILAR-TEST';
         $privateParent = $accountRoot . DIRECTORY_SEPARATOR . 'private';
 
+        $manifestUrl = 'https://raw.githubusercontent.com/ronhenderyckx/DONDEBAILAR/develop/database/update-commands.json';
+        $ch = curl_init($manifestUrl);
+        if ($ch === false) {
+            throw new RuntimeException('GitHub-verbinding kon niet worden gestart.');
+        }
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => false,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_TIMEOUT => 25,
+            CURLOPT_SSL_VERIFYPEER => true,
+            CURLOPT_SSL_VERIFYHOST => 2,
+            CURLOPT_HTTPHEADER => ['Accept: application/json'],
+        ]);
+        $manifestBody = curl_exec($ch);
+        $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+        if (!is_string($manifestBody) || $httpCode !== 200) {
+            throw new RuntimeException('Opdrachtenbestand kon niet van GitHub worden gelezen. HTTP ' . $httpCode . ' ' . $curlError);
+        }
+        $manifest = json_decode($manifestBody, true, 64, JSON_THROW_ON_ERROR);
+        if (($manifest['project'] ?? '') !== 'DONDEBAILAR'
+            || ($manifest['environment'] ?? '') !== 'test'
+            || !is_array($manifest['steps'] ?? null)) {
+            throw new RuntimeException('Het GitHub-opdrachtenbestand is niet geldig voor DONDEBAILAR TEST.');
+        }
+        $target = $manifest['deployment']['targets']['test'] ?? [];
+        if (($target['host'] ?? '') !== 'test.dondebailar.eu'
+            || ($target['private_root'] ?? '') !== 'private/DONDEBAILAR-TEST'
+            || ($target['public_root'] ?? '') !== 'test') {
+            throw new RuntimeException('De TEST-doelpaden in het opdrachtenbestand zijn gewijzigd of ongeldig.');
+        }
+        $hasPrepareStep = false;
+        foreach ($manifest['steps'] as $step) {
+            if (($step['id'] ?? '') === 'prepare_test_roots'
+                && ($step['type'] ?? '') === 'prepare_test_roots') {
+                $hasPrepareStep = true;
+            }
+        }
+        if (!$hasPrepareStep) {
+            throw new RuntimeException('De opdracht prepare_test_roots ontbreekt in het GitHub-opdrachtenbestand.');
+        }
+
         $results = [];
 
         $ensureDirectory = static function (string $path, string $label) use (&$results): void {
@@ -58,6 +102,7 @@ if (!function_exists('dondebailar_webreus_run')) {
             $ensureDirectory($privateRoot . DIRECTORY_SEPARATOR . $folder, 'private/' . $folder);
         }
 
+        $results[] = 'GitHub-opdrachtenbestand gelezen: ' . (string) ($manifest['release'] ?? 'onbekende release');
         $results[] = 'Publieke map test is niet gewijzigd.';
         $results[] = 'Preview en productie zijn niet benaderd of gewijzigd.';
 
