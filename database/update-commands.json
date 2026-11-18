@@ -2,7 +2,7 @@
     "format_version": 1,
     "project": "DONDEBAILAR",
     "environment": "test",
-    "release": "webreus-event-list-first-media-20261118-9",
+    "release": "webreus-event-list-large-media-20261118-10",
     "source_ref": "develop",
     "deployment": {
         "strategy": "separate_private_and_public_roots",
