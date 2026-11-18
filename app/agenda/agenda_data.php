@@ -56,7 +56,7 @@ $regions = $db->query(
             a.primary_color, a.primary_dark, a.accent_color,
             a.secondary_color, a.tertiary_color, a.header_color, a.menu_color, a.organizer_color, a.filter_hover_color,
             a.filter_bar_color, a.filter_text_color, a.search_button_color, a.back_top_color,
-             a.search_field_color, a.search_text_color, a.footer_color, a.background_color, a.text_color, a.weekday_colors
+             a.search_field_color, a.search_text_color, a.footer_color, a.background_color, a.text_color, a.weekday_colors, a.past_event_color
      FROM regions r
      LEFT JOIN region_appearance a ON a.region_id = r.id
      WHERE r.is_active = 1 ORDER BY r.id"
@@ -86,6 +86,8 @@ foreach ($regions as $item) {
     $regionById[(int) $item['id']] = $item;
 }
 $region = $regionById[$regionId] ?? null;
+$pastEventColor = strtoupper((string) ($region['past_event_color'] ?? '#777777'));
+if (!preg_match('/^#[0-9A-F]{6}$/', $pastEventColor)) $pastEventColor = '#777777';
 
 // Regiospecifieke tekst voor evenementen zonder media.
 $eventFallbackText = 'SALSA · BACHATA · KIZOMBA';
