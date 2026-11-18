@@ -2,7 +2,7 @@
   "format_version": 1,
   "project": "DONDEBAILAR",
   "environment": "test",
-  "release": "webreus-test-private-app-deploy",
+  "release": "webreus-test-private-and-public-deploy",
   "source_ref": "develop",
   "deployment": {
     "strategy": "separate_private_and_public_roots",
@@ -65,6 +65,12 @@
         "cron/",
         "tests/"
       ]
+    },
+    {
+      "id": "deploy_test_public_application",
+      "type": "deploy_public_repository_tree",
+      "description": "Publiceert uitsluitend de inhoud van de GitHub-map public/ naar de publieke WebReus TEST-map; beschermt de vaste updaterbestanden.",
+      "source_path": "public/"
     }
   ]
 }
