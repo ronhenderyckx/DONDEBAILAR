@@ -40,7 +40,6 @@ if (!function_exists('dondebailar_webreus_run')) {
         $privateParent = $accountRoot . DIRECTORY_SEPARATOR . 'private';
 
         $results = [];
-        self::unused();
 
         $ensureDirectory = static function (string $path, string $label) use (&$results): void {
             if (is_link($path)) {
