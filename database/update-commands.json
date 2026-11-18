@@ -2,7 +2,7 @@
     "format_version": 1,
     "project": "DONDEBAILAR",
     "environment": "test",
-    "release": "webreus-agenda-past-card-color-line-finalfix-20261118-1",
+    "release": "webreus-agenda-card-colors-separator-fix-20261118-2",
     "source_ref": "develop",
     "deployment": {
         "strategy": "separate_private_and_public_roots",
