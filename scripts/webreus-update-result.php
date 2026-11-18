@@ -4,7 +4,7 @@ declare(strict_types=1);
 /**
  * DONDEBAILAR WebReus TEST result page.
  * Install once as test/update-result.php.
- * Loads the current TEST runner from the trusted develop branch.
+ * Loads the current TEST runner from the trusted develop branch with cache busting.
  */
 if (strtolower((string) ($_SERVER['HTTP_HOST'] ?? '')) !== 'test.dondebailar.eu') {
     http_response_code(404);
@@ -47,7 +47,7 @@ if ($expectedToken === '' || $postedToken === '' || !hash_equals($expectedToken,
     updatePage('Beveiligingscontrole mislukt', 'De beveiligingstoken ontbreekt of is ongeldig. Open de updater opnieuw en probeer nogmaals.');
 }
 
-$runnerUrl = 'https://raw.githubusercontent.com/ronhenderyckx/DONDEBAILAR/develop/scripts/webreus-update-runner.php';
+$runnerUrl = 'https://raw.githubusercontent.com/ronhenderyckx/DONDEBAILAR/develop/scripts/webreus-update-runner.php?v=webreus-test-index-cleanup-20261118-1';
 $ch = curl_init($runnerUrl);
 if ($ch === false) {
     updatePage('Updaterfout', 'De verbinding met GitHub kon niet worden gestart.');
@@ -84,7 +84,7 @@ try {
     }
     $result = dondebailar_webreus_run(['host' => 'test.dondebailar.eu']);
     $lines = [
-        'Resultpagina-versie: webreus-test-diagnostic-20261118-1',
+        'Resultpagina-versie: webreus-test-cachebust-20261118-1',
         'Runner SHA-256: ' . hash('sha256', $runnerCode),
     ];
     foreach (($result['results'] ?? []) as $line) {
