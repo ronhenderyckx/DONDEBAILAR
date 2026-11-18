@@ -13,6 +13,9 @@
                 <?php foreach ($events as $eventIndex => $event): ?>
                     <?php
                     $start = new DateTimeImmutable((string) $event['starts_at'], $timezone);
+                    $eventEndValue = trim((string) ($event['ends_at'] ?? ''));
+                    $eventEnd = new DateTimeImmutable($eventEndValue !== '' ? $eventEndValue : (string) $event['starts_at'], $timezone);
+                    $eventIsPast = $eventEnd < $now;
                     $eventUrl = '/event.php?id=' . (int) $event['id'];
                     $locationLabel = trim((string) ($event['location_city'] ?? ''));
                     $mapUrl = (string) ($event['google_maps_url'] ?? '');
