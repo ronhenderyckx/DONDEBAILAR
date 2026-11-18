@@ -2356,3 +2356,14 @@ body.has-agenda-footer .site-main > .agenda-page {
 
 /* Regionaal instelbare kleur voor volledig afgelopen evenementen. */
 .agenda-card--past{background:var(--db-event-day-color,#777777);border-color:var(--db-event-day-color,#777777)}
+
+
+/* Instelbare scheidingslijn en afzonderlijke achtergrond voor afgelopen evenementen. */
+.agenda-feed > .agenda-card {
+    border-bottom:2px solid var(--db-event-separator-color,#D0D0D0)!important;
+}
+.agenda-feed > .agenda-card--past,
+.agenda-feed > .agenda-card--past .agenda-card__details,
+.agenda-feed > .agenda-card--past .agenda-card__quick {
+    background:var(--db-event-day-color,#777777)!important;
+}
