@@ -1,23 +1,44 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/app/bootstrap.php';
-require_once dirname(__DIR__) . '/app/Authorization.php';
-require_once dirname(__DIR__) . '/app/Security.php';
+$host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+$host = preg_replace('/:\\d+$/', '', $host) ?? '';
+$environmentRoots = [
+    'test.dondebailar.eu' => 'DONDEBAILAR-TEST',
+];
+
+if (!isset($environmentRoots[$host])) {
+    http_response_code(404);
+    exit('Inloggen is niet beschikbaar op deze website.');
+}
+
+$privateRoot = dirname(__DIR__) . '/private/' . $environmentRoots[$host];
+if (!is_file($privateRoot . '/app/bootstrap.php')) {
+    http_response_code(503);
+    exit('De private applicatiebestanden zijn niet beschikbaar.');
+}
+
+require_once $privateRoot . '/app/bootstrap.php';
+require_once $privateRoot . '/app/Authorization.php';
+require_once $privateRoot . '/app/Security.php';
 
 $pageTitle = 'Inloggen - DONDEBAILAR';
 $errorMessage = '';
 $login = '';
 
-$returnTo = $_GET['return'] ?? $_POST['return'] ?? '/';
+$returnTo = $_GET['return'] ?? $_POST['return'] ?? '/admin/';
 
 if (
     !is_string($returnTo)
     || !str_starts_with($returnTo, '/')
     || str_starts_with($returnTo, '//')
-    || preg_match('/[\r\n]/', $returnTo)
+    || preg_match('/[\\r\\n]/', $returnTo)
 ) {
-    $returnTo = '/';
+    $returnTo = '/admin/';
+}
+
+if ($returnTo === '/') {
+    $returnTo = '/admin/';
 }
 
 if (currentUser() !== null) {
@@ -35,46 +56,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($login === '' || strlen($login) > 190 || $password === '') {
         $errorMessage = 'Vul je gebruikersnaam of e-mailadres en wachtwoord in.';
     } else {
-        $statement = Database::connection()->prepare(
-            "SELECT id, password_hash, status
-             FROM users
-             WHERE email = :email OR display_name = :display_name
-             ORDER BY id DESC"
-        );
-        $statement->execute([
-            'email' => strtolower($login),
-            'display_name' => $login,
-        ]);
-        $matchingUsers = $statement->fetchAll();
-        $user = null;
+        try {
+            $statement = Database::connection()->prepare(
+                "SELECT id, password_hash, status
+                 FROM users
+                 WHERE email = :email OR display_name = :display_name
+                 ORDER BY id DESC"
+            );
+            $statement->execute([
+                'email' => strtolower($login),
+                'display_name' => $login,
+            ]);
+            $matchingUsers = $statement->fetchAll();
+            $user = null;
 
-        // Meerdere testaccounts mogen hetzelfde e-mailadres delen.
-        // Het wachtwoord bepaalt bij welk account de gebruiker inlogt.
-        foreach ($matchingUsers as $candidate) {
-            if (
-                $candidate['status'] === 'active'
-                && password_verify($password, $candidate['password_hash'])
-            ) {
-                $user = $candidate;
-                break;
+            foreach ($matchingUsers as $candidate) {
+                if (
+                    $candidate['status'] === 'active'
+                    && password_verify($password, $candidate['password_hash'])
+                ) {
+                    $user = $candidate;
+                    break;
+                }
             }
-        }
 
-        if ($user === null) {
-            $errorMessage = 'Gebruikersnaam/e-mailadres of wachtwoord is niet correct.';
-        } else {
-            session_regenerate_id(true);
-
-            $_SESSION['user_id'] = (int) $user['id'];
-            unset($_SESSION['csrf_token']);
-
-            header('Location: ' . $returnTo);
-            exit;
+            if ($user === null) {
+                $errorMessage = 'Gebruikersnaam/e-mailadres of wachtwoord is niet correct.';
+            } else {
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = (int) $user['id'];
+                unset($_SESSION['csrf_token']);
+                header('Location: ' . $returnTo);
+                exit;
+            }
+        } catch (Throwable $error) {
+            error_log('DONDEBAILAR login error: ' . get_class($error) . ': ' . $error->getMessage());
+            $errorMessage = 'Inloggen is tijdelijk niet mogelijk. Controleer de database-instellingen of probeer later opnieuw.';
         }
     }
 }
 
-require dirname(__DIR__) . '/app/views/header.php';
+require $privateRoot . '/app/views/header.php';
 ?>
 
 <section class="auth-card">
@@ -88,17 +110,8 @@ require dirname(__DIR__) . '/app/views/header.php';
     <?php endif; ?>
 
     <form method="post" action="/login.php" class="auth-form">
-        <input
-            type="hidden"
-            name="csrf_token"
-            value="<?= escapeHtml(csrfToken()) ?>"
-        >
-
-        <input
-            type="hidden"
-            name="return"
-            value="<?= escapeHtml($returnTo) ?>"
-        >
+        <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+        <input type="hidden" name="return" value="<?= escapeHtml($returnTo) ?>">
 
         <label for="login">Gebruikersnaam of e-mailadres</label>
         <input
@@ -120,12 +133,8 @@ require dirname(__DIR__) . '/app/views/header.php';
             required
         >
 
-        <button type="submit" class="button button--primary">
-            Inloggen
-        </button>
-        <p><a href="/forgot-password.php">Wachtwoord vergeten?</a></p>
-        <p>Nog geen account? <a href="/register.php">Registreer je hier</a>.</p>
+        <button type="submit" class="button button--primary">Inloggen</button>
     </form>
 </section>
 
-<?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
+<?php require $privateRoot . '/app/views/footer.php'; ?>
