@@ -294,6 +294,11 @@
     max-width:1200px;
     margin:0 auto
 }
+/* Houd het eerste actuele/komende evenement vrij van de vaste kopbalk. */
+#agenda-today-start {
+    scroll-margin-top:110px;
+}
+
 .agenda-card {
     overflow:hidden;
     border:1px solid #65c99b;
