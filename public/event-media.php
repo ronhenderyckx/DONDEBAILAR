@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/app/bootstrap.php';
-require_once dirname(__DIR__) . '/app/Authorization.php';
-require_once dirname(__DIR__) . '/app/Events.php';
+require_once __DIR__ . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Events.php';
 
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 if (!$id || $id < 1) {
@@ -51,7 +53,7 @@ if (!preg_match('/\A[a-f0-9]{32}\.(jpg|png|webp|mp4|webm|mov)\z/', $filename)) {
 }
 
 $base = realpath(dirname(__DIR__) . '/uploads/events/' . (int) $media['event_id']);
-$file = realpath(dirname(__DIR__) . '/' . $relativePath);
+$file = realpath(DONDEBAILAR_PRIVATE_ROOT . '/' . $relativePath);
 if ($base === false || $file === false || !str_starts_with($file, $base . DIRECTORY_SEPARATOR) || !is_file($file)) {
     http_response_code(404);
     exit;
