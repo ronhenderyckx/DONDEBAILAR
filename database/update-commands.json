@@ -2,8 +2,8 @@
   "format_version": 1,
   "project": "DONDEBAILAR",
   "environment": "test",
-  "release": "webreus-test-private-setup",
-  "source_ref": "95013fa7324e87966d8518bbc9e4afa0305a84ef",
+  "release": "webreus-test-private-app-deploy",
+  "source_ref": "develop",
   "deployment": {
     "strategy": "separate_private_and_public_roots",
     "path_base": "webreus_account_root",
@@ -47,6 +47,23 @@
         "private/DONDEBAILAR-TEST/uploads",
         "private/DONDEBAILAR-TEST/storage",
         "private/DONDEBAILAR-TEST/vendor"
+      ]
+    },
+    {
+      "id": "deploy_test_private_application",
+      "type": "deploy_repository_tree",
+      "description": "Downloadt de applicatiebronbestanden naar de private TEST-map; slaat lokale gegevens en afhankelijkheden over.",
+      "source_paths": [
+        "app/",
+        "config/config.example.php",
+        "database/migrations/",
+        "includes/",
+        "modules/",
+        "languages/",
+        "assets/",
+        "api/",
+        "cron/",
+        "tests/"
       ]
     }
   ]
