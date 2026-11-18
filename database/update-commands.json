@@ -2,7 +2,7 @@
   "format_version": 1,
   "project": "DONDEBAILAR",
   "environment": "test",
-  "release": "webreus-past-event-color-20261118-1",
+  "release": "webreus-agenda-today-anchor-20261118-1",
   "source_ref": "develop",
   "deployment": {
     "strategy": "separate_private_and_public_roots",
