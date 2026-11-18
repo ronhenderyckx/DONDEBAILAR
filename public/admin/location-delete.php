@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
-require_once dirname(__DIR__, 2) . '/app/Locations.php';
+
+require_once dirname(__DIR__) . '/_private-root.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Locations.php';
 $user = requireLogin();
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !verifyCsrfToken($_POST['csrf_token'] ?? null)) {
     http_response_code(400);
@@ -39,7 +41,7 @@ try {
     if ($delete->rowCount() !== 1) { header('Location: /admin/locations.php?delete_error=failed'); exit; }
     $logoPath = (string) ($location['logo_path'] ?? '');
     if (preg_match('~\Auploads/locations/[a-f0-9]{32}\.(?:jpg|png|webp)\z~D', $logoPath)) {
-        $file = dirname(__DIR__, 2) . '/' . $logoPath;
+        $file = DONDEBAILAR_PRIVATE_ROOT . '/' . $logoPath;
         if (is_file($file)) @unlink($file);
     }
     header('Location: /admin/locations.php?deleted=1');
