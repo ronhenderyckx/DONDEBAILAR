@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $targetPath = null;
                         $sourcePath = (string) ($mediaItem['file_path'] ?? '');
                         if ($sourcePath !== '') {
-                            $sourceAbsolute = DONDEBAILAR_PRIVATE_ROOT . '/' . $sourcePath;
+                            $sourceAbsolute = dirname(__DIR__) . '/' . $sourcePath;
                             $extension = strtolower(pathinfo($sourcePath, PATHINFO_EXTENSION));
                             if (!is_file($sourceAbsolute) || !in_array($extension, ['jpg', 'png', 'webp', 'mp4', 'webm', 'mov'], true)) {
                                 throw new RuntimeException('Een mediabestand voor een herhaling kon niet worden gekopieerd.');
