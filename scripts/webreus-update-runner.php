@@ -118,6 +118,7 @@ if (!function_exists('dondebailar_webreus_run')) {
         $executedPlaceholderCleanup = false;
         $executedAdminStep = false;
         $executedOrganizerAuditStep = false;
+        $executedPastEventColorStep = false;
         foreach ($manifest['steps'] as $step) {
             if (!is_array($step)) {
                 throw new RuntimeException('Ongeldige opdracht in update-commands.json.');
@@ -278,6 +279,28 @@ if (!function_exists('dondebailar_webreus_run')) {
                 $results[] = 'install-update.php en update-result.php zijn beschermd en niet overschreven.';
                 $results[] = 'Publieke GitHub-bronversie: ' . $publicSourceCommit;
                 $executedPublicDeployStep = true;
+                continue;
+            }
+
+            if (($step['type'] ?? '') === 'ensure_region_past_event_color') {
+                $bootstrapFile = $privateRoot . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'bootstrap.php';
+                if (!is_file($bootstrapFile)) {
+                    throw new RuntimeException('De applicatie-bootstrap ontbreekt; regiokleurmigratie afgebroken.');
+                }
+                require_once $bootstrapFile;
+                $pdo = Database::connection();
+                $columnQuery = $pdo->prepare(
+                    'SELECT COUNT(*) FROM information_schema.COLUMNS
+                     WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :table_name AND COLUMN_NAME = :column_name'
+                );
+                $columnQuery->execute(['table_name' => 'region_appearance', 'column_name' => 'past_event_color']);
+                if ((int) $columnQuery->fetchColumn() === 0) {
+                    $pdo->exec("ALTER TABLE region_appearance ADD COLUMN past_event_color CHAR(7) NOT NULL DEFAULT '#777777' AFTER filter_text_color");
+                    $results[] = 'Database: region_appearance.past_event_color toegevoegd.';
+                } else {
+                    $results[] = 'Database: region_appearance.past_event_color bestond al.';
+                }
+                $executedPastEventColorStep = true;
                 continue;
             }
 
@@ -547,6 +570,9 @@ if (!function_exists('dondebailar_webreus_run')) {
         }
         if (!$executedPlaceholderCleanup) {
             throw new RuntimeException('Geen controle-opdracht voor de tijdelijke publieke index.html gevonden.');
+        }
+        if (!$executedPastEventColorStep) {
+            throw new RuntimeException('Geen opdracht gevonden om de kleurinstelling voor afgelopen evenementen te controleren.');
         }
         if (!$executedOrganizerAuditStep) {
             throw new RuntimeException('Geen opdracht gevonden om de organisatorauditkolommen te controleren.');
