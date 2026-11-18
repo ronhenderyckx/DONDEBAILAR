@@ -72,17 +72,6 @@ if (!function_exists('dondebailar_webreus_run')) {
             || ($target['public_root'] ?? '') !== 'test') {
             throw new RuntimeException('De TEST-doelpaden in het opdrachtenbestand zijn gewijzigd of ongeldig.');
         }
-        $hasPrepareStep = false;
-        foreach ($manifest['steps'] as $step) {
-            if (($step['id'] ?? '') === 'prepare_test_roots'
-                && ($step['type'] ?? '') === 'prepare_test_roots') {
-                $hasPrepareStep = true;
-            }
-        }
-        if (!$hasPrepareStep) {
-            throw new RuntimeException('De opdracht prepare_test_roots ontbreekt in het GitHub-opdrachtenbestand.');
-        }
-
         $results = [];
 
         $ensureDirectory = static function (string $path, string $label) use (&$results): void {
@@ -96,10 +85,38 @@ if (!function_exists('dondebailar_webreus_run')) {
         };
 
         $ensureDirectory($privateParent, 'Private-hoofdmap');
-        $ensureDirectory($privateRoot, 'DONDEBAILAR-TEST');
 
-        foreach (['app', 'config', 'database', 'uploads', 'storage', 'vendor'] as $folder) {
-            $ensureDirectory($privateRoot . DIRECTORY_SEPARATOR . $folder, 'private/' . $folder);
+        $executedDirectoryStep = false;
+        foreach ($manifest['steps'] as $step) {
+            if (!is_array($step) || ($step['type'] ?? '') !== 'create_directories') {
+                continue;
+            }
+            if (($step['id'] ?? '') !== 'create_test_private_directories'
+                || !is_array($step['directories'] ?? null)
+                || $step['directories'] === []) {
+                throw new RuntimeException('De opdracht voor private TEST-mappen is ongeldig.');
+            }
+
+            foreach ($step['directories'] as $relativePath) {
+                if (!is_string($relativePath)
+                    || ($relativePath !== 'private/DONDEBAILAR-TEST'
+                        && !str_starts_with($relativePath, 'private/DONDEBAILAR-TEST/'))) {
+                    throw new RuntimeException('Een mapopdracht valt buiten private/DONDEBAILAR-TEST.');
+                }
+                $segments = explode('/', $relativePath);
+                foreach ($segments as $segment) {
+                    if ($segment === '' || $segment === '.' || $segment === '..') {
+                        throw new RuntimeException('Ongeldig pad in de mapopdracht.');
+                    }
+                }
+                $absolutePath = $accountRoot . DIRECTORY_SEPARATOR . str_replace('/', DIRECTORY_SEPARATOR, $relativePath);
+                $ensureDirectory($absolutePath, $relativePath);
+            }
+            $executedDirectoryStep = true;
+        }
+
+        if (!$executedDirectoryStep) {
+            throw new RuntimeException('Geen geldige create_directories-opdracht gevonden in update-commands.json.');
         }
 
         $results[] = 'GitHub-opdrachtenbestand gelezen: ' . (string) ($manifest['release'] ?? 'onbekende release');
