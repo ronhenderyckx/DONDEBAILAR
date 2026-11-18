@@ -173,7 +173,14 @@ if (!function_exists('dondebailar_webreus_run')) {
                 }
             }
 
-            $treeUrl = 'https://api.github.com/repos/ronhenderyckx/DONDEBAILAR/git/trees/' . rawurlencode($sourceRef) . '?recursive=1';
+            $branchUrl = 'https://api.github.com/repos/ronhenderyckx/DONDEBAILAR/branches/' . rawurlencode($sourceRef);
+            $branchData = json_decode($curlGet($branchUrl), true, 128, JSON_THROW_ON_ERROR);
+            $sourceCommit = (string) ($branchData['commit']['sha'] ?? '');
+            $treeSha = (string) ($branchData['commit']['commit']['tree']['sha'] ?? '');
+            if (!preg_match('/^[a-f0-9]{40}$/', $sourceCommit) || !preg_match('/^[a-f0-9]{40}$/', $treeSha)) {
+                throw new RuntimeException('De GitHub-branch leverde geen geldige commit- en treeversie op.');
+            }
+            $treeUrl = 'https://api.github.com/repos/ronhenderyckx/DONDEBAILAR/git/trees/' . rawurlencode($treeSha) . '?recursive=1';
             $treeData = json_decode($curlGet($treeUrl), true, 128, JSON_THROW_ON_ERROR);
             if (!empty($treeData['truncated']) || !is_array($treeData['tree'] ?? null)) {
                 throw new RuntimeException('GitHub kon de volledige bestandslijst niet leveren; deployment afgebroken.');
@@ -234,7 +241,7 @@ if (!function_exists('dondebailar_webreus_run')) {
                 }
 
                 $encodedPath = implode('/', array_map('rawurlencode', $segments));
-                $rawUrl = 'https://raw.githubusercontent.com/ronhenderyckx/DONDEBAILAR/' . rawurlencode($sourceRef) . '/' . $encodedPath;
+                $rawUrl = 'https://raw.githubusercontent.com/ronhenderyckx/DONDEBAILAR/' . rawurlencode($sourceCommit) . '/' . $encodedPath;
                 $fileBody = $curlGet($rawUrl, 'text/plain');
                 if (strlen($fileBody) !== $size) {
                     throw new RuntimeException('Bestandsgrootte komt niet overeen voor: ' . $relativePath);
@@ -268,7 +275,7 @@ if (!function_exists('dondebailar_webreus_run')) {
         }
 
 
-        $results[] = 'GitHub-bronversie: ' . $sourceRef;
+        $results[] = 'GitHub-bronversie: ' . $sourceCommit;
         $results[] = 'GitHub-opdrachtenbestand gelezen: ' . (string) ($manifest['release'] ?? 'onbekende release');
         $results[] = 'Publieke map test is niet gewijzigd.';
         $results[] = 'Preview en productie zijn niet benaderd of gewijzigd.';
