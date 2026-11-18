@@ -6,7 +6,8 @@ if (!preg_match('/\A[a-f0-9]{32}\.(jpg|png|webp)\z/', $filename)) {
     http_response_code(404);
     exit;
 }
-$path = dirname(__DIR__) . '/uploads/locations/' . $filename;
+require_once __DIR__ . '/_private-root.php';
+$path = DONDEBAILAR_PRIVATE_ROOT . '/uploads/locations/' . $filename;
 if (!is_file($path)) {
     http_response_code(404);
     exit;
