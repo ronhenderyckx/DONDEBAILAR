@@ -2,7 +2,7 @@
   "format_version": 1,
   "project": "DONDEBAILAR",
   "environment": "test",
-  "release": "webreus-agenda-order-fix-20261118-2",
+  "release": "webreus-past-event-color-20261118-1",
   "source_ref": "develop",
   "deployment": {
     "strategy": "separate_private_and_public_roots",
@@ -77,6 +77,11 @@
       "type": "remove_public_placeholder",
       "description": "Verwijdert uitsluitend de herkende tijdelijke DONDEBAILAR index.html uit de publieke TEST-map; laat onbekende bestanden ongemoeid.",
       "filename": "index.html"
+    },
+    {
+      "id": "ensure_region_past_event_color",
+      "type": "ensure_region_past_event_color",
+      "description": "Voegt de afzonderlijke regiokleur voor afgelopen evenementen veilig en herhaalbaar toe aan de TEST-database."
     },
     {
       "id": "ensure_organizer_audit_columns",
