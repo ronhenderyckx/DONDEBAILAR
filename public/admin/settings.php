@@ -1,10 +1,23 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
-require_once dirname(__DIR__, 2) . '/app/ImageOptimization.php';
+$host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+$host = preg_replace('/:\\d+$/', '', $host) ?? '';
+if ($host !== 'test.dondebailar.eu') {
+    http_response_code(404);
+    exit('Deze instellingenpagina is alleen beschikbaar op de TEST-omgeving.');
+}
+
+$privateRoot = dirname(__DIR__, 3) . '/private/DONDEBAILAR-TEST';
+if (!is_file($privateRoot . '/app/bootstrap.php')) {
+    http_response_code(503);
+    exit('De private applicatiebestanden zijn niet beschikbaar.');
+}
+
+require_once $privateRoot . '/app/bootstrap.php';
+require_once $privateRoot . '/app/Authorization.php';
+require_once $privateRoot . '/app/Security.php';
+require_once $privateRoot . '/app/ImageOptimization.php';
 
 requirePlatformAdmin();
 
@@ -30,7 +43,7 @@ $region = $regionQuery->fetch() ?: null;
 $errorMessage = '';
 $successMessage = '';
 
-$projectRoot = dirname(__DIR__, 2);
+$projectRoot = $privateRoot;
 $logoSettingFile = $projectRoot . '/storage/platform-logo-path.txt';
 $logoPath = is_file($logoSettingFile) ? trim((string) file_get_contents($logoSettingFile)) : '';
 
@@ -187,7 +200,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-require dirname(__DIR__, 2) . '/app/views/header.php';
+require $privateRoot . '/app/views/header.php';
 ?>
 
 <section class="admin-page">
@@ -361,4 +374,4 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     </section>
 </section>
 
-<?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
+<?php require $privateRoot . '/app/views/footer.php'; ?>
