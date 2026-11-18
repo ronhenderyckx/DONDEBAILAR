@@ -380,6 +380,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
                         'agenda_arrow_background' => $colors['agenda_arrow_background'],
                         'agenda_arrow_text' => $colors['agenda_arrow_text'],
                         'event_separator_color' => $separatorColor,
+                        'past_event_text_color' => $pastEventTextColor,
                     ] + $iconColors + ['event_title_color' => $eventTitleColor], JSON_THROW_ON_ERROR),
                     'logo_path' => $newLogoPath,
                 ]);
