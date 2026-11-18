@@ -18,7 +18,7 @@ if ($region === null && $headerUser !== null) {
                 ra.menu_color, ra.organizer_color, ra.filter_hover_color,
                 ra.filter_bar_color, ra.filter_text_color, ra.search_button_color,
                 ra.back_top_color, ra.search_field_color, ra.search_text_color,
-                ra.footer_color, ra.background_color, ra.text_color, ra.weekday_colors,
+                ra.footer_color, ra.background_color, ra.text_color, ra.weekday_colors, ra.past_event_color,
                 COALESCE(ra.logo_path, r.logo_path) AS logo_path
          FROM regions r
          LEFT JOIN region_appearance ra ON ra.region_id = r.id
