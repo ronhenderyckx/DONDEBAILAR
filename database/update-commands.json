@@ -2,7 +2,7 @@
   "format_version": 1,
   "project": "DONDEBAILAR",
   "environment": "test",
-  "release": "initial-test-install",
+  "release": "webreus-test-bootstrap",
   "source_ref": "95013fa7324e87966d8518bbc9e4afa0305a84ef",
   "deployment": {
     "strategy": "separate_private_and_public_roots",
@@ -41,6 +41,11 @@
       "path": "database/install_test.sql",
       "requires_empty_database": true,
       "description": "Installeert de volledige DONDEBAILAR-databasestructuur op een lege testdatabase."
+    },
+    {
+      "id": "prepare_test_roots",
+      "type": "prepare_test_roots",
+      "description": "Maakt de private TEST-map en de benodigde applicatiemappen aan. Wijzigt geen publieke bestanden, preview of productie."
     }
   ]
 }
