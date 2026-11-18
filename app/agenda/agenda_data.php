@@ -257,20 +257,23 @@ if ($regionId > 0) {
 
     $sql .= " ORDER BY
                   CASE
-                    WHEN COALESCE(e.ends_at, e.starts_at) >= :agenda_sort_now THEN 0
+                    WHEN COALESCE(e.ends_at, e.starts_at) >= :agenda_sort_now_1 THEN 0
                     ELSE 1
                   END ASC,
                   CASE
-                    WHEN COALESCE(e.ends_at, e.starts_at) >= :agenda_sort_now THEN e.starts_at
+                    WHEN COALESCE(e.ends_at, e.starts_at) >= :agenda_sort_now_2 THEN e.starts_at
                     ELSE NULL
                   END ASC,
                   CASE
-                    WHEN COALESCE(e.ends_at, e.starts_at) < :agenda_sort_now THEN COALESCE(e.ends_at, e.starts_at)
+                    WHEN COALESCE(e.ends_at, e.starts_at) < :agenda_sort_now_3 THEN COALESCE(e.ends_at, e.starts_at)
                     ELSE NULL
                   END DESC,
                   e.starts_at DESC, e.id DESC
               LIMIT " . (int) $agendaPageSize . " OFFSET " . (int) $agendaOffset;
-    $params['agenda_sort_now'] = $now->format('Y-m-d H:i:s');
+    $sortNow = $now->format('Y-m-d H:i:s');
+    $params['agenda_sort_now_1'] = $sortNow;
+    $params['agenda_sort_now_2'] = $sortNow;
+    $params['agenda_sort_now_3'] = $sortNow;
     $eventQuery = $db->prepare($sql);
     $eventQuery->execute($params);
     $events = $eventQuery->fetchAll();
