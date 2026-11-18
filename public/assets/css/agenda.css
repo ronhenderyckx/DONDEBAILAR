@@ -2346,3 +2346,6 @@ body.has-agenda-footer .site-main > .agenda-page {
     }
 }
 
+
+/* Regionaal instelbare kleur voor volledig afgelopen evenementen. */
+.agenda-card--past{background:var(--db-event-day-color,#777777);border-color:var(--db-event-day-color,#777777)}
