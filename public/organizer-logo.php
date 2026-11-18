@@ -8,7 +8,8 @@ if (!preg_match('/\A[a-f0-9]{32}\.(jpg|png|webp)\z/', $filename)) {
     exit;
 }
 
-$directory = dirname(__DIR__) . '/uploads/organizers';
+require_once __DIR__ . '/_private-root.php';
+$directory = DONDEBAILAR_PRIVATE_ROOT . '/uploads/organizers';
 $filePath = $directory . '/' . $filename;
 
 if (!is_file($filePath)) {
