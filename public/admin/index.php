@@ -1,44 +1,46 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
+$host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+$host = preg_replace('/:\\d+$/', '', $host) ?? '';
+$environmentRoots = [
+    'test.dondebailar.eu' => 'DONDEBAILAR-TEST',
+];
+
+if (!isset($environmentRoots[$host])) {
+    http_response_code(404);
+    exit('Beheer is niet beschikbaar op deze website.');
+}
+
+$privateRoot = dirname(__DIR__, 2) . '/private/' . $environmentRoots[$host];
+if (!is_file($privateRoot . '/app/bootstrap.php')) {
+    http_response_code(503);
+    exit('De private applicatiebestanden zijn niet beschikbaar.');
+}
+
+require_once $privateRoot . '/app/bootstrap.php';
+require_once $privateRoot . '/app/Authorization.php';
+require_once $privateRoot . '/app/Security.php';
 
 $user = requirePlatformAdmin();
 $pageTitle = 'Overzicht - DONDEBAILAR';
 $platformAdminPage = true;
-
 $db = Database::connection();
 
-$userCount = (int) $db->query(
-    "SELECT COUNT(*) FROM users"
-)->fetchColumn();
-
-$regionCount = (int) $db->query(
-    "SELECT COUNT(*) FROM regions"
-)->fetchColumn();
-
-$eventCount = (int) $db->query(
-    "SELECT COUNT(*) FROM events"
-)->fetchColumn();
-
-$organizerCount = (int) $db->query(
-    "SELECT COUNT(*) FROM organizers"
-)->fetchColumn();
+$userCount = (int) $db->query("SELECT COUNT(*) FROM users")->fetchColumn();
+$regionCount = (int) $db->query("SELECT COUNT(*) FROM regions")->fetchColumn();
+$eventCount = (int) $db->query("SELECT COUNT(*) FROM events")->fetchColumn();
+$organizerCount = (int) $db->query("SELECT COUNT(*) FROM organizers")->fetchColumn();
 
 $regions = $db->query(
-    "SELECT id, name, slug, subdomain, country_code,
-            timezone, is_active
-     FROM regions
-     ORDER BY name"
+    "SELECT id, name, slug, subdomain, country_code, timezone, is_active
+     FROM regions ORDER BY name"
 )->fetchAll();
 
-require dirname(__DIR__, 2) . '/app/views/header.php';
+require $privateRoot . '/app/views/header.php';
 ?>
 
 <section class="admin-page">
-
     <div class="admin-heading">
         <div>
             <p class="eyebrow">DONDEBAILAR</p>
@@ -48,25 +50,10 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     </div>
 
     <div class="dashboard-cards">
-        <article class="dashboard-card">
-            <span>Gebruikers</span>
-            <strong><?= $userCount ?></strong>
-        </article>
-
-        <article class="dashboard-card">
-            <span>Regio's</span>
-            <strong><?= $regionCount ?></strong>
-        </article>
-
-        <article class="dashboard-card">
-            <span>Evenementen</span>
-            <strong><?= $eventCount ?></strong>
-        </article>
-
-        <article class="dashboard-card">
-            <span>Organisatoren</span>
-            <strong><?= $organizerCount ?></strong>
-        </article>
+        <article class="dashboard-card"><span>Gebruikers</span><strong><?= $userCount ?></strong></article>
+        <article class="dashboard-card"><span>Regio's</span><strong><?= $regionCount ?></strong></article>
+        <article class="dashboard-card"><span>Evenementen</span><strong><?= $eventCount ?></strong></article>
+        <article class="dashboard-card"><span>Organisatoren</span><strong><?= $organizerCount ?></strong></article>
     </div>
 
     <section class="admin-section">
@@ -83,19 +70,12 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             <div class="table-wrapper">
                 <table class="admin-table">
                     <thead>
-                        <tr>
-                            <th>Regio</th>
-                            <th>Subdomein</th>
-                            <th>Land</th>
-                            <th>Status</th>
-                        </tr>
+                        <tr><th>Regio</th><th>Subdomein</th><th>Land</th><th>Status</th></tr>
                     </thead>
                     <tbody>
                     <?php foreach ($regions as $region): ?>
                         <tr>
-                            <td>
-                                <strong><?= escapeHtml($region['name']) ?></strong>
-                            </td>
+                            <td><strong><?= escapeHtml($region['name']) ?></strong></td>
                             <td><?= escapeHtml($region['subdomain']) ?></td>
                             <td><?= escapeHtml($region['country_code']) ?></td>
                             <td>
@@ -112,7 +92,6 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
             </div>
         <?php endif; ?>
     </section>
-
 </section>
 
-<?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
+<?php require $privateRoot . '/app/views/footer.php'; ?>
