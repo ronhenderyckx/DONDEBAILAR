@@ -7,7 +7,7 @@
     <?php else: ?>
         
         <?php if ($events === []): ?>
-            <section class="agenda-empty"><h2>Geen evenementen gevonden</h2><p>Er zijn momenteel geen toekomstige gepubliceerde evenementen met deze filters.</p></section>
+            <section class="agenda-empty"><h2>Geen evenementen gevonden</h2><p>Er zijn momenteel geen gepubliceerde evenementen met deze filters.</p></section>
         <?php else: ?>
             <div class="agenda-feed">
                 <?php foreach ($events as $eventIndex => $event): ?>
