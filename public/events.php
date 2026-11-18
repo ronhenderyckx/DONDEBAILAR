@@ -18,7 +18,15 @@ if ($regionIds !== []) {
     $placeholders = implode(',', array_fill(0, count($regionIds), '?'));
     $statement = $db->prepare(
         "SELECT e.id, e.region_id, e.title, e.starts_at, e.status,
-                e.created_by, r.name AS region_name, o.name AS organizer_name
+                e.created_by, r.name AS region_name, o.name AS organizer_name,
+                (SELECT em.id
+                 FROM event_media em
+                 WHERE em.event_id = e.id
+                   AND em.media_context = 'event'
+                   AND em.media_type = 'image'
+                   AND em.file_path IS NOT NULL
+                 ORDER BY em.id ASC
+                 LIMIT 1) AS first_media_id
          FROM events e
          INNER JOIN regions r ON r.id = e.region_id
          LEFT JOIN organizers o ON o.id = e.organizer_id
@@ -58,10 +66,20 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
         <?php else: ?>
             <div class="table-wrapper">
                 <table class="admin-table">
-                    <thead><tr><th>Datum</th><th>Evenement</th><th>Regio</th><th>Organisator</th><th>Status</th><th>Actie</th></tr></thead>
+                    <thead><tr><th>Media</th><th>Datum</th><th>Evenement</th><th>Regio</th><th>Organisator</th><th>Status</th><th>Actie</th></tr></thead>
                     <tbody>
                     <?php foreach ($events as $event): ?>
                         <tr>
+                            <td class="event-list-media">
+                                <?php if (!empty($event['first_media_id'])): ?>
+                                    <img src="/event-media.php?id=<?= (int) $event['first_media_id'] ?>"
+                                         alt="Eerste foto van <?= escapeHtml($event['title']) ?>"
+                                         loading="lazy"
+                                         style="display:block;width:76px;height:56px;object-fit:cover;border-radius:6px;">
+                                <?php else: ?>
+                                    <span aria-label="Geen media">—</span>
+                                <?php endif; ?>
+                            </td>
                             <td><?= escapeHtml(date('d-m-Y H:i', strtotime($event['starts_at']))) ?></td>
                             <td><strong><?php if ($event['status'] === 'published'): ?><a href="/event.php?id=<?= (int) $event['id'] ?>" target="_blank" rel="noopener noreferrer"><?= escapeHtml($event['title']) ?></a><?php else: ?><?= escapeHtml($event['title']) ?><?php endif; ?></strong></td>
                             <td><?= escapeHtml($event['region_name']) ?></td>
