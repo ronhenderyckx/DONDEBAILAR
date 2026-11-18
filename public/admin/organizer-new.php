@@ -1,11 +1,13 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
-require_once dirname(__DIR__, 2) . '/app/Organizers.php';
-require_once dirname(__DIR__, 2) . '/app/ImageOptimization.php';
+require_once dirname(__DIR__) . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Organizers.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/ImageOptimization.php';
 
 $user = requireOrganizerManagement();
 $db = Database::connection();
@@ -69,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 is_string($logoPath)
                 && preg_match('~\\Auploads/organizers/[a-f0-9]{32}\\.webp\\z~D', $logoPath) === 1
             ) {
-                $logoFile = dirname(__DIR__, 2) . '/' . $logoPath;
+                $logoFile = DONDEBAILAR_PRIVATE_ROOT . '/' . $logoPath;
                 if (is_file($logoFile)) {
                     @unlink($logoFile);
                 }
@@ -82,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-require dirname(__DIR__, 2) . '/app/views/header.php';
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 
 <section class="admin-page">
@@ -141,4 +143,4 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 .organizer-form-section input[type="file"] { padding:8px; }
 </style>
 
-<?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
