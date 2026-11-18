@@ -35,20 +35,21 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
         <div>
             <p class="eyebrow">PLATFORMBEHEER</p>
             <h1>Updates uitvoeren</h1>
-            <p>Haal de nieuwste versie van DONDEBAILAR op vanaf GitHub en werk de database bij.</p>
+            <p>Werk DONDEBAILAR bij via de beveiligde WebReus-updater. De bronbestanden worden rechtstreeks uit GitHub opgehaald.</p>
         </div>
     </div>
 
     <section class="admin-section">
         <h2>DONDEBAILAR bijwerken</h2>
-        <p>De updater controleert eerst of de installatie op branch <strong>develop</strong> staat en of er geen lokale wijzigingen zijn. Daarna wordt de nieuwste versie opgehaald en worden de bijbehorende database-updates uitgevoerd.</p>
-        <p>Start de update alleen wanneer je klaar bent om de nieuwe versie te installeren.</p>
+        <p>De WebReus-updater leest het opdrachtenbestand en het uitvoerprogramma uit GitHub. Daarna werkt hij de publieke TEST-bestanden en de private applicatiebestanden bij. De lokale databaseconfiguratie, uploads, opslagbestanden en afhankelijkheden blijven beschermd.</p>
+        <p>Deze installatie hoeft geen Git-checkout te zijn. Git hoeft dus niet op de WebReus-server geïnstalleerd te staan.</p>
+        <p>Start de update alleen wanneer je klaar bent om de nieuwste versie te installeren.</p>
 
-        <form method="post" action="/admin/update.php"
-              onsubmit="return confirm('Wil je DONDEBAILAR nu bijwerken?');">
-            <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
-            <button class="button button--primary" type="submit">UPDATE STARTEN</button>
-        </form>
+        <p>
+            <a class="button button--primary" href="/install-update.php">
+                UPDATE STARTEN
+            </a>
+        </p>
     </section>
 </section>
 
