@@ -36,16 +36,23 @@
   },
   "steps": [
     {
-      "id": "install_empty_database",
-      "type": "sql_file",
-      "path": "database/install_test.sql",
-      "requires_empty_database": true,
-      "description": "Installeert de volledige DONDEBAILAR-databasestructuur op een lege testdatabase."
-    },
-    {
       "id": "prepare_test_roots",
       "type": "prepare_test_roots",
       "description": "Maakt de private TEST-map en de benodigde applicatiemappen aan. Wijzigt geen publieke bestanden, preview of productie."
+    },
+    {
+      "id": "create_test_private_directories",
+      "type": "create_directories",
+      "description": "Maakt de private TEST-hoofdmap en alle benodigde submappen aan.",
+      "directories": [
+        "private/DONDEBAILAR-TEST",
+        "private/DONDEBAILAR-TEST/app",
+        "private/DONDEBAILAR-TEST/config",
+        "private/DONDEBAILAR-TEST/database",
+        "private/DONDEBAILAR-TEST/uploads",
+        "private/DONDEBAILAR-TEST/storage",
+        "private/DONDEBAILAR-TEST/vendor"
+      ]
     }
   ]
 }
