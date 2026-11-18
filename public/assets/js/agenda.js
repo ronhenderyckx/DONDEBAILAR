@@ -658,7 +658,13 @@ window.scrollToAgendaStart = function () {
     const todayTarget = document.getElementById('agenda-today-start');
     const visibleCards = Array.from(document.querySelectorAll('.agenda-feed .agenda-card'))
         .filter(function (card) { return !card.hidden; });
-    const target = todayTarget && !todayTarget.hidden ? todayTarget : (visibleCards[0] || null);
+    // Als er een actueel/komend evenement is, begin daar.
+    // Bevat de selectie uitsluitend afgelopen evenementen, begin dan bij
+    // het meest recente verleden; oudere evenementen staan erboven en zijn
+    // bereikbaar door omhoog te swipen.
+    const target = todayTarget && !todayTarget.hidden
+        ? todayTarget
+        : (visibleCards.length ? visibleCards[visibleCards.length - 1] : null);
     if (target) {
         target.scrollIntoView({behavior:reduceMotion ? 'auto' : 'smooth', block:'start'});
     } else {
