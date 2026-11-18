@@ -1,100 +1,100 @@
 {
-  "format_version": 1,
-  "project": "DONDEBAILAR",
-  "environment": "test",
-  "release": "webreus-agenda-past-background-separator-20261118-1",
-  "source_ref": "develop",
-  "deployment": {
-    "strategy": "separate_private_and_public_roots",
-    "path_base": "webreus_account_root",
-    "targets": {
-      "test": {
-        "host": "test.dondebailar.eu",
-        "private_root": "private/DONDEBAILAR-TEST",
-        "public_root": "test"
-      },
-      "preview": {
-        "private_root": "private/DONDEBAILAR-PREVIEW",
-        "public_root": "preview"
-      },
-      "production": {
-        "private_root": "private/DONDEBAILAR-PROD",
-        "public_root": "web"
-      }
+    "format_version": 1,
+    "project": "DONDEBAILAR",
+    "environment": "test",
+    "release": "webreus-agenda-past-background-separator-fix-20261118-1",
+    "source_ref": "develop",
+    "deployment": {
+        "strategy": "separate_private_and_public_roots",
+        "path_base": "webreus_account_root",
+        "targets": {
+            "test": {
+                "host": "test.dondebailar.eu",
+                "private_root": "private/DONDEBAILAR-TEST",
+                "public_root": "test"
+            },
+            "preview": {
+                "private_root": "private/DONDEBAILAR-PREVIEW",
+                "public_root": "preview"
+            },
+            "production": {
+                "private_root": "private/DONDEBAILAR-PROD",
+                "public_root": "web"
+            }
+        },
+        "protected_paths": [
+            "config/config.local.php",
+            "uploads/",
+            "storage/",
+            "vendor/"
+        ],
+        "notes": [
+            "Each environment has its own private application files, local configuration, uploads, storage and database settings.",
+            "The public_root contains only the contents of the repository public/ directory.",
+            "The production target must never be modified by a test or preview update."
+        ]
     },
-    "protected_paths": [
-      "config/config.local.php",
-      "uploads/",
-      "storage/",
-      "vendor/"
-    ],
-    "notes": [
-      "Each environment has its own private application files, local configuration, uploads, storage and database settings.",
-      "The public_root contains only the contents of the repository public/ directory.",
-      "The production target must never be modified by a test or preview update."
+    "steps": [
+        {
+            "id": "create_test_private_directories",
+            "type": "create_directories",
+            "description": "Maakt de private TEST-hoofdmap en alle benodigde submappen aan.",
+            "directories": [
+                "private/DONDEBAILAR-TEST",
+                "private/DONDEBAILAR-TEST/app",
+                "private/DONDEBAILAR-TEST/config",
+                "private/DONDEBAILAR-TEST/database",
+                "private/DONDEBAILAR-TEST/uploads",
+                "private/DONDEBAILAR-TEST/storage",
+                "private/DONDEBAILAR-TEST/vendor"
+            ]
+        },
+        {
+            "id": "deploy_test_private_application",
+            "type": "deploy_repository_tree",
+            "description": "Downloadt de applicatiebronbestanden naar de private TEST-map; slaat lokale gegevens en afhankelijkheden over.",
+            "source_paths": [
+                "app/",
+                "config/config.example.php",
+                "database/migrations/",
+                "includes/",
+                "modules/",
+                "languages/",
+                "assets/",
+                "api/",
+                "cron/",
+                "tests/"
+            ]
+        },
+        {
+            "id": "deploy_test_public_application",
+            "type": "deploy_public_repository_tree",
+            "description": "Publiceert uitsluitend de inhoud van de GitHub-map public/ naar de publieke WebReus TEST-map; beschermt de vaste updaterbestanden.",
+            "source_path": "public/"
+        },
+        {
+            "id": "remove_test_placeholder_index",
+            "type": "remove_public_placeholder",
+            "description": "Verwijdert uitsluitend de herkende tijdelijke DONDEBAILAR index.html uit de publieke TEST-map; laat onbekende bestanden ongemoeid.",
+            "filename": "index.html"
+        },
+        {
+            "id": "ensure_region_past_event_color",
+            "type": "ensure_region_past_event_color",
+            "description": "Voegt de afzonderlijke regiokleur voor afgelopen evenementen veilig en herhaalbaar toe aan de TEST-database."
+        },
+        {
+            "id": "ensure_organizer_audit_columns",
+            "type": "ensure_organizer_audit_columns",
+            "description": "Voegt ontbrekende auditkolommen voor organisatoren veilig en herhaalbaar toe aan de TEST-database."
+        },
+        {
+            "id": "ensure_test_platform_admin",
+            "type": "ensure_platform_admin",
+            "description": "Maakt de platform-admin aan indien die ontbreekt, of herstelt de bestaande account zonder het wachtwoord te wijzigen.",
+            "email": "ron@henderyckx.be",
+            "display_name": "Ron",
+            "preferred_language": "nl"
+        }
     ]
-  },
-  "steps": [
-    {
-      "id": "create_test_private_directories",
-      "type": "create_directories",
-      "description": "Maakt de private TEST-hoofdmap en alle benodigde submappen aan.",
-      "directories": [
-        "private/DONDEBAILAR-TEST",
-        "private/DONDEBAILAR-TEST/app",
-        "private/DONDEBAILAR-TEST/config",
-        "private/DONDEBAILAR-TEST/database",
-        "private/DONDEBAILAR-TEST/uploads",
-        "private/DONDEBAILAR-TEST/storage",
-        "private/DONDEBAILAR-TEST/vendor"
-      ]
-    },
-    {
-      "id": "deploy_test_private_application",
-      "type": "deploy_repository_tree",
-      "description": "Downloadt de applicatiebronbestanden naar de private TEST-map; slaat lokale gegevens en afhankelijkheden over.",
-      "source_paths": [
-        "app/",
-        "config/config.example.php",
-        "database/migrations/",
-        "includes/",
-        "modules/",
-        "languages/",
-        "assets/",
-        "api/",
-        "cron/",
-        "tests/"
-      ]
-    },
-    {
-      "id": "deploy_test_public_application",
-      "type": "deploy_public_repository_tree",
-      "description": "Publiceert uitsluitend de inhoud van de GitHub-map public/ naar de publieke WebReus TEST-map; beschermt de vaste updaterbestanden.",
-      "source_path": "public/"
-    },
-    {
-      "id": "remove_test_placeholder_index",
-      "type": "remove_public_placeholder",
-      "description": "Verwijdert uitsluitend de herkende tijdelijke DONDEBAILAR index.html uit de publieke TEST-map; laat onbekende bestanden ongemoeid.",
-      "filename": "index.html"
-    },
-    {
-      "id": "ensure_region_past_event_color",
-      "type": "ensure_region_past_event_color",
-      "description": "Voegt de afzonderlijke regiokleur voor afgelopen evenementen veilig en herhaalbaar toe aan de TEST-database."
-    },
-    {
-      "id": "ensure_organizer_audit_columns",
-      "type": "ensure_organizer_audit_columns",
-      "description": "Voegt ontbrekende auditkolommen voor organisatoren veilig en herhaalbaar toe aan de TEST-database."
-    },
-    {
-      "id": "ensure_test_platform_admin",
-      "type": "ensure_platform_admin",
-      "description": "Maakt de platform-admin aan indien die ontbreekt, of herstelt de bestaande account zonder het wachtwoord te wijzigen.",
-      "email": "ron@henderyckx.be",
-      "display_name": "Ron",
-      "preferred_language": "nl"
-    }
-  ]
 }
