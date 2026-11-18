@@ -135,6 +135,9 @@ require $privateRoot . '/app/views/header.php';
 
         <button type="submit" class="button button--primary">Inloggen</button>
     </form>
+
+    <p><a href="/register.php">Registreren via e-mail</a></p>
+    <p><a href="/forgot-password.php">Wachtwoord vergeten?</a></p>
 </section>
 
 <?php require $privateRoot . '/app/views/footer.php'; ?>
