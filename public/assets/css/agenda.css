@@ -2363,6 +2363,11 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-feed > .agenda-card {
     background:var(--db-event-day-color,var(--db-primary,#f78d19))!important;
     border-bottom:5px solid var(--db-event-separator-color,#D0D0D0)!important;
+    box-sizing:border-box!important;
+}
+.agenda-feed > .agenda-card.agenda-card--past,
+.agenda-feed > .agenda-card.agenda-card--past :where(.agenda-card__media-wrap,.agenda-card__quick,.agenda-card__details,.agenda-card__gallery,.agenda-card__media-slide,.agenda-card__media-caption) {
+    background-color:var(--db-event-day-color,#777777)!important;
 }
 
 /* De ingestelde achtergrondkleur wordt op alle zichtbare kaartdelen toegepast. */
