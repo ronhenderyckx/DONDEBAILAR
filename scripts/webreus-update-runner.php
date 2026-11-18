@@ -74,7 +74,7 @@ if (!function_exists('dondebailar_webreus_run')) {
         }
 
         $results = [];
-        $results[] = 'Runner-versie: webreus-test-diagnostic-20261118-1';
+        $results[] = 'Runner-versie: webreus-test-index-cleanup-20261118-1';
 
         $curlGet = static function (string $url, string $accept = 'application/vnd.github+json'): string {
             $ch = curl_init($url);
@@ -115,6 +115,7 @@ if (!function_exists('dondebailar_webreus_run')) {
         $executedDirectoryStep = false;
         $executedDeployStep = false;
         $executedPublicDeployStep = false;
+        $executedPlaceholderCleanup = false;
         foreach ($manifest['steps'] as $step) {
             if (!is_array($step)) {
                 throw new RuntimeException('Ongeldige opdracht in update-commands.json.');
@@ -141,6 +142,42 @@ if (!function_exists('dondebailar_webreus_run')) {
                     $ensureDirectory($absolutePath, $relativePath);
                 }
                 $executedDirectoryStep = true;
+                continue;
+            }
+
+            if (($step['type'] ?? '') === 'remove_public_placeholder') {
+                $filename = (string) ($step['filename'] ?? '');
+                if ($filename !== 'index.html') {
+                    throw new RuntimeException('Alleen de tijdelijke publieke index.html mag door deze opdracht worden verwijderd.');
+                }
+                $placeholderPath = $documentRoot . DIRECTORY_SEPARATOR . 'index.html';
+                if (is_link($placeholderPath)) {
+                    throw new RuntimeException('De publieke index.html is een symbolische link; niet verwijderd.');
+                }
+                if (!is_file($placeholderPath)) {
+                    $results[] = 'Tijdelijke index.html: niet aanwezig; niets verwijderd.';
+                } else {
+                    $placeholderContent = file_get_contents($placeholderPath);
+                    if (!is_string($placeholderContent)) {
+                        throw new RuntimeException('De bestaande index.html kon niet worden gelezen.');
+                    }
+                    $normalizedPlaceholder = html_entity_decode($placeholderContent, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+                    $isKnownPlaceholder = stripos($normalizedPlaceholder, 'DONDEBAILAR') !== false
+                        && (
+                            stripos($normalizedPlaceholder, 'en construcción') !== false
+                            || stripos($normalizedPlaceholder, 'en construcciÃ³n') !== false
+                            || stripos($normalizedPlaceholder, 'sección está en construcción') !== false
+                            || stripos($normalizedPlaceholder, 'secciÃ³n estÃ¡ en construcciÃ³n') !== false
+                        );
+                    if (!$isKnownPlaceholder) {
+                        throw new RuntimeException('index.html bevat geen herkende tijdelijke DONDEBAILAR-pagina. Bestand is bewust behouden; controleer eerst de inhoud.');
+                    }
+                    if (!unlink($placeholderPath)) {
+                        throw new RuntimeException('De herkende tijdelijke index.html kon niet worden verwijderd.');
+                    }
+                    $results[] = 'Tijdelijke DONDEBAILAR index.html verwijderd; index.php kan nu de startpagina leveren.';
+                }
+                $executedPlaceholderCleanup = true;
                 continue;
             }
 
@@ -376,11 +413,13 @@ if (!function_exists('dondebailar_webreus_run')) {
         if (!$executedPublicDeployStep) {
             throw new RuntimeException('Geen deploy_public_repository_tree-opdracht gevonden in update-commands.json.');
         }
+        if (!$executedPlaceholderCleanup) {
+            throw new RuntimeException('Geen controle-opdracht voor de tijdelijke publieke index.html gevonden.');
+        }
 
 
         $results[] = 'GitHub-bronversie: ' . $sourceCommit;
         $results[] = 'GitHub-opdrachtenbestand gelezen: ' . (string) ($manifest['release'] ?? 'onbekende release');
-        $results[] = 'Publieke map test is niet gewijzigd.';
         $results[] = 'Preview en productie zijn niet benaderd of gewijzigd.';
 
         return [
