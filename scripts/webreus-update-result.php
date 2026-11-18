@@ -4,7 +4,7 @@ declare(strict_types=1);
 /**
  * DONDEBAILAR WebReus TEST result page.
  * Install once as test/update-result.php.
- * The runner is pinned; it reads the current update-commands.json on each run.
+ * Loads the current TEST runner from the trusted develop branch.
  */
 if (strtolower((string) ($_SERVER['HTTP_HOST'] ?? '')) !== 'test.dondebailar.eu') {
     http_response_code(404);
@@ -20,6 +20,7 @@ if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
     exit('Start de updater via de updatepagina.');
 }
 session_start();
+set_time_limit(180);
 
 function updatePage(string $title, string $message, bool $success = false): never
 {
