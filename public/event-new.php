@@ -1,10 +1,12 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/app/bootstrap.php';
-require_once dirname(__DIR__) . '/app/Authorization.php';
-require_once dirname(__DIR__) . '/app/Security.php';
-require_once dirname(__DIR__) . '/app/Events.php';
+require_once __DIR__ . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Events.php';
 
 $user = requireLogin();
 $db = Database::connection();
@@ -226,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $targetPath = null;
                         $sourcePath = (string) ($mediaItem['file_path'] ?? '');
                         if ($sourcePath !== '') {
-                            $sourceAbsolute = dirname(__DIR__) . '/' . $sourcePath;
+                            $sourceAbsolute = DONDEBAILAR_PRIVATE_ROOT . '/' . $sourcePath;
                             $extension = strtolower(pathinfo($sourcePath, PATHINFO_EXTENSION));
                             if (!is_file($sourceAbsolute) || !in_array($extension, ['jpg', 'png', 'webp', 'mp4', 'webm', 'mov'], true)) {
                                 throw new RuntimeException('Een mediabestand voor een herhaling kon niet worden gekopieerd.');
@@ -269,7 +271,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $pageTitle = 'Evenement toevoegen - DONDEBAILAR';
-require dirname(__DIR__) . '/app/views/header.php';
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 <section class="admin-page">
     <div class="admin-heading">
@@ -379,4 +381,4 @@ require dirname(__DIR__) . '/app/views/header.php';
         });
     });
 </script>
-<?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
