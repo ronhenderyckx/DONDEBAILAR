@@ -107,12 +107,9 @@ try {
 date_default_timezone_set($timezone->getName());
 
 $now = new DateTimeImmutable('now', $timezone);
-// Een evenement blijft zichtbaar tot zijn einde. De ondergrens op starts_at houdt
-// idx_events_region_feed bruikbaar als bereikindex; zonder die grens leest MariaDB
-// alle voorbije evenementen van de regio. Evenementen die langer dan dit aantal
-// dagen duren verdwijnen dus eerder uit de agenda.
-$agendaMaxEventDays = 31;
-$windowStart = $now->modify('-' . $agendaMaxEventDays . ' days')->format('Y-m-d H:i:s');
+// Alle gepubliceerde evenementen blijven zichtbaar, ook wanneer ze al lang
+// afgelopen zijn. De sortering groepeert komende evenementen vóór afgelopen
+// evenementen; binnen elke groep blijft de chronologie logisch.
 $organizerId = $restoreSavedAgendaPreferences
     ? (int) ($savedAgendaPreferences['organizer_id'] ?? 0)
     : (filter_input(INPUT_GET, 'organizer_id', FILTER_VALIDATE_INT) ?: 0);
@@ -157,15 +154,10 @@ if ($regionId > 0) {
          FROM organizers o
          INNER JOIN events e ON e.organizer_id = o.id
          WHERE o.is_active = 1 AND e.region_id = :region_id
-           AND e.status = 'published' AND e.starts_at >= :window_start
-           AND COALESCE(e.ends_at, e.starts_at) >= :now
+           AND e.status = 'published'
          ORDER BY o.name"
     );
-    $organizerQuery->execute([
-        'region_id' => $regionId,
-        'window_start' => $windowStart,
-        'now' => $now->format('Y-m-d H:i:s'),
-    ]);
+    $organizerQuery->execute(['region_id' => $regionId]);
     $organizers = $organizerQuery->fetchAll();
     $organizerIds = array_map(static fn(array $item): int => (int) $item['id'], $organizers);
     if ($organizerId > 0 && !in_array($organizerId, $organizerIds, true)) {
@@ -178,15 +170,11 @@ if ($regionId > 0) {
          INNER JOIN events e ON e.location_id = l.id
          WHERE l.region_id = :region_id AND l.is_active = 1 AND l.city <> ''
            AND e.region_id = :event_region_id AND e.status = 'published'
-           AND e.starts_at >= :window_start
-           AND COALESCE(e.ends_at, e.starts_at) >= :now
          ORDER BY l.city"
     );
     $cityQuery->execute([
         'region_id' => $regionId,
         'event_region_id' => $regionId,
-        'window_start' => $windowStart,
-        'now' => $now->format('Y-m-d H:i:s'),
     ]);
     $cities = $cityQuery->fetchAll();
     $cityNames = array_column($cities, 'city');
@@ -215,13 +203,9 @@ if ($regionId > 0) {
                  ORDER BY em.is_cover DESC, em.sort_order, em.id LIMIT 1)
             )
             WHERE e.region_id = :region_id
-              AND e.status = 'published'
-              AND e.starts_at >= :window_start
-              AND COALESCE(e.ends_at, e.starts_at) >= :now";
+              AND e.status = 'published'";
     $params = [
         'region_id' => $regionId,
-        'window_start' => $windowStart,
-        'now' => $now->format('Y-m-d H:i:s'),
     ];
     if ($organizerId > 0) {
         $sql .= " AND e.organizer_id = :organizer_id";
@@ -271,8 +255,22 @@ if ($regionId > 0) {
     $agendaPage = min($agendaPage, $totalPages);
     $agendaOffset = ($agendaPage - 1) * $agendaPageSize;
 
-    $sql .= " ORDER BY e.starts_at ASC, e.id ASC
+    $sql .= " ORDER BY
+                  CASE
+                    WHEN COALESCE(e.ends_at, e.starts_at) >= :agenda_sort_now THEN 0
+                    ELSE 1
+                  END ASC,
+                  CASE
+                    WHEN COALESCE(e.ends_at, e.starts_at) >= :agenda_sort_now THEN e.starts_at
+                    ELSE NULL
+                  END ASC,
+                  CASE
+                    WHEN COALESCE(e.ends_at, e.starts_at) < :agenda_sort_now THEN COALESCE(e.ends_at, e.starts_at)
+                    ELSE NULL
+                  END DESC,
+                  e.starts_at DESC, e.id DESC
               LIMIT " . (int) $agendaPageSize . " OFFSET " . (int) $agendaOffset;
+    $params['agenda_sort_now'] = $now->format('Y-m-d H:i:s');
     $eventQuery = $db->prepare($sql);
     $eventQuery->execute($params);
     $events = $eventQuery->fetchAll();
