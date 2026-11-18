@@ -119,6 +119,7 @@ $weekdayTextColors = $weekdayTextDefaults;
 $weekdayTitleDefaults = array_fill(0, 7, '#222222');
 $weekdayTitleColors = $weekdayTitleDefaults;
 $eventTitleColor = '#222222';
+$separatorColor = '#D0D0D0';
 $iconColorDefaults = [
     'back_top_icon_color' => '#FFFFFF',
     'search_icon_color' => '#FFFFFF',
@@ -128,6 +129,8 @@ $iconColors = $iconColorDefaults;
 if (!empty($saved['weekday_colors'])) {
     $decoded = json_decode((string) $saved['weekday_colors'], true);
     if (is_array($decoded)) {
+        $separatorCandidate = strtoupper((string) ($decoded['event_separator_color'] ?? '#D0D0D0'));
+        $separatorColor = preg_match('/^#[0-9A-F]{6}$/', $separatorCandidate) ? $separatorCandidate : '#D0D0D0';
         $titleCandidate = (string) ($decoded['event_title_color'] ?? '#222222');
         $eventTitleColor = preg_match('/^#[0-9a-fA-F]{6}$/', $titleCandidate) ? strtoupper($titleCandidate) : '#222222';
         $weekdayTitleDefaults = array_fill(0, 7, $eventTitleColor);
@@ -231,6 +234,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
             } catch (RuntimeException $exception) {
                 $errorMessage = $exception->getMessage();
             }
+        }
+
+        $separatorCandidate = strtoupper(trim((string) ($_POST['event_separator_color'] ?? $separatorColor)));
+        if (!preg_match('/^#[0-9A-F]{6}$/', $separatorCandidate)) {
+            $errorMessage = 'De kleur van de scheidingslijn is ongeldig.';
+        } else {
+            $separatorColor = $separatorCandidate;
         }
 
         $pastEventCandidate = strtoupper(trim((string) ($_POST['past_event_color'] ?? $pastEventColor)));
@@ -360,6 +370,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
                     ) + [
                         'agenda_arrow_background' => $colors['agenda_arrow_background'],
                         'agenda_arrow_text' => $colors['agenda_arrow_text'],
+                        'event_separator_color' => $separatorColor,
                     ] + $iconColors + ['event_title_color' => $eventTitleColor], JSON_THROW_ON_ERROR),
                     'logo_path' => $newLogoPath,
                 ]);
@@ -482,9 +493,14 @@ if (!$embeddedRegionAppearanceEditor) {
             <?php endforeach; ?>
             </div>
             <h2>Afgelopen evenementen</h2>
-            <p>Deze achtergrondkleur wordt gebruikt voor evenementen waarvan de einddatum en -tijd voorbij zijn.</p>
+            <p>Stel de achtergrondkleur van afgelopen evenementenkaarten afzonderlijk in, los van de weekdagkleuren.</p>
             <div class="region-color-grid">
-                <label class="region-color-field" for="past_event_color"><span>Kleur afgelopen evenementen</span><input type="color" id="past_event_color" name="past_event_color" value="<?= escapeHtml($pastEventColor) ?>"><code><?= escapeHtml($pastEventColor) ?></code></label>
+                <label class="region-color-field" for="past_event_color"><span>Achtergrondkleur afgelopen evenementen</span><input type="color" id="past_event_color" name="past_event_color" value="<?= escapeHtml($pastEventColor) ?>"><code><?= escapeHtml($pastEventColor) ?></code></label>
+            </div>
+            <h2>Scheidingslijn tussen evenementen</h2>
+            <p>Kies de kleur van de horizontale lijn onder de evenementenkaarten.</p>
+            <div class="region-color-grid">
+                <label class="region-color-field" for="event_separator_color"><span>Kleur scheidingslijn</span><input type="color" id="event_separator_color" name="event_separator_color" value="<?= escapeHtml($separatorColor) ?>"><code><?= escapeHtml($separatorColor) ?></code></label>
             </div>
             <h2>Weekdagen</h2>
             <p>Stel per weekdag de achtergrondkleur, de dagtekstkleur en de tekstkleur van de evenementtitel afzonderlijk in.</p>
