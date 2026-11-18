@@ -8,16 +8,8 @@ if ($host !== 'test.dondebailar.eu') {
     exit('Deze instellingenpagina is alleen beschikbaar op de TEST-omgeving.');
 }
 
-$accountRoot = realpath(dirname((string) ($_SERVER['DOCUMENT_ROOT'] ?? '')));
-if ($accountRoot === false) {
-    http_response_code(503);
-    exit('De WebReus-accountmap kon niet worden vastgesteld.');
-}
-$privateRoot = $accountRoot . '/private/DONDEBAILAR-TEST';
-if (!is_file($privateRoot . '/app/bootstrap.php')) {
-    http_response_code(503);
-    exit('De private applicatiebestanden zijn niet beschikbaar.');
-}
+require_once dirname(__DIR__) . '/_private-root.php';
+$privateRoot = DONDEBAILAR_PRIVATE_ROOT;
 
 require_once $privateRoot . '/app/bootstrap.php';
 require_once $privateRoot . '/app/Authorization.php';
