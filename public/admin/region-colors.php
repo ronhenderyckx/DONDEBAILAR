@@ -106,6 +106,8 @@ $weekdayDefaults = ['#F6D84A', '#4A90D9', '#55A96B', '#A78BDA', '#E78AAE', '#F49
 $select = $db->prepare("SELECT * FROM region_appearance WHERE region_id = :id LIMIT 1");
 $select->execute(['id' => $regionId]);
 $saved = $select->fetch() ?: [];
+$pastEventColor = strtoupper((string) ($saved['past_event_color'] ?? '#777777'));
+if (!preg_match('/^#[0-9A-F]{6}$/', $pastEventColor)) $pastEventColor = '#777777';
 $colors = [];
 foreach ($defaults as $key => $value) {
     $candidate = (string) ($saved[$key] ?? $value);
