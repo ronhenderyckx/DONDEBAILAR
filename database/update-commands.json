@@ -4,6 +4,36 @@
   "environment": "test",
   "release": "initial-test-install",
   "source_ref": "95013fa7324e87966d8518bbc9e4afa0305a84ef",
+  "deployment": {
+    "strategy": "separate_private_and_public_roots",
+    "path_base": "webreus_account_root",
+    "targets": {
+      "test": {
+        "host": "test.dondebailar.eu",
+        "private_root": "private/DONDEBAILAR-TEST",
+        "public_root": "test"
+      },
+      "preview": {
+        "private_root": "private/DONDEBAILAR-PREVIEW",
+        "public_root": "preview"
+      },
+      "production": {
+        "private_root": "private/DONDEBAILAR-PROD",
+        "public_root": "web"
+      }
+    },
+    "protected_paths": [
+      "config/config.local.php",
+      "uploads/",
+      "storage/",
+      "vendor/"
+    ],
+    "notes": [
+      "Each environment has its own private application files, local configuration, uploads, storage and database settings.",
+      "The public_root contains only the contents of the repository public/ directory.",
+      "The production target must never be modified by a test or preview update."
+    ]
+  },
   "steps": [
     {
       "id": "install_empty_database",
