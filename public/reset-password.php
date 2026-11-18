@@ -1,8 +1,20 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/app/bootstrap.php';
-require_once dirname(__DIR__) . '/app/Security.php';
+$host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+$host = preg_replace('/:\\d+$/', '', $host) ?? '';
+if ($host !== 'test.dondebailar.eu') {
+    http_response_code(404);
+    exit('Deze pagina is niet beschikbaar op deze website.');
+}
+$privateRoot = dirname(__DIR__) . '/private/DONDEBAILAR-TEST';
+if (!is_file($privateRoot . '/app/bootstrap.php')) {
+    http_response_code(503);
+    exit('De private applicatiebestanden zijn niet beschikbaar.');
+}
+
+require_once $privateRoot . '/app/bootstrap.php';
+require_once $privateRoot . '/app/Security.php';
 
 $pageTitle = 'Nieuw wachtwoord instellen - DONDEBAILAR';
 $errorMessage = '';
@@ -98,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-require dirname(__DIR__) . '/app/views/header.php';
+require $privateRoot . '/app/views/header.php';
 ?>
 
 <section class="auth-card">
@@ -134,4 +146,4 @@ require dirname(__DIR__) . '/app/views/header.php';
     <?php endif; ?>
 </section>
 
-<?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
+<?php require $privateRoot . '/app/views/footer.php'; ?>
