@@ -1,10 +1,12 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/app/bootstrap.php';
-require_once dirname(__DIR__) . '/app/Security.php';
-require_once dirname(__DIR__) . '/app/Authorization.php';
-require_once dirname(__DIR__) . '/app/Events.php';
+require_once __DIR__ . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Events.php';
 
 $db = Database::connection();
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -227,7 +229,7 @@ $region = [
 $eventTimezone = new DateTimeZone((string) ($event['timezone'] ?: 'Europe/Madrid'));
 $eventStart = new DateTimeImmutable((string) $event['starts_at'], $eventTimezone);
 $eventWeekday = (int) $eventStart->format('N');
-require dirname(__DIR__) . '/app/views/header.php';
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 $escape = static fn($value): string => escapeHtml((string) $value);
 $mentionNames = [];
 foreach ($mentionUsers as $mentionUser) {
@@ -482,4 +484,4 @@ body:has(.event-chat--popup) .site-main{height:100%;max-width:none!important;mar
     }
 })();
 </script>
-<?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
