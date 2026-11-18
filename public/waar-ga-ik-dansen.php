@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/app/bootstrap.php';
-require_once dirname(__DIR__) . '/app/Authorization.php';
-require_once dirname(__DIR__) . '/app/Security.php';
+require_once __DIR__ . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
 
 $user = requireLogin();
 $db = Database::connection();
@@ -135,7 +137,7 @@ if ($events !== []) {
 
 $eventFallbackText = 'SALSA · BACHATA · KIZOMBA';
 if ((int) ($region['id'] ?? 0) > 0) {
-    $fallbackTextFile = dirname(__DIR__) . '/storage/region-event-fallback-text/' . (int) $region['id'] . '.txt';
+    $fallbackTextFile = DONDEBAILAR_PRIVATE_ROOT . '/storage/region-event-fallback-text/' . (int) $region['id'] . '.txt';
     if (is_file($fallbackTextFile)) {
         $configuredFallbackText = trim((string) file_get_contents($fallbackTextFile));
         if ($configuredFallbackText !== '') {
@@ -149,7 +151,7 @@ $agendaPageSize = max(1, count($events));
 $isAgendaPage = false;
 $pageTitle = 'Waar ga ik dansen? — DONDEBAILAR';
 $pageRobots = 'noindex, nofollow';
-require dirname(__DIR__) . '/app/views/header.php';
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 <section class="agenda-page my-dance-events">
     <div class="agenda-heading">
@@ -184,7 +186,7 @@ require dirname(__DIR__) . '/app/views/header.php';
                 $shareScheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
                 $shareUrl = $shareScheme . ($_SERVER['HTTP_HOST'] ?? '') . $eventUrl;
                 ?>
-                <?php require dirname(__DIR__) . '/app/views/agenda/event-card.php'; ?>
+                <?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/agenda/event-card.php'; ?>
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
@@ -218,4 +220,4 @@ window.DONDEBAILAR_AGENDA_CONFIG = <?= json_encode([
 ], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT) ?>;
 </script>
 <script src="/assets/js/agenda.js"></script>
-<?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
