@@ -1,10 +1,12 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
-require_once dirname(__DIR__, 2) . '/app/SmtpMailer.php';
+require_once dirname(__DIR__) . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/SmtpMailer.php';
 
 $admin = requirePlatformAdmin();
 $db = Database::connection();
@@ -53,7 +55,7 @@ if ($existing) {
 
 function mailSettingsEncryptionKey(): string
 {
-    $keyFile = dirname(__DIR__, 2) . '/storage/mail-settings.key';
+    $keyFile = DONDEBAILAR_PRIVATE_ROOT . '/storage/mail-settings.key';
     $storageDirectory = dirname($keyFile);
 
     if (!is_dir($storageDirectory) || !is_writable($storageDirectory)) {
@@ -208,7 +210,7 @@ if (isset($_GET['saved'])) {
     $successMessage = 'De e-mailinstellingen zijn opgeslagen.';
 }
 
-require dirname(__DIR__, 2) . '/app/views/header.php';
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 
 <section class="admin-page">
@@ -312,4 +314,4 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
     <p>Het SMTP-wachtwoord wordt versleuteld opgeslagen. Bewaar ook het bestand <code>storage/mail-settings.key</code> in een beveiligde back-up; zonder dat bestand kan het wachtwoord niet meer ontsleuteld worden.</p>
 </section>
 
-<?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
