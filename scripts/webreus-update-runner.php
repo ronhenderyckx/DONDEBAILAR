@@ -74,7 +74,7 @@ if (!function_exists('dondebailar_webreus_run')) {
         }
 
         $results = [];
-        $results[] = 'Runner-versie: webreus-test-index-cleanup-20261118-1';
+        $results[] = 'Runner-versie: webreus-test-admin-account-20261118-1';
 
         $curlGet = static function (string $url, string $accept = 'application/vnd.github+json'): string {
             $ch = curl_init($url);
@@ -116,6 +116,7 @@ if (!function_exists('dondebailar_webreus_run')) {
         $executedDeployStep = false;
         $executedPublicDeployStep = false;
         $executedPlaceholderCleanup = false;
+        $executedAdminStep = false;
         foreach ($manifest['steps'] as $step) {
             if (!is_array($step)) {
                 throw new RuntimeException('Ongeldige opdracht in update-commands.json.');
@@ -279,6 +280,86 @@ if (!function_exists('dondebailar_webreus_run')) {
                 continue;
             }
 
+            if (($step['type'] ?? '') === 'ensure_platform_admin') {
+                $email = strtolower(trim((string) ($step['email'] ?? '')));
+                $displayName = trim((string) ($step['display_name'] ?? 'Ron'));
+                $language = (string) ($step['preferred_language'] ?? 'nl');
+
+                if ($email !== 'ron@henderyckx.be' || $displayName === '' || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                    throw new RuntimeException('De platform-admin opdracht bevat ongeldige accountgegevens.');
+                }
+                if (!in_array($language, ['nl', 'en', 'es', 'fr'], true)) {
+                    throw new RuntimeException('De voorkeurstaal voor de platform-admin is ongeldig.');
+                }
+
+                $bootstrapFile = $privateRoot . DIRECTORY_SEPARATOR . 'app' . DIRECTORY_SEPARATOR . 'bootstrap.php';
+                if (!is_file($bootstrapFile)) {
+                    throw new RuntimeException('De applicatie-bootstrap ontbreekt; de database kan niet veilig worden geopend.');
+                }
+                require_once $bootstrapFile;
+                if (!class_exists('Database') || !method_exists('Database', 'connection')) {
+                    throw new RuntimeException('De bestaande databaseverbinding van DONDEBAILAR is niet beschikbaar.');
+                }
+
+                $pdo = Database::connection();
+                $pdo->beginTransaction();
+                try {
+                    $findUser = $pdo->prepare('SELECT id FROM users WHERE email = :email LIMIT 1');
+                    $findUser->execute(['email' => $email]);
+                    $existingUser = $findUser->fetch(PDO::FETCH_ASSOC);
+
+                    if (is_array($existingUser)) {
+                        $updateUser = $pdo->prepare(
+                            "UPDATE users
+                             SET display_name = :display_name,
+                                 preferred_language = :preferred_language,
+                                 platform_role = 'admin',
+                                 status = 'active',
+                                 email_verified_at = COALESCE(email_verified_at, NOW()),
+                                 updated_at = NOW()
+                             WHERE id = :id"
+                        );
+                        $updateUser->execute([
+                            'display_name' => $displayName,
+                            'preferred_language' => $language,
+                            'id' => (int) $existingUser['id'],
+                        ]);
+                        $pdo->commit();
+                        $results[] = 'Platform-admin hersteld voor ' . $email . '; bestaand wachtwoord behouden.';
+                    } else {
+                        $temporaryPassword = rtrim(strtr(base64_encode(random_bytes(24)), '+/', '-_'), '=');
+                        $passwordHash = password_hash($temporaryPassword, PASSWORD_DEFAULT);
+                        if (!is_string($passwordHash) || $passwordHash === '') {
+                            throw new RuntimeException('Het tijdelijke wachtwoord kon niet veilig worden aangemaakt.');
+                        }
+                        $insertUser = $pdo->prepare(
+                            "INSERT INTO users
+                                (email, password_hash, display_name, preferred_language, platform_role, status, email_verified_at, created_at, updated_at)
+                             VALUES
+                                (:email, :password_hash, :display_name, :preferred_language, 'admin', 'active', NOW(), NOW(), NOW())"
+                        );
+                        $insertUser->execute([
+                            'email' => $email,
+                            'password_hash' => $passwordHash,
+                            'display_name' => $displayName,
+                            'preferred_language' => $language,
+                        ]);
+                        $pdo->commit();
+                        $results[] = 'Nieuwe platform-admin aangemaakt: ' . $email;
+                        $results[] = 'Eenmalig tijdelijk wachtwoord (bewaar dit veilig): ' . $temporaryPassword;
+                        $results[] = 'Log daarna in en wijzig het wachtwoord zodra de accountinstellingen dit toelaten.';
+                    }
+                } catch (Throwable $adminError) {
+                    if ($pdo->inTransaction()) {
+                        $pdo->rollBack();
+                    }
+                    throw $adminError;
+                }
+
+                $executedAdminStep = true;
+                continue;
+            }
+
             if (($step['type'] ?? '') !== 'deploy_repository_tree') {
                 throw new RuntimeException('Niet-ondersteund opdrachttype: ' . (string) ($step['type'] ?? 'onbekend'));
             }
@@ -415,6 +496,9 @@ if (!function_exists('dondebailar_webreus_run')) {
         }
         if (!$executedPlaceholderCleanup) {
             throw new RuntimeException('Geen controle-opdracht voor de tijdelijke publieke index.html gevonden.');
+        }
+        if (!$executedAdminStep) {
+            throw new RuntimeException('Geen opdracht gevonden om de platform-admin te controleren of aan te maken.');
         }
 
 
