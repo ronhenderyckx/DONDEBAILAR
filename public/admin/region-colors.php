@@ -1,10 +1,12 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
-require_once dirname(__DIR__, 2) . '/app/ImageOptimization.php';
+require_once dirname(__DIR__) . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/ImageOptimization.php';
 
 /**
  * Sla filtericonen op zonder ze naar WebP om te zetten.
@@ -67,7 +69,7 @@ $regionQuery = $db->prepare("SELECT id, name, logo_path FROM regions WHERE id = 
 $regionQuery->execute(['id' => $regionId]);
 $region = $regionQuery->fetch();
 
-$fallbackTextSettingFile = dirname(__DIR__, 2) . '/storage/region-event-fallback-text/' . $regionId . '.txt';
+$fallbackTextSettingFile = DONDEBAILAR_PRIVATE_ROOT . '/storage/region-event-fallback-text/' . $regionId . '.txt';
 $eventFallbackText = 'SALSA · BACHATA · KIZOMBA';
 if (is_file($fallbackTextSettingFile)) {
     $savedFallbackText = trim((string) file_get_contents($fallbackTextSettingFile));
@@ -157,9 +159,9 @@ $logoPath = $saved !== []
     ? (string) ($saved['logo_path'] ?? '')
     : (string) ($region['logo_path'] ?? '');
 
-$cityIconSettingFile = dirname(__DIR__, 2) . '/storage/region-city-icons/' . $regionId . '.txt';
-$organizerIconSettingFile = dirname(__DIR__, 2) . '/storage/region-organizer-icons/' . $regionId . '.txt';
-$citySwitchIconSettingFile = dirname(__DIR__, 2) . '/storage/region-city-switch-icons/' . $regionId . '.txt';
+$cityIconSettingFile = DONDEBAILAR_PRIVATE_ROOT . '/storage/region-city-icons/' . $regionId . '.txt';
+$organizerIconSettingFile = DONDEBAILAR_PRIVATE_ROOT . '/storage/region-organizer-icons/' . $regionId . '.txt';
+$citySwitchIconSettingFile = DONDEBAILAR_PRIVATE_ROOT . '/storage/region-city-switch-icons/' . $regionId . '.txt';
 $cityIconPath = is_file($cityIconSettingFile) ? trim((string) file_get_contents($cityIconSettingFile)) : '';
 $organizerIconPath = is_file($organizerIconSettingFile) ? trim((string) file_get_contents($organizerIconSettingFile)) : '';
 $citySwitchIconPath = is_file($citySwitchIconSettingFile) ? trim((string) file_get_contents($citySwitchIconSettingFile)) : '';
@@ -419,7 +421,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
 
 $pageTitle = 'Kleuren en logo - ' . $region['name'];
 if (!$embeddedRegionAppearanceEditor) {
-    require dirname(__DIR__, 2) . '/app/views/header.php';
+    require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 }
 ?>
 <?php if (!$embeddedRegionAppearanceEditor): ?>
@@ -584,4 +586,4 @@ if (!$embeddedRegionAppearanceEditor) {
 .region-weekday-color code{font-size:12px;color:#596273}
 @media(max-width:520px){.region-color-grid,.region-weekday-grid{grid-template-columns:1fr}.region-color-field{grid-template-columns:minmax(0,1fr) 52px}}
 </style>
-<?php if (!$embeddedRegionAppearanceEditor) require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
+<?php if (!$embeddedRegionAppearanceEditor) require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
