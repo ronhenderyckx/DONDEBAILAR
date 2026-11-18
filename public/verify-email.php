@@ -1,7 +1,19 @@
 <?php
 declare(strict_types=1);
-require_once dirname(__DIR__) . '/app/bootstrap.php';
-require_once dirname(__DIR__) . '/app/Security.php';
+
+$host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+$host = preg_replace('/:\\d+$/', '', $host) ?? '';
+if ($host !== 'test.dondebailar.eu') {
+    http_response_code(404);
+    exit('Deze pagina is niet beschikbaar op deze website.');
+}
+$privateRoot = dirname(__DIR__) . '/private/DONDEBAILAR-TEST';
+if (!is_file($privateRoot . '/app/bootstrap.php')) {
+    http_response_code(503);
+    exit('De private applicatiebestanden zijn niet beschikbaar.');
+}
+require_once $privateRoot . '/app/bootstrap.php';
+require_once $privateRoot . '/app/Security.php';
 
 $pageTitle = 'E-mailadres bevestigen - DONDEBAILAR';
 $errorMessage = '';
@@ -59,7 +71,7 @@ if (!preg_match('/^[a-f0-9]{64}$/', $token)) {
     }
 }
 
-require dirname(__DIR__) . '/app/views/header.php';
+require $privateRoot . '/app/views/header.php';
 ?>
 <section class="auth-card">
     <h1>E-mailadres bevestigen</h1>
@@ -67,4 +79,4 @@ require dirname(__DIR__) . '/app/views/header.php';
     <p><a href="/register.php">Opnieuw registreren</a></p>
     <p><a href="/login.php">Naar inloggen</a></p>
 </section>
-<?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
+<?php require $privateRoot . '/app/views/footer.php'; ?>
