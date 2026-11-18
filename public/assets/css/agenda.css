@@ -296,7 +296,7 @@
 }
 /* Houd het eerste actuele/komende evenement vrij van de vaste kopbalk. */
 #agenda-today-start {
-    scroll-margin-top:110px;
+    scroll-margin-top:0;
 }
 
 .agenda-card {
