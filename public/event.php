@@ -1,8 +1,10 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/app/bootstrap.php';
-require_once dirname(__DIR__) . '/app/Security.php';
+require_once __DIR__ . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
 
 $db = Database::connection();
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
@@ -42,7 +44,7 @@ $region = [
     'logo_path' => $event['logo_path'],
     'weekday_colors' => $event['weekday_colors'] ?? '',
 ];
-require dirname(__DIR__) . '/app/views/header.php';
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 $escape = static fn($value): string => escapeHtml((string) $value);
 $eventTimezoneName = (string) ($event['region_timezone'] ?? 'Europe/Madrid');
 try {
@@ -119,4 +121,4 @@ $eventInfoTextColor = 'var(--db-weekday-text-' . $eventWeekday . ', #222222)';
 <style>
 .public-event-page{max-width:1000px;margin:0 auto}.public-event-page .public-event-info-text,.public-event-page .public-event-info-text *{color:var(--db-event-info-text-color,#222222)!important}.public-event-page .public-event-description,.public-event-page .public-event-description *{color:var(--db-event-info-text-color,#222222)!important}.public-event-page .public-event-info-text a:not(.button){color:var(--db-event-info-text-color,#222222)!important}.public-event-message-link{margin:18px 0 24px}.public-event-description{margin:24px 0;line-height:1.7}.public-event-hashtags{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 24px;color:var(--db-primary);font-weight:700;overflow-wrap:anywhere}.public-event-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}.public-event-media-item{min-width:0;padding:12px;border:1px solid #e7eaf0;border-radius:10px;background:#fff}.public-event-media-item img,.public-event-media-item video,.public-event-media-item iframe{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/5;border:0;border-radius:7px;background:#111;object-fit:contain}.public-event-media-item iframe{height:520px}.public-event-media-item p{overflow-wrap:anywhere}
 </style>
-<?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
