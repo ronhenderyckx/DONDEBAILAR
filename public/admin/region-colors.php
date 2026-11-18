@@ -108,6 +108,7 @@ $select->execute(['id' => $regionId]);
 $saved = $select->fetch() ?: [];
 $pastEventColor = strtoupper((string) ($saved['past_event_color'] ?? '#777777'));
 if (!preg_match('/^#[0-9A-F]{6}$/', $pastEventColor)) $pastEventColor = '#777777';
+$pastEventTextColor = '#FFFFFF';
 $colors = [];
 foreach ($defaults as $key => $value) {
     $candidate = (string) ($saved[$key] ?? $value);
@@ -131,6 +132,8 @@ if (!empty($saved['weekday_colors'])) {
     if (is_array($decoded)) {
         $separatorCandidate = strtoupper((string) ($decoded['event_separator_color'] ?? '#D0D0D0'));
         $separatorColor = preg_match('/^#[0-9A-F]{6}$/', $separatorCandidate) ? $separatorCandidate : '#D0D0D0';
+        $pastTextCandidate = strtoupper((string) ($decoded['past_event_text_color'] ?? '#FFFFFF'));
+        $pastEventTextColor = preg_match('/^#[0-9A-F]{6}$/', $pastTextCandidate) ? $pastTextCandidate : '#FFFFFF';
         $titleCandidate = (string) ($decoded['event_title_color'] ?? '#222222');
         $eventTitleColor = preg_match('/^#[0-9a-fA-F]{6}$/', $titleCandidate) ? strtoupper($titleCandidate) : '#222222';
         $weekdayTitleDefaults = array_fill(0, 7, $eventTitleColor);
@@ -248,6 +251,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
             $errorMessage = 'De kleur van afgelopen evenementen is ongeldig.';
         } else {
             $pastEventColor = $pastEventCandidate;
+        }
+        $pastTextCandidate = strtoupper(trim((string) ($_POST['past_event_text_color'] ?? $pastEventTextColor)));
+        if (!preg_match('/^#[0-9A-F]{6}$/', $pastTextCandidate)) {
+            $errorMessage = 'De tekstkleur van afgelopen evenementen is ongeldig.';
+        } else {
+            $pastEventTextColor = $pastTextCandidate;
         }
 
         foreach ($defaults as $key => $default) {
@@ -496,6 +505,7 @@ if (!$embeddedRegionAppearanceEditor) {
             <p>Stel de achtergrondkleur van afgelopen evenementenkaarten afzonderlijk in, los van de weekdagkleuren.</p>
             <div class="region-color-grid">
                 <label class="region-color-field" for="past_event_color"><span>Achtergrondkleur afgelopen evenementen</span><input type="color" id="past_event_color" name="past_event_color" value="<?= escapeHtml($pastEventColor) ?>"><code><?= escapeHtml($pastEventColor) ?></code></label>
+                <label class="region-color-field" for="past_event_text_color"><span>Tekstkleur afgelopen evenementen</span><input type="color" id="past_event_text_color" name="past_event_text_color" value="<?= escapeHtml($pastEventTextColor) ?>"><code><?= escapeHtml($pastEventTextColor) ?></code></label>
             </div>
             <h2>Scheidingslijn tussen evenementen</h2>
             <p>Kies de kleur van de horizontale lijn onder de evenementenkaarten.</p>
