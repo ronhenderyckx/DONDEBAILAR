@@ -1,8 +1,10 @@
 <?php
 declare(strict_types=1);
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
+
+require_once dirname(__DIR__) . '/_private-root.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
 requirePlatformAdmin();
 if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !verifyCsrfToken(is_string($_POST['csrf_token'] ?? null) ? $_POST['csrf_token'] : null)) { http_response_code(400); exit('Ongeldige aanvraag.'); }
 $id = filter_var($_POST['region_id'] ?? null, FILTER_VALIDATE_INT);
