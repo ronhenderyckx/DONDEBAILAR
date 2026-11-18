@@ -255,25 +255,25 @@ if ($regionId > 0) {
     $agendaPage = min($agendaPage, $totalPages);
     $agendaOffset = ($agendaPage - 1) * $agendaPageSize;
 
+    // Gebruik vaste sorteerwaarden rechtstreeks in de SQL. Zo is de volgorde
+    // onafhankelijk van PDO-placeholderafhandeling: komende starts ASC, daarna
+    // afgelopen einddatums DESC.
+    $sortNowSql = $db->quote($now->format('Y-m-d H:i:s'));
     $sql .= " ORDER BY
                   CASE
-                    WHEN COALESCE(e.ends_at, e.starts_at) >= :agenda_sort_now_1 THEN 0
-                    ELSE 1
+                    WHEN COALESCE(e.ends_at, e.starts_at) < $sortNowSql THEN 1
+                    ELSE 0
                   END ASC,
                   CASE
-                    WHEN COALESCE(e.ends_at, e.starts_at) >= :agenda_sort_now_2 THEN e.starts_at
-                    ELSE NULL
+                    WHEN COALESCE(e.ends_at, e.starts_at) >= $sortNowSql THEN e.starts_at
+                    ELSE '9999-12-31 23:59:59'
                   END ASC,
                   CASE
-                    WHEN COALESCE(e.ends_at, e.starts_at) < :agenda_sort_now_3 THEN COALESCE(e.ends_at, e.starts_at)
-                    ELSE NULL
+                    WHEN COALESCE(e.ends_at, e.starts_at) < $sortNowSql THEN COALESCE(e.ends_at, e.starts_at)
+                    ELSE '1000-01-01 00:00:00'
                   END DESC,
-                  e.starts_at DESC, e.id DESC
+                  e.id ASC
               LIMIT " . (int) $agendaPageSize . " OFFSET " . (int) $agendaOffset;
-    $sortNow = $now->format('Y-m-d H:i:s');
-    $params['agenda_sort_now_1'] = $sortNow;
-    $params['agenda_sort_now_2'] = $sortNow;
-    $params['agenda_sort_now_3'] = $sortNow;
     $eventQuery = $db->prepare($sql);
     $eventQuery->execute($params);
     $events = $eventQuery->fetchAll();
