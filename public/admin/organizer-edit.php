@@ -103,7 +103,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $update = $db->prepare(
                 "UPDATE organizers
                  SET name = :name, phone = :phone, website = :website,
-                     logo_path = :logo_path, notes = :notes, is_active = :is_active
+                     logo_path = :logo_path, notes = :notes, is_active = :is_active,
+                     updated_by = :updated_by
                  WHERE id = :id"
             );
 
@@ -114,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'logo_path' => $logoPath,
                 'notes' => $notes !== '' ? $notes : null,
                 'is_active' => $isActive ? 1 : 0,
+                'updated_by' => (int) $user['id'],
                 'id' => $id,
             ]);
 
