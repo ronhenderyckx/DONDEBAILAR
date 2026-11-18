@@ -2,7 +2,7 @@
   "format_version": 1,
   "project": "DONDEBAILAR",
   "environment": "test",
-  "release": "webreus-test-private-and-public-deploy",
+  "release": "webreus-test-remove-temporary-landing-page",
   "source_ref": "develop",
   "deployment": {
     "strategy": "separate_private_and_public_roots",
@@ -71,6 +71,12 @@
       "type": "deploy_public_repository_tree",
       "description": "Publiceert uitsluitend de inhoud van de GitHub-map public/ naar de publieke WebReus TEST-map; beschermt de vaste updaterbestanden.",
       "source_path": "public/"
+    },
+    {
+      "id": "remove_test_placeholder_index",
+      "type": "remove_public_placeholder",
+      "description": "Verwijdert uitsluitend de herkende tijdelijke DONDEBAILAR index.html uit de publieke TEST-map; laat onbekende bestanden ongemoeid.",
+      "filename": "index.html"
     }
   ]
 }
