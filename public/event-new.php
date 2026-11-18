@@ -220,7 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($targetEventId < 1) {
                         continue;
                     }
-                    $targetDirectory = dirname(__DIR__) . '/uploads/events/' . $targetEventId;
+                    $targetDirectory = DONDEBAILAR_PRIVATE_ROOT . '/uploads/events/' . $targetEventId;
                     if (!is_dir($targetDirectory) && !mkdir($targetDirectory, 0755, true) && !is_dir($targetDirectory)) {
                         throw new RuntimeException('De mediamap voor een herhaling kon niet worden aangemaakt.');
                     }
@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         $targetPath = null;
                         $sourcePath = (string) ($mediaItem['file_path'] ?? '');
                         if ($sourcePath !== '') {
-                            $sourceAbsolute = dirname(__DIR__) . '/' . $sourcePath;
+                            $sourceAbsolute = DONDEBAILAR_PRIVATE_ROOT . '/' . $sourcePath;
                             $extension = strtolower(pathinfo($sourcePath, PATHINFO_EXTENSION));
                             if (!is_file($sourceAbsolute) || !in_array($extension, ['jpg', 'png', 'webp', 'mp4', 'webm', 'mov'], true)) {
                                 throw new RuntimeException('Een mediabestand voor een herhaling kon niet worden gekopieerd.');
