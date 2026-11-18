@@ -53,7 +53,7 @@ if (!preg_match('/\A[a-f0-9]{32}\.(jpg|png|webp|mp4|webm|mov)\z/', $filename)) {
 }
 
 $base = realpath(dirname(__DIR__) . '/uploads/events/' . (int) $media['event_id']);
-$file = realpath(DONDEBAILAR_PRIVATE_ROOT . '/' . $relativePath);
+$file = realpath(dirname(__DIR__) . '/' . $relativePath);
 if ($base === false || $file === false || !str_starts_with($file, $base . DIRECTORY_SEPARATOR) || !is_file($file)) {
     http_response_code(404);
     exit;
