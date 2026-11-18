@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
-require_once dirname(__DIR__, 2) . '/app/bootstrap.php';
-require_once dirname(__DIR__, 2) . '/app/Authorization.php';
-require_once dirname(__DIR__, 2) . '/app/Security.php';
-require_once dirname(__DIR__, 2) . '/app/Locations.php';
+
+require_once dirname(__DIR__) . '/_private-root.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Locations.php';
 $user = requireLogin();
 $db = Database::connection();
 $regions = locationManageableRegions($db, $user);
@@ -29,7 +31,7 @@ if ($regionIds !== []) {
     $locations = $statement->fetchAll();
 }
 $pageTitle = 'Locaties beheren - DONDEBAILAR';
-require dirname(__DIR__, 2) . '/app/views/header.php';
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 <section class="admin-page">
 <div class="admin-heading"><div><p class="eyebrow">DONDEBAILAR</p><h1>Locaties</h1><p>Beheer de locaties van de regio's waartoe je toegang hebt.</p></div><a class="button" href="/admin/">Terug naar dashboard</a></div>
@@ -72,4 +74,4 @@ require dirname(__DIR__, 2) . '/app/views/header.php';
 .location-search{margin:0 0 22px}.location-search label{display:block;margin-bottom:7px;font-size:13px;font-weight:650}.location-search__controls{display:flex;flex-wrap:wrap;gap:9px}.location-search input{min-width:220px;min-height:42px;flex:1;padding:9px 12px;border:1px solid #DCE1E8;border-radius:8px}.location-search select{min-height:42px;padding:8px 12px;border:1px solid #DCE1E8;border-radius:8px;background:#fff}.location-note{font-size:13px;color:var(--db-muted)}
 .location-table{min-width:900px}.location-table th,.location-table td{white-space:nowrap;vertical-align:middle}.location-list-item{display:flex;align-items:center;gap:10px;min-width:230px}.location-list-logo{display:block;width:42px;height:42px;flex:0 0 42px;object-fit:contain;background:#fff;border:1px solid #e2e5e9;border-radius:6px;padding:3px}.location-list-logo--empty{display:flex;align-items:center;justify-content:center;color:#9aa1aa;background:#f7f8fa}.location-list-name{display:flex;flex-direction:row;align-items:baseline;gap:8px;white-space:nowrap}.location-list-name small{font-size:12px;color:var(--db-muted)}.location-actions{display:flex;align-items:center;gap:6px}.location-actions form{margin:0}.button--danger{background:#fff!important;color:#b42318!important;border:1px solid #d92d20!important}
 </style>
-<?php require dirname(__DIR__, 2) . '/app/views/footer.php'; ?>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
