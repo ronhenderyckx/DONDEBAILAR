@@ -70,14 +70,14 @@
             start = Math.max(0, start - pageSize);
             end = Math.min(start + pageSize, cards.length);
             updatePagination();
-            document.querySelector('.agenda-feed')?.scrollIntoView({behavior:'smooth', block:'start'});
+            if (typeof window.scrollToAgendaStart === 'function') window.scrollToAgendaStart();
         });
         if (next) next.addEventListener('click', function () {
             if (start + pageSize >= cards.length) return;
             start += pageSize;
             end = Math.min(start + pageSize, cards.length);
             updatePagination();
-            document.querySelector('.agenda-feed')?.scrollIntoView({behavior:'smooth', block:'start'});
+            if (typeof window.scrollToAgendaStart === 'function') window.scrollToAgendaStart();
         });
 
         // Initialiseer de galerijen en video's in de nieuw geladen evenementkaarten.
@@ -150,7 +150,7 @@
             window.instgrm.Embeds.process();
         }
         if (typeof updateAgendaStripIndicators === 'function') updateAgendaStripIndicators();
-        window.scrollTo({top:0, behavior:'instant'});
+        if (typeof window.scrollToAgendaStart === 'function') window.scrollToAgendaStart();
     }
 
     async function loadAgendaFilter(url, addHistory) {
