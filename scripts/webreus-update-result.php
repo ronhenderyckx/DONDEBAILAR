@@ -83,7 +83,10 @@ try {
         throw new RuntimeException('Het uitvoerprogramma bevat niet de verwachte startfunctie.');
     }
     $result = dondebailar_webreus_run(['host' => 'test.dondebailar.eu']);
-    $lines = [];
+    $lines = [
+        'Resultpagina-versie: webreus-test-diagnostic-20261118-1',
+        'Runner SHA-256: ' . hash('sha256', $runnerCode),
+    ];
     foreach (($result['results'] ?? []) as $line) {
         $lines[] = (string) $line;
     }
