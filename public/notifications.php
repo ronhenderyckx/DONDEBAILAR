@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/app/bootstrap.php';
-require_once dirname(__DIR__) . '/app/Security.php';
-require_once dirname(__DIR__) . '/app/Authorization.php';
+require_once __DIR__ . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
 
 $user = requireLogin();
 $db = Database::connection();
@@ -45,7 +47,7 @@ if (!$notificationsTableMissing) {
 $pageTitle = 'Meldingen — DONDEBAILAR';
 $pageRobots = 'noindex, nofollow';
 $region = null;
-require dirname(__DIR__) . '/app/views/header.php';
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 $escape = static fn($value): string => escapeHtml((string) $value);
 ?>
 <section class="admin-page notifications-page">
@@ -156,4 +158,4 @@ $escape = static fn($value): string => escapeHtml((string) $value);
 })();
 </script>
 
-<?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
