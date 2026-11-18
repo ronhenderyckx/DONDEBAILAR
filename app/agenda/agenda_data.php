@@ -109,9 +109,8 @@ try {
 date_default_timezone_set($timezone->getName());
 
 $now = new DateTimeImmutable('now', $timezone);
-// Alle gepubliceerde evenementen blijven zichtbaar, ook wanneer ze al lang
-// afgelopen zijn. De sortering groepeert komende evenementen vóór afgelopen
-// evenementen; binnen elke groep blijft de chronologie logisch.
+// Alle gepubliceerde evenementen blijven zichtbaar. Afgelopen evenementen
+// staan chronologisch vóór het eerste evenement dat nu of later plaatsvindt.
 $organizerId = $restoreSavedAgendaPreferences
     ? (int) ($savedAgendaPreferences['organizer_id'] ?? 0)
     : (filter_input(INPUT_GET, 'organizer_id', FILTER_VALIDATE_INT) ?: 0);
@@ -254,26 +253,38 @@ if ($regionId > 0) {
     }
 
     $totalPages = max(1, (int) ceil($totalEvents / $agendaPageSize));
+    // Bij een nieuwe agendaweergave tonen we een reeks met vijf afgelopen
+    // evenementen vóór het eerste actuele/toekomstige evenement.
+    $hasExplicitPage = array_key_exists('page', $_GET);
+    if (!$hasExplicitPage && $totalEvents > 0) {
+        $pastCountQuery = $db->prepare(
+            'SELECT COUNT(*)' . $countFromSql . ' AND COALESCE(e.ends_at, e.starts_at) < :agenda_now'
+        );
+        $pastCountParams = $params;
+        $pastCountParams['agenda_now'] = $now->format('Y-m-d H:i:s');
+        $pastCountQuery->execute($pastCountParams);
+        $pastEventCount = (int) $pastCountQuery->fetchColumn();
+        if ($pastEventCount < $totalEvents) {
+            $desiredOffset = max(0, $pastEventCount - 5);
+            $agendaPage = (int) floor($desiredOffset / $agendaPageSize) + 1;
+        }
+    }
     $agendaPage = min($agendaPage, $totalPages);
     $agendaOffset = ($agendaPage - 1) * $agendaPageSize;
 
-    // Gebruik vaste sorteerwaarden rechtstreeks in de SQL. Zo is de volgorde
-    // onafhankelijk van PDO-placeholderafhandeling: komende starts ASC, daarna
-    // afgelopen einddatums DESC.
+    // Eerst alle afgelopen evenementen in chronologische volgorde; daarna
+    // het eerste actuele evenement en de komende evenementen op starttijd.
     $sortNowSql = $db->quote($now->format('Y-m-d H:i:s'));
     $sql .= " ORDER BY
                   CASE
-                    WHEN COALESCE(e.ends_at, e.starts_at) < $sortNowSql THEN 1
-                    ELSE 0
+                    WHEN COALESCE(e.ends_at, e.starts_at) < $sortNowSql THEN 0
+                    ELSE 1
                   END ASC,
                   CASE
-                    WHEN COALESCE(e.ends_at, e.starts_at) >= $sortNowSql THEN e.starts_at
-                    ELSE '9999-12-31 23:59:59'
+                    WHEN COALESCE(e.ends_at, e.starts_at) < $sortNowSql
+                      THEN COALESCE(e.ends_at, e.starts_at)
+                    ELSE e.starts_at
                   END ASC,
-                  CASE
-                    WHEN COALESCE(e.ends_at, e.starts_at) < $sortNowSql THEN COALESCE(e.ends_at, e.starts_at)
-                    ELSE '1000-01-01 00:00:00'
-                  END DESC,
                   e.id ASC
               LIMIT " . (int) $agendaPageSize . " OFFSET " . (int) $agendaOffset;
     $eventQuery = $db->prepare($sql);
