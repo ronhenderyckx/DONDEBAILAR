@@ -220,10 +220,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($targetEventId < 1) {
                         continue;
                     }
-                    $targetDirectory = DONDEBAILAR_PRIVATE_ROOT . '/uploads/events/' . $targetEventId;
-                    if (!is_dir($targetDirectory) && !mkdir($targetDirectory, 0755, true) && !is_dir($targetDirectory)) {
-                        throw new RuntimeException('De mediamap voor een herhaling kon niet worden aangemaakt.');
-                    }
+                    $targetDirectory = eventMediaDirectory($targetEventId);
                     foreach ($mediaItems as $mediaItem) {
                         $targetPath = null;
                         $sourcePath = (string) ($mediaItem['file_path'] ?? '');
