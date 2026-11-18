@@ -1,9 +1,11 @@
 <?php
 declare(strict_types=1);
 
-require_once dirname(__DIR__) . '/app/bootstrap.php';
-require_once dirname(__DIR__) . '/app/Security.php';
-require_once dirname(__DIR__) . '/app/Authorization.php';
+require_once __DIR__ . '/_private-root.php';
+
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
 
 $db = Database::connection();
 $regions = $db->query(
@@ -42,7 +44,7 @@ $defaultLanguage = strtolower((string) ($region['default_language'] ?? 'nl'));
 if (!in_array($defaultLanguage, $languages, true)) $defaultLanguage = 'nl';
 $language = $defaultLanguage;
 
-$storageFile = dirname(__DIR__) . '/storage/region-info/' . $regionId . '.json';
+$storageFile = DONDEBAILAR_PRIVATE_ROOT . '/storage/region-info/' . $regionId . '.json';
 $translations = [];
 if (is_file($storageFile)) {
     $decoded = json_decode((string) file_get_contents($storageFile), true);
@@ -61,7 +63,7 @@ $label = $labels[$language];
 $escape = static fn($value): string => htmlspecialchars((string) $value, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
 $pageTitle = 'DONDEBAILE - ' . (string) $region['name'];
 $pageRobots = 'index, follow';
-require dirname(__DIR__) . '/app/views/header.php';
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 <section class="region-info-page">
     <div class="region-info-heading">
@@ -99,4 +101,4 @@ require dirname(__DIR__) . '/app/views/header.php';
 .region-info-content{font-size:17px;line-height:1.8;overflow-wrap:anywhere}
 .region-info-empty{padding:22px;background:var(--db-background,#f7f8fa);border-radius:12px}
 </style>
-<?php require dirname(__DIR__) . '/app/views/footer.php'; ?>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
