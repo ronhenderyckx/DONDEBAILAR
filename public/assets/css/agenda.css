@@ -2975,3 +2975,25 @@ body.has-agenda-footer .site-main > .agenda-page {
     background-image:none!important;
     box-shadow:none!important;
 }
+
+
+/* Alle filterknoppen exact dezelfde ovale rand, ongeacht logo of tekst. */
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item,
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item:has(.agenda-organizer-logo),
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item:has(.agenda-city-filter-icon),
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item:not(:has(img)),
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item.is-selected {
+    box-sizing:border-box!important;
+    border-style:solid!important;
+    border-width:1px!important;
+    border-color:var(--db-search-field-color,var(--db-border,#D8DEE8))!important;
+    border-radius:999px!important;
+    outline:0!important;
+    box-shadow:none!important;
+}
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item.is-selected {
+    border-color:var(--db-primary,#E23A2C)!important;
+}
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item.agenda-organizer-item--organizer.is-selected {
+    border-color:var(--db-organizer-color,#E23A2C)!important;
+}
