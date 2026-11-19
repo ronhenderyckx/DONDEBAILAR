@@ -3281,3 +3281,12 @@ body.has-agenda-footer .site-main > .agenda-page {
     min-width:48px!important;
     max-width:48px!important;
 }
+
+
+/* Pc: evenement-/dagkaarten naast elkaar; op smartphone blijft één kaart per rij. */
+@media (min-width: 701px) {
+    .agenda-feed {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        max-width: 1200px;
+    }
+}
