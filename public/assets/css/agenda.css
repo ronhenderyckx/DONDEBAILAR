@@ -3533,3 +3533,18 @@ body.has-agenda-footer .site-main > .agenda-page {
         grid-row: 5;
     }
 }
+
+
+/* Pc: alle evenementkaarten binnen de agenda even hoog. Smartphone blijft ongewijzigd. */
+@media (min-width: 701px) {
+    .agenda-feed {
+        display: grid !important;
+        grid-auto-rows: 1fr !important;
+        align-items: stretch !important;
+    }
+    .agenda-feed > .agenda-card {
+        height: 100% !important;
+        min-height: 0;
+        align-self: stretch !important;
+    }
+}
