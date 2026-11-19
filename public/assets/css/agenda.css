@@ -3660,3 +3660,39 @@ body.has-agenda-footer .site-main > .agenda-page {
         grid-row: 5 !important;
     }
 }
+
+
+/* Pc: media compacter binnen de rechterkolom; geen uitrekken tot de volledige kaarthoogte. */
+@media (min-width: 701px) {
+    .agenda-card > .agenda-card__media-wrap {
+        box-sizing: border-box !important;
+        padding: 12px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+    }
+    .agenda-card__media-wrap .agenda-card__media-slide {
+        flex: 0 1 auto !important;
+        width: 100% !important;
+        max-height: 170px !important;
+        min-height: 0 !important;
+        justify-content: center !important;
+        overflow: hidden !important;
+    }
+    .agenda-card__media-wrap .agenda-card__image-link,
+    .agenda-card__media-wrap .agenda-card__video {
+        flex: 0 1 auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: 170px !important;
+        margin: 0 auto !important;
+        object-fit: contain !important;
+    }
+    .agenda-card__media-wrap .agenda-card__image-link .agenda-card__image {
+        width: 100% !important;
+        height: auto !important;
+        max-height: 170px !important;
+        object-fit: contain !important;
+    }
+}
