@@ -3716,3 +3716,16 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-card:has(.agenda-card__placeholder) .agenda-card__details > h2 {
     display: block !important;
 }
+
+
+/* Dagkoppen groeperen de evenementkaarten per kalenderdag. */
+.agenda-day-heading {
+    grid-column: 1 / -1;
+    margin: 12px 0 -8px;
+    padding: 0 0 8px;
+    border-bottom: 2px solid var(--db-primary, #E23A2C);
+    color: var(--db-text, #222);
+    font-size: 18px;
+    font-weight: 800;
+    line-height: 1.3;
+}
