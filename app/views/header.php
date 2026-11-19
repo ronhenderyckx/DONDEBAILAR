@@ -490,7 +490,7 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
 <style>
 .agenda-region-selector{display:flex;align-items:center;margin:0 0 7px}
 .agenda-region-selector select{width:100%;min-height:34px;padding:5px 32px 5px 10px;border:1px solid var(--db-border,#ddd);border-radius:9px;background:var(--db-surface,#fff);color:var(--db-text);font:inherit;font-size:13px;font-weight:700}
-.agenda-city-filter-icon{display:block;width:62px!important;height:62px!important;min-width:62px;min-height:62px;max-width:62px;max-height:62px;flex:0 0 62px;object-fit:contain;background:transparent}
+.agenda-city-filter-icon{display:block;width:38px!important;height:38px!important;min-width:38px;min-height:38px;max-width:38px;max-height:38px;flex:0 0 38px;object-fit:contain;background:transparent}
 .site-header__inner{display:flex;align-items:center;justify-content:flex-start;gap:8px;min-height:44px!important}
 .site-brand-group{display:flex;align-items:center;gap:0;min-width:0;flex:0 0 auto;margin-right:auto}
 .site-brand--platform{display:flex;align-items:center;justify-content:flex-start;min-height:40px;min-width:0;flex:0 0 auto;padding:0;border:0;text-decoration:none}
