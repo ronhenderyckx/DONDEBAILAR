@@ -2499,3 +2499,18 @@ body.has-agenda-footer .site-main > .agenda-page {
     content: none !important;
     display: none !important;
 }
+
+
+/* Stadslogo's en organisatielogo's exact even groot houden. */
+.agenda-organizer-item img.agenda-organizer-logo,
+.agenda-organizer-item img.agenda-city-filter-icon,
+.agenda-organizer-item .agenda-organizer-fallback {
+    width:38px!important;
+    height:38px!important;
+    min-width:38px!important;
+    min-height:38px!important;
+    max-width:38px!important;
+    max-height:38px!important;
+    flex:0 0 38px!important;
+    object-fit:contain!important;
+}
