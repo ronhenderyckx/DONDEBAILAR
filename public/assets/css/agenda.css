@@ -2997,3 +2997,26 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item.agenda-organizer-item--organizer.is-selected {
     border-color:var(--db-organizer-color,#E23A2C)!important;
 }
+
+
+/* Smartphone/tablet: mobiele knopregels expliciet overschrijven.
+   Logo- en tekstknoppen krijgen identieke randvorm, dikte en binnenruimte. */
+@media (max-width:900px) {
+    .agenda-selector-panel .agenda-organizer-strip a.agenda-organizer-item,
+    .agenda-selector-panel .agenda-organizer-strip a.agenda-organizer-item:has(img),
+    .agenda-selector-panel .agenda-organizer-strip a.agenda-organizer-item:not(:has(img)),
+    .agenda-selector-panel .agenda-organizer-strip a.agenda-organizer-item.is-selected {
+        box-sizing:border-box!important;
+        border:1px solid var(--db-search-field-color,var(--db-border,#D8DEE8))!important;
+        border-radius:999px!important;
+        outline:none!important;
+        box-shadow:none!important;
+        background-image:none!important;
+    }
+    .agenda-selector-panel .agenda-organizer-strip a.agenda-organizer-item.is-selected {
+        border-color:var(--db-primary,#E23A2C)!important;
+    }
+    .agenda-selector-panel .agenda-organizer-strip a.agenda-organizer-item.agenda-organizer-item--organizer.is-selected {
+        border-color:var(--db-organizer-color,#E23A2C)!important;
+    }
+}
