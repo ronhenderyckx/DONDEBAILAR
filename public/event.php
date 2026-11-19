@@ -59,23 +59,28 @@ $eventWeekday = (int) $eventDate->format('N');
 $eventInfoTextColor = 'var(--db-weekday-text-' . $eventWeekday . ', #222222)';
 ?>
 <section class="admin-page public-event-page" style="--db-event-info-text-color:<?= $escape($eventInfoTextColor) ?>">
-    <p class="eyebrow"><?= $escape($event['region_name']) ?></p>
-    <h1><?= $escape($event['title']) ?></h1>
-    <p><strong><?= $escape(date('d-m-Y H:i', strtotime($event['starts_at']))) ?></strong></p>
-    <p class="public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important">Organisator: <?= $escape($event['organizer_name']) ?></p>
-    <?php if (!empty($event['location_name'])): ?>
-        <p class="public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important">Locatie: <?= $escape($event['location_name']) ?><?= !empty($event['location_city']) ? ' — ' . $escape($event['location_city']) : '' ?></p>
-    <?php endif; ?>
-    <?php if (!empty($event['description'])): ?><div class="public-event-description public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important"><?= nl2br($escape($event['description'])) ?></div><?php endif; ?>
-    <?php if (!empty($event['extra_info'])): ?><section class="public-event-extra-info public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important"><h2>Extra info</h2><div><?= nl2br($escape($event['extra_info'])) ?></div></section><?php endif; ?>
-    <?php
-    $eventHashtags = preg_split('/[\s,]+/u', trim((string) ($event['hashtags'] ?? '')), -1, PREG_SPLIT_NO_EMPTY) ?: [];
-    $eventHashtags = array_values(array_filter(array_map(static function (string $tag): string {
-        $tag = ltrim($tag, '#');
-        return preg_match('/\A[\p{L}\p{N}_]+\z/u', $tag) ? '#' . $tag : '';
-    }, $eventHashtags)));
-    ?>
-    <?php if ($eventHashtags !== []): ?><p class="public-event-hashtags public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important"><?= implode(' ', array_map($escape, $eventHashtags)) ?></p><?php endif; ?>
+    <div data-event-info class="public-event-swipe-area">
+        <p class="eyebrow"><?= $escape($event['region_name']) ?></p>
+        <h1><?= $escape($event['title']) ?></h1>
+        <p><strong><?= $escape(date('d-m-Y H:i', strtotime($event['starts_at']))) ?></strong></p>
+        <?php
+        $eventHashtags = preg_split('/[\s,]+/u', trim((string) ($event['hashtags'] ?? '')), -1, PREG_SPLIT_NO_EMPTY) ?: [];
+        $eventHashtags = array_values(array_filter(array_map(static function (string $tag): string {
+            $tag = ltrim($tag, '#');
+            return preg_match('/\A[\p{L}\p{N}_]+\z/u', $tag) ? '#' . $tag : '';
+        }, $eventHashtags)));
+        ?>
+        <?php if ($eventHashtags !== []): ?><p class="public-event-hashtags public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important"><?= implode(' ', array_map($escape, $eventHashtags)) ?></p><?php endif; ?>
+        <p class="agenda-card__swipe-hint" data-swipe-hint>→ Swipe voor meer info</p>
+        <div class="public-event-swipe-details" data-event-description aria-hidden="true">
+            <p class="public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important">Organisator: <?= $escape($event['organizer_name']) ?></p>
+            <?php if (!empty($event['location_name'])): ?>
+                <p class="public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important">Locatie: <?= $escape($event['location_name']) ?><?= !empty($event['location_city']) ? ' — ' . $escape($event['location_city']) : '' ?></p>
+            <?php endif; ?>
+            <?php if (!empty($event['description'])): ?><div class="public-event-description public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important"><?= nl2br($escape($event['description'])) ?></div><?php endif; ?>
+            <?php if (!empty($event['extra_info'])): ?><section class="public-event-extra-info public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important"><h2>Extra info</h2><div><?= nl2br($escape($event['extra_info'])) ?></div></section><?php endif; ?>
+        </div>
+    </div>
     <?php
     $messageCountQuery = $db->prepare("SELECT COUNT(*) FROM event_messages WHERE event_id = :event_id AND is_deleted = 0");
     $messageCountQuery->execute(['event_id' => $id]);
@@ -119,6 +124,36 @@ $eventInfoTextColor = 'var(--db-weekday-text-' . $eventWeekday . ', #222222)';
     <?php endif; ?>
 </section>
 <style>
-.public-event-page{max-width:1000px;margin:0 auto}.public-event-page .public-event-info-text,.public-event-page .public-event-info-text *{color:var(--db-event-info-text-color,#222222)!important}.public-event-page .public-event-description,.public-event-page .public-event-description *{color:var(--db-event-info-text-color,#222222)!important}.public-event-page .public-event-info-text a:not(.button){color:var(--db-event-info-text-color,#222222)!important}.public-event-message-link{margin:18px 0 24px}.public-event-description{margin:24px 0;line-height:1.7}.public-event-hashtags{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 24px;color:var(--db-primary);font-weight:700;overflow-wrap:anywhere}.public-event-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}.public-event-media-item{min-width:0;padding:12px;border:1px solid #e7eaf0;border-radius:10px;background:#fff}.public-event-media-item img,.public-event-media-item video,.public-event-media-item iframe{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/5;border:0;border-radius:7px;background:#111;object-fit:contain}.public-event-media-item iframe{height:520px}.public-event-media-item p{overflow-wrap:anywhere}
+.public-event-page{max-width:1000px;margin:0 auto}.public-event-swipe-area{touch-action:pan-y}.public-event-swipe-details{display:none}.public-event-swipe-details.is-visible{display:block}.public-event-swipe-area .agenda-card__swipe-hint{display:block!important;margin:8px 0 12px!important;font-size:12px;font-weight:700;line-height:1.4;opacity:.85}.public-event-page .public-event-info-text,.public-event-page .public-event-info-text *{color:var(--db-event-info-text-color,#222222)!important}.public-event-page .public-event-description,.public-event-page .public-event-description *{color:var(--db-event-info-text-color,#222222)!important}.public-event-page .public-event-info-text a:not(.button){color:var(--db-event-info-text-color,#222222)!important}.public-event-message-link{margin:18px 0 24px}.public-event-description{margin:24px 0;line-height:1.7}.public-event-hashtags{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 24px;color:var(--db-primary);font-weight:700;overflow-wrap:anywhere}.public-event-media{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:18px}.public-event-media-item{min-width:0;padding:12px;border:1px solid #e7eaf0;border-radius:10px;background:#fff}.public-event-media-item img,.public-event-media-item video,.public-event-media-item iframe{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/5;border:0;border-radius:7px;background:#111;object-fit:contain}.public-event-media-item iframe{height:520px}.public-event-media-item p{overflow-wrap:anywhere}
 </style>
+<script>
+(function () {
+    document.querySelectorAll('[data-event-info]').forEach(function (info) {
+        const details = info.querySelector('[data-event-description]');
+        if (!details) return;
+        let start = null;
+        function finish(x, y) {
+            if (!start) return;
+            const dx = x - start.x;
+            const dy = y - start.y;
+            start = null;
+            if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.25) return;
+            const show = dx < 0;
+            details.classList.toggle('is-visible', show);
+            details.setAttribute('aria-hidden', show ? 'false' : 'true');
+            const hint = info.querySelector('[data-swipe-hint]');
+            if (hint) hint.textContent = show ? '← Swipe voor minder info' : '→ Swipe voor meer info';
+        }
+        info.addEventListener('touchstart', function (event) {
+            if (event.changedTouches.length) {
+                start = {x:event.changedTouches[0].clientX, y:event.changedTouches[0].clientY};
+            }
+        }, {passive:true});
+        info.addEventListener('touchend', function (event) {
+            if (event.changedTouches.length) finish(event.changedTouches[0].clientX, event.changedTouches[0].clientY);
+        }, {passive:true});
+        info.addEventListener('touchcancel', function () { start = null; }, {passive:true});
+    });
+})();
+</script>
 <?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
