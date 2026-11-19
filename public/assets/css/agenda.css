@@ -3351,3 +3351,116 @@ body.has-agenda-footer .site-main > .agenda-page {
         padding: 0 20px 12px;
     }
 }
+
+
+/* Pc: naam en datum bovenaan, iconen eronder, locatie en organisator daaronder, media rechts. Smartphone blijft ongewijzigd. */
+@media (min-width: 701px) {
+    .agenda-card {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) minmax(220px, 30%) !important;
+        grid-auto-rows: min-content;
+        align-items: start;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    /* Maak de inhoud van details afzonderlijke grid-items, zodat de info
+       onder de iconen kan staan zonder de smartphone-swipe te wijzigen. */
+    .agenda-card > .agenda-card__details {
+        display: contents !important;
+    }
+    .agenda-card > .agenda-card__details > h2,
+    .agenda-card > .agenda-card__details > .agenda-card__date-line,
+    .agenda-card > .agenda-card__details > .agenda-card__hashtags,
+    .agenda-card > .agenda-card__details > .agenda-card__description {
+        grid-column: 1;
+        min-width: 0;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 20px;
+        padding-right: 20px;
+        text-align: left !important;
+        order: 0;
+    }
+    .agenda-card > .agenda-card__details > h2 {
+        grid-row: 1;
+        padding-top: 12px;
+        margin-bottom: 5px !important;
+    }
+    .agenda-card > .agenda-card__details > .agenda-card__date-line {
+        grid-row: 2;
+        margin-bottom: 5px !important;
+    }
+    .agenda-card > .agenda-card__details > .agenda-card__hashtags {
+        grid-row: 3;
+        margin-top: 0 !important;
+        padding-bottom: 4px;
+    }
+    .agenda-card > .agenda-card__quick {
+        grid-column: 1;
+        grid-row: 4;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: nowrap;
+        align-items: center;
+        justify-content: flex-start;
+        gap: 10px;
+        min-width: 0;
+        margin: 0;
+        padding: 4px 20px 10px;
+        position: relative !important;
+        top: auto !important;
+        box-shadow: none !important;
+        order: 0;
+    }
+    .agenda-card__quick > * {
+        flex: 0 0 auto;
+        min-width: 0;
+    }
+    .agenda-card > .agenda-card__details > .agenda-card__description {
+        grid-row: 5;
+        display: block !important;
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding-top: 0;
+        padding-bottom: 10px;
+        opacity: 1 !important;
+        transition: none !important;
+    }
+    .agenda-card__description-inner {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .agenda-card__info-scroller {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        min-width: 0;
+        overflow: visible;
+    }
+    .agenda-card__info-block,
+    .agenda-card__info-block--organizer {
+        margin: 0 !important;
+        min-width: 0;
+    }
+    /* De langere evenementbeschrijving blijft onderdeel van de swipe-info,
+       niet van de vaste desktoprij. */
+    .agenda-card__description-text {
+        display: none !important;
+    }
+    .agenda-card > .agenda-card__media-wrap {
+        grid-column: 2;
+        grid-row: 1 / span 5;
+        min-width: 0;
+        align-self: stretch;
+        border-radius: 0 14px 14px 0;
+    }
+    .agenda-card > .agenda-card__swipe-hint {
+        grid-column: 1;
+        grid-row: 6;
+        margin: 0 !important;
+        padding: 0 20px 12px;
+    }
+}
