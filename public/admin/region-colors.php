@@ -316,13 +316,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
                 try {
                     $uploadedRegionLogo = storeOptimizedLogoUpload(
                         $_FILES['region_logo'],
-                        'public/uploads/regions',
+                        'uploads/regions',
                         800,
                         5 * 1024 * 1024,
-                        'region-' . $regionId . '-'
+                        'region-' . $regionId . '-',
+                        dirname(__DIR__)
                     );
                     if ($uploadedRegionLogo !== null) {
-                        $newLogoPath = substr($uploadedRegionLogo, strlen('public/'));
+                        $newLogoPath = $uploadedRegionLogo;
                     }
                 } catch (RuntimeException $exception) {
                     $errorMessage = $exception->getMessage();
