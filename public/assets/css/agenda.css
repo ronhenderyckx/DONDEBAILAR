@@ -3134,3 +3134,12 @@ body.has-agenda-footer .site-main > .agenda-page {
     max-width:34px!important;
     max-height:34px!important;
 }
+
+/* Wisselknop: verberg het niet-actieve icoon ook wanneer de algemene
+   icoonregels display:grid gebruiken. Zo staat er nooit twee iconen naast elkaar. */
+.agenda-selector-line > #agenda-filter-switch .agenda-filter-switch-icon[hidden] {
+    display:none!important;
+}
+.agenda-selector-line > #agenda-filter-switch .agenda-filter-switch-icon:not([hidden]) {
+    display:grid!important;
+}
