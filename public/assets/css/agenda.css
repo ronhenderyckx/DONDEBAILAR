@@ -3551,3 +3551,80 @@ body.has-agenda-footer .site-main > .agenda-page {
         min-height: 0;
     }
 }
+
+
+/* Pc: titel helemaal linksboven; datum er direct onder.
+   Media vult de hoogte van de kaart die door de tekst wordt bepaald. */
+@media (min-width: 701px) {
+    .agenda-feed > .agenda-card {
+        display: grid !important;
+        grid-template-columns: minmax(240px, 1fr) minmax(280px, 1.15fr) minmax(220px, 30%) !important;
+        grid-auto-rows: min-content;
+        align-items: stretch !important;
+        height: auto !important;
+    }
+    .agenda-card > .agenda-card__details {
+        display: contents !important;
+    }
+    .agenda-card > .agenda-card__details > h2 {
+        grid-column: 1 !important;
+        grid-row: 1 !important;
+        justify-self: stretch;
+        text-align: left !important;
+        margin: 0 !important;
+        padding: 12px 10px 4px 12px !important;
+    }
+    .agenda-card > .agenda-card__details > .agenda-card__date-line {
+        grid-column: 1 !important;
+        grid-row: 2 !important;
+        text-align: left !important;
+        margin: 0 !important;
+        padding: 0 10px 4px 12px !important;
+    }
+    .agenda-card > .agenda-card__details > .agenda-card__hashtags {
+        grid-column: 1 !important;
+        grid-row: 3 !important;
+        padding-left: 12px !important;
+        padding-right: 10px !important;
+    }
+    .agenda-card > .agenda-card__quick {
+        grid-column: 1 !important;
+        grid-row: 4 !important;
+        width: auto !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding-left: 12px !important;
+        flex-wrap: wrap;
+    }
+    .agenda-card > .agenda-card__details > .agenda-card__description {
+        grid-column: 2 !important;
+        grid-row: 1 / span 4 !important;
+        align-self: center !important;
+    }
+    .agenda-card > .agenda-card__media-wrap {
+        grid-column: 3 !important;
+        grid-row: 1 / span 5 !important;
+        align-self: stretch !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: stretch !important;
+        height: 100% !important;
+        min-height: 0 !important;
+    }
+    .agenda-card__media-wrap > .agenda-card__image-link,
+    .agenda-card__media-slide > .agenda-card__image-link,
+    .agenda-card__media-wrap > .agenda-card__video,
+    .agenda-card__media-slide > .agenda-card__video {
+        flex: 1 1 auto !important;
+        min-height: 0 !important;
+    }
+    .agenda-card__image-link .agenda-card__image {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: cover !important;
+    }
+    .agenda-card > .agenda-card__swipe-hint {
+        grid-column: 1 !important;
+        grid-row: 5 !important;
+    }
+}
