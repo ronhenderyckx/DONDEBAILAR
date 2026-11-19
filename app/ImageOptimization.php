@@ -62,7 +62,7 @@ function optimizeLogoDataToWebp(string $data, string $destination, int $maxDimen
 }
 
 /** Store a validated uploaded logo and return its relative WebP path. */
-function storeOptimizedLogoUpload(array $file, string $relativeDirectory, int $maxDimension, int $maxUploadBytes = 5242880, string $prefix = ''): ?string
+function storeOptimizedLogoUpload(array $file, string $relativeDirectory, int $maxDimension, int $maxUploadBytes = 5242880, string $prefix = '', ?string $storageRoot = null): ?string
 {
     $error = (int) ($file['error'] ?? UPLOAD_ERR_NO_FILE);
     if ($error === UPLOAD_ERR_NO_FILE) {
@@ -83,13 +83,13 @@ function storeOptimizedLogoUpload(array $file, string $relativeDirectory, int $m
         throw new RuntimeException('Het geüploade logo kon niet worden gelezen.');
     }
 
-    return storeOptimizedLogoData($data, $relativeDirectory, $maxDimension, $prefix);
+    return storeOptimizedLogoData($data, $relativeDirectory, $maxDimension, $prefix, $storageRoot);
 }
 
 /** Store validated image bytes (including logos discovered online) as WebP. */
-function storeOptimizedLogoData(string $data, string $relativeDirectory, int $maxDimension, string $prefix = ''): string
+function storeOptimizedLogoData(string $data, string $relativeDirectory, int $maxDimension, string $prefix = '', ?string $storageRoot = null): string
 {
-    $projectRoot = dirname(__DIR__);
+    $projectRoot = $storageRoot !== null ? rtrim($storageRoot, '/\\') : dirname(__DIR__);
     $relativeDirectory = trim($relativeDirectory, '/');
     if ($relativeDirectory === '' || str_contains($relativeDirectory, '..')) {
         throw new RuntimeException('Ongeldige uploadmap voor het logo.');
