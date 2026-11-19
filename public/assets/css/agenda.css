@@ -2514,3 +2514,36 @@ body.has-agenda-footer .site-main > .agenda-page {
     flex:0 0 38px!important;
     object-fit:contain!important;
 }
+
+
+/* Steden en organisatoren: nooit een losse beginletter tonen.
+   Met logo staan logo en naam naast elkaar; zonder logo staat alleen de naam gecentreerd. */
+.agenda-organizer-item {
+    display:flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:8px!important;
+    text-align:center!important;
+}
+.agenda-organizer-item .agenda-organizer-fallback { display:none!important; }
+.agenda-organizer-item .agenda-organizer-name {
+    flex:0 1 auto!important;
+    min-width:0!important;
+    text-align:center!important;
+}
+.agenda-organizer-item:not(:has(img.agenda-organizer-logo)):not(:has(img.agenda-city-filter-icon)) .agenda-organizer-name {
+    width:100%!important;
+    margin-inline:auto!important;
+}
+.agenda-organizer-item img.agenda-organizer-logo,
+.agenda-organizer-item img.agenda-city-filter-icon {
+    display:block!important;
+    flex:0 0 38px!important;
+    width:38px!important;
+    height:38px!important;
+    min-width:38px!important;
+    min-height:38px!important;
+    max-width:38px!important;
+    max-height:38px!important;
+    object-fit:contain!important;
+}
