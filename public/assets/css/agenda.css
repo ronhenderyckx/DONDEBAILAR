@@ -3628,3 +3628,35 @@ body.has-agenda-footer .site-main > .agenda-page {
         grid-row: 5 !important;
     }
 }
+
+
+/* Pc: ruimte voor vijf tekstregels; kaart groeit verder als tekst meer plaats vraagt.
+   De media rechts volgt altijd de volledige kaarthoogte. */
+@media (min-width: 701px) {
+    .agenda-feed > .agenda-card {
+        min-height: calc(5 * 1.5em + 28px) !important;
+        height: auto !important;
+        grid-template-rows: repeat(5, minmax(1.5em, auto)) !important;
+        align-items: stretch !important;
+    }
+    .agenda-card > .agenda-card__details > h2 { grid-row: 1 !important; }
+    .agenda-card > .agenda-card__details > .agenda-card__date-line { grid-row: 2 !important; }
+    .agenda-card > .agenda-card__details > .agenda-card__hashtags { grid-row: 3 !important; }
+    .agenda-card > .agenda-card__quick { grid-row: 4 !important; }
+    .agenda-card > .agenda-card__details > .agenda-card__description {
+        grid-column: 2 !important;
+        grid-row: 1 / span 5 !important;
+        align-self: stretch !important;
+    }
+    .agenda-card > .agenda-card__media-wrap {
+        grid-column: 3 !important;
+        grid-row: 1 / span 5 !important;
+        align-self: stretch !important;
+        height: 100% !important;
+        min-height: 0 !important;
+    }
+    .agenda-card > .agenda-card__swipe-hint {
+        grid-column: 1 !important;
+        grid-row: 5 !important;
+    }
+}
