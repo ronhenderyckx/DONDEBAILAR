@@ -2464,11 +2464,18 @@ body.has-agenda-footer .site-main > .agenda-page {
 }
 
 
-/* Ovaal kader rond de locatie- en organisatorkaarten op smartphone. */
+/* Eén doorlopend ovaal kader rond de volledige locatie-/organisatorbalk.
+   De rand volgt dezelfde instelbare kleur als het zoekveld van de regio. */
 @media (max-width: 700px) {
-    .agenda-card__info-scroller > .agenda-card__info-block {
-        border: 1px solid rgba(255,255,255,.75);
+    .agenda-card__info-scroller {
+        box-sizing: border-box;
+        border: 1px solid var(--db-search-field-color, #FFFFFF);
         border-radius: 22px;
+        padding: 8px;
+    }
+    .agenda-card__info-scroller > .agenda-card__info-block {
+        border: 0;
+        border-radius: 0;
         box-sizing: border-box;
     }
 }
