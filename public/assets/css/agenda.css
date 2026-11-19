@@ -3535,16 +3535,19 @@ body.has-agenda-footer .site-main > .agenda-page {
 }
 
 
-/* Pc: alle evenementkaarten binnen de agenda even hoog. Smartphone blijft ongewijzigd. */
+/* Pc: elke dagkaart krijgt een natuurlijke hoogte op basis van de eigen tekstinhoud. */
 @media (min-width: 701px) {
     .agenda-feed {
-        display: grid !important;
-        grid-auto-rows: 1fr !important;
-        align-items: stretch !important;
+        grid-auto-rows: auto !important;
+        align-items: start !important;
     }
     .agenda-feed > .agenda-card {
-        height: 100% !important;
+        height: auto !important;
         min-height: 0;
-        align-self: stretch !important;
+        align-self: start !important;
+    }
+    .agenda-card > .agenda-card__media-wrap {
+        align-self: stretch;
+        min-height: 0;
     }
 }
