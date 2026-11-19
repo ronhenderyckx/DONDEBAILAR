@@ -523,17 +523,20 @@ document.querySelectorAll('.agenda-card__video').forEach(function (video) {
     // daadwerkelijk heeft weergegeven. loadeddata alleen kan nog een zwart
     // tussenbeeld opleveren; requestVideoFrameCallback wacht op een gerenderd frame.
     video.addEventListener('playing', function () {
+        // Na het vrijgeven en opnieuw laden van een inactieve galerij-slide
+        // moet ook het eerste beeld opnieuw zichtbaar worden. Daarom blijft
+        // deze listener actief bij iedere hervatting van dezelfde video.
         if (typeof video.requestVideoFrameCallback === 'function') {
             video.requestVideoFrameCallback(function () {
                 video.classList.add('is-frame-ready');
             });
         } else {
-            // Oudere browsers: wacht op de eerste voortgang van de afspelende video.
+            // Oudere browsers: wacht per afspeelbeurt op de eerste voortgang.
             video.addEventListener('timeupdate', function revealFirstFrame() {
                 video.classList.add('is-frame-ready');
             }, {once:true});
         }
-    }, {once:true});
+    });
     video.muted = agendaVideosMuted;
     video.removeAttribute('autoplay');
     // Haal metadata van de eerste zichtbare video meteen op; overige video's blijven uitgesteld.
