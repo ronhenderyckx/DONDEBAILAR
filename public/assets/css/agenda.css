@@ -3103,3 +3103,34 @@ body.has-agenda-footer .site-main > .agenda-page {
     max-width:34px!important;
     max-height:34px!important;
 }
+
+
+/* Wisselknop even groot als de filterknoppen, met alleen het actieve icoon. */
+.agenda-selector-line > .agenda-selector-button {
+    flex:0 0 82px!important;
+    width:82px!important;
+    min-width:82px!important;
+    max-width:82px!important;
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    padding:2px 5px!important;
+    justify-content:center!important;
+}
+.agenda-selector-line > .agenda-selector-button .agenda-filter-switch-label {
+    display:none!important;
+}
+.agenda-selector-line > .agenda-selector-button .agenda-filter-switch-icon {
+    flex:0 0 34px!important;
+    width:34px!important;
+    height:34px!important;
+    min-width:34px!important;
+    max-width:34px!important;
+}
+.agenda-selector-line > .agenda-selector-button .agenda-filter-icon--image,
+.agenda-selector-line > .agenda-selector-button .agenda-filter-icon {
+    width:34px!important;
+    height:34px!important;
+    max-width:34px!important;
+    max-height:34px!important;
+}
