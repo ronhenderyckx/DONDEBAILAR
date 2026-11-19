@@ -59,53 +59,22 @@ if (agendaFilterSwitch) {
     });
     showAgendaFilter(agendaFilterIndex);
 }
-// Swipe over de evenementinformatie: rechts toont de uitleg, links verbergt ze.
+// Meer evenementinformatie openen of sluiten met een tik/klik.
 function setEventDescription(info, show) {
     const description = info ? info.querySelector('[data-event-description]') : null;
     if (!description) return;
     description.classList.toggle('is-visible', show);
     description.setAttribute('aria-hidden', show ? 'false' : 'true');
-    const hint = info.querySelector('[data-swipe-hint]');
-    if (hint) hint.textContent = show
-        ? '← Swipe voor minder info'
-        : '→ Swipe voor meer info';
 }
 document.querySelectorAll('[data-event-info]').forEach(function (info) {
-    if (!info.querySelector('[data-event-description]')) return;
-    let start = null;
-    info.addEventListener('touchstart', function (event) {
-        if (!event.changedTouches.length) return;
-        const touch = event.changedTouches[0];
-        start = {x: touch.clientX, y: touch.clientY};
-    }, {passive:true});
-    info.addEventListener('touchend', function (event) {
-        if (!start || !event.changedTouches.length) return;
-        const touch = event.changedTouches[0];
-        const dx = touch.clientX - start.x;
-        const dy = touch.clientY - start.y;
-        start = null;
-        if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.25) return;
-        setEventDescription(info, dx < 0);
-    }, {passive:true});
-    info.addEventListener('touchcancel', function () { start = null; }, {passive:true});
+    const description = info.querySelector('[data-event-description]');
+    if (!description) return;
+    info.addEventListener('click', function (event) {
+        // Links en bedieningselementen behouden hun eigen klikfunctie.
+        if (event.target.closest('a, button, input, select, textarea, video')) return;
+        setEventDescription(info, description.getAttribute('aria-hidden') !== 'false');
+    });
 });
-let eventInfoPointerStart = null;
-document.addEventListener('pointerdown', function (event) {
-    if (event.pointerType === 'touch') return;
-    const info = event.target.closest('[data-event-info]');
-    if (!info || !info.querySelector('[data-event-description]')) return;
-    eventInfoPointerStart = {info:info, pointerId:event.pointerId, x:event.clientX, y:event.clientY};
-}, {passive:true});
-document.addEventListener('pointerup', function (event) {
-    if (!eventInfoPointerStart || event.pointerId !== eventInfoPointerStart.pointerId) return;
-    const start = eventInfoPointerStart;
-    eventInfoPointerStart = null;
-    const dx = event.clientX - start.x;
-    const dy = event.clientY - start.y;
-    if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy) * 1.25) return;
-    setEventDescription(start.info, dx < 0);
-}, {passive:true});
-document.addEventListener('pointercancel', function () { eventInfoPointerStart = null; }, {passive:true});
 
 // Mobiele browsers blokkeren automatisch afspelen met geluid.
 const agendaIsMobileVideo = window.matchMedia('(max-width: 700px)').matches;
