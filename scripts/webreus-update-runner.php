@@ -39,6 +39,21 @@ if (!function_exists('dondebailar_webreus_run')) {
         $privateRoot = $accountRoot . DIRECTORY_SEPARATOR . 'private' . DIRECTORY_SEPARATOR . 'DONDEBAILAR-TEST';
         $privateParent = $accountRoot . DIRECTORY_SEPARATOR . 'private';
 
+        // GitHub token is stored outside the public document root, never in the repository.
+        $githubTokenFile = $privateParent . DIRECTORY_SEPARATOR . 'dondebailar-github-token.php';
+        if (is_link($githubTokenFile) || !is_file($githubTokenFile)) {
+            throw new RuntimeException('De beveiligde GitHub-token ontbreekt. Plaats private/dondebailar-github-token.php op WebReus.');
+        }
+        $realTokenFile = realpath($githubTokenFile);
+        if ($realTokenFile === false || !str_starts_with($realTokenFile, $privateParent . DIRECTORY_SEPARATOR)) {
+            throw new RuntimeException('Het pad van de GitHub-token is niet veilig.');
+        }
+        $githubToken = require $realTokenFile;
+        if (!is_string($githubToken) || !preg_match('/^(github_pat_|ghp_)[A-Za-z0-9_]{20,}$/', trim($githubToken))) {
+            throw new RuntimeException('De beveiligde GitHub-token heeft een ongeldig formaat.');
+        }
+        $githubToken = trim($githubToken);
+
         $manifestUrl = 'https://raw.githubusercontent.com/ronhenderyckx/DONDEBAILAR/develop/database/update-commands.json';
         $ch = curl_init($manifestUrl);
         if ($ch === false) {
@@ -51,7 +66,11 @@ if (!function_exists('dondebailar_webreus_run')) {
             CURLOPT_TIMEOUT => 25,
             CURLOPT_SSL_VERIFYPEER => true,
             CURLOPT_SSL_VERIFYHOST => 2,
-            CURLOPT_HTTPHEADER => ['Accept: application/json'],
+            CURLOPT_HTTPHEADER => [
+                'Accept: application/json',
+                'Authorization: Bearer ' . $githubToken,
+                'User-Agent: DONDEBAILAR-WebReus-Updater',
+            ],
         ]);
         $manifestBody = curl_exec($ch);
         $httpCode = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -76,7 +95,7 @@ if (!function_exists('dondebailar_webreus_run')) {
         $results = [];
         $results[] = 'Runner-versie: webreus-central-private-root-20261118-1';
 
-        $curlGet = static function (string $url, string $accept = 'application/vnd.github+json'): string {
+        $curlGet = static function (string $url, string $accept = 'application/vnd.github+json') use ($githubToken): string {
             $ch = curl_init($url);
             if ($ch === false) {
                 throw new RuntimeException('GitHub-verbinding kon niet worden gestart.');
@@ -88,7 +107,11 @@ if (!function_exists('dondebailar_webreus_run')) {
                 CURLOPT_TIMEOUT => 25,
                 CURLOPT_SSL_VERIFYPEER => true,
                 CURLOPT_SSL_VERIFYHOST => 2,
-                CURLOPT_HTTPHEADER => ['Accept: ' . $accept, 'User-Agent: DONDEBAILAR-WebReus-Updater'],
+                CURLOPT_HTTPHEADER => [
+                    'Accept: ' . $accept,
+                    'Authorization: Bearer ' . $githubToken,
+                    'User-Agent: DONDEBAILAR-WebReus-Updater',
+                ],
             ]);
             $body = curl_exec($ch);
             $status = (int) curl_getinfo($ch, CURLINFO_HTTP_CODE);
