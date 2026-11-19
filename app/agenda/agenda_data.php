@@ -52,7 +52,7 @@ if ($currentUser === null) {
 $visitorHash = $visitorToken !== '' ? hash('sha256', $visitorToken) : '';
 $regions = $db->query(
     "SELECT r.id, r.name, r.timezone,
-            CASE WHEN a.region_id IS NOT NULL THEN a.logo_path ELSE r.logo_path END AS logo_path,
+            COALESCE(NULLIF(a.logo_path, ''), NULLIF(r.logo_path, '')) AS logo_path,
             a.primary_color, a.primary_dark, a.accent_color,
             a.secondary_color, a.tertiary_color, a.header_color, a.menu_color, a.organizer_color, a.filter_hover_color,
             a.filter_bar_color, a.filter_text_color, a.search_button_color, a.back_top_color,
