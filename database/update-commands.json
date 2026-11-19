@@ -2,7 +2,7 @@
     "format_version": 1,
     "project": "DONDEBAILAR",
     "environment": "test",
-    "release": "webreus-agenda-video-gallery-frame-resume-20261119-22",
+    "release": "webreus-agenda-filter-selected-color-consistency-20261119-23",
     "source_ref": "develop",
     "deployment": {
         "strategy": "separate_private_and_public_roots",
@@ -31,7 +31,8 @@
         "notes": [
             "Each environment has its own private application files, local configuration, uploads, storage and database settings.",
             "The public_root contains only the contents of the repository public/ directory.",
-            "The production target must never be modified by a test or preview update."
+            "The production target must never be modified by a test or preview update.",
+            "The TEST deployment includes the agenda CSS update that makes selected organizer and city filter buttons use the same regional selected background color, with or without a logo."
         ]
     },
     "steps": [
@@ -70,7 +71,7 @@
         {
             "id": "deploy_test_public_application",
             "type": "deploy_public_repository_tree",
-            "description": "Publiceert uitsluitend de inhoud van de GitHub-map public/ naar de publieke WebReus TEST-map; beschermt de vaste updaterbestanden.",
+            "description": "Publiceert uitsluitend de inhoud van de GitHub-map public/ naar de publieke WebReus TEST-map; bevat ook de agenda-CSS met uniforme geselecteerde filterkleur en beschermt de vaste updaterbestanden.",
             "source_path": "public/"
         },
         {
