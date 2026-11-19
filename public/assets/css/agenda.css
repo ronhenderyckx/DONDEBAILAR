@@ -3710,3 +3710,9 @@ body.has-agenda-footer .site-main > .agenda-page {
         grid-column: 2 !important;
     }
 }
+
+
+/* De evenementnaam blijft altijd zichtbaar, ook wanneer de kaart geen media heeft. */
+.agenda-card:has(.agenda-card__placeholder) .agenda-card__details > h2 {
+    display: block !important;
+}
