@@ -3257,12 +3257,11 @@ body.has-agenda-footer .site-main > .agenda-page {
     color:var(--db-filter-text-color,#FFFFFF)!important;
 }
 
-/* Exacte hoogte van de filterknoppen: 42px (ook op smartphone). */
+/* Wisselknop even hoog als de volledige slider/filterbalk (48px).
+   De slider en de overige filterknoppen zelf blijven ongewijzigd. */
 .agenda-selector-line > #agenda-filter-switch {
-    height:42px!important;
-    min-height:42px!important;
-    max-height:42px!important;
-    padding-top:1px!important;
-    padding-bottom:1px!important;
+    height:48px!important;
+    min-height:48px!important;
+    max-height:48px!important;
     box-sizing:border-box!important;
 }
