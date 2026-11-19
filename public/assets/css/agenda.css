@@ -2547,3 +2547,40 @@ body.has-agenda-footer .site-main > .agenda-page {
     max-height:38px!important;
     object-fit:contain!important;
 }
+
+
+/* Steden en organisatoren krijgen dezelfde maat en selectie-opmaak.
+   De selectie wordt op de knop getoond, niet als dikke rand op het logo. */
+.agenda-organizer-item img.agenda-organizer-logo,
+.agenda-organizer-item img.agenda-city-filter-icon {
+    box-sizing:content-box!important;
+    width:38px!important;
+    height:38px!important;
+    min-width:38px!important;
+    min-height:38px!important;
+    max-width:38px!important;
+    max-height:38px!important;
+    flex:0 0 38px!important;
+    padding:0!important;
+    border:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+    background:transparent!important;
+    object-fit:contain!important;
+}
+.agenda-organizer-item--organizer.is-selected img.agenda-organizer-logo,
+.agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) img.agenda-city-filter-icon {
+    border:0!important;
+    outline:0!important;
+    padding:0!important;
+    box-shadow:none!important;
+    background:transparent!important;
+}
+.agenda-organizer-item--organizer.is-selected,
+.agenda-organizer-item.is-selected:not(.agenda-organizer-item--organizer) {
+    box-sizing:border-box!important;
+    border:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+    border-radius:10px!important;
+}
