@@ -3020,3 +3020,44 @@ body.has-agenda-footer .site-main > .agenda-page {
         border-color:var(--db-organizer-color,#E23A2C)!important;
     }
 }
+
+
+/* Filterknoppen volgen de regionale kleurinstellingen:
+   organizer_color = gedeelde knopachtergrond, search_field_color = rand,
+   filter_text_color = tekst. Dezelfde regels gelden voor logo- en tekstknoppen. */
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item,
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item:has(img),
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item:not(:has(img)) {
+    background:var(--db-organizer-color,#E23A2C)!important;
+    background-color:var(--db-organizer-color,#E23A2C)!important;
+    background-image:none!important;
+    color:var(--db-filter-text-color,#FFFFFF)!important;
+    border:1px solid var(--db-search-field-color,#FFFFFF)!important;
+    border-radius:999px!important;
+    box-sizing:border-box!important;
+}
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item.is-selected {
+    background:color-mix(in srgb,var(--db-primary,#E23A2C) 20%,var(--db-organizer-color,#E23A2C))!important;
+    background-color:color-mix(in srgb,var(--db-primary,#E23A2C) 20%,var(--db-organizer-color,#E23A2C))!important;
+    color:var(--db-filter-text-color,#FFFFFF)!important;
+    border-color:var(--db-primary,#E23A2C)!important;
+}
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item.agenda-organizer-item--organizer.is-selected {
+    border-color:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
+}
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item img {
+    background:transparent!important;
+    background-color:transparent!important;
+    background-image:none!important;
+}
+@media (max-width:900px) {
+    .agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item,
+    .agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item:has(img),
+    .agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item:not(:has(img)) {
+        background:var(--db-organizer-color,#E23A2C)!important;
+        background-color:var(--db-organizer-color,#E23A2C)!important;
+        color:var(--db-filter-text-color,#FFFFFF)!important;
+        border:1px solid var(--db-search-field-color,#FFFFFF)!important;
+        border-radius:999px!important;
+    }
+}
