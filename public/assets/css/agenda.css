@@ -3211,3 +3211,14 @@ body.has-agenda-footer .site-main > .agenda-page {
     padding:0!important;
     object-fit:contain!important;
 }
+
+/* Laat de wisselknop exact aansluiten op de geselecteerde filterknop. */
+.agenda-selector-line > #agenda-filter-switch {
+    align-self:center!important;
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    background:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
+    background-color:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
+    border-color:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
+}
