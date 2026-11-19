@@ -3696,3 +3696,17 @@ body.has-agenda-footer .site-main > .agenda-page {
         object-fit: contain !important;
     }
 }
+
+
+/* Pc: toon geen media in de dagkaarten; de smartphone-indeling blijft behouden. */
+@media (min-width: 701px) {
+    .agenda-feed > .agenda-card {
+        grid-template-columns: minmax(240px, 1fr) minmax(280px, 1.15fr) !important;
+    }
+    .agenda-card > .agenda-card__media-wrap {
+        display: none !important;
+    }
+    .agenda-card > .agenda-card__details > .agenda-card__description {
+        grid-column: 2 !important;
+    }
+}
