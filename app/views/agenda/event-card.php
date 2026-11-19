@@ -108,6 +108,7 @@
                             <?php if ($hasMoreInfo): ?>
                                 <div class="agenda-card__description" data-event-description aria-hidden="true">
                                     <div class="agenda-card__description-inner">
+                                        <div class="agenda-card__info-scroller" aria-label="Locatie en organisator">
                                         <?php if ($locationName !== '' || $locationAddressLine !== '' || $locationPostalCity !== '' || $locationPhone !== ''): ?>
                                             <div class="agenda-card__info-block">
                                                 <h3 class="agenda-card__section-label">LOCATIE</h3>
@@ -141,6 +142,7 @@
                                                 </div>
                                             </div>
                                         <?php endif; ?>
+                                        </div>
                                         <?php if ($eventDescription !== ''): ?>
                                             <div class="agenda-card__description-text"><?= nl2br($escape($eventDescription)) ?></div>
                                         <?php endif; ?>
