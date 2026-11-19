@@ -49,10 +49,14 @@ if (!function_exists('dondebailar_webreus_run')) {
             throw new RuntimeException('Het pad van de GitHub-token is niet veilig.');
         }
         $githubToken = require $realTokenFile;
-        if (!is_string($githubToken) || !preg_match('/^(github_pat_|ghp_)[A-Za-z0-9_]{20,}$/', trim($githubToken))) {
-            throw new RuntimeException('De beveiligde GitHub-token heeft een ongeldig formaat.');
+        if (!is_string($githubToken)) {
+            throw new RuntimeException('Het beveiligde GitHub-tokenbestand moet een PHP-string teruggeven.');
         }
         $githubToken = trim($githubToken);
+        if (strlen($githubToken) < 40 || strlen($githubToken) > 255
+            || !preg_match('/\\A(?:github_pat_|ghp_)[A-Za-z0-9_-]+\\z/D', $githubToken)) {
+            throw new RuntimeException('De beveiligde GitHub-token heeft een ongeldig formaat. Controleer dat het PHP-bestand exact de nieuwe token als string teruggeeft, zonder extra tekst.');
+        }
 
         $manifestUrl = 'https://raw.githubusercontent.com/ronhenderyckx/DONDEBAILAR/develop/database/update-commands.json';
         $ch = curl_init($manifestUrl);
