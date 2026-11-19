@@ -2916,3 +2916,20 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-organizer-strip {
     border-radius:999px!important;
 }
+
+
+/* Alle filterknoppen dezelfde achtergrond, met of zonder logo/icoon. */
+.agenda-organizer-item {
+    box-sizing:border-box!important;
+    background:var(--db-selector-strip-background,var(--db-filter-bar-color,#FFFFFF))!important;
+    border:1px solid var(--db-search-field-color,var(--db-border,#D8DEE8))!important;
+    border-radius:999px!important;
+}
+.agenda-organizer-item.is-selected {
+    background:color-mix(in srgb,var(--db-primary,#E23A2C) 16%,var(--db-selector-strip-background,var(--db-filter-bar-color,#FFFFFF)))!important;
+    border-color:var(--db-primary,#E23A2C)!important;
+}
+.agenda-organizer-item--organizer.is-selected {
+    background:color-mix(in srgb,var(--db-organizer-color,#E23A2C) 16%,var(--db-selector-strip-background,var(--db-filter-bar-color,#FFFFFF)))!important;
+    border-color:var(--db-organizer-color,#E23A2C)!important;
+}
