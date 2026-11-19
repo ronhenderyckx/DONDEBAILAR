@@ -3243,3 +3243,16 @@ body.has-agenda-footer .site-main > .agenda-page {
     align-self:center!important;
     box-sizing:border-box!important;
 }
+
+/* Bij openen dezelfde normale achtergrondkleur als de filterknoppen.
+   De geselecteerde/hover-kleur wordt niet als standaardkleur gebruikt. */
+.agenda-selector-line > #agenda-filter-switch,
+.agenda-selector-line > #agenda-filter-switch:hover,
+.agenda-selector-line > #agenda-filter-switch:active,
+.agenda-selector-line > #agenda-filter-switch:focus,
+.agenda-selector-line > #agenda-filter-switch:focus-visible {
+    background:var(--db-organizer-color,#E23A2C)!important;
+    background-color:var(--db-organizer-color,#E23A2C)!important;
+    border-color:var(--db-search-field-color,#FFFFFF)!important;
+    color:var(--db-filter-text-color,#FFFFFF)!important;
+}
