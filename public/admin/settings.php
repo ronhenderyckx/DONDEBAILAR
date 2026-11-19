@@ -151,7 +151,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } elseif (isset($_POST['remove_logo'])) {
         if ($logoPath !== '') {
-            $oldFile = $projectRoot . '/public' . $logoPath;
+            $oldFile = dirname(__DIR__) . $logoPath;
             if (is_file($oldFile)) {
                 @unlink($oldFile);
             }
@@ -165,22 +165,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $newRelativePath = storeOptimizedLogoUpload(
                 $_FILES['platform_logo'],
-                'public/uploads/platform',
+                'uploads/platform',
                 800,
                 5 * 1024 * 1024,
-                'logo-'
+                'logo-',
+                dirname(__DIR__)
             );
             if ($newRelativePath !== null) {
-                $newLogoPath = '/' . substr($newRelativePath, strlen('public/'));
+                $newLogoPath = '/' . $newRelativePath;
                 if (file_put_contents($logoSettingFile, $newLogoPath . PHP_EOL, LOCK_EX) === false) {
-                    $newFile = $projectRoot . '/' . $newRelativePath;
+                    $newFile = dirname(__DIR__) . '/' . $newRelativePath;
                     if (is_file($newFile)) {
                         @unlink($newFile);
                     }
                     $errorMessage = 'Het logo is geoptimaliseerd, maar de instelling kon niet worden bijgewerkt. Controleer de schrijfrechten van storage.';
                 } else {
                     if ($logoPath !== '') {
-                        $oldFile = $projectRoot . '/public' . $logoPath;
+                        $oldFile = dirname(__DIR__) . $logoPath;
                         if (is_file($oldFile)) {
                             @unlink($oldFile);
                         }
