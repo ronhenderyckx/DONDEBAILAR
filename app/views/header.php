@@ -452,8 +452,6 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                             <a class="agenda-organizer-item agenda-organizer-item--organizer<?= $organizerSelected ? ' is-selected' : '' ?>" data-organizer-id="<?= (int) $organizerOption['id'] ?>" href="<?= $escape($organizerHref) ?>" title="<?= $escape($organizerOption['name']) ?>" aria-label="<?= $organizerSelected ? 'Verwijder filter voor ' : 'Toon evenementen van ' ?><?= $escape($organizerOption['name']) ?>">
                                 <?php if ($hasOrganizerLogo): ?>
                                     <img class="agenda-organizer-logo" src="/organizer-logo.php?file=<?= rawurlencode($logoFilename) ?>" alt="" loading="lazy">
-                                <?php else: ?>
-                                    <span class="agenda-organizer-fallback" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr((string) $organizerOption['name'], 0, 1))) ?></span>
                                 <?php endif; ?>
                                 <span class="agenda-organizer-name"><?= $escape($organizerOption['name']) ?></span>
                             </a>
@@ -473,8 +471,6 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                             <a class="agenda-organizer-item<?= $citySelected ? ' is-selected' : '' ?>" data-city="<?= $escape($cityName) ?>" href="<?= $escape($cityHref) ?>" title="<?= $escape($cityName) ?>" aria-label="<?= $citySelected ? 'Verwijder stadsfilter ' : 'Toon evenementen in ' ?><?= $escape($cityName) ?>">
                                 <?php if ($cityFilterIconPath !== ''): ?>
                                     <img class="agenda-city-filter-icon" src="<?= $escape($cityFilterIconPath) ?>" alt="" loading="eager" decoding="async">
-                                <?php else: ?>
-                                    <span class="agenda-organizer-fallback" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr($cityName, 0, 1))) ?></span>
                                 <?php endif; ?>
                                 <span class="agenda-organizer-name"><?= $escape($cityName) ?></span>
                             </a>
