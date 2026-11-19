@@ -1114,4 +1114,4 @@ body.has-agenda-footer .site-footer--agenda .agenda-footer-tools form.agenda-foo
 .site-brand--platform,.site-brand--region{display:inline-flex;align-items:center;justify-content:flex-start;gap:0;min-width:0;text-decoration:none}
 .site-brand__logo{width:auto;max-width:140px;max-height:38px;object-fit:contain}
 .site-brand__region-logo{max-width:110px;max-height:34px}
-.site-brand__region-name{display:none!important}
+.site-brand__region-name{display:inline-block!important;visibility:visible!important;white-space:nowrap}
