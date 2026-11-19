@@ -150,5 +150,5 @@
                                 </div>
                             <?php endif; ?>
                         </div>
-                        <p class="agenda-card__swipe-hint" data-swipe-hint>→ Swipe voor meer info</p>
+
                     </article>
