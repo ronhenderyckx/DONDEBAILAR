@@ -99,8 +99,6 @@ $defaults = [
     'footer_color' => '#FFFFFF',
     'background_color' => '#FFFFFF',
     'text_color' => '#222222',
-    'agenda_arrow_background' => '#F6B22E',
-    'agenda_arrow_text' => '#222222',
 ];
 $weekdayDefaults = ['#F6D84A', '#4A90D9', '#55A96B', '#A78BDA', '#E78AAE', '#F49A45', '#999999'];
 $select = $db->prepare("SELECT * FROM region_appearance WHERE region_id = :id LIMIT 1");
@@ -109,6 +107,7 @@ $saved = $select->fetch() ?: [];
 $pastEventColor = strtoupper((string) ($saved['past_event_color'] ?? '#777777'));
 if (!preg_match('/^#[0-9A-F]{6}$/', $pastEventColor)) $pastEventColor = '#777777';
 $pastEventTextColor = '#FFFFFF';
+$selectorStripBackgroundColor = '#FFFFFF';
 $colors = [];
 foreach ($defaults as $key => $value) {
     $candidate = (string) ($saved[$key] ?? $value);
@@ -130,6 +129,8 @@ $iconColors = $iconColorDefaults;
 if (!empty($saved['weekday_colors'])) {
     $decoded = json_decode((string) $saved['weekday_colors'], true);
     if (is_array($decoded)) {
+        $stripCandidate = strtoupper((string) ($decoded['selector_strip_background_color'] ?? '#FFFFFF'));
+        $selectorStripBackgroundColor = preg_match('/^#[0-9A-F]{6}$/', $stripCandidate) ? $stripCandidate : '#FFFFFF';
         $separatorCandidate = strtoupper((string) ($decoded['event_separator_color'] ?? '#D0D0D0'));
         $separatorColor = preg_match('/^#[0-9A-F]{6}$/', $separatorCandidate) ? $separatorCandidate : '#D0D0D0';
         $pastTextCandidate = strtoupper((string) ($decoded['past_event_text_color'] ?? '#FFFFFF'));
@@ -137,10 +138,6 @@ if (!empty($saved['weekday_colors'])) {
         $titleCandidate = (string) ($decoded['event_title_color'] ?? '#222222');
         $eventTitleColor = preg_match('/^#[0-9a-fA-F]{6}$/', $titleCandidate) ? strtoupper($titleCandidate) : '#222222';
         $weekdayTitleDefaults = array_fill(0, 7, $eventTitleColor);
-        foreach (['agenda_arrow_background', 'agenda_arrow_text'] as $arrowKey) {
-            $candidate = (string) ($decoded[$arrowKey] ?? $defaults[$arrowKey]);
-            $colors[$arrowKey] = preg_match('/^#[0-9a-fA-F]{6}$/', $candidate) ? strtoupper($candidate) : $defaults[$arrowKey];
-        }
         foreach ($iconColorDefaults as $iconKey => $iconDefault) {
             $candidate = (string) ($decoded[$iconKey] ?? $iconDefault);
             $iconColors[$iconKey] = preg_match('/^#[0-9a-fA-F]{6}$/', $candidate) ? strtoupper($candidate) : $iconDefault;
@@ -259,6 +256,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
             $pastEventTextColor = $pastTextCandidate;
         }
 
+        $stripColorCandidate = strtoupper(trim((string) ($_POST['selector_strip_background_color'] ?? $selectorStripBackgroundColor)));
+        if (!preg_match('/^#[0-9A-F]{6}$/', $stripColorCandidate)) {
+            $errorMessage = 'De achtergrondkleur van de locatie- en organisatorbalk is ongeldig.';
+        } else {
+            $selectorStripBackgroundColor = $stripColorCandidate;
+        }
+
         foreach ($defaults as $key => $default) {
             $value = strtoupper(trim((string) ($_POST[$key] ?? $default)));
             if (!preg_match('/^#[0-9A-F]{6}$/', $value)) {
@@ -266,12 +270,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
                 break;
             }
             $colors[$key] = $value;
-        }
-        $arrowColor = strtoupper(trim((string) ($_POST['agenda_arrow_text'] ?? $colors['agenda_arrow_text'])));
-        if (!preg_match('/^#[0-9A-F]{6}$/', $arrowColor)) {
-            $errorMessage = 'De kleur van de bladerpijlen is ongeldig.';
-        } else {
-            $colors['agenda_arrow_text'] = $arrowColor;
         }
         foreach ($iconColorDefaults as $iconKey => $iconDefault) {
             $value = strtoupper(trim((string) ($_POST[$iconKey] ?? $iconColors[$iconKey])));
@@ -378,8 +376,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
                         array_map(static fn (int $i): string => 'weekday_title_' . $i, array_keys($weekdayTitleColors)),
                         array_values($weekdayTitleColors)
                     ) + [
-                        'agenda_arrow_background' => $colors['agenda_arrow_background'],
-                        'agenda_arrow_text' => $colors['agenda_arrow_text'],
+                        'selector_strip_background_color' => $selectorStripBackgroundColor,
                         'event_separator_color' => $separatorColor,
                         'past_event_text_color' => $pastEventTextColor,
                     ] + $iconColors + ['event_title_color' => $eventTitleColor], JSON_THROW_ON_ERROR),
@@ -489,7 +486,6 @@ if (!$embeddedRegionAppearanceEditor) {
                 'menu_color' => 'Menukleur',
                 'organizer_color' => 'Achtergrondkleur van de organisatorknoppen',
                 'filter_hover_color' => 'Hoverkleur van de filterknoppen (stad en organisator)',
-                'filter_bar_color' => 'Achtergrondkleur van de filterbalk',
                 'filter_text_color' => 'Tekstkleur van de filterknoppen',
                 'search_field_color' => 'Achtergrondkleur zoekveld',
                 'search_text_color' => 'Tekstkleur zoekfunctie (invoer en placeholder)',
@@ -502,6 +498,11 @@ if (!$embeddedRegionAppearanceEditor) {
                     <code><?= escapeHtml($colors[$key]) ?></code>
                 </label>
             <?php endforeach; ?>
+            </div>
+            <h2>Locatie- en organisatorbalk</h2>
+            <p>Stel de achtergrondkleur van de horizontale balk met steden en organisatoren afzonderlijk in.</p>
+            <div class="region-color-grid">
+                <label class="region-color-field" for="selector_strip_background_color"><span>Achtergrondkleur locatie- en organisatorbalk</span><input type="color" id="selector_strip_background_color" name="selector_strip_background_color" value="<?= escapeHtml($selectorStripBackgroundColor) ?>"><code><?= escapeHtml($selectorStripBackgroundColor) ?></code></label>
             </div>
             <h2>Afgelopen evenementen</h2>
             <p>Stel de achtergrondkleur van afgelopen evenementenkaarten afzonderlijk in, los van de weekdagkleuren.</p>
@@ -537,11 +538,6 @@ if (!$embeddedRegionAppearanceEditor) {
                     </div>
                 </div>
             <?php endforeach; ?>
-            </div>
-            <h2>Kleur van de bladerpijlen</h2>
-            <p>Stel de kleur van de linker- en rechterpijl in. De achtergrond van deze pijlen blijft altijd transparant.</p>
-            <div class="region-color-grid">
-                <label class="region-color-field" for="agenda_arrow_text"><span>Kleur bladerpijlen</span><input type="color" id="agenda_arrow_text" name="agenda_arrow_text" value="<?= escapeHtml($colors['agenda_arrow_text']) ?>"><code><?= escapeHtml($colors['agenda_arrow_text']) ?></code></label>
             </div>
             <h2>Footer en footerknoppen</h2>
             <p>Alle kleuren die bij de footer horen staan hier samen. Je kunt de achtergrond van de footer en knoppen apart instellen van de kleur van de pictogrammen.</p>
