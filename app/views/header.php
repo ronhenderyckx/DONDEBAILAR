@@ -6,7 +6,7 @@ require_once dirname(__DIR__) . '/Security.php';
 
 $pageTitle = isset($pageTitle) && is_string($pageTitle)
     ? $pageTitle
-    : 'DONDEBAILE';
+    : 'DONDEBAILAR';
 
 $region = isset($region) && is_array($region) ? $region : null;
 $headerUser = currentUser();
@@ -79,7 +79,7 @@ if ($headerUser !== null && !$canManageLocations) {
 
 $brandName = $region && !empty($region['name'])
     ? (string) $region['name']
-    : 'DONDEBAILE';
+    : 'DONDEBAILAR';
 
 $projectRoot = dirname(__DIR__, 2);
 $platformLogoPath = '';
@@ -287,7 +287,7 @@ $escape = static fn ($value): string =>
     <meta name="theme-color" content="<?= $escape($primaryColor) ?>">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="DONDEBAILE">
+    <meta name="apple-mobile-web-app-title" content="DONDEBAILAR">
     <link rel="manifest" href="/manifest.webmanifest">
     <link rel="icon" href="/icons/app-icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icons/app-icon.svg">
@@ -312,13 +312,24 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
     <div class="site-header__inner">
 
         <div class="site-brand-group">
-            <a class="site-brand site-brand--platform" href="/?region_id=<?= $regionId ?>&amp;agenda_change=1&amp;filter=organizer" aria-label="DONDEBAILE agenda — filters wissen">
+            <a class="site-brand site-brand--platform" href="/?region_id=<?= $regionId ?>&amp;agenda_change=1&amp;filter=organizer" aria-label="DONDEBAILAR agenda — filters wissen">
                 <?php if ($platformLogoPath !== ''): ?>
-                    <img src="<?= $escape($platformLogoPath) ?>" alt="DONDEBAILE" class="site-brand__logo">
+                    <img src="<?= $escape($platformLogoPath) ?>" alt="DONDEBAILAR" class="site-brand__logo">
                 <?php else: ?>
                     <span class="site-brand__mark" style="--brand-color:<?= $escape($primaryColor) ?>" aria-hidden="true">D</span>
                 <?php endif; ?>
             </a>
+
+            <?php if ($nextRegionId > 0): ?>
+                <a class="site-brand site-brand--region" href="/?region_id=<?= $nextRegionId ?>&amp;agenda_change=1&amp;filter=organizer" aria-label="<?= $escape($brandName) ?>">
+                    <?php if ($regionLogoPath !== ''): ?>
+                        <img src="<?= $escape($regionLogoPath) ?>" alt="" class="site-brand__logo site-brand__region-logo">
+                    <?php else: ?>
+                        <span class="site-brand__mark site-brand__region-mark" style="--brand-color:<?= $escape($primaryColor) ?>" aria-hidden="true"><?= $escape(mb_strtoupper(mb_substr($brandName, 0, 1))) ?></span>
+                    <?php endif; ?>
+                    <span class="site-brand__region-name"><?= $escape($brandName) ?></span>
+                </a>
+            <?php endif; ?>
 
         </div>
 
