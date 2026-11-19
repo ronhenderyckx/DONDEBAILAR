@@ -2794,3 +2794,34 @@ body.has-agenda-footer .site-main > .agenda-page {
 .site-header__agenda-filters {
     padding-bottom:18px!important;
 }
+
+
+/* Organisatoren met logo: naam naast het logo tonen, niet eronder afknippen. */
+.agenda-organizer-item--organizer:has(img.agenda-organizer-logo) {
+    display:inline-flex!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:flex-start!important;
+    flex:0 0 auto!important;
+    width:max-content!important;
+    min-width:0!important;
+    max-width:none!important;
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    gap:7px!important;
+    padding:2px 9px!important;
+    overflow:visible!important;
+}
+.agenda-organizer-item--organizer:has(img.agenda-organizer-logo) .agenda-organizer-name {
+    display:block!important;
+    flex:0 0 auto!important;
+    width:auto!important;
+    max-width:none!important;
+    margin:0!important;
+    white-space:nowrap!important;
+    overflow:visible!important;
+    text-overflow:clip!important;
+    text-align:left!important;
+    line-height:1.2!important;
+}
