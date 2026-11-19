@@ -93,7 +93,7 @@ if (!function_exists('dondebailar_webreus_run')) {
         }
 
         $results = [];
-        $results[] = 'Runner-versie: webreus-central-private-root-20261118-1';
+        $results[] = 'Runner-versie: webreus-github-token-20261119-1';
 
         $curlGet = static function (string $url, string $accept = 'application/vnd.github+json') use ($githubToken): string {
             $ch = curl_init($url);
