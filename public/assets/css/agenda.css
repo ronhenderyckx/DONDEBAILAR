@@ -3464,3 +3464,24 @@ body.has-agenda-footer .site-main > .agenda-page {
         padding: 0 20px 12px;
     }
 }
+
+
+/* Pc: locatie en organisator naast elkaar onder de iconen. */
+@media (min-width: 701px) {
+    .agenda-card__info-scroller {
+        display: flex;
+        flex-direction: row;
+        align-items: stretch;
+        gap: 10px;
+        min-width: 0;
+        overflow: visible;
+    }
+    .agenda-card__info-scroller > .agenda-card__info-block {
+        flex: 1 1 0;
+        min-width: 0;
+        margin: 0 !important;
+    }
+    .agenda-card__info-block--organizer {
+        margin: 0 !important;
+    }
+}
