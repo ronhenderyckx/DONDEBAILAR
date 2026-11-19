@@ -2951,3 +2951,27 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-organizer-item.agenda-organizer-item--organizer.is-selected {
     background-color:color-mix(in srgb,var(--db-primary,#E23A2C) 16%,var(--db-selector-strip-background,var(--db-filter-bar-color,#FFFFFF)))!important;
 }
+
+
+/* Forceer dezelfde vlakke achtergrond op logo-knoppen en tekstknoppen.
+   Verwijder eventuele oude achtergrondafbeeldingen/gradienten uit eerdere regels. */
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item,
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item:has(.agenda-organizer-logo),
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item:has(.agenda-city-filter-icon),
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item:not(:has(img)) {
+    background:var(--db-selector-strip-background,var(--db-filter-bar-color,#FFFFFF))!important;
+    background-color:var(--db-selector-strip-background,var(--db-filter-bar-color,#FFFFFF))!important;
+    background-image:none!important;
+}
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item.is-selected {
+    background:color-mix(in srgb,var(--db-primary,#E23A2C) 16%,var(--db-selector-strip-background,var(--db-filter-bar-color,#FFFFFF)))!important;
+    background-color:color-mix(in srgb,var(--db-primary,#E23A2C) 16%,var(--db-selector-strip-background,var(--db-filter-bar-color,#FFFFFF)))!important;
+    background-image:none!important;
+}
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item img.agenda-organizer-logo,
+.agenda-selector-panel .agenda-organizer-strip > .agenda-organizer-item img.agenda-city-filter-icon {
+    background:transparent!important;
+    background-color:transparent!important;
+    background-image:none!important;
+    box-shadow:none!important;
+}
