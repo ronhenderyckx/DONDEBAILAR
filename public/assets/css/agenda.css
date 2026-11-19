@@ -2754,3 +2754,12 @@ body.has-agenda-footer .site-main > .agenda-page {
         padding-bottom:0!important;
     }
 }
+
+
+/* Geef de buitenste filterbalk opnieuw duidelijke ruimte boven de eerste dagkaart. */
+.agenda-selectors {
+    margin-bottom:18px!important;
+}
+.agenda-selector-line {
+    margin-bottom:0!important;
+}
