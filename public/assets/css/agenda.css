@@ -3143,3 +3143,71 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-selector-line > #agenda-filter-switch .agenda-filter-switch-icon:not([hidden]) {
     display:grid!important;
 }
+
+/* Wisselknop: exact dezelfde basisvorm en kleuren als de filterknoppen.
+   Alleen deze knop wordt gestyled; de filterbalken blijven onaangeroerd. */
+.agenda-selector-line > #agenda-filter-switch {
+    position:relative!important;
+    z-index:1!important;
+    display:flex!important;
+    flex:0 0 82px!important;
+    flex-direction:row!important;
+    align-items:center!important;
+    justify-content:center!important;
+    gap:5px!important;
+    width:82px!important;
+    min-width:82px!important;
+    max-width:82px!important;
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    box-sizing:border-box!important;
+    margin:0!important;
+    padding:2px 5px!important;
+    border:1px solid var(--db-search-field-color,#FFFFFF)!important;
+    border-radius:999px!important;
+    outline:0!important;
+    box-shadow:none!important;
+    background:var(--db-organizer-color,#E23A2C)!important;
+    background-image:none!important;
+    color:var(--db-filter-text-color,#FFFFFF)!important;
+    cursor:pointer!important;
+    touch-action:manipulation!important;
+    -webkit-tap-highlight-color:transparent!important;
+    user-select:none!important;
+    -webkit-user-select:none!important;
+    overflow:hidden!important;
+}
+.agenda-selector-line > #agenda-filter-switch:hover,
+.agenda-selector-line > #agenda-filter-switch:active {
+    background:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
+    background-color:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
+    border-color:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
+    color:var(--db-filter-text-color,#FFFFFF)!important;
+}
+.agenda-selector-line > #agenda-filter-switch .agenda-filter-switch-label {
+    display:none!important;
+}
+.agenda-selector-line > #agenda-filter-switch .agenda-filter-switch-icon:not([hidden]) {
+    display:grid!important;
+    flex:0 0 34px!important;
+    place-items:center!important;
+    width:34px!important;
+    height:34px!important;
+    min-width:34px!important;
+    max-width:34px!important;
+}
+.agenda-selector-line > #agenda-filter-switch .agenda-filter-switch-icon[hidden] {
+    display:none!important;
+}
+.agenda-selector-line > #agenda-filter-switch .agenda-filter-icon--image,
+.agenda-selector-line > #agenda-filter-switch .agenda-filter-icon {
+    display:block!important;
+    width:34px!important;
+    height:34px!important;
+    max-width:34px!important;
+    max-height:34px!important;
+    margin:0!important;
+    padding:0!important;
+    object-fit:contain!important;
+}
