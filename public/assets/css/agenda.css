@@ -2440,36 +2440,22 @@ body.has-agenda-footer .site-main > .agenda-page {
 }
 
 
-/* Mobiele horizontale schuifbalk voor locatie en organisator. */
+/* Extra evenementinformatie staat verticaal onder elkaar, zoals voorheen. */
 @media (max-width: 700px) {
     .agenda-card__info-scroller {
-        display: grid;
-        grid-auto-flow: column;
-        grid-auto-columns: minmax(84%, 1fr);
-        gap: 10px;
+        display: block;
         width: 100%;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: 2px 2px 12px;
+        overflow: visible;
+        padding: 0;
         margin: 0 0 8px;
-        overscroll-behavior-x: contain;
-        -webkit-overflow-scrolling: touch;
-        scroll-snap-type: x mandatory;
-        scrollbar-width: thin;
-        touch-action: pan-x pan-y;
     }
     .agenda-card__info-scroller > .agenda-card__info-block {
+        width: 100%;
         min-width: 0;
-        margin: 0;
-        scroll-snap-align: start;
-        scroll-snap-stop: always;
+        margin: 0 0 12px;
     }
-    .agenda-card__info-scroller::-webkit-scrollbar {
-        height: 4px;
-    }
-    .agenda-card__info-scroller::-webkit-scrollbar-thumb {
-        background: rgba(255,255,255,.55);
-        border-radius: 4px;
+    .agenda-card__info-scroller > .agenda-card__info-block--organizer {
+        margin-top: 12px;
     }
 }
 
