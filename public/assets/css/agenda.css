@@ -3222,3 +3222,14 @@ body.has-agenda-footer .site-main > .agenda-page {
     background-color:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
     border-color:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
 }
+
+/* De wisselknop behoudt bij indrukken dezelfde kleur als de gewone filterknoppen. */
+.agenda-selector-line > #agenda-filter-switch:hover,
+.agenda-selector-line > #agenda-filter-switch:active,
+.agenda-selector-line > #agenda-filter-switch:focus,
+.agenda-selector-line > #agenda-filter-switch:focus-visible {
+    background:var(--db-organizer-color,#E23A2C)!important;
+    background-color:var(--db-organizer-color,#E23A2C)!important;
+    border-color:var(--db-search-field-color,#FFFFFF)!important;
+    color:var(--db-filter-text-color,#FFFFFF)!important;
+}
