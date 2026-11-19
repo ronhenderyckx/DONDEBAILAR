@@ -3061,3 +3061,30 @@ body.has-agenda-footer .site-main > .agenda-page {
         border-radius:999px!important;
     }
 }
+
+
+/* Geselecteerde filterknoppen: exact dezelfde instelbare achtergrond,
+   ongeacht of de knop een logo/icoon bevat. */
+.agenda-selector-panel .agenda-organizer-strip > a.agenda-organizer-item.is-selected,
+.agenda-selector-panel .agenda-organizer-strip > a.agenda-organizer-item:has(img).is-selected,
+.agenda-selector-panel .agenda-organizer-strip > a.agenda-organizer-item:not(:has(img)).is-selected {
+    background:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
+    background-color:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
+    background-image:none!important;
+    border-color:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
+}
+.agenda-selector-panel .agenda-organizer-strip > a.agenda-organizer-item.is-selected img {
+    background:transparent!important;
+    background-color:transparent!important;
+    background-image:none!important;
+}
+@media (max-width:900px) {
+    .agenda-selector-panel .agenda-organizer-strip > a.agenda-organizer-item.is-selected,
+    .agenda-selector-panel .agenda-organizer-strip > a.agenda-organizer-item:has(img).is-selected,
+    .agenda-selector-panel .agenda-organizer-strip > a.agenda-organizer-item:not(:has(img)).is-selected {
+        background:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
+        background-color:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
+        background-image:none!important;
+        border-color:var(--db-filter-hover-color,var(--db-primary,#E23A2C))!important;
+    }
+}
