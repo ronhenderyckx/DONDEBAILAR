@@ -2825,3 +2825,45 @@ body.has-agenda-footer .site-main > .agenda-page {
     text-align:left!important;
     line-height:1.2!important;
 }
+
+
+/* Verlaag uitsluitend de hoogte van de buitenste balk; filterknoppen blijven 42px. */
+.agenda-selector-line {
+    height:46px!important;
+    min-height:46px!important;
+    align-items:center!important;
+}
+.agenda-selector-panel:not([hidden]) {
+    height:46px!important;
+    min-height:46px!important;
+    max-height:46px!important;
+    box-sizing:border-box!important;
+    padding:1px 7px!important;
+    align-items:center!important;
+}
+.agenda-organizer-strip {
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    padding:0!important;
+    align-items:center!important;
+}
+.agenda-organizer-item,
+.agenda-organizer-item:not(:has(img.agenda-organizer-logo)):not(:has(img.agenda-city-filter-icon)),
+.agenda-organizer-item--organizer:has(img.agenda-organizer-logo) {
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+}
+@media(max-width:700px) {
+    .agenda-selector-line {
+        height:46px!important;
+        min-height:46px!important;
+    }
+    .agenda-selector-panel:not([hidden]) {
+        height:46px!important;
+        min-height:46px!important;
+        max-height:46px!important;
+        padding:1px 6px!important;
+    }
+}
