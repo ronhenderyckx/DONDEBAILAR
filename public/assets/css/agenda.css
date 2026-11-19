@@ -2714,3 +2714,43 @@ body.has-agenda-footer .site-main > .agenda-page {
         padding:2px 11px!important;
     }
 }
+
+
+/* Herstel volledige zichtbaarheid van logo's; verklein alleen de buitenste balk. */
+.agenda-organizer-item,
+.agenda-organizer-item:not(:has(img.agenda-organizer-logo)):not(:has(img.agenda-city-filter-icon)) {
+    height:48px!important;
+    min-height:48px!important;
+    max-height:48px!important;
+    padding-top:3px!important;
+    padding-bottom:3px!important;
+}
+.agenda-organizer-item img.agenda-organizer-logo,
+.agenda-organizer-item img.agenda-city-filter-icon {
+    display:block!important;
+    width:38px!important;
+    height:38px!important;
+    min-width:38px!important;
+    min-height:38px!important;
+    max-width:38px!important;
+    max-height:38px!important;
+    flex:0 0 38px!important;
+    object-fit:contain!important;
+}
+.agenda-selector-panel:not([hidden]) {
+    padding-top:0!important;
+    padding-bottom:0!important;
+    min-height:0!important;
+}
+@media(max-width:700px) {
+    .agenda-organizer-item,
+    .agenda-organizer-item:not(:has(img.agenda-organizer-logo)):not(:has(img.agenda-city-filter-icon)) {
+        height:48px!important;
+        min-height:48px!important;
+        max-height:48px!important;
+    }
+    .agenda-selector-panel:not([hidden]) {
+        padding-top:0!important;
+        padding-bottom:0!important;
+    }
+}
