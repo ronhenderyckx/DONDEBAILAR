@@ -505,6 +505,7 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
 .site-notifications:hover{background:var(--db-surface,#f2f4f7)}
 .site-notifications span{position:absolute;top:0;right:-2px;display:grid;place-items:center;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#dc3545;color:#fff;font-size:10px;font-weight:800;line-height:1}
 .site-menu{margin-left:0}
+.site-brand--region{display:inline-flex!important;align-items:center;gap:6px;min-width:0;flex:0 1 auto;text-decoration:none}.site-brand__region-logo{display:block;max-width:90px;max-height:34px;width:auto;height:auto;object-fit:contain}.site-brand__region-name{display:inline-block!important;visibility:visible!important;white-space:nowrap;font-size:13px;font-weight:700;color:var(--db-text,#222)}
 @media(max-width:600px){.site-header__inner{gap:5px;width:calc(100% - 16px);min-height:42px!important}.site-brand--platform{min-height:38px}.site-brand__logo{max-width:120px;max-height:34px}.site-welcome{font-size:10px;max-width:30vw}.site-notifications,.site-save-preferences{width:26px;height:28px}.site-notifications svg,.site-save-preferences svg{width:19px;height:19px}.site-menu__toggle{min-height:28px;padding:0 6px}}
 </style>
 </header>
