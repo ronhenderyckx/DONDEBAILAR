@@ -2770,3 +2770,27 @@ body.has-agenda-footer .site-main > .agenda-page {
 .site-header__agenda-filters {
     padding-bottom:18px!important;
 }
+
+
+/* Compactere filterbalk: minder verticale ruimte rond de logo-iconen.
+   De tussenruimte tot de eerste dagkaart blijft constant, ook na filteren. */
+.agenda-organizer-strip {
+    padding-top:0!important;
+    padding-bottom:0!important;
+    align-items:center!important;
+}
+.agenda-selector-panel:not([hidden]) {
+    padding-top:0!important;
+    padding-bottom:0!important;
+}
+.agenda-organizer-item,
+.agenda-organizer-item:not(:has(img.agenda-organizer-logo)):not(:has(img.agenda-city-filter-icon)) {
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    padding-top:1px!important;
+    padding-bottom:1px!important;
+}
+.site-header__agenda-filters {
+    padding-bottom:18px!important;
+}
