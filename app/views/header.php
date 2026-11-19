@@ -240,9 +240,9 @@ if ($isPlatformAdminPage) {
         . ';--db-border:' . $platformColors['border'];
 }
 $appearancePalette = json_decode((string) ($region['weekday_colors'] ?? ''), true);
-$agendaArrowColor = is_array($appearancePalette) ? (string) ($appearancePalette['agenda_arrow_text'] ?? '#222222') : '#222222';
-if (!preg_match('/^#[0-9a-fA-F]{6}$/', $agendaArrowColor)) $agendaArrowColor = '#222222';
-$themeStyle .= ';--db-agenda-arrow-color:' . strtoupper($agendaArrowColor);
+$selectorStripBackgroundColor = is_array($appearancePalette) ? (string) ($appearancePalette['selector_strip_background_color'] ?? '#FFFFFF') : '#FFFFFF';
+if (!preg_match('/^#[0-9a-fA-F]{6}$/', $selectorStripBackgroundColor)) $selectorStripBackgroundColor = '#FFFFFF';
+$themeStyle .= ';--db-selector-strip-background:' . strtoupper($selectorStripBackgroundColor);
 $separatorColor = is_array($appearancePalette) ? (string) ($appearancePalette['event_separator_color'] ?? '#D0D0D0') : '#D0D0D0';
 if (!preg_match('/^#[0-9a-fA-F]{6}$/', $separatorColor)) $separatorColor = '#D0D0D0';
 $themeStyle .= ';--db-event-separator-color:' . strtoupper($separatorColor);
