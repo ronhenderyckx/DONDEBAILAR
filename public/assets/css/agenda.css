@@ -3256,3 +3256,13 @@ body.has-agenda-footer .site-main > .agenda-page {
     border-color:var(--db-search-field-color,#FFFFFF)!important;
     color:var(--db-filter-text-color,#FFFFFF)!important;
 }
+
+/* Exacte hoogte van de filterknoppen: 42px (ook op smartphone). */
+.agenda-selector-line > #agenda-filter-switch {
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+    padding-top:1px!important;
+    padding-bottom:1px!important;
+    box-sizing:border-box!important;
+}
