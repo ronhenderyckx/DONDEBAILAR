@@ -320,8 +320,9 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                 <?php endif; ?>
             </a>
 
-            <?php if ($nextRegionId > 0): ?>
-                <a class="site-brand site-brand--region" href="/?region_id=<?= $nextRegionId ?>&amp;agenda_change=1&amp;filter=organizer" aria-label="<?= $escape($brandName) ?>">
+            <?php $regionBrandTargetId = $nextRegionId > 0 ? $nextRegionId : $regionId; ?>
+            <?php if ($regionBrandTargetId > 0): ?>
+                <a class="site-brand site-brand--region" href="/?region_id=<?= $regionBrandTargetId ?>&amp;agenda_change=1&amp;filter=organizer" aria-label="<?= $escape($brandName) ?>">
                     <?php if ($regionLogoPath !== ''): ?>
                         <img src="<?= $escape($regionLogoPath) ?>" alt="" class="site-brand__logo site-brand__region-logo">
                     <?php else: ?>
