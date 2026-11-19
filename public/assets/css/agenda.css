@@ -3302,9 +3302,20 @@ body.has-agenda-footer .site-main > .agenda-page {
     .agenda-card > .agenda-card__details {
         grid-column: 1;
         grid-row: 1;
+        align-self: start;
         min-width: 0;
-        padding: 17px 20px 8px;
+        padding: 12px 20px 8px;
         border-radius: 14px 0 0 0;
+        text-align: left;
+    }
+    .agenda-card > .agenda-card__details > h2 {
+        margin: 0 0 8px !important;
+        text-align: left !important;
+    }
+    .agenda-card > .agenda-card__details > .agenda-card__date-line,
+    .agenda-card > .agenda-card__details > .agenda-card__hashtags {
+        text-align: left !important;
+        margin-left: 0 !important;
     }
     .agenda-card > .agenda-card__quick {
         grid-column: 1;
