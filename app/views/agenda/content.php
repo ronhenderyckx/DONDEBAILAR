@@ -10,10 +10,13 @@
             <section class="agenda-empty"><h2>Geen evenementen gevonden</h2><p>Er zijn momenteel geen gepubliceerde evenementen met deze filters.</p></section>
         <?php else: ?>
             <div class="agenda-feed">
-                <?php $agendaStartFound = false; ?>
+                <?php $agendaStartFound = false; $agendaPreviousDay = null; ?>
                 <?php foreach ($events as $eventIndex => $event): ?>
                     <?php
                     $start = new DateTimeImmutable((string) $event['starts_at'], $timezone);
+                    $eventDayKey = $start->format('Y-m-d');
+                    $isFirstEventOfDay = $eventDayKey !== $agendaPreviousDay;
+                    $agendaPreviousDay = $eventDayKey;
                     $eventEndValue = trim((string) ($event['ends_at'] ?? ''));
                     $eventEnd = new DateTimeImmutable($eventEndValue !== '' ? $eventEndValue : (string) $event['starts_at'], $timezone);
                     $eventIsPast = $eventEnd < $now;
@@ -28,6 +31,9 @@
                     $shareScheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
                     $shareUrl = $shareScheme . ($_SERVER['HTTP_HOST'] ?? '') . $eventUrl;
                     ?>
+                    <?php if ($isFirstEventOfDay): ?>
+                        <h2 class="agenda-day-heading"><?= $escape(strtoupper($start->format('l, d M Y'))) ?></h2>
+                    <?php endif; ?>
                     <?php require __DIR__ . '/event-card.php'; ?>
                 <?php endforeach; ?>
             </div>
