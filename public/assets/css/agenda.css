@@ -90,6 +90,16 @@
 .agenda-selector-panel[hidden] {
     display:none
 }
+/* Ovaal kader rond de verschuifbare locatie-/organisatorbalk.
+   De wisselknop blijft buiten het kader; achtergrond volgt de regiokleurinstelling. */
+.agenda-selector-panel:not([hidden]) {
+    box-sizing: border-box;
+    min-width: 0;
+    padding: 4px 8px;
+    border: 1px solid var(--db-search-field-color, #FFFFFF);
+    border-radius: 24px;
+    background: var(--db-filter-bar-color, #FFFFFF);
+}
 .agenda-selector-panel select {
     width:100%;
     min-width:0;
