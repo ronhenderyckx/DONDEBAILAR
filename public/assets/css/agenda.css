@@ -2867,3 +2867,38 @@ body.has-agenda-footer .site-main > .agenda-page {
         padding:1px 6px!important;
     }
 }
+
+
+/* Buitenste ovale balk vast op 48px; de filterknoppen blijven 42px hoog. */
+.agenda-selector-line {
+    height:48px!important;
+    min-height:48px!important;
+}
+.agenda-selector-panel:not([hidden]) {
+    height:48px!important;
+    min-height:48px!important;
+    max-height:48px!important;
+}
+.agenda-organizer-strip {
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+}
+.agenda-organizer-item,
+.agenda-organizer-item:not(:has(img.agenda-organizer-logo)):not(:has(img.agenda-city-filter-icon)),
+.agenda-organizer-item--organizer:has(img.agenda-organizer-logo) {
+    height:42px!important;
+    min-height:42px!important;
+    max-height:42px!important;
+}
+@media(max-width:700px) {
+    .agenda-selector-line {
+        height:48px!important;
+        min-height:48px!important;
+    }
+    .agenda-selector-panel:not([hidden]) {
+        height:48px!important;
+        min-height:48px!important;
+        max-height:48px!important;
+    }
+}
