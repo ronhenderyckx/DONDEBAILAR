@@ -2,7 +2,7 @@
     "format_version": 1,
     "project": "DONDEBAILAR",
     "environment": "test",
-    "release": "webreus-header-logo-path-fix-20261119-17",
+    "release": "webreus-header-logo-display-fix-20261119-18",
     "source_ref": "develop",
     "deployment": {
         "strategy": "separate_private_and_public_roots",
