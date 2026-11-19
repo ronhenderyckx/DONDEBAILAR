@@ -2462,3 +2462,13 @@ body.has-agenda-footer .site-main > .agenda-page {
         border-radius: 4px;
     }
 }
+
+
+/* Ovaal kader rond de locatie- en organisatorkaarten op smartphone. */
+@media (max-width: 700px) {
+    .agenda-card__info-scroller > .agenda-card__info-block {
+        border: 1px solid rgba(255,255,255,.75);
+        border-radius: 22px;
+        box-sizing: border-box;
+    }
+}
