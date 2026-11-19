@@ -3283,10 +3283,35 @@ body.has-agenda-footer .site-main > .agenda-page {
 }
 
 
-/* Pc: evenement-/dagkaarten naast elkaar; op smartphone blijft één kaart per rij. */
+/* Pc: media links en evenementinformatie rechts binnen dezelfde dagkaart.
+   Smartphone behoudt de bestaande verticale kaartindeling. */
 @media (min-width: 701px) {
-    .agenda-feed {
-        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
-        max-width: 1200px;
+    .agenda-card {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        align-items: start;
+    }
+    .agenda-card__media-wrap {
+        grid-column: 1;
+        grid-row: 1 / span 3;
+        min-width: 0;
+    }
+    .agenda-card__quick,
+    .agenda-card__details,
+    .agenda-card__swipe-hint {
+        grid-column: 2;
+        min-width: 0;
+    }
+    .agenda-card__quick {
+        grid-row: 1;
+        margin: 0;
+        padding: 10px 14px 0;
+    }
+    .agenda-card__details {
+        grid-row: 2;
+    }
+    .agenda-card__swipe-hint {
+        grid-row: 3;
+        padding: 0 14px 8px;
     }
 }
