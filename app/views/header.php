@@ -19,7 +19,7 @@ if ($region === null && $headerUser !== null) {
                 ra.filter_bar_color, ra.filter_text_color, ra.search_button_color,
                 ra.back_top_color, ra.search_field_color, ra.search_text_color,
                 ra.footer_color, ra.background_color, ra.text_color, ra.weekday_colors, ra.past_event_color,
-                COALESCE(ra.logo_path, r.logo_path) AS logo_path
+                COALESCE(NULLIF(ra.logo_path, ''), NULLIF(r.logo_path, '')) AS logo_path
          FROM regions r
          LEFT JOIN region_appearance ra ON ra.region_id = r.id
          WHERE r.is_active = 1
@@ -82,7 +82,7 @@ $brandName = $region && !empty($region['name'])
     : 'DONDEBAILAR';
 
 $projectRoot = dirname(__DIR__, 2);
-$platformLogoPath = '';
+$platformLogoPath = '/uploads/platform/logo-a0faf5e1ad98be3d877a6a7e33876a91.webp';
 $platformLogoSetting = $projectRoot . '/storage/platform-logo-path.txt';
 if (is_file($platformLogoSetting)) {
     $configuredLogo = trim((string) file_get_contents($platformLogoSetting));
