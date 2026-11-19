@@ -2763,3 +2763,10 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-selector-line {
     margin-bottom:0!important;
 }
+
+
+/* Behoud de volledige hoogte van de filterbalk; maak ruimte eronder,
+   zodat de eerste dagkaart niet tegen de balk aansluit. */
+.site-header__agenda-filters {
+    padding-bottom:18px!important;
+}
