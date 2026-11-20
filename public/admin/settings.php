@@ -225,7 +225,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require $privateRoot . '/app/views/header.php';
 ?>
 
-<section class="admin-page">
+<section class="admin-page settings-page">
     <div class="admin-heading">
         <div>
             <p class="eyebrow">PLATFORMBEHEER</p>
