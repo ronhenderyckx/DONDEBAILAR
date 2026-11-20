@@ -504,13 +504,13 @@ require $privateRoot . '/app/views/header.php';
         const formButtonHoverBg = color('form_button_hover_bg', dark);
         const formButtonHoverText = color('form_button_hover_text', '#FFFFFF');
         setBackground('#preview-form-panel', formPanelBg);
-        setBackground('#preview-form-panel input, #preview-form-panel select, #preview-form-panel .preview-form-button--secondary', formInputBg);
+        setBackground('#preview-form-panel input:not([type="color"]), #preview-form-panel select, #preview-form-panel .preview-form-button--secondary', formInputBg);
         setBackground('#preview-form-panel .preview-form-button:not(.preview-form-button--secondary)', formButtonBg);
         setText('#preview-form-panel', formLabelText);
-        setText('#preview-form-panel input, #preview-form-panel select, #preview-form-panel .preview-form-button--secondary', formInputText);
+        setText('#preview-form-panel input:not([type="color"]), #preview-form-panel select, #preview-form-panel .preview-form-button--secondary', formInputText);
         setText('#preview-form-panel .preview-form-button:not(.preview-form-button--secondary)', formButtonText);
-        setBorder('#preview-form-panel, #preview-form-panel input, #preview-form-panel select, #preview-form-panel .preview-form-button', formInputBorder);
-        preview.querySelectorAll('#preview-form-panel input, #preview-form-panel select').forEach(field => {
+        setBorder('#preview-form-panel, #preview-form-panel input:not([type="color"]), #preview-form-panel select, #preview-form-panel .preview-form-button', formInputBorder);
+        preview.querySelectorAll('#preview-form-panel input:not([type="color"]), #preview-form-panel select').forEach(field => {
             field.style.transition = 'border-color .15s ease, box-shadow .15s ease';
             field.onmouseenter = () => { field.style.borderColor = formInputHoverBorder; };
             field.onmouseleave = () => { if (document.activeElement !== field) field.style.borderColor = formInputBorder; };
