@@ -63,9 +63,64 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
     #regions-admin-table .status-active { background: <?= escapeHtml($regionListColors['status_active_bg']) ?> !important; color: <?= escapeHtml($regionListColors['status_active_text']) ?> !important; }
     #regions-admin-table .status-inactive { background: <?= escapeHtml($regionListColors['status_inactive_bg']) ?> !important; color: <?= escapeHtml($regionListColors['status_inactive_text']) ?> !important; }
     #regions-admin-table td, #regions-admin-table th { border-color: <?= escapeHtml($regionListColors['border']) ?> !important; }
+
+    /* Compacte desktopweergave: meer regio-informatie in beeld met minder witruimte. */
+    .regions-admin-page .admin-heading {
+        margin-bottom: 20px;
+        gap: 12px;
+    }
+    .regions-admin-page .admin-section {
+        margin-bottom: 18px;
+        padding: 18px;
+    }
+    .regions-admin-page .section-heading {
+        margin-bottom: 12px;
+        gap: 10px;
+    }
+    #regions-admin-table {
+        table-layout: auto;
+    }
+    #regions-admin-table th {
+        padding: 9px 11px;
+        font-size: 10px;
+    }
+    #regions-admin-table td {
+        padding: 9px 11px;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    #regions-admin-table td:last-child {
+        min-width: 225px;
+        white-space: nowrap;
+    }
+    #regions-admin-table td:last-child .button,
+    #regions-admin-table td:last-child form {
+        margin: 0 4px 0 0;
+        vertical-align: middle;
+    }
+    #regions-admin-table .button {
+        min-height: 32px;
+        padding: 6px 10px;
+        font-size: 11px;
+    }
+    @media (max-width: 760px) {
+        .regions-admin-page .admin-heading {
+            margin-bottom: 16px;
+        }
+        .regions-admin-page .admin-section {
+            padding: 14px;
+        }
+        .regions-admin-page .section-heading {
+            align-items: flex-start;
+        }
+        #regions-admin-table th,
+        #regions-admin-table td {
+            padding: 9px 10px;
+        }
+    }
 </style>
 
-<section class="admin-page">
+<section class="admin-page regions-admin-page">
     <div class="admin-heading">
         <div>
             <p class="eyebrow">PLATFORMBEHEER</p>
