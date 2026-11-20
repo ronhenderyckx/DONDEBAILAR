@@ -1691,3 +1691,57 @@ body.platform-admin-page {
         gap: 7px;
     }
 }
+
+
+/* Platformlogo: label bovenaan, uploadveld en knop op één lijn met gelijke hoogte. */
+.platform-admin-page .settings-page .auth-form:has(.platform-logo-controls) {
+    display: block !important;
+}
+.platform-admin-page .settings-page .auth-form:has(.platform-logo-controls) > label {
+    display: block;
+    margin: 0 0 9px;
+}
+.platform-admin-page .settings-page .platform-logo-controls {
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+}
+.platform-admin-page .settings-page .platform-logo-controls > input[type="file"] {
+    box-sizing: border-box;
+    flex: 0 1 420px;
+    width: min(420px, 100%);
+    max-width: 420px !important;
+    height: 42px;
+    min-height: 42px;
+    margin: 0 !important;
+    padding: 5px 8px;
+    line-height: 30px;
+}
+.platform-admin-page .settings-page .platform-logo-controls .form-actions {
+    display: flex !important;
+    flex: 0 0 auto;
+    align-items: center;
+    margin: 0 !important;
+    padding: 0;
+}
+.platform-admin-page .settings-page .platform-logo-controls .form-actions button {
+    box-sizing: border-box;
+    height: 42px;
+    min-height: 42px;
+    margin: 0;
+    padding: 0 16px;
+    line-height: 40px;
+    white-space: nowrap;
+}
+@media (max-width: 600px) {
+    .platform-admin-page .settings-page .platform-logo-controls {
+        align-items: flex-start;
+    }
+    .platform-admin-page .settings-page .platform-logo-controls > input[type="file"] {
+        flex: 1 1 100%;
+        max-width: 100% !important;
+    }
+}
