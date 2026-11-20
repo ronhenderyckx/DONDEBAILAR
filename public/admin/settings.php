@@ -160,15 +160,7 @@ require $privateRoot . '/app/views/header.php';
         <div class="message message--success" role="status"><?= escapeHtml($successMessage) ?></div>
     <?php endif; ?>
 
-    <section class="admin-section">
-        <div class="section-heading">
-            <div>
-                <h2>Kleuren platformbeheer</h2>
-                <p>Pas de kleuren van het platformbeheer aan in een apart scherm.</p>
-            </div>
-            <a class="button button--primary" href="/admin/platform-colors.php">Kleuren instellen</a>
-        </div>
-    </section>
+
 
     <section class="admin-section">
         <div class="section-heading">
@@ -249,6 +241,16 @@ require $privateRoot . '/app/views/header.php';
                 <p>SMTP-server en afzender voor systeemmails, zoals wachtwoordherstel.</p>
             </div>
             <a class="button button--primary" href="/admin/mail-settings.php">E-mailinstellingen openen</a>
+        </div>
+    </section>
+
+    <section class="admin-section">
+        <div class="section-heading">
+            <div>
+                <h2>Kleuren platformbeheer</h2>
+                <p>Pas de kleuren van het platformbeheer aan in een apart scherm.</p>
+            </div>
+            <a class="button button--primary" href="/admin/platform-colors.php">Kleuren instellen</a>
         </div>
     </section>
 </section>
