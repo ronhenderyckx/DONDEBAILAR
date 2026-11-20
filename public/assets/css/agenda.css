@@ -3800,7 +3800,7 @@ body.has-agenda-footer .site-main > .agenda-page {
         color: inherit !important;
     }
     .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__swipe-hint::before {
-        content: "←";
+        content: attr(data-arrow, "→");
         display: inline-block;
         margin-right: 8px;
         color: inherit !important;
@@ -3811,7 +3811,7 @@ body.has-agenda-footer .site-main > .agenda-page {
         vertical-align: -1px;
     }
     .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__swipe-hint::after {
-        content: "Swipe voor meer info";
+        content: attr(data-label, "Meer info");
         color: inherit !important;
         font-size: 13px;
         font-weight: 400;
