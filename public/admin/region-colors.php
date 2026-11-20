@@ -497,7 +497,7 @@ if (!$embeddedRegionAppearanceEditor) {
                     <article class="region-preview-event" data-preview="event">
                         <div class="region-preview-event-date" data-preview-day="4"><strong>VR</strong><small>20</small></div>
                         <div class="region-preview-event-copy"><strong data-preview="event-title">Salsa & Bachata Social</strong><span>20:00 · Dénia</span><small>Dansavond voor iedereen</small></div>
-                        <span class="region-preview-organizer" data-preview="organizer">Organisator</span>
+                        <div class="region-preview-event-tags"><span class="region-preview-organizer" data-preview="organizer">Organisator</span><span class="region-preview-category" data-preview="category">Bachata</span><button type="button" data-preview="primary-button">Details</button></div>
                     </article>
                     <article class="region-preview-event region-preview-event--past" data-preview="past-event">
                         <div class="region-preview-event-date"><strong>DO</strong><small>19</small></div>
@@ -683,7 +683,7 @@ if (!$embeddedRegionAppearanceEditor) {
 .region-preview-event-date{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:38px;min-height:42px;border-radius:5px;background:#f49a45;color:#222}
 .region-preview-event-copy{display:flex;flex:1;flex-direction:column;gap:3px;min-width:0}
 .region-preview-event-copy strong{color:#222}.region-preview-event-copy span,.region-preview-event-copy small{color:#687586}
-.region-preview-organizer{padding:5px 7px;border-radius:5px;background:#e23a2c;color:#fff;font-size:10px}
+.region-preview-event-tags{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end}.region-preview-organizer{padding:5px 7px;border-radius:5px;background:#e23a2c;color:#fff;font-size:10px}.region-preview-category{padding:5px 7px;border-radius:5px;background:#1fa898;color:#fff;font-size:10px}.region-preview-event-tags button{border:0;border-radius:5px;padding:5px 7px;background:#e23a2c;color:#fff;font-size:10px;font-weight:700}
 .region-preview-event--past{background:#777;color:#fff}.region-preview-event--past .region-preview-event-copy strong,.region-preview-event--past .region-preview-event-copy span{color:#fff}
 .region-preview-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;padding:10px;border-top:2px solid #ddd;background:#fff;color:#687586}
 @media(max-width:520px){.region-agenda-live-preview{padding:10px}.region-preview-topbar{padding:9px}.region-preview-content{padding:8px}.region-preview-event{gap:7px;padding:8px}.region-preview-organizer{font-size:9px}.region-preview-days{gap:3px}}
@@ -704,16 +704,16 @@ if (!$embeddedRegionAppearanceEditor) {
   const bg=value("background_color","#FFFFFF"), text=value("text_color","#222222");
   const past=value("past_event_color","#777777"), pastText=value("past_event_text_color","#FFFFFF");
   paint("[data-preview=header]","background-color",header); paint("[data-preview=header]","color",text);
-  paint("[data-preview=page]","background-color",bg); paint("[data-preview=page]","color",text);
+  paint("[data-preview=page],.region-preview-content","background-color",bg); paint("[data-preview=page],.region-preview-content","color",text);
   paint("[data-preview=strip]","background-color",strip); paint("[data-preview=filter-text]","color",stripText);
   paint("[data-preview=search-button]","background-color",search); paint("[data-preview=search-button]","color","#FFFFFF");
-  paint("[data-preview=organizer]","background-color",organizer); paint("[data-preview=organizer]","color","#FFFFFF");
+  paint("[data-preview=organizer]","background-color",organizer); paint("[data-preview=organizer]","color","#FFFFFF");\n  paint("[data-preview=category]","background-color",value("secondary_color","#1FA898")); paint("[data-preview=category]","color","#FFFFFF");\n  paint("[data-preview=primary-button]","background-color",primary); paint("[data-preview=primary-button]","color","#FFFFFF");
   paint("[data-preview=footer]","background-color",footer); paint("[data-preview=footer]","color",text);
   paint("[data-preview=back-top]","background-color",back); paint("[data-preview=back-top]","color","#FFFFFF");
   paint("[data-preview=past-event]","background-color",past); paint("[data-preview=past-event]","color",pastText);
   paint("[data-preview=past-event] .region-preview-event-copy strong","color",pastText); paint("[data-preview=past-event] .region-preview-event-copy span","color",pastText);
   paint(".region-preview-event:not(.region-preview-event--past)","background-color",bg); paint(".region-preview-event:not(.region-preview-event--past)","color",text);
-  paint("[data-preview=event-title]","color",value("weekday_title_colors[4]",text));
+  paint("[data-preview=event-title]","color",value("weekday_title_colors[4]",text));\n  paint(".region-preview-title","color",text);\n  paint(".region-preview-filters span","background-color",value("search_field_color","#FFFFFF")); paint(".region-preview-filters span","color",value("search_text_color","#222222"));
   paint(".region-preview-day","background-color",value("weekday_colors[0]","#F6D84A"));
   paint(".region-preview-day","color",value("weekday_text_colors[0]","#222222"));
   root.querySelectorAll(".region-preview-day").forEach((el,i)=>{el.style.setProperty("background-color",value("weekday_colors["+i+"]","#F6D84A"),"important");el.style.setProperty("color",value("weekday_text_colors["+i+"]","#222222"),"important")});
