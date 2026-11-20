@@ -93,12 +93,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $regionId = (int) $db->lastInsertId();
 
+                // Neem bij het aanmaken de actuele platformkleuren als startwaarden.
+                // Latere wijzigingen in een regio blijven volledig onafhankelijk.
+                $platformColorDefaults = [
+                    'primary' => '#0A4D9F',
+                    'primary_dark' => '#083B79',
+                    'accent' => '#00AFC5',
+                    'header' => '#FFFFFF',
+                    'menu' => '#FFFFFF',
+                    'background' => '#F7F8FA',
+                    'surface' => '#FFFFFF',
+                    'text' => '#202B38',
+                    'muted' => '#687586',
+                    'border' => '#E7EAF0',
+                ];
+                $platformColorsFile = DONDEBAILAR_PRIVATE_ROOT . '/storage/platform-admin-colors.json';
+                if (is_file($platformColorsFile)) {
+                    $savedPlatformColors = json_decode((string) file_get_contents($platformColorsFile), true);
+                    if (is_array($savedPlatformColors)) {
+                        foreach ($platformColorDefaults as $colorKey => $fallbackColor) {
+                            $candidate = strtoupper(trim((string) ($savedPlatformColors[$colorKey] ?? '')));
+                            if (preg_match('/^#[0-9A-F]{6}$/', $candidate)) {
+                                $platformColorDefaults[$colorKey] = $candidate;
+                            }
+                        }
+                    }
+                }
+
                 $appearance = $db->prepare(
-                    "INSERT INTO region_appearance (region_id, updated_by)
-                     VALUES (:region_id, :updated_by)"
+                    "INSERT INTO region_appearance
+                        (region_id, primary_color, primary_dark, accent_color, header_color,
+                         menu_color, organizer_color, filter_hover_color, filter_bar_color,
+                         filter_text_color, search_button_color, back_top_color,
+                         search_field_color, search_text_color, footer_color,
+                         background_color, text_color, updated_by)
+                     VALUES
+                        (:region_id, :primary_color, :primary_dark, :accent_color, :header_color,
+                         :menu_color, :organizer_color, :filter_hover_color, :filter_bar_color,
+                         :filter_text_color, :search_button_color, :back_top_color,
+                         :search_field_color, :search_text_color, :footer_color,
+                         :background_color, :text_color, :updated_by)"
                 );
                 $appearance->execute([
                     'region_id' => $regionId,
+                    'primary_color' => $platformColorDefaults['primary'],
+                    'primary_dark' => $platformColorDefaults['primary_dark'],
+                    'accent_color' => $platformColorDefaults['accent'],
+                    'header_color' => $platformColorDefaults['header'],
+                    'menu_color' => $platformColorDefaults['menu'],
+                    'organizer_color' => $platformColorDefaults['primary'],
+                    'filter_hover_color' => $platformColorDefaults['primary_dark'],
+                    'filter_bar_color' => $platformColorDefaults['surface'],
+                    'filter_text_color' => $platformColorDefaults['text'],
+                    'search_button_color' => $platformColorDefaults['primary'],
+                    'back_top_color' => $platformColorDefaults['primary'],
+                    'search_field_color' => $platformColorDefaults['surface'],
+                    'search_text_color' => $platformColorDefaults['text'],
+                    'footer_color' => $platformColorDefaults['surface'],
+                    'background_color' => $platformColorDefaults['background'],
+                    'text_color' => $platformColorDefaults['text'],
                     'updated_by' => (int) $user['id'],
                 ]);
 
