@@ -3778,6 +3778,19 @@ body.has-agenda-footer .site-main > .agenda-page {
     }
 }
 
+/* Smartphone: prijzen direct onder de datum, links exact op dezelfde lijn uitgelijnd. */
+@media (max-width: 700px) {
+    .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__prices {
+        display: block !important;
+        order: 4 !important;
+        width: auto !important;
+        margin: 0 16px 7px 16px !important;
+        padding: 0 !important;
+        text-align: left !important;
+        box-sizing: border-box !important;
+    }
+}
+
 /* Smartphone: hashtags uitlijnen met de linker inspringing van naam en datum. */
 @media (max-width: 700px) {
     .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__hashtags {
