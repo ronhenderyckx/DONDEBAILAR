@@ -388,11 +388,13 @@ require $privateRoot . '/app/views/header.php';
         <form method="post" action="/admin/settings.php" class="auth-form event-duration-settings-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="max_event_duration_hours">Maximale duur (1–168 uur)</label>
-            <div style="max-width:180px">
-                <input type="number" id="max_event_duration_hours" name="max_event_duration_hours" min="1" max="168" step="1" value="<?= (int) $maxEventDurationHours ?>" required style="text-align:center;margin:0">
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="button button--primary" name="save_event_duration" value="1">Maximale duur opslaan</button>
+            <div class="duration-setting-controls">
+                <div class="duration-setting-input">
+                    <input type="number" id="max_event_duration_hours" name="max_event_duration_hours" min="1" max="168" step="1" value="<?= (int) $maxEventDurationHours ?>" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="button button--primary" name="save_event_duration" value="1">Maximale duur opslaan</button>
+                </div>
             </div>
         </form>
     </section>
