@@ -122,23 +122,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 $appearance = $db->prepare(
                     "INSERT INTO region_appearance
-                        (region_id, primary_color, primary_dark, accent_color, header_color,
-                         menu_color, organizer_color, filter_hover_color, filter_bar_color,
-                         filter_text_color, search_button_color, back_top_color,
-                         search_field_color, search_text_color, footer_color,
-                         background_color, text_color, updated_by)
+                        (region_id, primary_color, primary_dark, accent_color, secondary_color,
+                         tertiary_color, header_color, menu_color, organizer_color, filter_hover_color,
+                         filter_bar_color, filter_text_color, search_button_color, back_top_color,
+                         search_field_color, search_text_color, footer_color, background_color,
+                         text_color, weekday_colors, updated_by)
                      VALUES
-                        (:region_id, :primary_color, :primary_dark, :accent_color, :header_color,
-                         :menu_color, :organizer_color, :filter_hover_color, :filter_bar_color,
-                         :filter_text_color, :search_button_color, :back_top_color,
-                         :search_field_color, :search_text_color, :footer_color,
-                         :background_color, :text_color, :updated_by)"
+                        (:region_id, :primary_color, :primary_dark, :accent_color, :secondary_color,
+                         :tertiary_color, :header_color, :menu_color, :organizer_color, :filter_hover_color,
+                         :filter_bar_color, :filter_text_color, :search_button_color, :back_top_color,
+                         :search_field_color, :search_text_color, :footer_color, :background_color,
+                         :text_color, :weekday_colors, :updated_by)"
                 );
                 $appearance->execute([
                     'region_id' => $regionId,
                     'primary_color' => $platformColorDefaults['primary'],
                     'primary_dark' => $platformColorDefaults['primary_dark'],
                     'accent_color' => $platformColorDefaults['accent'],
+                    'secondary_color' => $platformColorDefaults['accent'],
+                    'tertiary_color' => $platformColorDefaults['accent'],
                     'header_color' => $platformColorDefaults['header'],
                     'menu_color' => $platformColorDefaults['menu'],
                     'organizer_color' => $platformColorDefaults['primary'],
@@ -152,6 +154,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'footer_color' => $platformColorDefaults['surface'],
                     'background_color' => $platformColorDefaults['background'],
                     'text_color' => $platformColorDefaults['text'],
+                    'weekday_colors' => json_encode([
+                        'selector_strip_background_color' => $platformColorDefaults['surface'],
+                        'event_separator_color' => $platformColorDefaults['border'],
+                        'event_title_color' => $platformColorDefaults['text'],
+                    ], JSON_THROW_ON_ERROR),
                     'updated_by' => (int) $user['id'],
                 ]);
 
