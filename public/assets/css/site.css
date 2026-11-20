@@ -69,3 +69,23 @@ body { margin: 0; min-width: 320px; }
     .site-navigation.is-open { display: flex; }
     .site-navigation a { width: 100%; }
 }
+
+/* Mobile agenda cards: event title and date above the action icons. */
+@media (max-width: 700px) {
+    .agenda-card__details {
+        display: flex;
+        flex-direction: column;
+    }
+    .agenda-card__details > * {
+        order: 4;
+    }
+    .agenda-card__details > h2 {
+        order: 1;
+    }
+    .agenda-card__details > .agenda-card__date-line {
+        order: 2;
+    }
+    .agenda-card__details > .agenda-card__quick {
+        order: 3;
+    }
+}
