@@ -582,7 +582,7 @@ if (!$embeddedRegionAppearanceEditor) {
                 <div class="region-weekday-card">
                     <strong><?= $day ?></strong>
                     <div class="region-weekday-setting">
-                        <label for="weekday_<?= $i ?>">Achtergrond</label>
+                        <label for="weekday_<?= $i ?>">Achtergrondkleur</label>
                         <div class="region-weekday-color">
                             <input type="color" id="weekday_<?= $i ?>" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>">
                             <code><?= escapeHtml($weekdayColors[$i]) ?></code>
@@ -596,7 +596,7 @@ if (!$embeddedRegionAppearanceEditor) {
                         </div>
                     </div>
                     <div class="region-weekday-setting">
-                        <label for="weekday_title_<?= $i ?>">Tekstkleur titel</label>
+                        <label for="weekday_title_<?= $i ?>">Tekstkleur evenementtitel</label>
                         <div class="region-weekday-color">
                             <input type="color" id="weekday_title_<?= $i ?>" name="weekday_title_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTitleColors[$i]) ?>">
                             <code><?= escapeHtml($weekdayTitleColors[$i]) ?></code>
@@ -684,64 +684,29 @@ if (!$embeddedRegionAppearanceEditor) {
 .region-color-field code,.region-weekday-color code{grid-column:1/-1;color:#596273;font-size:12px}
 .admin-section .auth-form>h2{margin:30px 0 8px;padding-bottom:10px;border-bottom:1px solid #e5e9ef}
 .admin-section .auth-form>h2:first-of-type{margin-top:8px}
-.region-weekday-grid{display:grid;grid-template-columns:1fr;gap:8px;margin:14px 0 30px}
-.region-weekday-card{display:grid;grid-template-columns:minmax(105px,150px) repeat(3,minmax(0,1fr));align-items:center;gap:10px;padding:10px 14px;border:1px solid #e1e5eb;border-radius:9px;background:#fff}
-.region-weekday-card>strong{font-size:14px}
-.region-weekday-setting{min-width:0;display:flex;flex-direction:column;gap:4px}
-.region-weekday-setting>label{color:#596273;font-size:11px;font-weight:600;line-height:1.2}
-.region-weekday-color{display:flex;align-items:center;gap:7px;min-width:0}
-.region-weekday-color input[type=color]{width:42px;height:34px;flex:0 0 42px;padding:2px}
+.region-weekday-grid{display:flex;flex-direction:column;gap:7px;margin:14px 0 30px}
+.region-weekday-card{display:grid;grid-template-columns:150px repeat(3,minmax(0,1fr));align-items:center;gap:12px;padding:8px 12px;border:1px solid #e1e5eb;border-radius:8px;background:#fff}
+.region-weekday-card>strong{font-size:14px;white-space:nowrap}
+.region-weekday-setting{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}
+.region-weekday-setting>label{color:#596273;font-size:12px;font-weight:600;line-height:1.2}
+.region-weekday-color{display:flex;align-items:center;gap:6px;flex:0 0 auto}
+.region-weekday-color input[type=color]{width:40px;height:32px;padding:2px}
 .region-weekday-color code{font-size:11px;color:#596273}
-@media(max-width:640px){
- .region-color-grid{grid-template-columns:1fr}
- .region-weekday-card{grid-template-columns:86px repeat(3,minmax(0,1fr));gap:6px;padding:8px}
- .region-weekday-card>strong{font-size:12px}
+@media(max-width:760px){
+ .region-weekday-card{grid-template-columns:100px repeat(3,minmax(0,1fr));gap:6px;padding:8px}
+ .region-weekday-setting{flex-direction:column;align-items:flex-start;gap:3px}
  .region-weekday-setting>label{font-size:10px}
- .region-weekday-color{gap:3px;flex-wrap:wrap}
- .region-weekday-color input[type=color]{width:34px;height:30px;flex-basis:34px}
+ .region-weekday-color input[type=color]{width:34px;height:29px}
  .region-weekday-color code{font-size:10px}
- .region-color-field{grid-template-columns:minmax(0,1fr) 52px}
 }
-@media(max-width:390px){
- .region-weekday-card{grid-template-columns:72px repeat(3,minmax(0,1fr));gap:4px;padding:6px}
- .region-weekday-color input[type=color]{width:30px;height:28px;flex-basis:30px}
+@media(max-width:430px){
+ .region-weekday-card{grid-template-columns:76px repeat(3,minmax(0,1fr));gap:4px;padding:6px}
+ .region-weekday-card>strong{font-size:12px}
+ .region-weekday-setting>label{font-size:9px}
+ .region-weekday-color{gap:3px}
+ .region-weekday-color input[type=color]{width:29px;height:27px}
  .region-weekday-color code{font-size:9px}
 }
-
-.region-agenda-live-preview{margin:4px 0 26px;padding:16px;border:1px solid var(--db-border,#e1e5eb);border-radius:12px;background:var(--db-surface,#fff)}
-.region-preview-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
-.region-preview-heading h2{margin:0 0 4px!important;padding:0!important;border:0!important;font-size:18px}
-.region-preview-heading p{margin:0;color:var(--db-muted,#687586);font-size:13px}
-.region-preview-live{padding:5px 9px;border-radius:20px;background:#eaf7f0;color:#16845b;font-size:10px;font-weight:800;white-space:nowrap}
-.region-preview-shell{overflow:hidden;border:1px solid #dce2e9;border-radius:10px;background:#fff;color:#222;font-size:12px}
-.region-preview-topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;background:#222;color:#fff}
-.region-preview-brand{font-size:14px;letter-spacing:.5px}
-.region-preview-agenda{padding:12px;background:#fff;color:#222}
-.region-preview-title{display:flex;align-items:baseline;gap:9px;margin:0 0 10px;color:#222}
-.region-preview-title strong{font-size:17px}.region-preview-title span{color:#687586}
-.region-preview-filters{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:8px;background:#fff}
-.region-preview-filters span,.region-preview-filters input{min-width:0;padding:7px 9px;border:1px solid #ddd;border-radius:5px;background:#fff;color:#222}
-.region-preview-filters input{flex:1;width:90px}
-.region-preview-filters button{border:0;border-radius:5px;padding:7px 12px;background:#e23a2c;color:#fff;font-weight:700}
-.region-preview-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin:10px 0 14px}
-.region-preview-calendar-day{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:5px;background:#f6d84a;color:#222}
-.region-preview-calendar-day strong{font-size:10px}.region-preview-calendar-day span{font-size:12px;font-weight:700}
-.region-preview-events{display:block}
-.region-preview-events .agenda-day-heading{margin:12px 0 8px;padding-bottom:6px;font-size:13px}
-.region-preview-agenda-card{display:block;margin:0 0 14px;overflow:hidden;border-radius:10px}
-.region-preview-agenda-card .agenda-card__media-wrap{height:125px}
-.region-preview-agenda-card .agenda-card__placeholder{display:flex;align-items:center;justify-content:center;min-height:125px;padding:12px;background:var(--db-event-day-color,var(--db-primary));color:var(--db-event-day-title-color,#222);text-align:center}
-.region-preview-agenda-card .agenda-card__placeholder strong{font-size:clamp(20px,4vw,32px)}
-.region-preview-agenda-card .agenda-card__quick{display:flex;justify-content:flex-end;gap:14px;padding:6px 12px;background:var(--db-event-day-color,var(--db-primary));color:var(--db-event-day-text-color,#222)}
-.region-preview-quick-icon{font-size:13px}
-.region-preview-agenda-card .agenda-card__details{padding:12px 14px;background:var(--db-event-day-color,var(--db-primary));color:var(--db-event-day-text-color,#222)}
-.region-preview-agenda-card .agenda-card__details h2{margin:0 0 6px;font-size:18px;color:var(--db-event-day-title-color,#222)}
-.region-preview-agenda-card .agenda-card__details h2 span{color:inherit}
-.region-preview-agenda-card .agenda-card__date-line{margin:0 0 6px;font-size:11px}
-.region-preview-agenda-card .agenda-card__hashtags{margin:0;font-size:11px}
-.region-preview-event-description{margin:7px 0 0;font-size:12px}
-.region-preview-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;padding:10px;border-top:2px solid #ddd;background:#fff;color:#687586}
-.region-preview-footer button{border:0;border-radius:5px;padding:7px 12px;background:#e23a2c;color:#fff;font-weight:700}
 @media(max-width:520px){.region-agenda-live-preview{padding:10px}.region-preview-topbar{padding:9px}.region-preview-agenda{padding:8px}.region-preview-agenda-card .agenda-card__media-wrap,.region-preview-agenda-card .agenda-card__placeholder{height:100px;min-height:100px}.region-preview-agenda-card .agenda-card__details{padding:10px}.region-preview-calendar{gap:2px}.region-preview-calendar-day{padding:6px 1px}}
 
 </style>
