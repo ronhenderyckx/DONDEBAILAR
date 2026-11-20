@@ -3801,7 +3801,19 @@ body.has-agenda-footer .site-main > .agenda-page {
         font-size: 0 !important;
     }
     .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__swipe-hint::before {
-        content: "← SWIPE VOOR MEER INFO";
+        content: "←";
+        display: inline-block;
+        margin-right: 8px;
+        color: var(--db-primary, #E23A2C);
+        font-size: 19px;
+        font-weight: 900;
+        line-height: 1;
+        text-shadow: 0 0 1px currentColor;
+        vertical-align: -1px;
+    }
+    .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__swipe-hint::after {
+        content: "Swipe voor meer info";
         font-size: 13px;
+        font-weight: 800;
     }
 }
