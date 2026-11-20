@@ -367,11 +367,13 @@ require $privateRoot . '/app/views/header.php';
         <form method="post" action="/admin/settings.php" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="agenda_page_size">Evenementen per reeks (1–100)</label>
-            <div style="max-width:180px">
-                <input type="number" id="agenda_page_size" name="agenda_page_size" min="1" max="100" step="1" value="<?= (int) $agendaPageSize ?>" required style="text-align:center;margin:0">
-            </div>
-            <div class="form-actions">
-                <button type="submit" class="button button--primary" name="save_agenda_settings" value="1">Agenda-instelling opslaan</button>
+            <div class="agenda-setting-controls">
+                <div class="agenda-setting-input" style="max-width:180px">
+                    <input type="number" id="agenda_page_size" name="agenda_page_size" min="1" max="100" step="1" value="<?= (int) $agendaPageSize ?>" required style="text-align:center;margin:0">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="button button--primary" name="save_agenda_settings" value="1">Agenda-instelling opslaan</button>
+                </div>
             </div>
         </form>
     </section>
