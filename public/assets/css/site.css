@@ -290,18 +290,26 @@ img {
 }
 
 .site-menu__logout {
+    display: flex;
+    align-items: center;
     width: 100%;
+    min-height: 40px;
     padding: 10px 12px;
     border: 0;
     border-radius: 7px;
     background: transparent;
-    color: var(--db-menu-text, var(--db-danger));
+    color: var(--db-menu-text, var(--db-text));
     text-align: left;
-    font-weight: 600;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.35;
+    cursor: pointer;
 }
 
 .site-menu__logout:hover {
-    background: var(--db-danger-bg);
+    background: var(--db-menu-hover-bg, color-mix(in srgb, var(--db-menu-color, #FFFFFF) 88%, var(--db-text)));
+    color: var(--db-menu-hover-text, var(--db-primary));
 }
 
 /* Hoofdinhoud */
