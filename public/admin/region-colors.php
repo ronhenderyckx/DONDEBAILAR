@@ -602,7 +602,7 @@ if (!$embeddedRegionAppearanceEditor) {
             <input type="file" id="region_logo" name="region_logo" accept="image/png,image/jpeg,image/webp">
             <div class="form-actions">
                 <button type="submit" class="button button--primary">Kleuren en logo opslaan</button>
-                <a class="button" href="<?= $embeddedRegionAppearanceEditor ? '/admin/regions.php' : '/admin/regions.php' ?>">Annuleren</a>
+                <a class="button" href="/admin/region-edit.php?id=<?= (int) $regionId ?>">Terug naar regio</a>
             </div>
         </form>
     </section>
