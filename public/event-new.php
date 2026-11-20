@@ -49,6 +49,8 @@ $title = trim((string) ($_POST['title'] ?? ''));
 $description = trim((string) ($_POST['description'] ?? ''));
 $extraInfo = trim((string) ($_POST['extra_info'] ?? ''));
 $hashtags = trim((string) ($_POST['hashtags'] ?? ''));
+$presalePrice = trim((string) ($_POST['presale_price'] ?? ''));
+$doorPrice = trim((string) ($_POST['door_price'] ?? ''));
 $eventLanguage = (string) ($_POST['event_language'] ?? ($region['default_language'] ?? 'es'));
 $organizerId = (int) ($_POST['organizer_id'] ?? 0);
 $locationId = (int) ($_POST['location_id'] ?? 0);
@@ -139,11 +141,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             $insert = $db->prepare(
                 "INSERT INTO events
-                    (region_id, organizer_id, location_id, category_id, title, description, extra_info, hashtags,
+                    (region_id, organizer_id, location_id, category_id, title, description, extra_info, hashtags, presale_price, door_price,
                      event_language, starts_at, ends_at, timezone, status, created_by, updated_by,
                      recurrence_series_id, recurrence_number)
                  VALUES
-                    (:region_id, :organizer_id, :location_id, :category_id, :title, :description, :extra_info, :hashtags,
+                    (:region_id, :organizer_id, :location_id, :category_id, :title, :description, :extra_info, :hashtags, :presale_price, :door_price,
                      :event_language, :starts_at, :ends_at, :timezone, 'draft', :created_by, :updated_by,
                      :recurrence_series_id, :recurrence_number)"
             );
@@ -188,6 +190,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'description' => $description !== '' ? $description : null,
                     'extra_info' => $extraInfo !== '' ? $extraInfo : null,
                     'hashtags' => $hashtags !== '' ? $hashtags : null,
+                    'presale_price' => $presalePrice !== '' ? $presalePrice : null,
+                    'door_price' => $doorPrice !== '' ? $doorPrice : null,
                     'event_language' => $eventLanguage,
                     'starts_at' => $occurrenceStart->format('Y-m-d H:i:s'),
                     'ends_at' => $occurrenceEnd?->format('Y-m-d H:i:s'),
@@ -324,6 +328,8 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                 <input id="recurrence_until" type="date" name="recurrence_until" value="<?= escapeHtml($recurrenceUntil) ?>">
                 <p class="event-form-note">Elke editie wordt een afzonderlijk evenement. Maximaal 120 edities en twee jaar vooruit.</p>
             </div>
+            <label for="presale_price">Voorverkoop (€)</label><input id="presale_price" name="presale_price" type="number" min="0" max="99999.99" step="0.01" value="<?= escapeHtml($presalePrice) ?>" placeholder="Bijvoorbeeld 10">
+            <label for="door_price">Aan de poort (€)</label><input id="door_price" name="door_price" type="number" min="0" max="99999.99" step="0.01" value="<?= escapeHtml($doorPrice) ?>" placeholder="Bijvoorbeeld 15">
             <label for="description">Beschrijving</label>
             <textarea id="description" name="description" rows="8"><?= escapeHtml($description) ?></textarea>
             <label for="extra_info">Extra info</label>
