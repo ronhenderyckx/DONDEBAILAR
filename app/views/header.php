@@ -241,6 +241,9 @@ if ($isPlatformAdminPage) {
 
     // Deel ook de formulier- en lijstkleuren met alle platformbeheerpagina's.
     $platformDetailColors = [
+        'menu_text' => '#202B38',
+        'menu_hover_bg' => '#F3F6F9',
+        'menu_hover_text' => '#0A4D9F',
         'form_panel_bg' => '#F7F8FA',
         'form_label_text' => '#202B38',
         'form_input_bg' => '#FFFFFF',
