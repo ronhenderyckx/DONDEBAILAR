@@ -313,49 +313,9 @@ require $privateRoot . '/app/views/header.php';
         </div>
 <form method="post" action="/admin/settings.php">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
-            <div class="table-wrapper">
-                <table class="admin-table">
-                    <thead><tr><th>Kleur</th><th>Waarvoor dient deze?</th><th>Kleur kiezen</th><th>Code</th></tr></thead>
-                    <tbody>
-                        <?php
-                        $colorDescriptions = [
-                            'primary' => ['Primaire kleur', 'Hoofdkleur voor actieknoppen, links en geselecteerde onderdelen.'],
-                            'primary_dark' => ['Donkere primaire kleur', 'Donkere variant bij aanwijzen of hoveren over een knop.'],
-                            'action_button' => ['Knop Wijzigen', 'Achtergrondkleur van de knoppen Wijzigen in de beheerlijst. De hoverkleur gebruikt de donkere primaire kleur.'],
-                            'list_text' => ['Tekstkleur beheerlijst', 'Kleur van de teksten in de voorbeeldregels, zoals Regel 1, Regio 1 en de status.'],
-                            'list_header_bg' => ['Kopachtergrond lijst', 'Achtergrond van de kolomkoppen.'],
-                            'list_header_text' => ['Koptekst lijst', 'Tekstkleur van de kolomkoppen.'],
-                            'list_row_bg' => ['Regelachtergrond lijst', 'Achtergrondkleur van de voorbeeldregels.'],
-                            'list_hover_bg' => ['Hoverachtergrond lijst', 'Achtergrondkleur van een regel bij hover.'],
-                            'list_hover_text' => ['Hovertekst lijst', 'Tekstkleur van een regel bij hover.'],
-                            'action_button_text' => ['Tekst knop Wijzigen', 'Tekstkleur van de knop Wijzigen.'],
-                            'action_hover_bg' => ['Hoverachtergrond knop', 'Achtergrondkleur van Wijzigen bij hover.'],
-                            'action_hover_text' => ['Hovertekst knop', 'Tekstkleur van Wijzigen bij hover.'],
-                            'status_active_bg' => ['Actief statusachtergrond', 'Achtergrond van de status Actief.'],
-                            'status_active_text' => ['Actief statustekst', 'Tekstkleur van de status Actief.'],
-                            'status_inactive_bg' => ['Inactief statusachtergrond', 'Achtergrond van de status Inactief.'],
-                            'status_inactive_text' => ['Inactief statustekst', 'Tekstkleur van de status Inactief.'],
-                            'accent' => ['Accentkleur', 'Laat belangrijke details en markeringen extra opvallen.'],
-                            'header' => ['Bovenbalk', 'Achtergrond van de bovenste balk met het DONDEBAILAR-logo.'],
-                            'menu' => ['Menu', 'Achtergrondkleur van het uitklapmenu met navigatie-items.'],
-                            'background' => ['Pagina-achtergrond', 'Achtergrond achter de panelen en inhoud van de beheerpagina.'],
-                            'surface' => ['Panelen en kaarten', 'Achtergrond van inhoudspanelen, kaarten en instellingenblokken.'],
-                            'text' => ['Tekstkleur', 'Standaardkleur voor titels, koppen en gewone teksten.'],
-                            'muted' => ['Gedempte tekst', 'Voor toelichtingen, ondertitels en aanvullende informatie.'],
-                            'border' => ['Randkleur', 'Voor randen en scheidingslijnen rond panelen, kaarten, tabellen en menu’s.']
-                        ];
-                        ?>
-                        <?php foreach ($colorDescriptions as $colorKey => [$colorLabel, $colorDescription]): ?>
-                            <tr>
-                                <td><strong><?= escapeHtml($colorLabel) ?></strong></td>
-                                <td><?= escapeHtml($colorDescription) ?></td>
-                                <td><input type="color" id="platform_color_<?= escapeHtml($colorKey) ?>" name="platform_colors[<?= escapeHtml($colorKey) ?>]" value="<?= escapeHtml($platformAdminColors[$colorKey]) ?>" aria-label="<?= escapeHtml($colorLabel) ?>" style="width:64px;height:42px;padding:3px"></td>
-                                <td><code><?= escapeHtml($platformAdminColors[$colorKey]) ?></code></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
+            <?php foreach ($platformAdminColors as $colorKey => $colorValue): ?>
+                <input type="hidden" id="platform_color_<?= escapeHtml($colorKey) ?>" name="platform_colors[<?= escapeHtml($colorKey) ?>]" value="<?= escapeHtml($colorValue) ?>">
+            <?php endforeach; ?>
             <div class="form-actions">
                 <button type="submit" class="button button--primary" name="save_platform_colors" value="1">Platformkleuren opslaan</button>
             </div>
@@ -571,10 +531,7 @@ require $privateRoot . '/app/views/header.php';
         picker.addEventListener('input', function () {
             const key = picker.dataset.previewColor;
             const original = document.getElementById('platform_color_' + key);
-            if (original) {
-                original.value = picker.value;
-                original.dispatchEvent(new Event('input', { bubbles: true }));
-            }
+            if (original) original.value = picker.value;
             preview.querySelectorAll('[data-preview-color="' + key + '"]').forEach(other => {
                 if (other !== picker) other.value = picker.value;
             });
