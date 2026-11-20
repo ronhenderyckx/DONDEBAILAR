@@ -3757,16 +3757,14 @@ body.has-agenda-footer .site-main > .agenda-page {
     /* Bij openen komt alle extra informatie tussen hashtags en iconen. */
     .agenda-card > .agenda-card__details > .agenda-card__description {
         order: 5 !important;
+        width: auto !important;
+        min-width: 0 !important;
     }
     .agenda-card > .agenda-card__quick {
         order: 6 !important;
     }
     .agenda-card > .agenda-card__details > .agenda-card__swipe-hint {
         order: 7 !important;
-    }
-/*
-        width: auto !important;
-        min-width: 0 !important;
     }
 }
 
