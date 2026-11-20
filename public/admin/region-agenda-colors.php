@@ -1,0 +1,181 @@
+<?php
+declare(strict_types=1);
+
+require_once dirname(__DIR__) . '/_private-root.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/bootstrap.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Authorization.php';
+require_once DONDEBAILAR_PRIVATE_ROOT . '/app/Security.php';
+
+$db = Database::connection();
+$regionId = filter_input(INPUT_GET, 'region_id', FILTER_VALIDATE_INT);
+if (!$regionId || $regionId < 1) {
+    http_response_code(400);
+    exit('Ongeldig regionummer.');
+}
+requireRegionRole((int) $regionId, ['region_admin']);
+
+$regionQuery = $db->prepare('SELECT id, name FROM regions WHERE id = :id LIMIT 1');
+$regionQuery->execute(['id' => $regionId]);
+$region = $regionQuery->fetch();
+if (!$region) {
+    http_response_code(404);
+    exit('Regio niet gevonden.');
+}
+
+$weekdayNames = ['Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag', 'Zondag'];
+$weekdayDates = [
+    'MAANDAG, 16 NOV 2026', 'DINSDAG, 17 NOV 2026', 'WOENSDAG, 18 NOV 2026',
+    'DONDERDAG, 19 NOV 2026', 'VRIJDAG, 20 NOV 2026', 'ZATERDAG, 21 NOV 2026', 'ZONDAG, 22 NOV 2026'
+];
+$eventNames = ['Salsa beginnersles', 'Bachata open training', 'Latin dance social', 'Kizomba workshop', 'Salsa & Bachata Social', 'Latin Dance Night', 'Sunday dance practice'];
+$eventTags = ['#Salsa #Dénia', '#Bachata #Jávea', '#Latin #Calpe', '#Kizomba #Altea', '#Bachata #Dénia', '#Salsa #Bachata #Jávea', '#Dansen #MarinaAlta'];
+$eventTimes = ['19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '18:00'];
+$defaultColors = ['#F6D84A', '#4A90D9', '#55A96B', '#A78BDA', '#E78AAE', '#F49A45', '#999999'];
+$defaultText = array_fill(0, 7, '#222222');
+$defaultTitles = array_fill(0, 7, '#222222');
+
+$appearanceQuery = $db->prepare('SELECT weekday_colors FROM region_appearance WHERE region_id = :id LIMIT 1');
+$appearanceQuery->execute(['id' => $regionId]);
+$appearance = $appearanceQuery->fetch() ?: [];
+$weekdayData = json_decode((string) ($appearance['weekday_colors'] ?? ''), true);
+if (!is_array($weekdayData)) $weekdayData = [];
+$weekdayColors = $defaultColors;
+$weekdayTextColors = $defaultText;
+$weekdayTitleColors = $defaultTitles;
+foreach ($weekdayNames as $i => $_day) {
+    foreach ([
+        ['key' => $i, 'target' => &$weekdayColors[$i], 'default' => $defaultColors[$i]],
+        ['key' => 'weekday_text_' . $i, 'target' => &$weekdayTextColors[$i], 'default' => '#222222'],
+        ['key' => 'weekday_title_' . $i, 'target' => &$weekdayTitleColors[$i], 'default' => '#222222'],
+    ] as &$item) {
+        $candidate = strtoupper((string) ($weekdayData[$item['key']] ?? $item['default']));
+        if (preg_match('/^#[0-9A-F]{6}$/', $candidate)) $item['target'] = $candidate;
+    }
+    unset($item);
+}
+unset($item);
+
+$errorMessage = '';
+$successMessage = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    if (!verifyCsrfToken(is_string($_POST['csrf_token'] ?? null) ? $_POST['csrf_token'] : null)) {
+        $errorMessage = 'De beveiligingscontrole is verlopen. Vernieuw de pagina.';
+    } else {
+        $submitted = [
+            'weekday_colors' => $_POST['weekday_colors'] ?? [],
+            'weekday_text_colors' => $_POST['weekday_text_colors'] ?? [],
+            'weekday_title_colors' => $_POST['weekday_title_colors'] ?? [],
+        ];
+        foreach ($weekdayNames as $i => $_day) {
+            foreach ([
+                ['source' => 'weekday_colors', 'target' => &$weekdayColors[$i]],
+                ['source' => 'weekday_text_colors', 'target' => &$weekdayTextColors[$i]],
+                ['source' => 'weekday_title_colors', 'target' => &$weekdayTitleColors[$i]],
+            ] as &$item) {
+                $candidate = strtoupper(trim((string) ($submitted[$item['source']][$i] ?? $item['target'])));
+                if (!preg_match('/^#[0-9A-F]{6}$/', $candidate)) {
+                    $errorMessage = 'Een of meer kleurcodes zijn ongeldig.';
+                    break 2;
+                }
+                $item['target'] = $candidate;
+            }
+            unset($item);
+        }
+        unset($item);
+        if ($errorMessage === '') {
+            foreach ($weekdayNames as $i => $_day) {
+                $weekdayData[$i] = $weekdayColors[$i];
+                $weekdayData['weekday_text_' . $i] = $weekdayTextColors[$i];
+                $weekdayData['weekday_title_' . $i] = $weekdayTitleColors[$i];
+            }
+            $encoded = json_encode($weekdayData, JSON_THROW_ON_ERROR);
+            $save = $db->prepare('INSERT INTO region_appearance (region_id, weekday_colors) VALUES (:id, :colors)
+                ON DUPLICATE KEY UPDATE weekday_colors = VALUES(weekday_colors)');
+            $save->execute(['id' => $regionId, 'colors' => $encoded]);
+            $successMessage = 'De agendakleuren zijn opgeslagen.';
+        }
+    }
+}
+
+$pageTitle = 'Agendakleuren - ' . $region['name'];
+$platformAdminPage = true;
+require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
+?>
+<section class="admin-page region-agenda-colors-page">
+    <div class="admin-heading">
+        <div><p class="eyebrow">REGIOBEHEER</p><h1>Agendakleuren</h1><p>Stel per weekdag de kleuren van de evenementenkaarten in voor <?= escapeHtml($region['name']) ?>.</p></div>
+        <a class="button" href="/admin/region-colors.php?region_id=<?= (int) $regionId ?>">Terug naar kleuren en logo</a>
+    </div>
+    <?php if ($errorMessage !== ''): ?><div class="message message--error" role="alert"><?= escapeHtml($errorMessage) ?></div><?php endif; ?>
+    <?php if ($successMessage !== ''): ?><div class="message message--success" role="status"><?= escapeHtml($successMessage) ?></div><?php endif; ?>
+    <section class="admin-section">
+        <div class="section-heading"><div><h2>Live agenda-voorbeeld</h2><p>Elke kaart toont fictieve evenementgegevens. Pas de kleuren rechts aan en zie onmiddellijk het resultaat.</p></div></div>
+        <form method="post" id="agenda-weekday-colors-form">
+            <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+            <div class="agenda-weekday-editor">
+            <?php foreach ($weekdayNames as $i => $day): ?>
+                <div class="agenda-weekday-editor-row">
+                    <article class="agenda-card agenda-weekday-preview-card" data-day-card="<?= $i ?>">
+                        <div class="agenda-card__media-wrap"><div class="agenda-card__placeholder" data-day-placeholder="<?= $i ?>"><strong>SALSA · BACHATA · KIZOMBA</strong></div></div>
+                        <div class="agenda-card__quick"><span class="region-preview-quick-icon">👠 <b><?= 5 + $i ?></b></span><span class="region-preview-quick-icon">↗</span><span class="region-preview-quick-icon">⌖</span></div>
+                        <div class="agenda-card__details">
+                            <h2><?= escapeHtml($eventNames[$i]) ?></h2>
+                            <p class="agenda-card__date-line"><?= escapeHtml($weekdayDates[$i]) ?> <span>◷</span> <?= escapeHtml($eventTimes[$i]) ?></p>
+                            <p class="agenda-card__hashtags"><?= escapeHtml($eventTags[$i]) ?></p>
+                            <p class="agenda-weekday-description">Voorbeeld evenement · <?= escapeHtml($region['name']) ?></p>
+                        </div>
+                    </article>
+                    <div class="agenda-weekday-color-controls">
+                        <h3><?= escapeHtml($day) ?></h3>
+                        <label>Kaartkleur<input type="color" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>"></label>
+                        <label>Tekstkleur<input type="color" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>"></label>
+                        <label>Titelkleur<input type="color" name="weekday_title_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTitleColors[$i]) ?>"></label>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+            </div>
+            <div class="form-actions"><button class="button button--primary" type="submit">Agendakleuren opslaan</button><a class="button" href="/admin/region-colors.php?region_id=<?= (int) $regionId ?>">Terug</a></div>
+        </form>
+    </section>
+</section>
+<style>
+.agenda-weekday-editor{display:flex;flex-direction:column;gap:12px}
+.agenda-weekday-editor-row{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:14px;align-items:stretch;padding:10px;border:1px solid #e1e5eb;border-radius:10px;background:#fff}
+.agenda-weekday-preview-card{margin:0;min-width:0}
+.agenda-weekday-preview-card .agenda-card__media-wrap,.agenda-weekday-preview-card .agenda-card__placeholder{min-height:118px}
+.agenda-weekday-preview-card .agenda-card__details{padding:12px}
+.agenda-weekday-description{margin:6px 0 0;font-size:13px}
+.agenda-weekday-color-controls{display:grid;align-content:center;gap:10px;padding:12px;border:1px solid #e1e5eb;border-radius:8px;background:#f8f9fb}
+.agenda-weekday-color-controls h3{margin:0 0 3px;font-size:15px}
+.agenda-weekday-color-controls label{display:grid;grid-template-columns:1fr 48px;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#596273}
+.agenda-weekday-color-controls input[type=color]{width:48px;height:34px;padding:2px;border:1px solid #d5dbe3;border-radius:6px;background:#fff;cursor:pointer}
+@media(max-width:600px){.agenda-weekday-editor-row{grid-template-columns:1fr;gap:8px;padding:8px}.agenda-weekday-preview-card .agenda-card__media-wrap,.agenda-weekday-preview-card .agenda-card__placeholder{min-height:90px}.agenda-weekday-color-controls{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px}.agenda-weekday-color-controls h3{grid-column:1/-1}.agenda-weekday-color-controls label{display:flex;flex-direction:column;align-items:flex-start;font-size:10px}.agenda-weekday-color-controls input[type=color]{width:100%;height:32px}}
+</style>
+<script>
+(function(){
+ const form=document.getElementById('agenda-weekday-colors-form'); if(!form)return;
+ function update(){
+  for(let i=0;i<7;i++){
+   const card=form.querySelector('[data-day-card="'+i+'"]');
+   const bg=form.querySelector('[name="weekday_colors['+i+']"]').value;
+   const text=form.querySelector('[name="weekday_text_colors['+i+']"]').value;
+   const title=form.querySelector('[name="weekday_title_colors['+i+']"]').value;
+   card.style.setProperty('--db-event-day-color',bg);
+   card.style.setProperty('--db-event-day-text-color',text);
+   card.style.setProperty('--db-event-day-title-color',title);
+   const media=card.querySelector('.agenda-card__media-wrap');
+   const placeholder=card.querySelector('.agenda-card__placeholder');
+   const details=card.querySelector('.agenda-card__details');
+   if(media)media.style.setProperty('background-color',bg,'important');
+   if(placeholder){placeholder.style.setProperty('background-color',bg,'important');placeholder.style.setProperty('color',text,'important')}
+   if(details)details.style.setProperty('color',text,'important');
+   const heading=details?.querySelector('h2');
+   if(heading)heading.style.setProperty('color',title,'important');
+   details?.querySelectorAll('.agenda-card__date-line,.agenda-card__hashtags,.agenda-weekday-description').forEach(el=>el.style.setProperty('color',text,'important'));
+  }
+ }
+ form.querySelectorAll('input[type=color]').forEach(input=>{input.addEventListener('input',update);input.addEventListener('change',update)});
+ update();
+})();
+</script>
+<?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
