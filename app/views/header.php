@@ -337,7 +337,7 @@ $escape = static fn ($value): string =>
     <link rel="apple-touch-icon" href="/icons/app-icon.svg">
     <title><?= $escape($pageTitle) ?></title>
     <?php
-$siteCssFile = $projectRoot . '/public/assets/css/site.css';
+$siteCssFile = rtrim((string) ($_SERVER['DOCUMENT_ROOT'] ?? ''), DIRECTORY_SEPARATOR) . '/assets/css/site.css';
 $siteCssVersion = is_file($siteCssFile) ? (string) filemtime($siteCssFile) . '-' . (string) filesize($siteCssFile) : '1';
 ?>
 <link rel="stylesheet" href="/assets/css/site.css?v=<?= rawurlencode($siteCssVersion) ?>">
