@@ -13,6 +13,10 @@
         const accent = color('accent', '#00AFC5');
         const header = color('header', '#FFFFFF');
         const footer = color('footer', '#FFFFFF');
+        const footerText = color('footer_text', muted);
+        const footerBorder = color('footer_border', border);
+        const footerLink = color('footer_link', primary);
+        const footerLinkHover = color('footer_link_hover', dark);
         const text = color('text', '#202B38');
         const menu = color('menu', '#FFFFFF');
         const menuText = color('menu_text', text);
@@ -50,6 +54,10 @@
 
         setBackground('#preview-header', header);
         setBackground('#preview-footer', footer);
+        setText('#preview-footer', footerText);
+        setBorder('#preview-footer', footerBorder);
+        setText('#preview-footer a:not(.preview-footer-link-hover)', footerLink);
+        setText('#preview-footer .preview-footer-link-hover', footerLinkHover);
         setBackground('#preview-menu', menu);
         setBackground('#preview-menu .preview-menu-item--hover', menuHoverBg);
         setText('#preview-menu .preview-menu-item', menuText);
@@ -179,8 +187,15 @@
         if (original) original.value = picker.value;
 
         // Werk ook de echte Terug- en Opslaan-knoppen direct bij.
-        if (key === 'footer') {
-            document.body.style.setProperty('--db-footer-color', picker.value);
+        const footerVariables = {
+            footer: '--db-footer-color',
+            footer_text: '--db-footer-text',
+            footer_border: '--db-footer-border',
+            footer_link: '--db-footer-link',
+            footer_link_hover: '--db-footer-link-hover'
+        };
+        if (footerVariables[key]) {
+            document.body.style.setProperty(footerVariables[key], picker.value);
         } else if (key === 'primary') {
             document.body.style.setProperty('--db-primary', picker.value);
         } else if (key === 'primary_dark') {
