@@ -3761,3 +3761,15 @@ body.has-agenda-footer .site-main > .agenda-page {
         order: 6 !important;
     }
 }
+
+/* Smartphone: hashtags uitlijnen met de linker inspringing van naam en datum. */
+@media (max-width: 700px) {
+    .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__hashtags {
+        margin: 0 16px 7px 16px !important;
+        padding: 0 !important;
+        text-align: left !important;
+        width: auto !important;
+        box-sizing: border-box !important;
+        justify-self: stretch !important;
+    }
+}
