@@ -48,6 +48,7 @@ $platformMenuColorFile = $projectRoot . '/storage/platform-menu-color.txt';
 $platformAdminColors = [
     'primary' => '#0A4D9F',
     'primary_dark' => '#083B79',
+    'action_button' => '#0A4D9F',
     'accent' => '#00AFC5',
     'header' => '#FFFFFF',
     'menu' => '#FFFFFF',
@@ -262,13 +263,13 @@ require $privateRoot . '/app/views/header.php';
                                         <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Marina Alta</td>
                                         <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Spanje</td>
                                         <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>"><span style="display:inline-block;padding:3px 7px;border-radius:12px;background:#EAF7F0;color:#16845B">Actief</span></td>
-                                        <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>"><button type="button" class="preview-action-button" style="padding:4px 8px;border:1px solid <?= escapeHtml($platformAdminColors['primary']) ?>;border-radius:5px;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;cursor:pointer">Wijzigen</button></td>
+                                        <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>"><button type="button" class="preview-action-button" style="padding:4px 8px;border:1px solid <?= escapeHtml($platformAdminColors['action_button']) ?>;border-radius:5px;background:<?= escapeHtml($platformAdminColors['action_button']) ?>;color:#FFFFFF;cursor:pointer">Wijzigen</button></td>
                                     </tr>
                                     <tr>
                                         <td style="padding:9px 7px">Costa Blanca</td>
                                         <td style="padding:9px 7px">Spanje</td>
                                         <td style="padding:9px 7px"><span style="display:inline-block;padding:3px 7px;border-radius:12px;background:#F0F1F3;color:#68717C">Inactief</span></td>
-                                        <td style="padding:9px 7px"><button type="button" class="preview-action-button" style="padding:4px 8px;border:1px solid <?= escapeHtml($platformAdminColors['primary']) ?>;border-radius:5px;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;cursor:pointer">Wijzigen</button></td>
+                                        <td style="padding:9px 7px"><button type="button" class="preview-action-button" style="padding:4px 8px;border:1px solid <?= escapeHtml($platformAdminColors['action_button']) ?>;border-radius:5px;background:<?= escapeHtml($platformAdminColors['action_button']) ?>;color:#FFFFFF;cursor:pointer">Wijzigen</button></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -411,6 +412,7 @@ require $privateRoot . '/app/views/header.php';
     function applyPreviewColors() {
         const primary = color('primary', '#0A4D9F');
         const dark = color('primary_dark', '#083B79');
+        const actionButton = color('action_button', primary);
         const accent = color('accent', '#00AFC5');
         const header = color('header', '#FFFFFF');
         const menu = color('menu', '#FFFFFF');
@@ -445,8 +447,8 @@ require $privateRoot . '/app/views/header.php';
         setText('#preview-accent', '#202B38');
         setText('#preview-admin-list tbody td', text);
         setText('#preview-admin-list .preview-action-button', '#FFFFFF');
-        setBackground('#preview-admin-list .preview-action-button', primary);
-        setBorder('#preview-admin-list .preview-action-button', primary);
+        setBackground('#preview-admin-list .preview-action-button', actionButton);
+        setBorder('#preview-admin-list .preview-action-button', actionButton);
 
         setBorder('#platform-color-preview, #preview-header, #preview-menu, #preview-panel, #preview-admin-list', border);
         setBorder('#preview-admin-list th, #preview-admin-list td, #preview-admin-list .preview-action-button', border);
@@ -466,8 +468,8 @@ require $privateRoot . '/app/views/header.php';
                 row.style.backgroundColor = 'transparent';
                 row.querySelectorAll('td').forEach(cell => cell.style.color = text);
                 row.querySelectorAll('.preview-action-button').forEach(button => {
-                    button.style.backgroundColor = primary;
-                    button.style.borderColor = primary;
+                    button.style.backgroundColor = actionButton;
+                    button.style.borderColor = actionButton;
                     button.style.color = '#FFFFFF';
                 });
             };
@@ -496,8 +498,8 @@ require $privateRoot . '/app/views/header.php';
                 button.style.color = '#FFFFFF';
             };
             button.onmouseleave = () => {
-                button.style.backgroundColor = primary;
-                button.style.borderColor = primary;
+                button.style.backgroundColor = actionButton;
+                button.style.borderColor = actionButton;
                 button.style.color = '#FFFFFF';
             };
         });
