@@ -407,12 +407,6 @@ require $privateRoot . '/app/views/header.php';
             </div>
         </div>
 
-        <?php if ($logoPath !== ''): ?>
-            <p><img src="<?= escapeHtml($logoPath) ?>" alt="DONDEBAILAR-logo" style="max-width:280px;max-height:140px;object-fit:contain"></p>
-        <?php else: ?>
-            <p>Er is nog geen eigen platformlogo ingesteld. DONDEBAILAR gebruikt het standaardbeeldmerk.</p>
-        <?php endif; ?>
-
         <form method="post" action="/admin/settings.php" enctype="multipart/form-data" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="platform_logo">Logo uploaden (PNG, JPG of WEBP; maximaal 5 MB)</label>
@@ -422,6 +416,13 @@ require $privateRoot . '/app/views/header.php';
                     <button type="submit" class="button button--primary">Logo opslaan</button>
                     <?php if ($logoPath !== ''): ?>
                         <button type="submit" class="button" name="remove_logo" value="1" formnovalidate onclick="return confirm('Het platformlogo verwijderen?');">Logo verwijderen</button>
+                    <?php endif; ?>
+                </div>
+                <div class="platform-logo-preview">
+                    <?php if ($logoPath !== ''): ?>
+                        <img src="<?= escapeHtml($logoPath) ?>" alt="DONDEBAILAR-logo">
+                    <?php else: ?>
+                        <span>Standaardbeeldmerk</span>
                     <?php endif; ?>
                 </div>
             </div>
