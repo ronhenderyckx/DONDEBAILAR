@@ -2063,6 +2063,24 @@ body.platform-admin-page {
 }
 
 
+/* Algemene actieknoppen op alle Platformbeheerpagina's volgen de ingestelde formulierknopkleuren. */
+.platform-admin-page .admin-heading > .button,
+.platform-admin-page .form-actions > .button,
+.platform-admin-page button.button,
+.platform-admin-page a.button {
+    background: var(--db-form-button-bg, var(--db-primary)) !important;
+    border-color: var(--db-form-button-bg, var(--db-primary)) !important;
+    color: var(--db-form-button-text, #FFFFFF) !important;
+}
+.platform-admin-page .admin-heading > .button:hover,
+.platform-admin-page .form-actions > .button:hover,
+.platform-admin-page button.button:hover,
+.platform-admin-page a.button:hover {
+    background: var(--db-form-button-hover-bg, var(--db-primary-dark)) !important;
+    border-color: var(--db-form-button-hover-bg, var(--db-primary-dark)) !important;
+    color: var(--db-form-button-hover-text, #FFFFFF) !important;
+}
+
 /* Platformbeheer: lijstacties en statuslabels volgen ook de centrale kleurinstellingen. */
 .platform-admin-page .admin-table .button,
 .platform-admin-page .admin-table button.button {
