@@ -214,7 +214,7 @@ if (isset($_GET['saved'])) {
 require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 
-<section class="admin-page">
+<section class="admin-page platform-mail-settings-page">
     <div class="admin-heading">
         <div>
             <p class="eyebrow">PLATFORMBEHEER</p>
