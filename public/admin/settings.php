@@ -288,15 +288,9 @@ require $privateRoot . '/app/views/header.php';
                                     <label class="preview-color-choice" style="margin:0"><span>Hovertekst</span><input type="color" data-preview-color="form_button_hover_text" value="<?= escapeHtml($platformAdminColors['form_button_hover_text']) ?>" aria-label="Hovertekstkleur formulierknop"></label>
                                 </div>
                             </div>
-                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+                            <div style="max-width:360px">
                                 <label style="display:grid;gap:5px;font-size:12px;font-weight:600">Naam
-                                    <input type="text" value="Voorbeeld naam" readonly style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_input_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_input_text']) ?>">
-                                </label>
-                                <label style="display:grid;gap:5px;font-size:12px;font-weight:600">Regio
-                                    <input type="text" value="Marina Alta" readonly style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_input_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_input_text']) ?>">
-                                </label>
-                                <label style="display:grid;gap:5px;font-size:12px;font-weight:600">Status
-                                    <select style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_input_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_input_text']) ?>"><option>Actief</option><option>Inactief</option></select>
+                                    <input type="text" value="Voorbeeld invulveld" readonly style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_input_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_input_text']) ?>">
                                 </label>
                             </div>
                             <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
