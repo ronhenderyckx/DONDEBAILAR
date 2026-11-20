@@ -262,6 +262,24 @@ require $privateRoot . '/app/views/header.php';
                     <div id="preview-panel" style="background:<?= escapeHtml($platformAdminColors['surface']) ?>;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:9px;padding:14px"><div style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:8px"><label class="preview-color-choice"><span>Paneel</span><input type="color" data-preview-color="surface" value="<?= escapeHtml($platformAdminColors['surface']) ?>" aria-label="Kleur panelen"></label><label class="preview-color-choice"><span>Randen</span><input type="color" data-preview-color="border" value="<?= escapeHtml($platformAdminColors['border']) ?>" aria-label="Randkleur"></label></div>
                         <div style="font-size:15px;font-weight:700;margin-bottom:5px">Voorbeeld van een instellingenblok</div>
                         <div style="font-size:13px;margin-bottom:12px">Dit is gewone tekst in een paneel.</div>
+                        <div id="preview-form-panel" style="border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:8px;padding:12px;margin:12px 0 18px;background:<?= escapeHtml($platformAdminColors['background']) ?>">
+                            <div style="font-size:14px;font-weight:700;margin-bottom:10px">Voorbeeld invulscherm</div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
+                                <label style="display:grid;gap:5px;font-size:12px;font-weight:600">Naam
+                                    <input type="text" value="Voorbeeld naam" readonly style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['surface']) ?>;color:<?= escapeHtml($platformAdminColors['text']) ?>">
+                                </label>
+                                <label style="display:grid;gap:5px;font-size:12px;font-weight:600">Regio
+                                    <input type="text" value="Marina Alta" readonly style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['surface']) ?>;color:<?= escapeHtml($platformAdminColors['text']) ?>">
+                                </label>
+                                <label style="display:grid;gap:5px;font-size:12px;font-weight:600">Status
+                                    <select disabled style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['surface']) ?>;color:<?= escapeHtml($platformAdminColors['text']) ?>"><option>Actief</option><option>Inactief</option></select>
+                                </label>
+                            </div>
+                            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
+                                <button type="button" disabled style="padding:7px 12px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['surface']) ?>;color:<?= escapeHtml($platformAdminColors['text']) ?>">Annuleren</button>
+                                <button type="button" disabled style="padding:7px 12px;border:0;border-radius:6px;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF">Opslaan</button>
+                            </div>
+                        </div>
                         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:16px 0 8px"><div id="preview-list-title" style="font-size:14px;font-weight:700">Voorbeeld van een beheerlijst</div><div style="display:flex;gap:10px;flex-wrap:wrap"><label class="preview-color-choice" style="margin-left:0"><span>Lijsttekst</span><input type="color" data-preview-color="list_text" value="<?= escapeHtml($platformAdminColors['list_text']) ?>" aria-label="Tekstkleur van de voorbeeldlijst"></label><label class="preview-color-choice" style="margin-left:0"><span>Knop Wijzigen</span><input type="color" data-preview-color="action_button" value="<?= escapeHtml($platformAdminColors['action_button']) ?>" aria-label="Kleur knop Wijzigen"></label></div></div>
                         <div style="display:flex;flex-wrap:wrap;gap:7px;margin:8px 0 12px">
 <label class="preview-color-choice" style="margin-left:0"><span>Kopachtergrond</span><input type="color" data-preview-color="list_header_bg" value="<?= escapeHtml($platformAdminColors['list_header_bg']) ?>" aria-label="Kopachtergrond"></label>
@@ -319,7 +337,7 @@ require $privateRoot . '/app/views/header.php';
             <div class="form-actions">
                 <button type="submit" class="button button--primary" name="save_platform_colors" value="1">Platformkleuren opslaan</button>
             </div>
-        </form> </form>
+        </form>
     </section>
 
     <section class="admin-section">
@@ -451,6 +469,13 @@ require $privateRoot . '/app/views/header.php';
         setBackground('#preview-menu', menu);
         setBackground('#preview-page', background);
         setBackground('#preview-panel, #preview-admin-list', surface);
+        setBackground('#preview-form-panel', background);
+        setBackground('#preview-form-panel input, #preview-form-panel select, #preview-form-panel button:first-child', surface);
+        setBackground('#preview-form-panel button:last-child', primary);
+        setText('#preview-form-panel', text);
+        setText('#preview-form-panel input, #preview-form-panel select, #preview-form-panel button', text);
+        setText('#preview-form-panel button:last-child', '#FFFFFF');
+        setBorder('#preview-form-panel, #preview-form-panel input, #preview-form-panel select, #preview-form-panel button:first-child', border);
         setBackground('#preview-admin-list thead', listHeaderBg);
         setBackground('#preview-admin-list tbody tr', listRowBg);
         setBackground('.preview-status-active', activeBg);
