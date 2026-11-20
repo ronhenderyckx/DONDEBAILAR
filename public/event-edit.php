@@ -91,7 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($organizerId > 0 && !in_array($organizerId, $organizerIds, true)) $errors[] = 'Kies een geldige organisator.';
     if (!in_array($locationId, array_merge([0], array_map(static fn($l) => (int) $l['id'], $locations)), true)) $errors[] = 'Kies een geldige locatie.';
     if (!in_array($categoryId, array_merge([0], array_map(static fn($c) => (int) $c['id'], $categories)), true)) $errors[] = 'Kies een geldige categorie.';
-    if ($canPublish && !in_array($status, ['draft','published','unpublished','cancelled'], true)) $errors[] = 'Kies een geldige status.';
+    if ($canPublish && !in_array($status, ['draft','published','unpublished','cancelled','cancelled_rain'], true)) $errors[] = 'Kies een geldige status.';
 
     try {
         $timezone = new DateTimeZone((string) $event['timezone']);
@@ -210,7 +210,7 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
             <label for="hashtags">Hashtags</label><input id="hashtags" name="hashtags" maxlength="500" value="<?= escapeHtml($hashtags) ?>" placeholder="#salsa #bachata #kizomba">
             <p class="event-form-note">Zet de hashtags apart van de beschrijving, gescheiden door spaties of komma's.</p>
             <?php if ($canPublish): ?>
-                <label for="status">Status</label><select id="status" name="status"><?php foreach (['draft'=>'Concept','published'=>'Gepubliceerd','unpublished'=>'Niet gepubliceerd','cancelled'=>'Geannuleerd'] as $code=>$label): ?><option value="<?= $code ?>" <?= $status === $code ? 'selected' : '' ?>><?= $label ?></option><?php endforeach; ?></select>
+                <label for="status">Status</label><select id="status" name="status"><?php foreach (['draft'=>'Concept','published'=>'Gepubliceerd','unpublished'=>'Niet gepubliceerd','cancelled'=>'Geannuleerd','cancelled_rain'=>'Geannuleerd wegens regen'] as $code=>$label): ?><option value="<?= $code ?>" <?= $status === $code ? 'selected' : '' ?>><?= $label ?></option><?php endforeach; ?></select>
             <?php else: ?><p>Dit evenement blijft een concept totdat een regioredacteur of regiobeheerder het publiceert.</p><?php endif; ?>
 
             <h2>Media bij dit evenement</h2>
