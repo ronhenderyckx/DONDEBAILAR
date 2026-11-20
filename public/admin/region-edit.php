@@ -269,16 +269,15 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
         </form>
     </section>
 
-    <?php
-    $appearanceEditorHtml = (static function () use ($db, $regionId): string {
-        $embeddedRegionAppearanceEditor = true;
-        $embeddedRegionId = $regionId;
-        ob_start();
-        require dirname(__DIR__) . '/admin/region-colors.php';
-        return (string) ob_get_clean();
-    })();
-    echo $appearanceEditorHtml;
-    ?>
+    <section class="admin-section region-appearance-link">
+        <div class="section-heading">
+            <div>
+                <h2>Regiokleuren en logo</h2>
+                <p>Pas de kleuren, weekdagkleuren, filterknoppen, footer en het regiologo aan op een aparte instellingenpagina.</p>
+            </div>
+            <a class="button button--primary" href="/admin/region-colors.php?region_id=<?= (int) $regionId ?>">Kleuren en logo aanpassen</a>
+        </div>
+    </section>
 </section>
 
 <?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
