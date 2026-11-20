@@ -405,71 +405,103 @@ require $privateRoot . '/app/views/header.php';
     const preview = document.getElementById('platform-color-preview');
     if (!preview) return;
 
-    // Laat de voorbeeldknop en actielinks de echte hoverkleur gebruiken.
-    const hoverButton = preview.querySelector('#preview-hover-button');
-    const applyHover = function (element, hovering) {
-        if (!element) return;
-        element.style.backgroundColor = hovering
-            ? (preview.querySelector('[data-preview-color="primary_dark"]')?.value || '#083B79')
-            : (preview.querySelector('[data-preview-color="primary"]')?.value || '#0A4D9F');
-    };
-    if (hoverButton) {
-        hoverButton.addEventListener('mouseenter', function () { applyHover(hoverButton, true); });
-        hoverButton.addEventListener('mouseleave', function () { applyHover(hoverButton, false); });
-        hoverButton.addEventListener('focus', function () { applyHover(hoverButton, true); });
-        hoverButton.addEventListener('blur', function () { applyHover(hoverButton, false); });
+    const color = (key, fallback) =>
+        preview.querySelector('[data-preview-color="' + key + '"]')?.value || fallback;
+
+    function applyPreviewColors() {
+        const primary = color('primary', '#0A4D9F');
+        const dark = color('primary_dark', '#083B79');
+        const accent = color('accent', '#00AFC5');
+        const header = color('header', '#FFFFFF');
+        const menu = color('menu', '#FFFFFF');
+        const background = color('background', '#F7F8FA');
+        const surface = color('surface', '#FFFFFF');
+        const text = color('text', '#202B38');
+        const muted = color('muted', '#687586');
+        const border = color('border', '#E7EAF0');
+
+        preview.style.backgroundColor = background;
+        preview.style.color = text;
+        preview.style.borderColor = border;
+
+        const setBackground = (selector, value) =>
+            preview.querySelectorAll(selector).forEach(el => el.style.backgroundColor = value);
+        const setText = (selector, value) =>
+            preview.querySelectorAll(selector).forEach(el => el.style.color = value);
+        const setBorder = (selector, value) =>
+            preview.querySelectorAll(selector).forEach(el => el.style.borderColor = value);
+
+        setBackground('#preview-header', header);
+        setBackground('#preview-menu', menu);
+        setBackground('#preview-page', background);
+        setBackground('#preview-panel, #preview-admin-list', surface);
+        setBackground('#preview-primary-button', primary);
+        setBackground('#preview-hover-button', primary);
+        setBackground('#preview-accent', accent);
+
+        setText('#preview-header, #preview-menu, #preview-page, #preview-panel', text);
+        setText('#preview-muted, #preview-admin-list th', muted);
+        setText('#preview-primary-button, #preview-hover-button', '#FFFFFF');
+        setText('#preview-accent', '#202B38');
+        setText('#preview-admin-list tbody td', text);
+        setText('#preview-admin-list .preview-action-button', primary);
+
+        setBorder('#platform-color-preview, #preview-header, #preview-menu, #preview-panel, #preview-admin-list', border);
+        setBorder('#preview-admin-list th, #preview-admin-list td, #preview-admin-list .preview-action-button', border);
+
+        preview.querySelectorAll('#preview-admin-list tbody tr').forEach(row => {
+            row.style.transition = 'background-color .15s ease, color .15s ease';
+            row.onmouseenter = () => {
+                row.style.backgroundColor = dark;
+                row.querySelectorAll('td').forEach(cell => cell.style.color = '#FFFFFF');
+                row.querySelectorAll('.preview-action-button').forEach(button => {
+                    button.style.backgroundColor = dark;
+                    button.style.borderColor = dark;
+                    button.style.color = '#FFFFFF';
+                });
+            };
+            row.onmouseleave = () => {
+                row.style.backgroundColor = 'transparent';
+                row.querySelectorAll('td').forEach(cell => cell.style.color = text);
+                row.querySelectorAll('.preview-action-button').forEach(button => {
+                    button.style.backgroundColor = 'transparent';
+                    button.style.borderColor = border;
+                    button.style.color = primary;
+                });
+            };
+        });
+
+        const hoverButton = preview.querySelector('#preview-hover-button');
+        if (hoverButton) {
+            hoverButton.onmouseenter = () => {
+                hoverButton.style.backgroundColor = dark;
+                hoverButton.style.color = '#FFFFFF';
+            };
+            hoverButton.onmouseleave = () => {
+                hoverButton.style.backgroundColor = primary;
+                hoverButton.style.color = '#FFFFFF';
+            };
+            hoverButton.onfocus = hoverButton.onmouseenter;
+            hoverButton.onblur = hoverButton.onmouseleave;
+        }
+
+        preview.querySelectorAll('#preview-admin-list .preview-action-button').forEach(button => {
+            button.style.cursor = 'pointer';
+            button.style.transition = 'background-color .15s ease, color .15s ease';
+            button.onmouseenter = () => {
+                button.style.backgroundColor = dark;
+                button.style.borderColor = dark;
+                button.style.color = '#FFFFFF';
+            };
+            button.onmouseleave = () => {
+                button.style.backgroundColor = 'transparent';
+                button.style.borderColor = border;
+                button.style.color = primary;
+            };
+        });
     }
-    // Toon ook de hoverkleur wanneer de muis over een volledige lijstregel gaat.
-    preview.querySelectorAll('#preview-admin-list tbody tr').forEach(function (row) {
-        row.style.cursor = 'pointer';
-        row.style.transition = 'background .15s ease, color .15s ease';
-        row.addEventListener('mouseenter', function () {
-            row.style.backgroundColor = preview.querySelector('[data-preview-color="primary_dark"]')?.value || '#083B79';
-            row.querySelectorAll('td').forEach(function (cell) {
-                cell.style.color = '#FFFFFF';
-            });
-        });
-        row.addEventListener('mouseleave', function () {
-            row.style.backgroundColor = 'transparent';
-            const textColor = preview.querySelector('[data-preview-color="text"]')?.value || '#202B38';
-            row.querySelectorAll('td').forEach(function (cell) {
-                cell.style.color = textColor;
-            });
-            const actionColor = preview.querySelector('[data-preview-color="primary"]')?.value || '#0A4D9F';
-            row.querySelectorAll('td:last-child span').forEach(function (action) {
-                action.style.color = actionColor;
-            });
-        });
-    });
 
-    preview.querySelectorAll('#preview-admin-list td:last-child .preview-action-button').forEach(function (action) {
-        action.style.cursor = 'pointer';
-        action.style.transition = 'background .15s ease, color .15s ease';
-        action.addEventListener('mouseenter', function () {
-            action.style.backgroundColor = preview.querySelector('[data-preview-color="primary_dark"]')?.value || '#083B79';
-            action.style.color = '#FFFFFF';
-        });
-        action.addEventListener('mouseleave', function () {
-            action.style.backgroundColor = 'transparent';
-            action.style.color = preview.querySelector('[data-preview-color="primary"]')?.value || '#0A4D9F';
-        });
-    });
-
-    const targets = {
-        primary: ['preview-primary-button'],
-        primary_dark: ['preview-hover-button'],
-        accent: ['preview-accent'],
-        header: ['preview-header'],
-        menu: ['preview-menu'],
-        background: ['preview-page'],
-        surface: ['preview-panel'],
-        text: ['platform-color-preview'],
-        muted: ['preview-muted'],
-        border: ['platform-color-preview', 'preview-header', 'preview-menu', 'preview-panel', 'preview-admin-list'],
-        surface: ['preview-panel', 'preview-admin-list']
-    };
-
-    preview.querySelectorAll('[data-preview-color]').forEach(function (picker) {
+    preview.querySelectorAll('[data-preview-color]').forEach(picker => {
         picker.addEventListener('input', function () {
             const key = picker.dataset.previewColor;
             const original = document.getElementById('platform_color_' + key);
@@ -477,38 +509,15 @@ require $privateRoot . '/app/views/header.php';
                 original.value = picker.value;
                 original.dispatchEvent(new Event('input', { bubbles: true }));
             }
-            (targets[key] || []).forEach(function (id) {
-                const element = document.getElementById(id);
-                if (!element) return;
-                if (key === 'text') {
-                    element.style.color = picker.value;
-                    if (id === 'platform-color-preview') {
-                        preview.querySelectorAll('#preview-admin-list tbody td').forEach(function (cell) { cell.style.color = picker.value; });
-                    }
-                } else if (key === 'border') {
-                    element.style.borderColor = picker.value;
-                    if (id === 'preview-admin-list') preview.querySelectorAll('#preview-admin-list th, #preview-admin-list td').forEach(function (cell) { cell.style.borderBottomColor = picker.value; });
-                } else if (key === 'muted') {
-                    element.style.color = picker.value;
-                    preview.querySelectorAll('#preview-admin-list th').forEach(function (cell) { cell.style.color = picker.value; });
-                    const eyebrow = preview.querySelector('.preview-eyebrow');
-                    if (eyebrow) eyebrow.style.color = picker.value;
-                } else {
-                    element.style.backgroundColor = picker.value;
-                }
-                if (key === 'primary') preview.querySelectorAll('#preview-admin-list td:last-child .preview-action-button').forEach(function (item) { item.style.color = picker.value; });
-            });
-            preview.querySelectorAll('[data-preview-color="' + key + '"]').forEach(function (other) {
+            preview.querySelectorAll('[data-preview-color="' + key + '"]').forEach(other => {
                 if (other !== picker) other.value = picker.value;
             });
+            applyPreviewColors();
         });
     });
 
-    const backgroundPicker = preview.querySelector('[data-preview-color="background"]');
-    if (backgroundPicker) backgroundPicker.addEventListener('input', function () {
-        document.getElementById('platform-color-preview').style.backgroundColor = backgroundPicker.value;
-    });
-})();;
+    applyPreviewColors();
+})();
 </script>
 
 <?php require $privateRoot . '/app/views/footer.php'; ?>
