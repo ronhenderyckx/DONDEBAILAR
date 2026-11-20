@@ -450,6 +450,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && (!$embeddedRegionAppearanceEditor |
 }
 
 $pageTitle = 'Kleuren en logo - ' . $region['name'];
+// Deze regionale instellingenpagina gebruikt altijd de algemene platformkop en platformkleuren.
+$platformAdminPage = true;
 if (!$embeddedRegionAppearanceEditor) {
     require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 }
