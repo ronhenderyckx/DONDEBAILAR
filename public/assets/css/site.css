@@ -82,10 +82,10 @@ body { margin: 0; min-width: 320px; }
     .agenda-card__details > h2 {
         order: 1;
     }
-    .agenda-card__details > .agenda-card__date-line {
+    .agenda-card__details > .agenda-card__quick {
         order: 2;
     }
-    .agenda-card__details > .agenda-card__quick {
+    .agenda-card__details > .agenda-card__date-line {
         order: 3;
     }
 }
