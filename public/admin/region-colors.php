@@ -581,20 +581,26 @@ if (!$embeddedRegionAppearanceEditor) {
             <?php foreach (['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag','Zondag'] as $i => $day): ?>
                 <div class="region-weekday-card">
                     <strong><?= $day ?></strong>
-                    <label for="weekday_<?= $i ?>">Achtergrondkleur</label>
-                    <div class="region-weekday-color">
-                        <input type="color" id="weekday_<?= $i ?>" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>">
-                        <code><?= escapeHtml($weekdayColors[$i]) ?></code>
+                    <div class="region-weekday-setting">
+                        <label for="weekday_<?= $i ?>">Achtergrond</label>
+                        <div class="region-weekday-color">
+                            <input type="color" id="weekday_<?= $i ?>" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>">
+                            <code><?= escapeHtml($weekdayColors[$i]) ?></code>
+                        </div>
                     </div>
-                    <label for="weekday_text_<?= $i ?>">Tekstkleur dag</label>
-                    <div class="region-weekday-color">
-                        <input type="color" id="weekday_text_<?= $i ?>" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>">
-                        <code><?= escapeHtml($weekdayTextColors[$i]) ?></code>
+                    <div class="region-weekday-setting">
+                        <label for="weekday_text_<?= $i ?>">Tekstkleur dag</label>
+                        <div class="region-weekday-color">
+                            <input type="color" id="weekday_text_<?= $i ?>" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>">
+                            <code><?= escapeHtml($weekdayTextColors[$i]) ?></code>
+                        </div>
                     </div>
-                    <label for="weekday_title_<?= $i ?>">Tekstkleur evenementtitel</label>
-                    <div class="region-weekday-color">
-                        <input type="color" id="weekday_title_<?= $i ?>" name="weekday_title_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTitleColors[$i]) ?>">
-                        <code><?= escapeHtml($weekdayTitleColors[$i]) ?></code>
+                    <div class="region-weekday-setting">
+                        <label for="weekday_title_<?= $i ?>">Tekstkleur titel</label>
+                        <div class="region-weekday-color">
+                            <input type="color" id="weekday_title_<?= $i ?>" name="weekday_title_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTitleColors[$i]) ?>">
+                            <code><?= escapeHtml($weekdayTitleColors[$i]) ?></code>
+                        </div>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -678,13 +684,29 @@ if (!$embeddedRegionAppearanceEditor) {
 .region-color-field code,.region-weekday-color code{grid-column:1/-1;color:#596273;font-size:12px}
 .admin-section .auth-form>h2{margin:30px 0 8px;padding-bottom:10px;border-bottom:1px solid #e5e9ef}
 .admin-section .auth-form>h2:first-of-type{margin-top:8px}
-.region-weekday-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:14px 0 30px}
-.region-weekday-card{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;padding:14px;border:1px solid #e1e5eb;border-radius:10px;background:#fff}
-.region-weekday-card>strong{grid-column:1/-1;padding-bottom:7px;border-bottom:1px solid #edf0f4;font-size:14px}
-.region-weekday-card>label{grid-column:1/-1;margin:2px 0 -5px;color:#596273;font-size:12px;font-weight:600}
-.region-weekday-color{grid-column:1/-1;display:flex;align-items:center;gap:10px}
-.region-weekday-color code{font-size:12px;color:#596273}
-@media(max-width:520px){.region-color-grid,.region-weekday-grid{grid-template-columns:1fr}.region-color-field{grid-template-columns:minmax(0,1fr) 52px}}
+.region-weekday-grid{display:grid;grid-template-columns:1fr;gap:8px;margin:14px 0 30px}
+.region-weekday-card{display:grid;grid-template-columns:minmax(105px,150px) repeat(3,minmax(0,1fr));align-items:center;gap:10px;padding:10px 14px;border:1px solid #e1e5eb;border-radius:9px;background:#fff}
+.region-weekday-card>strong{font-size:14px}
+.region-weekday-setting{min-width:0;display:flex;flex-direction:column;gap:4px}
+.region-weekday-setting>label{color:#596273;font-size:11px;font-weight:600;line-height:1.2}
+.region-weekday-color{display:flex;align-items:center;gap:7px;min-width:0}
+.region-weekday-color input[type=color]{width:42px;height:34px;flex:0 0 42px;padding:2px}
+.region-weekday-color code{font-size:11px;color:#596273}
+@media(max-width:640px){
+ .region-color-grid{grid-template-columns:1fr}
+ .region-weekday-card{grid-template-columns:86px repeat(3,minmax(0,1fr));gap:6px;padding:8px}
+ .region-weekday-card>strong{font-size:12px}
+ .region-weekday-setting>label{font-size:10px}
+ .region-weekday-color{gap:3px;flex-wrap:wrap}
+ .region-weekday-color input[type=color]{width:34px;height:30px;flex-basis:34px}
+ .region-weekday-color code{font-size:10px}
+ .region-color-field{grid-template-columns:minmax(0,1fr) 52px}
+}
+@media(max-width:390px){
+ .region-weekday-card{grid-template-columns:72px repeat(3,minmax(0,1fr));gap:4px;padding:6px}
+ .region-weekday-color input[type=color]{width:30px;height:28px;flex-basis:30px}
+ .region-weekday-color code{font-size:9px}
+}
 
 .region-agenda-live-preview{margin:4px 0 26px;padding:16px;border:1px solid var(--db-border,#e1e5eb);border-radius:12px;background:var(--db-surface,#fff)}
 .region-preview-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
