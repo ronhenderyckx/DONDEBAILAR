@@ -205,10 +205,9 @@ if ($regionId > 0) {
                  ORDER BY em.is_cover DESC, em.sort_order, em.id LIMIT 1)
             )
             WHERE e.region_id = :region_id
-              AND (e.status = 'published' OR (:show_cancelled = 1 AND e.status IN ('cancelled','cancelled_rain')))";
+              AND e.status = 'published'";
     $params = [
         'region_id' => $regionId,
-        'show_cancelled' => $showCancelled ? 1 : 0,
     ];
     if ($organizerId > 0) {
         $sql .= " AND e.organizer_id = :organizer_id";
