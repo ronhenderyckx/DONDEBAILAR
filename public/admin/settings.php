@@ -144,6 +144,147 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require $privateRoot . '/app/views/header.php';
 ?>
 
+
+<style>
+.settings-page {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+.settings-page > .admin-heading {
+    margin-bottom: 0;
+}
+.settings-page > .admin-section {
+    margin: 0;
+    padding: 16px 18px;
+}
+.settings-page .section-heading {
+    margin-bottom: 10px;
+    gap: 12px;
+}
+.settings-page .section-heading h2 {
+    margin: 0 0 4px;
+}
+.settings-page .section-heading p {
+    margin: 0;
+    max-width: 900px;
+}
+.settings-page .auth-form {
+    margin: 0;
+    padding: 0;
+}
+.settings-page .agenda-settings-form,
+.settings-page .event-duration-settings-form {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto;
+    align-items: end;
+    column-gap: 18px;
+    row-gap: 8px;
+}
+.settings-page .agenda-settings-form > label,
+.settings-page .event-duration-settings-form > label {
+    margin: 0 0 8px;
+}
+.settings-page .agenda-setting-controls,
+.settings-page .duration-setting-controls {
+    display: flex;
+    align-items: end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.settings-page .agenda-setting-input,
+.settings-page .duration-setting-input {
+    width: 110px;
+    max-width: 110px;
+}
+.settings-page .agenda-setting-input input,
+.settings-page .duration-setting-input input {
+    min-height: 40px;
+    margin: 0;
+}
+.settings-page .form-actions {
+    margin: 0;
+    gap: 8px;
+}
+.settings-page .platform-logo-settings-form > label {
+    display: block;
+    margin: 0 0 8px;
+}
+.settings-page .platform-logo-controls {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+.settings-page .platform-logo-controls > input[type="file"] {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+.settings-page .platform-logo-preview {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 110px;
+    min-height: 54px;
+    padding: 6px 10px;
+}
+.settings-page .platform-logo-preview img {
+    display: block;
+    max-width: 150px;
+    max-height: 58px;
+    object-fit: contain;
+}
+.settings-page > section.admin-section:last-of-type {
+    padding: 14px 18px !important;
+}
+.settings-page > section.admin-section:last-of-type .section-heading {
+    margin: 0;
+}
+.settings-page > section.admin-section:last-of-type .section-heading .button {
+    min-height: 40px !important;
+    padding: 9px 16px !important;
+    font-size: 14px !important;
+}
+@media (max-width: 760px) {
+    .settings-page {
+        gap: 10px;
+    }
+    .settings-page > .admin-section {
+        padding: 13px 14px;
+    }
+    .settings-page .agenda-settings-form,
+    .settings-page .event-duration-settings-form {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 6px;
+    }
+    .settings-page .agenda-settings-form > label,
+    .settings-page .event-duration-settings-form > label {
+        margin-bottom: 0;
+    }
+    .settings-page .agenda-setting-controls,
+    .settings-page .duration-setting-controls {
+        align-items: center;
+    }
+    .settings-page .platform-logo-controls {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .settings-page .platform-logo-controls > input[type="file"] {
+        width: 100%;
+    }
+    .settings-page > section.admin-section:last-of-type {
+        padding: 13px 14px !important;
+    }
+    .settings-page > section.admin-section:last-of-type .section-heading {
+        align-items: flex-start !important;
+    }
+    .settings-page > section.admin-section:last-of-type .section-heading .button {
+        white-space: normal !important;
+    }
+}
+</style>
+
 <section class="admin-page settings-page">
     <div class="admin-heading">
         <div>
