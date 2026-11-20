@@ -4,7 +4,7 @@
                     <?php $eventStatus = (string) ($event['status'] ?? 'published'); ?>
                     <?php $eventBannerType = in_array($eventStatus, ['cancelled', 'cancelled_rain'], true) ? $eventStatus : (!empty($eventIsPast) ? 'archived' : ''); ?>
                     <article<?= !empty($eventIsAgendaStart) ? ' id="agenda-today-start"' : '' ?> class="agenda-card<?= !empty($eventIsPast) ? ' agenda-card--past' : '' ?><?= $eventStatus === 'cancelled' ? ' agenda-card--cancelled' : '' ?><?= $eventStatus === 'cancelled_rain' ? ' agenda-card--cancelled agenda-card--cancelled-rain' : '' ?><?= $eventBannerType === 'archived' ? ' agenda-card--archived' : '' ?>" style="--db-event-day-color:<?= !empty($eventIsPast) ? $escape($pastEventColor) : 'var(--db-weekday-' . (int) $start->format('N') . ',var(--db-primary))' ?>;--db-event-day-text-color:<?= !empty($eventIsPast) ? $escape($pastEventTextColor) : 'var(--db-weekday-text-' . (int) $start->format('N') . ',#222222)' ?>;--db-event-day-title-color:<?= !empty($eventIsPast) ? $escape($pastEventTextColor) : 'var(--db-weekday-title-' . (int) $start->format('N') . ',#222222)' ?>">
-                        <?php if ($eventStatus === 'cancelled_rain'): ?><span class="agenda-card__rain-drop agenda-card__rain-drop--bottom-right" aria-hidden="true">💧</span><?php endif; ?>
+                        
                         <div class="agenda-card__media-wrap">
                         <?php $eventMediaItems = $event['media_items'] ?? []; ?>
                         <?php if (count($eventMediaItems) > 1): ?>
@@ -65,7 +65,7 @@
                         <?php endif; ?>
                         </div>
                             <div class="agenda-card__content">
-                                <?php if ($eventStatus === 'cancelled_rain'): ?><span class="agenda-card__rain-drop agenda-card__rain-drop--top-left" aria-hidden="true">💧</span><?php endif; ?>
+                                <?php if ($eventStatus === 'cancelled_rain'): ?><span class="agenda-card__rain-drop agenda-card__rain-drop--top-left" aria-hidden="true">💧</span><?php endif; ?><?php if ($eventStatus === 'cancelled_rain'): ?><span class="agenda-card__rain-drop agenda-card__rain-drop--bottom-right" aria-hidden="true">💧</span><?php endif; ?>
                             <div class="agenda-card__quick">
                                 <?php if ($eventBannerType !== ''): ?><div class="agenda-card__cancelled-label"><?= $eventBannerType === 'cancelled_rain' ? 'GEANNULEERD WEGENS REGEN' : ($eventBannerType === 'cancelled' ? 'GEANNULEERD' : 'GEARCHIVEERD') ?></div><?php endif; ?>
                                 <button type="button" class="agenda-attendance<?= !empty($event['is_attending']) ? ' is-attending' : '' ?>" data-event-id="<?= (int) $event['id'] ?>" data-event-title="<?= $escape($event['title']) ?>" aria-label="Ik kom dansen" aria-pressed="<?= !empty($event['is_attending']) ? 'true' : 'false' ?>" title="Tik: Ik kom dansen · Lang indrukken: deelnemers"><span aria-hidden="true">👠</span><b><?= (int) ($event['attendance_count'] ?? 0) ?></b></button>
