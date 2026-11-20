@@ -289,8 +289,8 @@ require $privateRoot . '/app/views/header.php';
                                 </div>
                             </div>
                             <div style="max-width:360px">
-                                <label style="display:grid;gap:5px;font-size:12px;font-weight:600">Naam
-                                    <input type="text" value="Voorbeeld invulveld" readonly style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_input_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_input_text']) ?>">
+                                <label style="display:grid;gap:5px;font-size:12px;font-weight:600">Regio naam
+                                    <input type="text" value="Marina Alta" readonly style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_input_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_input_text']) ?>">
                                 </label>
                             </div>
                             <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
@@ -498,14 +498,15 @@ require $privateRoot . '/app/views/header.php';
         const formButtonHoverBg = color('form_button_hover_bg', dark);
         const formButtonHoverText = color('form_button_hover_text', '#FFFFFF');
         setBackground('#preview-form-panel', formPanelBg);
-        setBackground('#preview-form-panel input:not([type="color"]), #preview-form-panel select, #preview-form-panel .preview-form-button--secondary', formInputBg);
+        preview.querySelectorAll('#preview-form-panel input:not([type="color"]), #preview-form-panel select, #preview-form-panel .preview-form-button--secondary').forEach(el => el.style.setProperty('background-color', formInputBg, 'important'));
         setBackground('#preview-form-panel .preview-form-button:not(.preview-form-button--secondary)', formButtonBg);
         setText('#preview-form-panel', formLabelText);
         setText('#preview-form-panel input:not([type="color"]), #preview-form-panel select, #preview-form-panel .preview-form-button--secondary', formInputText);
         setText('#preview-form-panel .preview-form-button:not(.preview-form-button--secondary)', formButtonText);
         setBorder('#preview-form-panel, #preview-form-panel input:not([type="color"]), #preview-form-panel select, #preview-form-panel .preview-form-button', formInputBorder);
         preview.querySelectorAll('#preview-form-panel input:not([type="color"]), #preview-form-panel select').forEach(field => {
-            field.style.transition = 'border-color .15s ease, box-shadow .15s ease';
+            field.style.setProperty('background-color', formInputBg, 'important');
+            field.style.transition = 'background-color .15s ease, border-color .15s ease, box-shadow .15s ease';
             field.onmouseenter = () => { field.style.borderColor = formInputHoverBorder; };
             field.onmouseleave = () => { if (document.activeElement !== field) field.style.borderColor = formInputBorder; };
             field.onfocus = () => { field.style.borderColor = formInputHoverBorder; field.style.boxShadow = '0 0 0 2px ' + formInputHoverBorder + '33'; };
