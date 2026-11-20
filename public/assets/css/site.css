@@ -1514,3 +1514,21 @@ body.platform-admin-page {
         grid-column: 1;
     }
 }
+
+
+/* Label, invoerveld en opslaanknop vormen samen één horizontale regel. */
+.platform-admin-page .settings-page .auth-form > .form-actions {
+    display: contents;
+}
+.platform-admin-page .settings-page .auth-form > .form-actions > button,
+.platform-admin-page .settings-page .auth-form > .form-actions > .button {
+    grid-column: 2;
+    justify-self: start;
+    align-self: center;
+}
+@media (max-width: 600px) {
+    .platform-admin-page .settings-page .auth-form > .form-actions > button,
+    .platform-admin-page .settings-page .auth-form > .form-actions > .button {
+        grid-column: 1;
+    }
+}
