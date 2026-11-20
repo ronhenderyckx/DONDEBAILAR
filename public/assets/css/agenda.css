@@ -4006,3 +4006,27 @@ body.has-agenda-footer .site-main > .agenda-page {
         width:100%!important;
     }
 }
+
+
+/* Smartphone: regenannulering mag de foto of video nooit verbergen. */
+@media (max-width:700px) {
+    .agenda-feed > .agenda-card.agenda-card--cancelled-rain > .agenda-card__media-wrap:has(.agenda-card__image, .agenda-card__video, .agenda-card__gallery, .agenda-card__instagram, .agenda-card__external-media) {
+        display:block!important;
+        position:relative!important;
+        z-index:1!important;
+        order:0!important;
+        flex:0 0 auto!important;
+        width:100%!important;
+        height:auto!important;
+        min-height:140px!important;
+        visibility:visible!important;
+        opacity:1!important;
+    }
+    .agenda-feed > .agenda-card.agenda-card--cancelled-rain > .agenda-card__media-wrap .agenda-card__image,
+    .agenda-feed > .agenda-card.agenda-card--cancelled-rain > .agenda-card__media-wrap .agenda-card__video,
+    .agenda-feed > .agenda-card.agenda-card--cancelled-rain > .agenda-card__media-wrap .agenda-card__gallery {
+        display:block!important;
+        visibility:visible!important;
+        opacity:1!important;
+    }
+}
