@@ -62,6 +62,16 @@ $platformAdminColors = [
     'status_active_text' => '#16845B',
     'status_inactive_bg' => '#F0F1F3',
     'status_inactive_text' => '#68717C',
+    'form_panel_bg' => '#F7F8FA',
+    'form_label_text' => '#202B38',
+    'form_input_bg' => '#FFFFFF',
+    'form_input_text' => '#202B38',
+    'form_input_border' => '#E7EAF0',
+    'form_input_hover_border' => '#0A4D9F',
+    'form_button_bg' => '#0A4D9F',
+    'form_button_text' => '#FFFFFF',
+    'form_button_hover_bg' => '#083B79',
+    'form_button_hover_text' => '#FFFFFF',
     'accent' => '#00AFC5',
     'header' => '#FFFFFF',
     'menu' => '#FFFFFF',
@@ -262,22 +272,36 @@ require $privateRoot . '/app/views/header.php';
                     <div id="preview-panel" style="background:<?= escapeHtml($platformAdminColors['surface']) ?>;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:9px;padding:14px"><div style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:8px"><label class="preview-color-choice"><span>Paneel</span><input type="color" data-preview-color="surface" value="<?= escapeHtml($platformAdminColors['surface']) ?>" aria-label="Kleur panelen"></label><label class="preview-color-choice"><span>Randen</span><input type="color" data-preview-color="border" value="<?= escapeHtml($platformAdminColors['border']) ?>" aria-label="Randkleur"></label></div>
                         <div style="font-size:15px;font-weight:700;margin-bottom:5px">Voorbeeld van een instellingenblok</div>
                         <div style="font-size:13px;margin-bottom:12px">Dit is gewone tekst in een paneel.</div>
-                        <div id="preview-form-panel" style="border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:8px;padding:12px;margin:12px 0 18px;background:<?= escapeHtml($platformAdminColors['background']) ?>">
-                            <div style="font-size:14px;font-weight:700;margin-bottom:10px">Voorbeeld invulscherm</div>
+                        <div id="preview-form-panel" style="border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:8px;padding:12px;margin:12px 0 18px;background:<?= escapeHtml($platformAdminColors['form_panel_bg']) ?>">
+                            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
+                                <div style="font-size:14px;font-weight:700">Voorbeeld invulscherm</div>
+                                <div style="display:flex;gap:8px;flex-wrap:wrap">
+                                    <label class="preview-color-choice" style="margin:0"><span>Paneel</span><input type="color" data-preview-color="form_panel_bg" value="<?= escapeHtml($platformAdminColors['form_panel_bg']) ?>" aria-label="Achtergrond invulscherm"></label>
+                                    <label class="preview-color-choice" style="margin:0"><span>Labeltekst</span><input type="color" data-preview-color="form_label_text" value="<?= escapeHtml($platformAdminColors['form_label_text']) ?>" aria-label="Labeltekst invulscherm"></label>
+                                    <label class="preview-color-choice" style="margin:0"><span>Veldachtergrond</span><input type="color" data-preview-color="form_input_bg" value="<?= escapeHtml($platformAdminColors['form_input_bg']) ?>" aria-label="Veldachtergrond invulscherm"></label>
+                                    <label class="preview-color-choice" style="margin:0"><span>Veldtekst</span><input type="color" data-preview-color="form_input_text" value="<?= escapeHtml($platformAdminColors['form_input_text']) ?>" aria-label="Veldtekst invulscherm"></label>
+                                    <label class="preview-color-choice" style="margin:0"><span>Veldrand</span><input type="color" data-preview-color="form_input_border" value="<?= escapeHtml($platformAdminColors['form_input_border']) ?>" aria-label="Randkleur invoervelden"></label>
+                                    <label class="preview-color-choice" style="margin:0"><span>Veld hoverrand</span><input type="color" data-preview-color="form_input_hover_border" value="<?= escapeHtml($platformAdminColors['form_input_hover_border']) ?>" aria-label="Hoverrand invoervelden"></label>
+                                    <label class="preview-color-choice" style="margin:0"><span>Knop</span><input type="color" data-preview-color="form_button_bg" value="<?= escapeHtml($platformAdminColors['form_button_bg']) ?>" aria-label="Achtergrondkleur formulierknop"></label>
+                                    <label class="preview-color-choice" style="margin:0"><span>Knoptekst</span><input type="color" data-preview-color="form_button_text" value="<?= escapeHtml($platformAdminColors['form_button_text']) ?>" aria-label="Tekstkleur formulierknop"></label>
+                                    <label class="preview-color-choice" style="margin:0"><span>Knop hover</span><input type="color" data-preview-color="form_button_hover_bg" value="<?= escapeHtml($platformAdminColors['form_button_hover_bg']) ?>" aria-label="Hoverkleur formulierknop"></label>
+                                    <label class="preview-color-choice" style="margin:0"><span>Hovertekst</span><input type="color" data-preview-color="form_button_hover_text" value="<?= escapeHtml($platformAdminColors['form_button_hover_text']) ?>" aria-label="Hovertekstkleur formulierknop"></label>
+                                </div>
+                            </div>
                             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px">
                                 <label style="display:grid;gap:5px;font-size:12px;font-weight:600">Naam
-                                    <input type="text" value="Voorbeeld naam" readonly style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['surface']) ?>;color:<?= escapeHtml($platformAdminColors['text']) ?>">
+                                    <input type="text" value="Voorbeeld naam" readonly style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_input_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_input_text']) ?>">
                                 </label>
                                 <label style="display:grid;gap:5px;font-size:12px;font-weight:600">Regio
-                                    <input type="text" value="Marina Alta" readonly style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['surface']) ?>;color:<?= escapeHtml($platformAdminColors['text']) ?>">
+                                    <input type="text" value="Marina Alta" readonly style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_input_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_input_text']) ?>">
                                 </label>
                                 <label style="display:grid;gap:5px;font-size:12px;font-weight:600">Status
-                                    <select disabled style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['surface']) ?>;color:<?= escapeHtml($platformAdminColors['text']) ?>"><option>Actief</option><option>Inactief</option></select>
+                                    <select style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_input_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_input_text']) ?>"><option>Actief</option><option>Inactief</option></select>
                                 </label>
                             </div>
                             <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
-                                <button type="button" disabled style="padding:7px 12px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['surface']) ?>;color:<?= escapeHtml($platformAdminColors['text']) ?>">Annuleren</button>
-                                <button type="button" disabled style="padding:7px 12px;border:0;border-radius:6px;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF">Opslaan</button>
+                                <button type="button" class="preview-form-button preview-form-button--secondary" style="padding:7px 12px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_input_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_input_text']) ?>">Annuleren</button>
+                                <button type="button" class="preview-form-button" style="padding:7px 12px;border:0;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_button_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_button_text']) ?>">Opslaan</button>
                             </div>
                         </div>
                         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:16px 0 8px"><div id="preview-list-title" style="font-size:14px;font-weight:700">Voorbeeld van een beheerlijst</div><div style="display:flex;gap:10px;flex-wrap:wrap"><label class="preview-color-choice" style="margin-left:0"><span>Lijsttekst</span><input type="color" data-preview-color="list_text" value="<?= escapeHtml($platformAdminColors['list_text']) ?>" aria-label="Tekstkleur van de voorbeeldlijst"></label><label class="preview-color-choice" style="margin-left:0"><span>Knop Wijzigen</span><input type="color" data-preview-color="action_button" value="<?= escapeHtml($platformAdminColors['action_button']) ?>" aria-label="Kleur knop Wijzigen"></label></div></div>
@@ -469,13 +493,45 @@ require $privateRoot . '/app/views/header.php';
         setBackground('#preview-menu', menu);
         setBackground('#preview-page', background);
         setBackground('#preview-panel, #preview-admin-list', surface);
-        setBackground('#preview-form-panel', background);
-        setBackground('#preview-form-panel input, #preview-form-panel select, #preview-form-panel button:first-child', surface);
-        setBackground('#preview-form-panel button:last-child', primary);
-        setText('#preview-form-panel', text);
-        setText('#preview-form-panel input, #preview-form-panel select, #preview-form-panel button', text);
-        setText('#preview-form-panel button:last-child', '#FFFFFF');
-        setBorder('#preview-form-panel, #preview-form-panel input, #preview-form-panel select, #preview-form-panel button:first-child', border);
+        const formPanelBg = color('form_panel_bg', background);
+        const formLabelText = color('form_label_text', text);
+        const formInputBg = color('form_input_bg', surface);
+        const formInputText = color('form_input_text', text);
+        const formInputBorder = color('form_input_border', border);
+        const formInputHoverBorder = color('form_input_hover_border', primary);
+        const formButtonBg = color('form_button_bg', primary);
+        const formButtonText = color('form_button_text', '#FFFFFF');
+        const formButtonHoverBg = color('form_button_hover_bg', dark);
+        const formButtonHoverText = color('form_button_hover_text', '#FFFFFF');
+        setBackground('#preview-form-panel', formPanelBg);
+        setBackground('#preview-form-panel input, #preview-form-panel select, #preview-form-panel .preview-form-button--secondary', formInputBg);
+        setBackground('#preview-form-panel .preview-form-button:not(.preview-form-button--secondary)', formButtonBg);
+        setText('#preview-form-panel', formLabelText);
+        setText('#preview-form-panel input, #preview-form-panel select, #preview-form-panel .preview-form-button--secondary', formInputText);
+        setText('#preview-form-panel .preview-form-button:not(.preview-form-button--secondary)', formButtonText);
+        setBorder('#preview-form-panel, #preview-form-panel input, #preview-form-panel select, #preview-form-panel .preview-form-button', formInputBorder);
+        preview.querySelectorAll('#preview-form-panel input, #preview-form-panel select').forEach(field => {
+            field.style.transition = 'border-color .15s ease, box-shadow .15s ease';
+            field.onmouseenter = () => { field.style.borderColor = formInputHoverBorder; };
+            field.onmouseleave = () => { if (document.activeElement !== field) field.style.borderColor = formInputBorder; };
+            field.onfocus = () => { field.style.borderColor = formInputHoverBorder; field.style.boxShadow = '0 0 0 2px ' + formInputHoverBorder + '33'; };
+            field.onblur = () => { field.style.borderColor = formInputBorder; field.style.boxShadow = 'none'; };
+        });
+        preview.querySelectorAll('#preview-form-panel .preview-form-button').forEach(button => {
+            button.style.cursor = 'pointer';
+            button.style.transition = 'background-color .15s ease, color .15s ease, border-color .15s ease';
+            button.onmouseenter = () => {
+                button.style.backgroundColor = formButtonHoverBg;
+                button.style.color = formButtonHoverText;
+                button.style.borderColor = formButtonHoverBg;
+            };
+            button.onmouseleave = () => {
+                const secondary = button.classList.contains('preview-form-button--secondary');
+                button.style.backgroundColor = secondary ? formInputBg : formButtonBg;
+                button.style.color = secondary ? formInputText : formButtonText;
+                button.style.borderColor = secondary ? formInputBorder : formButtonBg;
+            };
+        });
         setBackground('#preview-admin-list thead', listHeaderBg);
         setBackground('#preview-admin-list tbody tr', listRowBg);
         setBackground('.preview-status-active', activeBg);
