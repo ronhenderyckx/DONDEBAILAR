@@ -44,6 +44,10 @@ $platformAdminColors = [
     'accent' => '#00AFC5',
     'header' => '#FFFFFF',
     'footer' => '#FFFFFF',
+    'footer_text' => '#687586',
+    'footer_border' => '#E7EAF0',
+    'footer_link' => '#0A4D9F',
+    'footer_link_hover' => '#083B79',
     'menu' => '#FFFFFF',
     'menu_text' => '#202B38',
     'menu_hover_bg' => '#F3F6F9',
@@ -316,9 +320,19 @@ require $projectRoot . '/app/views/header.php';
                         </div>
                     </div>
                 </div>
-                <div id="preview-footer" style="padding:12px 16px;background:<?= escapeHtml($platformAdminColors['footer']) ?>;color:<?= escapeHtml($platformAdminColors['muted']) ?>;font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
-                    <span>Voorbeeld voettekst — DONDEBAILAR</span>
-                    <label class="preview-color-choice" style="margin-left:0"><span>Footerachtergrond</span><input type="color" data-preview-color="footer" value="<?= escapeHtml($platformAdminColors['footer']) ?>" aria-label="Footer achtergrondkleur"></label>
+                <div id="preview-footer" style="padding:12px 16px;background:<?= escapeHtml($platformAdminColors['footer']) ?>;color:<?= escapeHtml($platformAdminColors['footer_text']) ?>;border-top:1px solid <?= escapeHtml($platformAdminColors['footer_border']) ?>;font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+                    <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+                        <span>Voorbeeld voettekst — DONDEBAILAR</span>
+                        <a href="#" onclick="return false" style="color:<?= escapeHtml($platformAdminColors['footer_link']) ?>;text-decoration:underline">Voorbeeld link</a>
+                        <a href="#" onclick="return false" class="preview-footer-link-hover" style="color:<?= escapeHtml($platformAdminColors['footer_link_hover']) ?>;text-decoration:underline">Voorbeeld link (hover)</a>
+                    </div>
+                    <div style="display:flex;gap:10px;flex-wrap:wrap">
+                        <label class="preview-color-choice" style="margin-left:0"><span>Achtergrond</span><input type="color" data-preview-color="footer" value="<?= escapeHtml($platformAdminColors['footer']) ?>" aria-label="Footer achtergrondkleur"></label>
+                        <label class="preview-color-choice" style="margin-left:0"><span>Tekst</span><input type="color" data-preview-color="footer_text" value="<?= escapeHtml($platformAdminColors['footer_text']) ?>" aria-label="Footer tekstkleur"></label>
+                        <label class="preview-color-choice" style="margin-left:0"><span>Rand</span><input type="color" data-preview-color="footer_border" value="<?= escapeHtml($platformAdminColors['footer_border']) ?>" aria-label="Footer randkleur"></label>
+                        <label class="preview-color-choice" style="margin-left:0"><span>Link</span><input type="color" data-preview-color="footer_link" value="<?= escapeHtml($platformAdminColors['footer_link']) ?>" aria-label="Footer linkkleur"></label>
+                        <label class="preview-color-choice" style="margin-left:0"><span>Link hover</span><input type="color" data-preview-color="footer_link_hover" value="<?= escapeHtml($platformAdminColors['footer_link_hover']) ?>" aria-label="Footer link hoverkleur"></label>
+                    </div>
                 </div>
             </div>
             <p style="font-size:12px;color:var(--db-muted);margin:8px 0 0">Dit is een vereenvoudigde voorbeeldweergave; de echte pagina kan per onderdeel iets verschillen.</p>
