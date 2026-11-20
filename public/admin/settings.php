@@ -244,13 +244,13 @@ require $privateRoot . '/app/views/header.php';
         </div>
     </section>
 
-    <section class="admin-section">
-        <div class="section-heading">
-            <div>
-                <h2>Kleuren platformbeheer</h2>
-                <p>Pas de kleuren van het platformbeheer aan in een apart scherm.</p>
+    <section class="admin-section" style="border:2px solid var(--db-primary,#E23A2C);border-radius:12px;padding:20px;background:var(--db-surface,#fff)">
+        <div class="section-heading" style="align-items:center;gap:18px;flex-wrap:wrap">
+            <div style="flex:1 1 260px">
+                <h2 style="margin-top:0">Platformkleuren aanpassen</h2>
+                <p style="margin-bottom:0">Open het kleurenscherm om de kleuren van het menu, de tekst, invoervelden en knoppen afzonderlijk in te stellen. Je ziet daar meteen het voorbeeld.</p>
             </div>
-            <a class="button button--primary" href="/admin/platform-colors.php">Kleuren instellen</a>
+            <a class="button button--primary" href="/admin/platform-colors.php" style="display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 24px;font-size:16px;font-weight:700;white-space:nowrap">Kleuren instellen&nbsp; →</a>
         </div>
     </section>
 </section>
