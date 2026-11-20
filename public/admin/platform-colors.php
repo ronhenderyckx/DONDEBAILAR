@@ -153,9 +153,6 @@ require $projectRoot . '/app/views/header.php';
 }
 .platform-colors-page .admin-heading > a.button,
 .platform-colors-page > .admin-section > form .form-actions .button {
-    background: var(--db-primary, #0A4D9F) !important;
-    border-color: var(--db-primary, #0A4D9F) !important;
-    color: #FFFFFF !important;
     box-sizing: border-box;
     width: 230px;
     min-width: 230px;
@@ -166,12 +163,6 @@ require $projectRoot . '/app/views/header.php';
     text-align: center;
     white-space: normal;
     flex: 0 0 230px;
-}
-.platform-colors-page .admin-heading > a.button:hover,
-.platform-colors-page > .admin-section > form .form-actions .button:hover {
-    background: var(--db-primary-dark, #083B79) !important;
-    border-color: var(--db-primary-dark, #083B79) !important;
-    color: #FFFFFF !important;
 }
 @media (max-width: 700px) {
     .platform-colors-page > .admin-section {
