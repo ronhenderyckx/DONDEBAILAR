@@ -54,7 +54,7 @@ declare(strict_types=1);
                 $platformFooterTextPath = ($projectRoot ?? dirname(__DIR__, 2)) . '/storage/platform-admin-footer-text.txt';
                 $platformFooterText = is_file($platformFooterTextPath) ? trim((string) file_get_contents($platformFooterTextPath)) : '';
                 if ($platformFooterText !== ''): ?>
-                    <span class="platform-footer-text"><?= htmlspecialchars($platformFooterText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
+                    <span class="platform-footer-text" style="display:block;width:100%;text-align:center"><?= htmlspecialchars($platformFooterText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
                 <?php endif;
             endif; ?>
         </div>
