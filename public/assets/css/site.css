@@ -1301,3 +1301,62 @@ body.platform-admin-page {
 .platform-admin-page .admin-table tbody tr:hover td a:not(.button) {
     color: var(--db-list-hover-text, #FFFFFF) !important;
 }
+
+
+/* Compactere indeling uitsluitend voor de pagina Platformbeheer > Instellingen. */
+.platform-admin-page .settings-page {
+    padding-top: 0;
+}
+.platform-admin-page .settings-page > .admin-heading {
+    margin-bottom: 16px;
+    gap: 10px;
+}
+.platform-admin-page .settings-page > .admin-heading h1 {
+    margin-bottom: 4px;
+}
+.platform-admin-page .settings-page > .admin-section {
+    margin-bottom: 14px;
+    padding: 16px 18px;
+}
+.platform-admin-page .settings-page > .admin-section:last-child {
+    margin-bottom: 0;
+}
+.platform-admin-page .settings-page > .admin-section > .section-heading {
+    margin-bottom: 12px;
+    gap: 8px;
+}
+.platform-admin-page .settings-page > .admin-section > .section-heading p {
+    margin: 4px 0 0;
+}
+.platform-admin-page .settings-page .platform-color-preview-wrap {
+    margin: 10px 0 12px !important;
+}
+.platform-admin-page .settings-page #platform-color-preview #preview-page {
+    padding: 10px !important;
+}
+.platform-admin-page .settings-page #platform-color-preview #preview-panel {
+    padding: 10px !important;
+}
+.platform-admin-page .settings-page #platform-color-preview #preview-form-panel {
+    margin: 8px 0 10px !important;
+    padding: 9px !important;
+}
+.platform-admin-page .settings-page .auth-form {
+    padding: 12px 14px;
+    gap: 8px;
+}
+.platform-admin-page .settings-page .section-heading h2 {
+    font-size: 19px;
+}
+.platform-admin-page .settings-page .form-actions {
+    margin-top: 8px;
+}
+@media (max-width: 760px) {
+    .platform-admin-page .settings-page > .admin-section {
+        padding: 13px;
+        margin-bottom: 11px;
+    }
+    .platform-admin-page .settings-page > .admin-heading {
+        margin-bottom: 12px;
+    }
+}
