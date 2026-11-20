@@ -470,6 +470,9 @@
     overflow:hidden;
     background:var(--db-event-day-color,var(--db-primary,#f78d19))
 }
+.agenda-card__content {
+    display:contents;
+}
 .agenda-card__details {
     padding:17px 20px 20px;
     color:#fff;
@@ -3899,6 +3902,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     /* De inhoudszone begint pas onder de media en groeit mee wanneer extra info opent. */
     .agenda-card > .agenda-card__content {
         display:flex!important;
+        order:2!important;
         flex-direction:column!important;
         position:relative!important;
         isolation:isolate;
@@ -3920,7 +3924,7 @@ body.has-agenda-footer .site-main > .agenda-page {
         display:none;
     }
     .agenda-card__content > .agenda-card__quick {
-        position:relative!important;
+        position:static!important;
         z-index:1!important;
         overflow:visible!important;
     }
