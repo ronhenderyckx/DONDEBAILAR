@@ -3731,17 +3731,21 @@ body.has-agenda-footer .site-main > .agenda-page {
 }
 
 
-/* Smartphone: evenementnaam boven de actie-iconen; datum volgt onder de iconen. */
+/* Smartphone: media, naam, datum, hashtags, iconen en swipehint in vaste volgorde.
+   Alleen de smartphone-indeling verandert; desktop blijft onaangeroerd. */
 @media (max-width: 700px) {
     .agenda-card > .agenda-card__details {
         display: contents !important;
     }
-    .agenda-card > .agenda-card__details > h2 {
+    .agenda-card > .agenda-card__media-wrap {
         order: 1 !important;
-        margin: 10px 16px 4px !important;
     }
-    .agenda-card > .agenda-card__quick {
+    .agenda-card > .agenda-card__media-wrap:has(.agenda-card__placeholder) {
+        display: none !important;
+    }
+    .agenda-card > .agenda-card__details > h2 {
         order: 2 !important;
+        margin: 10px 16px 4px !important;
     }
     .agenda-card > .agenda-card__details > .agenda-card__date-line {
         order: 3 !important;
@@ -3750,10 +3754,10 @@ body.has-agenda-footer .site-main > .agenda-page {
     .agenda-card > .agenda-card__details > .agenda-card__hashtags {
         order: 4 !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__description {
+    .agenda-card > .agenda-card__quick {
         order: 5 !important;
     }
-    .agenda-card > .agenda-card__swipe-hint {
+    .agenda-card > .agenda-card__details > .agenda-card__swipe-hint {
         order: 6 !important;
     }
 }
