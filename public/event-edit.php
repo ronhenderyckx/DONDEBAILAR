@@ -54,6 +54,8 @@ $title = (string) $event['title'];
 $description = (string) ($event['description'] ?? '');
 $extraInfo = (string) ($event['extra_info'] ?? '');
 $hashtags = (string) ($event['hashtags'] ?? '');
+$presalePrice = (string) ($event['presale_price'] ?? '');
+$doorPrice = (string) ($event['door_price'] ?? '');
 $eventLanguage = (string) $event['event_language'];
 $organizerId = (int) ($event['organizer_id'] ?? 0);
 $locationId = (int) ($event['location_id'] ?? 0);
@@ -70,6 +72,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $description = trim((string) ($_POST['description'] ?? ''));
     $extraInfo = trim((string) ($_POST['extra_info'] ?? ''));
     $hashtags = trim((string) ($_POST['hashtags'] ?? ''));
+    $presalePrice = trim((string) ($_POST['presale_price'] ?? ''));
+    $doorPrice = trim((string) ($_POST['door_price'] ?? ''));
     $eventLanguage = (string) ($_POST['event_language'] ?? 'es');
     $organizerId = (int) ($_POST['organizer_id'] ?? 0);
     $locationId = (int) ($_POST['location_id'] ?? 0);
@@ -116,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $update = $db->prepare(
                 "UPDATE events SET organizer_id = :organizer_id, location_id = :location_id,
                     category_id = :category_id, title = :title, description = :description, extra_info = :extra_info,
-                    hashtags = :hashtags, event_language = :event_language, starts_at = :starts_at, ends_at = :ends_at,
+                    hashtags = :hashtags, presale_price = :presale_price, door_price = :door_price, event_language = :event_language, starts_at = :starts_at, ends_at = :ends_at,
                     status = :status, updated_by = :updated_by,
                     published_at = CASE WHEN :published_check = 'published' AND published_at IS NULL
                                         THEN CURRENT_TIMESTAMP ELSE published_at END
@@ -130,6 +134,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 'description' => $description !== '' ? $description : null,
                 'extra_info' => $extraInfo !== '' ? $extraInfo : null,
                 'hashtags' => $hashtags !== '' ? $hashtags : null,
+                'presale_price' => $presalePrice !== '' ? $presalePrice : null,
+                'door_price' => $doorPrice !== '' ? $doorPrice : null,
                 'event_language' => $eventLanguage,
                 'starts_at' => $start->format('Y-m-d H:i:s'),
                 'ends_at' => $end?->format('Y-m-d H:i:s'),
@@ -197,6 +203,8 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
             <label for="starts_at">Begint op *</label><input id="starts_at" type="datetime-local" name="starts_at" required value="<?= escapeHtml($startsAt) ?>">
             <label for="ends_at">Eindigt op</label><input id="ends_at" type="datetime-local" name="ends_at" value="<?= escapeHtml($endsAt) ?>">
             <p class="event-form-note">Maximale duur: <?= (int) $maxEventDurationHours ?> uur. Laat leeg om het evenement automatisch om 24:00 uur (middernacht) te laten eindigen.</p>
+            <label for="presale_price">Voorverkoop (€)</label><input id="presale_price" name="presale_price" type="number" min="0" max="99999.99" step="0.01" value="<?= escapeHtml($presalePrice) ?>" placeholder="Bijvoorbeeld 10">
+            <label for="door_price">Aan de poort (€)</label><input id="door_price" name="door_price" type="number" min="0" max="99999.99" step="0.01" value="<?= escapeHtml($doorPrice) ?>" placeholder="Bijvoorbeeld 15">
             <label for="description">Beschrijving</label><textarea id="description" name="description" rows="8"><?= escapeHtml($description) ?></textarea>
             <label for="extra_info">Extra info</label><textarea id="extra_info" name="extra_info" rows="4"><?= escapeHtml($extraInfo) ?></textarea>
             <label for="hashtags">Hashtags</label><input id="hashtags" name="hashtags" maxlength="500" value="<?= escapeHtml($hashtags) ?>" placeholder="#salsa #bachata #kizomba">
