@@ -3912,12 +3912,17 @@ body.has-agenda-footer .site-main > .agenda-page {
     }
     .agenda-card > .agenda-card__content::before {
         content:"";
+        display:none;
         position:absolute;
         z-index:0;
         inset:0;
         pointer-events:none;
         background:color-mix(in srgb,#ffffff 38%,var(--db-event-day-color,#1FA898));
         clip-path:polygon(0 88%,0 100%,100% 12%,100% 0);
+    }
+    .agenda-card--cancelled > .agenda-card__content::before,
+    .agenda-card--archived > .agenda-card__content::before {
+        display:block;
     }
     .agenda-feed > .agenda-card.agenda-card--cancelled::after,
     .agenda-feed > .agenda-card.agenda-card--archived::after {
