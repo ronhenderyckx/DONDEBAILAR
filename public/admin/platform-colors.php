@@ -43,6 +43,7 @@ $platformAdminColors = [
     'form_button_hover_text' => '#FFFFFF',
     'accent' => '#00AFC5',
     'header' => '#FFFFFF',
+    'footer' => '#FFFFFF',
     'menu' => '#FFFFFF',
     'menu_text' => '#202B38',
     'menu_hover_bg' => '#F3F6F9',
@@ -314,6 +315,10 @@ require $projectRoot . '/app/views/header.php';
                             <button type="button" id="preview-accent" style="border:0;cursor:pointer;background:<?= escapeHtml($platformAdminColors['accent']) ?>;color:#202B38;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Accent</button><label class="preview-color-choice"><span>Accent</span><input type="color" data-preview-color="accent" value="<?= escapeHtml($platformAdminColors['accent']) ?>" aria-label="Accentkleur"></label>
                         </div>
                     </div>
+                </div>
+                <div id="preview-footer" style="padding:12px 16px;background:<?= escapeHtml($platformAdminColors['footer']) ?>;color:<?= escapeHtml($platformAdminColors['muted']) ?>;font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
+                    <span>Voorbeeld voettekst — DONDEBAILAR</span>
+                    <label class="preview-color-choice" style="margin-left:0"><span>Footerachtergrond</span><input type="color" data-preview-color="footer" value="<?= escapeHtml($platformAdminColors['footer']) ?>" aria-label="Footer achtergrondkleur"></label>
                 </div>
             </div>
             <p style="font-size:12px;color:var(--db-muted);margin:8px 0 0">Dit is een vereenvoudigde voorbeeldweergave; de echte pagina kan per onderdeel iets verschillen.</p>
