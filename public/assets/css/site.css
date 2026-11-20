@@ -2005,6 +2005,8 @@ body.platform-admin-page {
 .platform-admin-page .site-menu__logout {
     color: var(--db-menu-text, var(--db-text)) !important;
 }
+.platform-admin-page .site-menu__toggle:hover,
+.platform-admin-page .site-menu[open] .site-menu__toggle,
 .platform-admin-page .site-menu__panel > a:hover,
 .platform-admin-page .site-menu__admin > summary:hover,
 .platform-admin-page .site-menu__admin > a:hover,
