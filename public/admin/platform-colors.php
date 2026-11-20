@@ -140,9 +140,9 @@ require $projectRoot . '/app/views/header.php';
 }
 .platform-colors-page .admin-heading > a.button,
 .platform-colors-page > .admin-section > form .form-actions .button {
-    background: var(--db-form-button-bg, var(--db-primary)) !important;
-    border-color: var(--db-form-button-bg, var(--db-primary)) !important;
-    color: var(--db-form-button-text, #FFFFFF) !important;
+    background: var(--db-primary, #0A4D9F) !important;
+    border-color: var(--db-primary, #0A4D9F) !important;
+    color: #FFFFFF !important;
     box-sizing: border-box;
     width: 230px;
     min-width: 230px;
@@ -156,9 +156,9 @@ require $projectRoot . '/app/views/header.php';
 }
 .platform-colors-page .admin-heading > a.button:hover,
 .platform-colors-page > .admin-section > form .form-actions .button:hover {
-    background: var(--db-form-button-hover-bg, var(--db-primary-dark)) !important;
-    border-color: var(--db-form-button-hover-bg, var(--db-primary-dark)) !important;
-    color: var(--db-form-button-hover-text, #FFFFFF) !important;
+    background: var(--db-primary-dark, #083B79) !important;
+    border-color: var(--db-primary-dark, #083B79) !important;
+    color: #FFFFFF !important;
 }
 @media (max-width: 700px) {
     .platform-colors-page > .admin-section {
