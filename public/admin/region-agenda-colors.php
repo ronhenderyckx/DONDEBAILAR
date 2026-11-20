@@ -43,17 +43,13 @@ $weekdayColors = $defaultColors;
 $weekdayTextColors = $defaultText;
 $weekdayTitleColors = $defaultTitles;
 foreach ($weekdayNames as $i => $_day) {
-    foreach ([
-        ['key' => $i, 'target' => &$weekdayColors[$i], 'default' => $defaultColors[$i]],
-        ['key' => 'weekday_text_' . $i, 'target' => &$weekdayTextColors[$i], 'default' => '#222222'],
-        ['key' => 'weekday_title_' . $i, 'target' => &$weekdayTitleColors[$i], 'default' => '#222222'],
-    ] as &$item) {
-        $candidate = strtoupper((string) ($weekdayData[$item['key']] ?? $item['default']));
-        if (preg_match('/^#[0-9A-F]{6}$/', $candidate)) $item['target'] = $candidate;
-    }
-    unset($item);
+    $candidate = strtoupper((string) ($weekdayData[$i] ?? $defaultColors[$i]));
+    if (preg_match('/^#[0-9A-F]{6}$/', $candidate)) $weekdayColors[$i] = $candidate;
+    $candidate = strtoupper((string) ($weekdayData['weekday_text_' . $i] ?? '#222222'));
+    if (preg_match('/^#[0-9A-F]{6}$/', $candidate)) $weekdayTextColors[$i] = $candidate;
+    $candidate = strtoupper((string) ($weekdayData['weekday_title_' . $i] ?? '#222222'));
+    if (preg_match('/^#[0-9A-F]{6}$/', $candidate)) $weekdayTitleColors[$i] = $candidate;
 }
-unset($item);
 
 $errorMessage = '';
 $successMessage = '';
@@ -62,26 +58,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errorMessage = 'De beveiligingscontrole is verlopen. Vernieuw de pagina.';
     } else {
         $submitted = [
-            'weekday_colors' => $_POST['weekday_colors'] ?? [],
-            'weekday_text_colors' => $_POST['weekday_text_colors'] ?? [],
-            'weekday_title_colors' => $_POST['weekday_title_colors'] ?? [],
+            'weekday_colors' => is_array($_POST['weekday_colors'] ?? null) ? $_POST['weekday_colors'] : [],
+            'weekday_text_colors' => is_array($_POST['weekday_text_colors'] ?? null) ? $_POST['weekday_text_colors'] : [],
+            'weekday_title_colors' => is_array($_POST['weekday_title_colors'] ?? null) ? $_POST['weekday_title_colors'] : [],
         ];
         foreach ($weekdayNames as $i => $_day) {
-            foreach ([
-                ['source' => 'weekday_colors', 'target' => &$weekdayColors[$i]],
-                ['source' => 'weekday_text_colors', 'target' => &$weekdayTextColors[$i]],
-                ['source' => 'weekday_title_colors', 'target' => &$weekdayTitleColors[$i]],
-            ] as &$item) {
-                $candidate = strtoupper(trim((string) ($submitted[$item['source']][$i] ?? $item['target'])));
+            $values = [
+                ['source' => 'weekday_colors', 'current' => $weekdayColors[$i]],
+                ['source' => 'weekday_text_colors', 'current' => $weekdayTextColors[$i]],
+                ['source' => 'weekday_title_colors', 'current' => $weekdayTitleColors[$i]],
+            ];
+            foreach ($values as $item) {
+                $candidate = strtoupper(trim((string) ($submitted[$item['source']][$i] ?? $item['current'])));
                 if (!preg_match('/^#[0-9A-F]{6}$/', $candidate)) {
                     $errorMessage = 'Een of meer kleurcodes zijn ongeldig.';
                     break 2;
                 }
-                $item['target'] = $candidate;
+                if ($item['source'] === 'weekday_colors') $weekdayColors[$i] = $candidate;
+                if ($item['source'] === 'weekday_text_colors') $weekdayTextColors[$i] = $candidate;
+                if ($item['source'] === 'weekday_title_colors') $weekdayTitleColors[$i] = $candidate;
             }
-            unset($item);
         }
-        unset($item);
         if ($errorMessage === '') {
             foreach ($weekdayNames as $i => $_day) {
                 $weekdayData[$i] = $weekdayColors[$i];
