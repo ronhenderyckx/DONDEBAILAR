@@ -530,6 +530,13 @@ p {
     color: #FFFFFF;
 }
 
+.platform-admin-page .admin-table .button:hover,
+.platform-admin-page .admin-table form button:hover {
+    border-color: var(--db-primary-dark, #083B79);
+    background: var(--db-primary-dark, #083B79);
+    color: #FFFFFF;
+}
+
 /* Status */
 
 .status-active,
