@@ -262,21 +262,21 @@ require $privateRoot . '/app/views/header.php';
                                         <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Marina Alta</td>
                                         <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Spanje</td>
                                         <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>"><span style="display:inline-block;padding:3px 7px;border-radius:12px;background:#EAF7F0;color:#16845B">Actief</span></td>
-                                        <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>"><span style="display:inline-block;padding:4px 8px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:5px;color:<?= escapeHtml($platformAdminColors['primary']) ?>">Wijzigen</span></td>
+                                        <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>"><button type="button" class="preview-action-button" style="padding:4px 8px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:5px;background:transparent;color:<?= escapeHtml($platformAdminColors['primary']) ?>">Wijzigen</button></td>
                                     </tr>
                                     <tr>
                                         <td style="padding:9px 7px">Costa Blanca</td>
                                         <td style="padding:9px 7px">Spanje</td>
                                         <td style="padding:9px 7px"><span style="display:inline-block;padding:3px 7px;border-radius:12px;background:#F0F1F3;color:#68717C">Inactief</span></td>
-                                        <td style="padding:9px 7px"><span style="display:inline-block;padding:4px 8px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:5px;color:<?= escapeHtml($platformAdminColors['primary']) ?>">Wijzigen</span></td>
+                                        <td style="padding:9px 7px"><button type="button" class="preview-action-button" style="padding:4px 8px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:5px;background:transparent;color:<?= escapeHtml($platformAdminColors['primary']) ?>">Wijzigen</button></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
-                            <span id="preview-primary-button" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Opslaan</span><label class="preview-color-choice"><span>Knoppen</span><input type="color" data-preview-color="primary" value="<?= escapeHtml($platformAdminColors['primary']) ?>" aria-label="Primaire kleur"></label>
-                            <span id="preview-hover-button" role="button" tabindex="0" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s ease">Beweeg muis hier</span><label class="preview-color-choice"><span>Hover</span><input type="color" data-preview-color="primary_dark" value="<?= escapeHtml($platformAdminColors['primary_dark']) ?>" aria-label="Donkere primaire kleur"></label>
-                            <span id="preview-accent" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['accent']) ?>;color:#202B38;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Accent</span><label class="preview-color-choice"><span>Accent</span><input type="color" data-preview-color="accent" value="<?= escapeHtml($platformAdminColors['accent']) ?>" aria-label="Accentkleur"></label>
+                            <button type="button" id="preview-primary-button" style="border:0;cursor:pointer;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Opslaan</button><label class="preview-color-choice"><span>Knoppen</span><input type="color" data-preview-color="primary" value="<?= escapeHtml($platformAdminColors['primary']) ?>" aria-label="Primaire kleur"></label>
+                            <button type="button" id="preview-hover-button" style="border:0;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s ease">Beweeg muis hier</button><label class="preview-color-choice"><span>Hover</span><input type="color" data-preview-color="primary_dark" value="<?= escapeHtml($platformAdminColors['primary_dark']) ?>" aria-label="Donkere primaire kleur"></label>
+                            <button type="button" id="preview-accent" style="border:0;cursor:pointer;background:<?= escapeHtml($platformAdminColors['accent']) ?>;color:#202B38;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Accent</button><label class="preview-color-choice"><span>Accent</span><input type="color" data-preview-color="accent" value="<?= escapeHtml($platformAdminColors['accent']) ?>" aria-label="Accentkleur"></label>
                         </div>
                     </div>
                 </div>
@@ -442,7 +442,7 @@ require $privateRoot . '/app/views/header.php';
         });
     });
 
-    preview.querySelectorAll('#preview-admin-list td:last-child span').forEach(function (action) {
+    preview.querySelectorAll('#preview-admin-list td:last-child .preview-action-button').forEach(function (action) {
         action.style.cursor = 'pointer';
         action.style.transition = 'background .15s ease, color .15s ease';
         action.addEventListener('mouseenter', function () {
@@ -496,7 +496,7 @@ require $privateRoot . '/app/views/header.php';
                 } else {
                     element.style.backgroundColor = picker.value;
                 }
-                if (key === 'primary') preview.querySelectorAll('#preview-admin-list td:last-child span').forEach(function (item) { item.style.color = picker.value; });
+                if (key === 'primary') preview.querySelectorAll('#preview-admin-list td:last-child .preview-action-button').forEach(function (item) { item.style.color = picker.value; });
             });
             preview.querySelectorAll('[data-preview-color="' + key + '"]').forEach(function (other) {
                 if (other !== picker) other.value = picker.value;
