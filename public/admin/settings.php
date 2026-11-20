@@ -241,6 +241,7 @@ require $privateRoot . '/app/views/header.php';
                     Dashboard　　Gebruikers　　Regio's　　Instellingen
                 </div>
                 <div id="preview-page" style="background:<?= escapeHtml($platformAdminColors['background']) ?>;padding:16px">
+                    <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><label class="preview-color-choice"><span>Pagina-achtergrond</span><input type="color" data-preview-color="background" value="<?= escapeHtml($platformAdminColors['background']) ?>" aria-label="Achtergrondkleur pagina"></label></div>
                     <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:<?= escapeHtml($platformAdminColors['muted']) ?>">PLATFORMBEHEER <label class="preview-color-choice"><span>Gedempte tekst</span><input type="color" data-preview-color="muted" value="<?= escapeHtml($platformAdminColors['muted']) ?>" aria-label="Gedempte tekstkleur"></label></div>
                     <div style="font-size:21px;font-weight:700;margin:3px 0 5px">Instellingen <label class="preview-color-choice"><span>Tekst</span><input type="color" data-preview-color="text" value="<?= escapeHtml($platformAdminColors['text']) ?>" aria-label="Tekstkleur"></label></div>
                     <div id="preview-muted" style="font-size:13px;color:<?= escapeHtml($platformAdminColors['muted']) ?>;margin-bottom:13px">Beheer de algemene instellingen en huisstijl.</div>
@@ -257,72 +258,41 @@ require $privateRoot . '/app/views/header.php';
             </div>
             <p style="font-size:12px;color:var(--db-muted);margin:8px 0 0">Dit is een vereenvoudigde voorbeeldweergave; de echte pagina kan per onderdeel iets verschillen.</p>
         </div>
-        <form method="post" action="/admin/settings.php" class="auth-form">
+<form method="post" action="/admin/settings.php">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
-            <label for="platform_color_primary">Primaire kleur (knoppen en links)</label>
-            <p class="platform-color-help" style="margin:-6px 0 2px;color:var(--db-muted);font-size:12px;line-height:1.45">Dit is de hoofdkleur van Platformbeheer. Je ziet deze kleur bijvoorbeeld op actieknoppen, links en onderdelen die geselecteerd zijn.</p>
-            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
-                <input type="color" id="platform_color_primary" name="platform_colors[primary]" value="<?= escapeHtml($platformAdminColors['primary']) ?>" style="width:64px;height:42px;padding:3px">
-                <code><?= escapeHtml($platformAdminColors['primary']) ?></code>
-            </div>
-            <label for="platform_color_primary_dark">Donkere primaire kleur</label>
-            <p class="platform-color-help" style="margin:-6px 0 2px;color:var(--db-muted);font-size:12px;line-height:1.45">Dit is de donkerdere variant van de hoofdkleur. Ze verschijnt wanneer je met de muis boven een actieknop of link beweegt.</p>
-            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
-                <input type="color" id="platform_color_primary_dark" name="platform_colors[primary_dark]" value="<?= escapeHtml($platformAdminColors['primary_dark']) ?>" style="width:64px;height:42px;padding:3px">
-                <code><?= escapeHtml($platformAdminColors['primary_dark']) ?></code>
-            </div>
-            <label for="platform_color_accent">Accentkleur</label>
-            <p class="platform-color-help" style="margin:-6px 0 2px;color:var(--db-muted);font-size:12px;line-height:1.45">Deze kleur dient om belangrijke details extra te laten opvallen, bijvoorbeeld een opvallend accent of markering. Ze vervangt niet de hoofdkleur van knoppen.</p>
-            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
-                <input type="color" id="platform_color_accent" name="platform_colors[accent]" value="<?= escapeHtml($platformAdminColors['accent']) ?>" style="width:64px;height:42px;padding:3px">
-                <code><?= escapeHtml($platformAdminColors['accent']) ?></code>
-            </div>
-            <label for="platform_color_header">Achtergrondkleur bovenbalk</label>
-            <p class="platform-color-help" style="margin:-6px 0 2px;color:var(--db-muted);font-size:12px;line-height:1.45">Bepaalt de kleur van de volledige bovenbalk bovenaan Platformbeheer, waar het DONDEBAILAR-logo en de navigatie staan.</p>
-            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
-                <input type="color" id="platform_color_header" name="platform_colors[header]" value="<?= escapeHtml($platformAdminColors['header']) ?>" style="width:64px;height:42px;padding:3px">
-                <code><?= escapeHtml($platformAdminColors['header']) ?></code>
-            </div>
-            <label for="platform_color_menu">Achtergrondkleur menu</label>
-            <p class="platform-color-help" style="margin:-6px 0 2px;color:var(--db-muted);font-size:12px;line-height:1.45">Bepaalt de achtergrond van het menu dat zichtbaar wordt wanneer je op de menuknop klikt. Kies een kleur waarbij de menu-items goed leesbaar blijven.</p>
-            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
-                <input type="color" id="platform_color_menu" name="platform_colors[menu]" value="<?= escapeHtml($platformAdminColors['menu']) ?>" style="width:64px;height:42px;padding:3px">
-                <code><?= escapeHtml($platformAdminColors['menu']) ?></code>
-            </div>
-            <label for="platform_color_background">Achtergrondkleur pagina</label>
-            <p class="platform-color-help" style="margin:-6px 0 2px;color:var(--db-muted);font-size:12px;line-height:1.45">Dit is de achtergrond van de pagina zelf, achter de witte panelen en instellingenblokken.</p>
-            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
-                <input type="color" id="platform_color_background" name="platform_colors[background]" value="<?= escapeHtml($platformAdminColors['background']) ?>" style="width:64px;height:42px;padding:3px">
-                <code><?= escapeHtml($platformAdminColors['background']) ?></code>
-            </div>
-            <label for="platform_color_surface">Achtergrondkleur panelen en kaarten</label>
-            <p class="platform-color-help" style="margin:-6px 0 2px;color:var(--db-muted);font-size:12px;line-height:1.45">Bepaalt de achtergrond van de afzonderlijke vlakken op de pagina, zoals instellingenblokken, kaarten en inhoudspanelen.</p>
-            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
-                <input type="color" id="platform_color_surface" name="platform_colors[surface]" value="<?= escapeHtml($platformAdminColors['surface']) ?>" style="width:64px;height:42px;padding:3px">
-                <code><?= escapeHtml($platformAdminColors['surface']) ?></code>
-            </div>
-            <label for="platform_color_text">Tekstkleur</label>
-            <p class="platform-color-help" style="margin:-6px 0 2px;color:var(--db-muted);font-size:12px;line-height:1.45">Bepaalt de standaardkleur van de belangrijkste teksten, zoals paginatitels, koppen en gewone tekst.</p>
-            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
-                <input type="color" id="platform_color_text" name="platform_colors[text]" value="<?= escapeHtml($platformAdminColors['text']) ?>" style="width:64px;height:42px;padding:3px">
-                <code><?= escapeHtml($platformAdminColors['text']) ?></code>
-            </div>
-            <label for="platform_color_muted">Gedempte tekstkleur</label>
-            <p class="platform-color-help" style="margin:-6px 0 2px;color:var(--db-muted);font-size:12px;line-height:1.45">Voor teksten die minder nadruk moeten krijgen, zoals korte toelichtingen, ondertitels en extra informatie onder een instelling.</p>
-            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
-                <input type="color" id="platform_color_muted" name="platform_colors[muted]" value="<?= escapeHtml($platformAdminColors['muted']) ?>" style="width:64px;height:42px;padding:3px">
-                <code><?= escapeHtml($platformAdminColors['muted']) ?></code>
-            </div>
-            <label for="platform_color_border">Randkleur</label>
-            <p class="platform-color-help" style="margin:-6px 0 2px;color:var(--db-muted);font-size:12px;line-height:1.45">Bepaalt de kleur van scheidingslijnen en fijne randen rond kaarten, instellingenblokken, tabellen en menu’s.</p>
-            <div style="display:flex;align-items:center;gap:12px;margin:0 0 14px">
-                <input type="color" id="platform_color_border" name="platform_colors[border]" value="<?= escapeHtml($platformAdminColors['border']) ?>" style="width:64px;height:42px;padding:3px">
-                <code><?= escapeHtml($platformAdminColors['border']) ?></code>
+            <div class="table-wrapper">
+                <table class="admin-table">
+                    <thead><tr><th>Kleur</th><th>Waarvoor dient deze?</th><th>Kleur kiezen</th><th>Code</th></tr></thead>
+                    <tbody>
+                        <?php
+                        $colorDescriptions = [
+                            'primary' => ['Primaire kleur', 'Hoofdkleur voor actieknoppen, links en geselecteerde onderdelen.'],
+                            'primary_dark' => ['Donkere primaire kleur', 'Donkere variant bij aanwijzen of hoveren over een knop.'],
+                            'accent' => ['Accentkleur', 'Laat belangrijke details en markeringen extra opvallen.'],
+                            'header' => ['Bovenbalk', 'Achtergrond van de bovenste balk met het DONDEBAILAR-logo.'],
+                            'menu' => ['Menu', 'Achtergrondkleur van het uitklapmenu met navigatie-items.'],
+                            'background' => ['Pagina-achtergrond', 'Achtergrond achter de panelen en inhoud van de beheerpagina.'],
+                            'surface' => ['Panelen en kaarten', 'Achtergrond van inhoudspanelen, kaarten en instellingenblokken.'],
+                            'text' => ['Tekstkleur', 'Standaardkleur voor titels, koppen en gewone teksten.'],
+                            'muted' => ['Gedempte tekst', 'Voor toelichtingen, ondertitels en aanvullende informatie.'],
+                            'border' => ['Randkleur', 'Voor randen en scheidingslijnen rond panelen, kaarten, tabellen en menu’s.']
+                        ];
+                        ?>
+                        <?php foreach ($colorDescriptions as $colorKey => [$colorLabel, $colorDescription]): ?>
+                            <tr>
+                                <td><strong><?= escapeHtml($colorLabel) ?></strong></td>
+                                <td><?= escapeHtml($colorDescription) ?></td>
+                                <td><input type="color" id="platform_color_<?= escapeHtml($colorKey) ?>" name="platform_colors[<?= escapeHtml($colorKey) ?>]" value="<?= escapeHtml($platformAdminColors[$colorKey]) ?>" aria-label="<?= escapeHtml($colorLabel) ?>" style="width:64px;height:42px;padding:3px"></td>
+                                <td><code><?= escapeHtml($platformAdminColors[$colorKey]) ?></code></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
             <div class="form-actions">
                 <button type="submit" class="button button--primary" name="save_platform_colors" value="1">Platformkleuren opslaan</button>
             </div>
-        </form>
+        </form> </form>
     </section>
 
     <section class="admin-section">
