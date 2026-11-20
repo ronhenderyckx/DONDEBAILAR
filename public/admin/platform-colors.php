@@ -192,13 +192,11 @@ require $projectRoot . '/app/views/header.php';
                                     </div>
                                 </div>
                             </div>
-                            <div style="max-width:360px">
-                                <label style="display:grid;gap:5px;font-size:12px;font-weight:600">Regio naam
+                            <div style="display:flex;align-items:flex-end;gap:12px;flex-wrap:wrap">
+                                <label style="display:grid;gap:5px;font-size:12px;font-weight:600;flex:1 1 240px;min-width:0">Regio naam
                                     <input type="text" value="Marina Alta" readonly style="width:100%;box-sizing:border-box;padding:8px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_input_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_input_text']) ?>">
                                 </label>
-                            </div>
-                            <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
-                                <button type="button" class="preview-form-button" style="padding:7px 12px;border:0;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_button_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_button_text']) ?>">Opslaan</button>
+                                <button type="button" class="preview-form-button" style="padding:8px 14px;border:0;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_button_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_button_text']) ?>;white-space:nowrap;min-height:37px">Opslaan</button>
                             </div>
                         </div>
                         <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:16px 0 8px"><div id="preview-list-title" style="font-size:14px;font-weight:700">Voorbeeld van een beheerlijst</div><div style="display:flex;gap:10px;flex-wrap:wrap"><label class="preview-color-choice" style="margin-left:0"><span>Lijsttekst</span><input type="color" data-preview-color="list_text" value="<?= escapeHtml($platformAdminColors['list_text']) ?>" aria-label="Tekstkleur van de voorbeeldlijst"></label><label class="preview-color-choice" style="margin-left:0"><span>Knop Wijzigen</span><input type="color" data-preview-color="action_button" value="<?= escapeHtml($platformAdminColors['action_button']) ?>" aria-label="Kleur knop Wijzigen"></label></div></div>
