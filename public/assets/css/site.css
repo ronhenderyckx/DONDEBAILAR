@@ -517,6 +517,19 @@ p {
     background: #FAFBFC;
 }
 
+/* Platformbeheer: gebruik de ingestelde hoverkleur ook op echte beheerregels. */
+.platform-admin-page .admin-table tbody tr:hover {
+    background: var(--db-primary-dark, #083B79);
+}
+
+.platform-admin-page .admin-table tbody tr:hover > td {
+    color: #FFFFFF;
+}
+
+.platform-admin-page .admin-table tbody tr:hover > td a:not(.button) {
+    color: #FFFFFF;
+}
+
 /* Status */
 
 .status-active,
