@@ -35,7 +35,7 @@ $statement = $db->prepare(
      FROM events e
      INNER JOIN regions r ON r.id = e.region_id
      LEFT JOIN region_appearance a ON a.region_id = r.id
-     WHERE e.id = :id AND e.status = 'published' LIMIT 1"
+     WHERE e.id = :id AND e.status IN ('published','cancelled','cancelled_rain') LIMIT 1"
 );
 $statement->execute(['id' => $id]);
 $event = $statement->fetch();
