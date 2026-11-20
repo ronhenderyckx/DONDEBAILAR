@@ -65,8 +65,8 @@ $eventInfoTextColor = 'var(--db-weekday-text-' . $eventWeekday . ', #222222)';
         <p><strong><?= $escape(date('d-m-Y H:i', strtotime($event['starts_at']))) ?></strong></p>
         <?php if (trim((string) ($event['presale_price'] ?? '')) !== '' || trim((string) ($event['door_price'] ?? '')) !== ''): ?>
             <div class="public-event-prices public-event-info-text" style="color:<?= $escape($eventInfoTextColor) ?> !important">
-                <?php if (trim((string) ($event['presale_price'] ?? '')) !== ''): ?><p>Voorverkoop: € <?= $escape(number_format((float) $event['presale_price'], 2, ',', '.')) ?></p><?php endif; ?>
-                <?php if (trim((string) ($event['door_price'] ?? '')) !== ''): ?><p>Aan de poort: € <?= $escape(number_format((float) $event['door_price'], 2, ',', '.')) ?></p><?php endif; ?>
+                <?php if (trim((string) ($event['door_price'] ?? '')) !== ''): ?><p>Inkom : <?= $escape(number_format((float) $event['door_price'], ((float) $event['door_price'] == (int) (float) $event['door_price'] ? 0 : 2), ',', '.')) ?> €</p><?php endif; ?>
+                <?php if (trim((string) ($event['presale_price'] ?? '')) !== ''): ?><p>VVK : <?= $escape(number_format((float) $event['presale_price'], ((float) $event['presale_price'] == (int) (float) $event['presale_price'] ? 0 : 2), ',', '.')) ?> €</p><?php endif; ?>
             </div>
         <?php endif; ?>
         <?php
