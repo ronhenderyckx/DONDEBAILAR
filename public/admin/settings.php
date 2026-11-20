@@ -49,6 +49,7 @@ $platformAdminColors = [
     'primary' => '#0A4D9F',
     'primary_dark' => '#083B79',
     'action_button' => '#0A4D9F',
+    'list_text' => '#202B38',
     'accent' => '#00AFC5',
     'header' => '#FFFFFF',
     'menu' => '#FFFFFF',
@@ -249,7 +250,7 @@ require $privateRoot . '/app/views/header.php';
                     <div id="preview-panel" style="background:<?= escapeHtml($platformAdminColors['surface']) ?>;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:9px;padding:14px"><div style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:8px"><label class="preview-color-choice"><span>Paneel</span><input type="color" data-preview-color="surface" value="<?= escapeHtml($platformAdminColors['surface']) ?>" aria-label="Kleur panelen"></label><label class="preview-color-choice"><span>Randen</span><input type="color" data-preview-color="border" value="<?= escapeHtml($platformAdminColors['border']) ?>" aria-label="Randkleur"></label></div>
                         <div style="font-size:15px;font-weight:700;margin-bottom:5px">Voorbeeld van een instellingenblok</div>
                         <div style="font-size:13px;margin-bottom:12px">Dit is gewone tekst in een paneel.</div>
-                        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:16px 0 8px"><div id="preview-list-title" style="font-size:14px;font-weight:700">Voorbeeld van een beheerlijst</div><label class="preview-color-choice" style="margin-left:0"><span>Knop Wijzigen</span><input type="color" data-preview-color="action_button" value="<?= escapeHtml($platformAdminColors['action_button']) ?>" aria-label="Kleur knop Wijzigen"></label></div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:16px 0 8px"><div id="preview-list-title" style="font-size:14px;font-weight:700">Voorbeeld van een beheerlijst</div><div style="display:flex;gap:10px;flex-wrap:wrap"><label class="preview-color-choice" style="margin-left:0"><span>Lijsttekst</span><input type="color" data-preview-color="list_text" value="<?= escapeHtml($platformAdminColors['list_text']) ?>" aria-label="Tekstkleur van de voorbeeldlijst"></label><label class="preview-color-choice" style="margin-left:0"><span>Knop Wijzigen</span><input type="color" data-preview-color="action_button" value="<?= escapeHtml($platformAdminColors['action_button']) ?>" aria-label="Kleur knop Wijzigen"></label></div></div>
                         <div style="overflow-x:auto">
                             <table id="preview-admin-list" style="width:100%;border-collapse:collapse;font-size:12px;background:<?= escapeHtml($platformAdminColors['surface']) ?>;color:<?= escapeHtml($platformAdminColors['text']) ?>">
                                 <thead><tr>
@@ -260,14 +261,14 @@ require $privateRoot . '/app/views/header.php';
                                 </tr></thead>
                                 <tbody>
                                     <tr>
-                                        <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Marina Alta</td>
-                                        <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Spanje</td>
+                                        <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Regel 1</td>
+                                        <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Regio 1</td>
                                         <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>"><span style="display:inline-block;padding:3px 7px;border-radius:12px;background:#EAF7F0;color:#16845B">Actief</span></td>
                                         <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>"><button type="button" class="preview-action-button" style="padding:4px 8px;border:1px solid <?= escapeHtml($platformAdminColors['action_button']) ?>;border-radius:5px;background:<?= escapeHtml($platformAdminColors['action_button']) ?>;color:#FFFFFF;cursor:pointer">Wijzigen</button></td>
                                     </tr>
                                     <tr>
-                                        <td style="padding:9px 7px">Costa Blanca</td>
-                                        <td style="padding:9px 7px">Spanje</td>
+                                        <td style="padding:9px 7px">Regel 2</td>
+                                        <td style="padding:9px 7px">Regio 2</td>
                                         <td style="padding:9px 7px"><span style="display:inline-block;padding:3px 7px;border-radius:12px;background:#F0F1F3;color:#68717C">Inactief</span></td>
                                         <td style="padding:9px 7px"><button type="button" class="preview-action-button" style="padding:4px 8px;border:1px solid <?= escapeHtml($platformAdminColors['action_button']) ?>;border-radius:5px;background:<?= escapeHtml($platformAdminColors['action_button']) ?>;color:#FFFFFF;cursor:pointer">Wijzigen</button></td>
                                     </tr>
@@ -295,6 +296,7 @@ require $privateRoot . '/app/views/header.php';
                             'primary' => ['Primaire kleur', 'Hoofdkleur voor actieknoppen, links en geselecteerde onderdelen.'],
                             'primary_dark' => ['Donkere primaire kleur', 'Donkere variant bij aanwijzen of hoveren over een knop.'],
                             'action_button' => ['Knop Wijzigen', 'Achtergrondkleur van de knoppen Wijzigen in de beheerlijst. De hoverkleur gebruikt de donkere primaire kleur.'],
+                            'list_text' => ['Tekstkleur beheerlijst', 'Kleur van de teksten in de voorbeeldregels, zoals Regel 1, Regio 1 en de status.'],
                             'accent' => ['Accentkleur', 'Laat belangrijke details en markeringen extra opvallen.'],
                             'header' => ['Bovenbalk', 'Achtergrond van de bovenste balk met het DONDEBAILAR-logo.'],
                             'menu' => ['Menu', 'Achtergrondkleur van het uitklapmenu met navigatie-items.'],
@@ -414,6 +416,7 @@ require $privateRoot . '/app/views/header.php';
         const primary = color('primary', '#0A4D9F');
         const dark = color('primary_dark', '#083B79');
         const actionButton = color('action_button', primary);
+        const listText = color('list_text', text);
         const accent = color('accent', '#00AFC5');
         const header = color('header', '#FFFFFF');
         const menu = color('menu', '#FFFFFF');
@@ -446,7 +449,7 @@ require $privateRoot . '/app/views/header.php';
         setText('#preview-muted, #preview-admin-list th', muted);
         setText('#preview-primary-button, #preview-hover-button', '#FFFFFF');
         setText('#preview-accent', '#202B38');
-        setText('#preview-admin-list tbody td', text);
+        setText('#preview-admin-list tbody td', listText);
         setText('#preview-admin-list .preview-action-button', '#FFFFFF');
         setBackground('#preview-admin-list .preview-action-button', actionButton);
         setBorder('#preview-admin-list .preview-action-button', actionButton);
@@ -467,7 +470,7 @@ require $privateRoot . '/app/views/header.php';
             };
             row.onmouseleave = () => {
                 row.style.backgroundColor = 'transparent';
-                row.querySelectorAll('td').forEach(cell => cell.style.color = text);
+                row.querySelectorAll('td').forEach(cell => cell.style.color = listText);
                 row.querySelectorAll('.preview-action-button').forEach(button => {
                     button.style.backgroundColor = actionButton;
                     button.style.borderColor = actionButton;
