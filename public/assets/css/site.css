@@ -189,7 +189,7 @@ img {
     border: 1px solid var(--db-border);
     border-radius: 9px;
     background: var(--db-menu-color, #FFFFFF);
-    color: var(--db-text);
+    color: var(--db-menu-text, var(--db-text));
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
@@ -260,7 +260,7 @@ img {
     gap: 11px;
     padding: 10px 12px;
     border-radius: 7px;
-    color: var(--db-text);
+    color: var(--db-menu-text, var(--db-text));
     font-size: 14px;
     font-weight: 500;
     text-decoration: none;
@@ -275,8 +275,8 @@ img {
 }
 
 .site-menu__panel > a:hover {
-    background: color-mix(in srgb, var(--db-menu-color, #FFFFFF) 88%, var(--db-text));
-    color: var(--db-primary);
+    background: var(--db-menu-hover-bg, color-mix(in srgb, var(--db-menu-color, #FFFFFF) 88%, var(--db-text)));
+    color: var(--db-menu-hover-text, var(--db-primary));
 }
 
 .site-menu__divider {
@@ -295,7 +295,7 @@ img {
     border: 0;
     border-radius: 7px;
     background: transparent;
-    color: var(--db-danger);
+    color: var(--db-menu-text, var(--db-danger));
     text-align: left;
     font-weight: 600;
 }
@@ -1993,4 +1993,26 @@ body.platform-admin-page {
 .region-new-page .form-actions > a,
 .region-new-page .form-actions > button {
     flex: 0 0 auto;
+}
+
+
+/* Instelbare menukleuren voor Platformbeheer. */
+.platform-admin-page .site-menu__toggle,
+.platform-admin-page .site-menu__panel,
+.platform-admin-page .site-menu__panel > a,
+.platform-admin-page .site-menu__admin > summary,
+.platform-admin-page .site-menu__admin > a,
+.platform-admin-page .site-menu__logout {
+    color: var(--db-menu-text, var(--db-text)) !important;
+}
+.platform-admin-page .site-menu__panel > a:hover,
+.platform-admin-page .site-menu__admin > summary:hover,
+.platform-admin-page .site-menu__admin > a:hover,
+.platform-admin-page .site-menu__logout:hover {
+    background: var(--db-menu-hover-bg, #F3F6F9) !important;
+    color: var(--db-menu-hover-text, var(--db-primary)) !important;
+}
+.platform-admin-page .site-menu__panel,
+.platform-admin-page .site-menu__panel .site-menu__admin {
+    background: var(--db-menu-color, #FFFFFF) !important;
 }
