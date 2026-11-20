@@ -1532,3 +1532,33 @@ body.platform-admin-page {
         grid-column: 1;
     }
 }
+
+
+/* Agenda-instelling: label bovenaan, invoerveld en opslaanknop samen op één regel. */
+.platform-admin-page .settings-page .agenda-setting-controls {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.platform-admin-page .settings-page .agenda-setting-controls .agenda-setting-input {
+    flex: 0 0 180px;
+    width: 180px;
+    max-width: 180px;
+}
+.platform-admin-page .settings-page .agenda-setting-controls .form-actions {
+    margin: 0;
+    padding: 0;
+}
+.platform-admin-page .settings-page .agenda-setting-controls .form-actions button {
+    margin: 0;
+}
+@media (max-width: 480px) {
+    .platform-admin-page .settings-page .agenda-setting-controls {
+        gap: 8px;
+    }
+    .platform-admin-page .settings-page .agenda-setting-controls .agenda-setting-input {
+        flex-basis: 120px;
+        width: 120px;
+    }
+}
