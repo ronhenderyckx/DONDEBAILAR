@@ -50,6 +50,13 @@ declare(strict_types=1);
 <?php else: ?>
     <footer class="site-footer">
         <div class="site-footer__inner">
+            <?php if (!empty($isPlatformAdminPage)):
+                $platformFooterTextPath = ($projectRoot ?? dirname(__DIR__, 2)) . '/storage/platform-admin-footer-text.txt';
+                $platformFooterText = is_file($platformFooterTextPath) ? trim((string) file_get_contents($platformFooterTextPath)) : '';
+                if ($platformFooterText !== ''): ?>
+                    <span class="platform-footer-text"><?= htmlspecialchars($platformFooterText, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') ?></span>
+                <?php endif;
+            endif; ?>
         </div>
     </footer>
 <?php endif; ?>
