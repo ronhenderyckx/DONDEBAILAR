@@ -1912,3 +1912,30 @@ body.platform-admin-page {
         max-height: 40px;
     }
 }
+
+
+/* E-mailinstellingen: alle knoppen krijgen dezelfde hoogte en uitlijning. */
+.platform-mail-settings-page .button,
+.platform-mail-settings-page button.button,
+.platform-mail-settings-page .form-actions > a,
+.platform-mail-settings-page .form-actions > button {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    height: 44px;
+    padding: 0 16px;
+    line-height: 1.2;
+    vertical-align: middle;
+}
+.platform-mail-settings-page .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+.platform-mail-settings-page .form-actions > a,
+.platform-mail-settings-page .form-actions > button {
+    margin: 0;
+}
