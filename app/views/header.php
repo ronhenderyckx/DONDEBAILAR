@@ -336,7 +336,11 @@ $escape = static fn ($value): string =>
     <link rel="icon" href="/icons/app-icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icons/app-icon.svg">
     <title><?= $escape($pageTitle) ?></title>
-    <link rel="stylesheet" href="/assets/css/site.css">
+    <?php
+$siteCssFile = $projectRoot . '/public/assets/css/site.css';
+$siteCssVersion = is_file($siteCssFile) ? (string) filemtime($siteCssFile) . '-' . (string) filesize($siteCssFile) : '1';
+?>
+<link rel="stylesheet" href="/assets/css/site.css?v=<?= rawurlencode($siteCssVersion) ?>">
     <?php
 $agendaCssFile = $projectRoot . '/public/assets/css/agenda.css';
 $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile) . '-' . (string) filesize($agendaCssFile) : '1';
