@@ -1462,3 +1462,39 @@ body.platform-admin-page {
         max-width: 100%;
     }
 }
+
+
+/* Zet formulierlabels en invoervelden naast elkaar op één regel. */
+.platform-admin-page .settings-page .auth-form {
+    grid-template-columns: minmax(170px, 220px) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 16px;
+    row-gap: 12px;
+}
+.platform-admin-page .settings-page .auth-form > label {
+    margin: 0;
+}
+.platform-admin-page .settings-page .auth-form > div:not(.form-actions) {
+    width: 100%;
+    max-width: 340px !important;
+}
+.platform-admin-page .settings-page .auth-form > div:not(.form-actions) input {
+    max-width: 100%;
+}
+.platform-admin-page .settings-page .auth-form > input[type="file"] {
+    grid-column: 2;
+    max-width: 420px;
+}
+.platform-admin-page .settings-page .auth-form > .form-actions {
+    grid-column: 1 / -1;
+}
+@media (max-width: 600px) {
+    .platform-admin-page .settings-page .auth-form {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+    }
+    .platform-admin-page .settings-page .auth-form > input[type="file"],
+    .platform-admin-page .settings-page .auth-form > .form-actions {
+        grid-column: 1;
+    }
+}
