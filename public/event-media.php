@@ -28,7 +28,7 @@ if (!$media) {
     exit;
 }
 
-if ($media['status'] !== 'published') {
+if (!in_array((string) $media['status'], ['published', 'cancelled', 'cancelled_rain'], true)) {
     $user = requireLogin();
     $event = [
         'region_id' => (int) $media['region_id'],
