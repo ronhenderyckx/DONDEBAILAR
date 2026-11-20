@@ -1607,3 +1607,28 @@ body.platform-admin-page {
         gap: 7px;
     }
 }
+
+
+/* Maximale evenementduur: label bovenaan, veld en opslaanknop op één regel. */
+.platform-admin-page .settings-page .event-duration-settings-form {
+    display: block !important;
+}
+.platform-admin-page .settings-page .event-duration-settings-form > label {
+    display: block;
+    margin: 0 0 9px;
+}
+.platform-admin-page .settings-page .event-duration-settings-form > div[style*="max-width"] {
+    display: inline-block;
+    width: 180px;
+    max-width: 180px !important;
+    vertical-align: middle;
+}
+.platform-admin-page .settings-page .event-duration-settings-form > .form-actions {
+    display: inline-flex !important;
+    margin: 0 0 0 10px !important;
+    padding: 0;
+    vertical-align: middle;
+}
+.platform-admin-page .settings-page .event-duration-settings-form > .form-actions button {
+    white-space: nowrap;
+}
