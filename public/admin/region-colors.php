@@ -473,6 +473,40 @@ if (!$embeddedRegionAppearanceEditor) {
         <?php endif; ?>
         <?php if ($errorMessage !== ''): ?><div class="message message--error" role="alert"><?= escapeHtml($errorMessage) ?></div><?php endif; ?>
         <?php if ($successMessage !== ''): ?><div class="message message--success" role="status"><?= escapeHtml($successMessage) ?></div><?php endif; ?>
+        <section class="region-agenda-live-preview" id="region-agenda-live-preview" aria-label="Live voorbeeld van de regionale agenda">
+            <div class="region-preview-heading">
+                <div><h2>Live voorbeeld agenda</h2><p>Wijzig hieronder de kleuren en bekijk hier onmiddellijk het resultaat.</p></div>
+                <span class="region-preview-live">LIVE VOORBEELD</span>
+            </div>
+            <div class="region-preview-shell" data-preview="page">
+                <div class="region-preview-topbar" data-preview="header">
+                    <strong class="region-preview-brand">DONDEBAILAR</strong>
+                    <span>Agenda · Evenementen · Menu</span>
+                </div>
+                <div class="region-preview-content">
+                    <div class="region-preview-title"><strong>Marina Alta</strong><span>Dansagenda</span></div>
+                    <div class="region-preview-filters" data-preview="strip">
+                        <span data-preview="filter-text">Alle steden</span><span data-preview="filter-text">Alle organisatoren</span>
+                        <button type="button" data-preview="search-button">Zoeken</button>
+                    </div>
+                    <div class="region-preview-days">
+                        <?php foreach (['MA','DI','WO','DO','VR','ZA','ZO'] as $i => $day): ?>
+                            <div class="region-preview-day" data-preview-day="<?= $i ?>"><strong><?= $day ?></strong><small>20</small></div>
+                        <?php endforeach; ?>
+                    </div>
+                    <article class="region-preview-event" data-preview="event">
+                        <div class="region-preview-event-date" data-preview-day="4"><strong>VR</strong><small>20</small></div>
+                        <div class="region-preview-event-copy"><strong data-preview="event-title">Salsa & Bachata Social</strong><span>20:00 · Dénia</span><small>Dansavond voor iedereen</small></div>
+                        <span class="region-preview-organizer" data-preview="organizer">Organisator</span>
+                    </article>
+                    <article class="region-preview-event region-preview-event--past" data-preview="past-event">
+                        <div class="region-preview-event-date"><strong>DO</strong><small>19</small></div>
+                        <div class="region-preview-event-copy"><strong>Afgelopen evenement</strong><span>20:30 · Jávea</span></div>
+                    </article>
+                    <div class="region-preview-footer" data-preview="footer"><span>DONDEBAILAR · Marina Alta</span><button type="button" data-preview="back-top">↑</button></div>
+                </div>
+            </div>
+        </section>
         <form method="post" enctype="multipart/form-data" class="auth-form" action="<?= $embeddedRegionAppearanceEditor ? '/admin/region-edit.php?id=' . (int) $regionId : '/admin/region-colors.php?region_id=' . (int) $regionId ?>">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <?php if ($embeddedRegionAppearanceEditor): ?><input type="hidden" name="save_appearance" value="1"><?php endif; ?>
@@ -627,5 +661,68 @@ if (!$embeddedRegionAppearanceEditor) {
 .region-weekday-color{grid-column:1/-1;display:flex;align-items:center;gap:10px}
 .region-weekday-color code{font-size:12px;color:#596273}
 @media(max-width:520px){.region-color-grid,.region-weekday-grid{grid-template-columns:1fr}.region-color-field{grid-template-columns:minmax(0,1fr) 52px}}
+
+.region-agenda-live-preview{margin:4px 0 26px;padding:16px;border:1px solid var(--db-border,#e1e5eb);border-radius:12px;background:var(--db-surface,#fff)}
+.region-preview-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.region-preview-heading h2{margin:0 0 4px!important;padding:0!important;border:0!important;font-size:18px}
+.region-preview-heading p{margin:0;color:var(--db-muted,#687586);font-size:13px}
+.region-preview-live{padding:5px 9px;border-radius:20px;background:#eaf7f0;color:#16845b;font-size:10px;font-weight:800;white-space:nowrap}
+.region-preview-shell{overflow:hidden;border:1px solid #dce2e9;border-radius:10px;background:#fff;color:#222;font-size:12px}
+.region-preview-topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;background:#222;color:#fff}
+.region-preview-brand{font-size:14px;letter-spacing:.5px}
+.region-preview-content{padding:12px;background:#fff}
+.region-preview-title{display:flex;align-items:baseline;gap:9px;margin-bottom:10px;color:#222}
+.region-preview-title strong{font-size:17px}.region-preview-title span{color:#687586}
+.region-preview-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px;border-radius:7px;background:#fff;color:#222}
+.region-preview-filters span{padding:6px 8px;border:1px solid #ddd;border-radius:5px;background:#fff}
+.region-preview-filters button,.region-preview-footer button{border:0;border-radius:5px;padding:7px 12px;background:#e23a2c;color:#fff;font-weight:700}
+.region-preview-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin:12px 0}
+.region-preview-day{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:5px;background:#f6d84a;color:#222}
+.region-preview-day strong{font-size:11px}.region-preview-day small{font-size:11px}
+.region-preview-event{display:flex;align-items:center;gap:10px;margin:7px 0;padding:10px;border:1px solid #d0d0d0;border-radius:7px;background:#fff;color:#222}
+.region-preview-event-date{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:38px;min-height:42px;border-radius:5px;background:#f49a45;color:#222}
+.region-preview-event-copy{display:flex;flex:1;flex-direction:column;gap:3px;min-width:0}
+.region-preview-event-copy strong{color:#222}.region-preview-event-copy span,.region-preview-event-copy small{color:#687586}
+.region-preview-organizer{padding:5px 7px;border-radius:5px;background:#e23a2c;color:#fff;font-size:10px}
+.region-preview-event--past{background:#777;color:#fff}.region-preview-event--past .region-preview-event-copy strong,.region-preview-event--past .region-preview-event-copy span{color:#fff}
+.region-preview-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;padding:10px;border-top:2px solid #ddd;background:#fff;color:#687586}
+@media(max-width:520px){.region-agenda-live-preview{padding:10px}.region-preview-topbar{padding:9px}.region-preview-content{padding:8px}.region-preview-event{gap:7px;padding:8px}.region-preview-organizer{font-size:9px}.region-preview-days{gap:3px}}
+
 </style>
+<script>
+(function(){
+ const root=document.getElementById("region-agenda-live-preview"); if(!root)return;
+ const field=(name)=>document.querySelector('[name="'+name+'"]');
+ const value=(name,fallback)=>field(name)?.value||fallback;
+ const paint=(selector,property,color)=>root.querySelectorAll(selector).forEach(el=>el.style.setProperty(property,color,"important"));
+ function update(){
+  const primary=value("primary_color","#E23A2C"), dark=value("primary_dark","#8F211B");
+  const header=value("header_color","#222222"), menu=value("menu_color","#FFFFFF");
+  const strip=value("selector_strip_background_color","#FFFFFF"), stripText=value("filter_text_color","#222222");
+  const search=value("search_button_color",primary), organizer=value("organizer_color",primary);
+  const footer=value("footer_color","#FFFFFF"), back=value("back_top_color",primary);
+  const bg=value("background_color","#FFFFFF"), text=value("text_color","#222222");
+  const past=value("past_event_color","#777777"), pastText=value("past_event_text_color","#FFFFFF");
+  paint("[data-preview=header]","background-color",header); paint("[data-preview=header]","color",text);
+  paint("[data-preview=page]","background-color",bg); paint("[data-preview=page]","color",text);
+  paint("[data-preview=strip]","background-color",strip); paint("[data-preview=filter-text]","color",stripText);
+  paint("[data-preview=search-button]","background-color",search); paint("[data-preview=search-button]","color","#FFFFFF");
+  paint("[data-preview=organizer]","background-color",organizer); paint("[data-preview=organizer]","color","#FFFFFF");
+  paint("[data-preview=footer]","background-color",footer); paint("[data-preview=footer]","color",text);
+  paint("[data-preview=back-top]","background-color",back); paint("[data-preview=back-top]","color","#FFFFFF");
+  paint("[data-preview=past-event]","background-color",past); paint("[data-preview=past-event]","color",pastText);
+  paint("[data-preview=past-event] .region-preview-event-copy strong","color",pastText); paint("[data-preview=past-event] .region-preview-event-copy span","color",pastText);
+  paint(".region-preview-event:not(.region-preview-event--past)","background-color",bg); paint(".region-preview-event:not(.region-preview-event--past)","color",text);
+  paint("[data-preview=event-title]","color",value("weekday_title_colors[4]",text));
+  paint(".region-preview-day","background-color",value("weekday_colors[0]","#F6D84A"));
+  paint(".region-preview-day","color",value("weekday_text_colors[0]","#222222"));
+  root.querySelectorAll(".region-preview-day").forEach((el,i)=>{el.style.setProperty("background-color",value("weekday_colors["+i+"]","#F6D84A"),"important");el.style.setProperty("color",value("weekday_text_colors["+i+"]","#222222"),"important")});
+  const eventDay=root.querySelector(".region-preview-event-date"); if(eventDay){eventDay.style.setProperty("background-color",value("weekday_colors[4]","#E78AAE"),"important");eventDay.style.setProperty("color",value("weekday_text_colors[4]","#222222"),"important")}
+  root.querySelector(".region-preview-event")?.style.setProperty("border-color",value("event_separator_color","#D0D0D0"),"important");
+  root.querySelectorAll(".region-color-field input[type=color],.region-weekday-color input[type=color]").forEach(input=>{const code=input.parentElement.querySelector("code");if(code)code.textContent=input.value.toUpperCase()});
+ }
+ document.querySelectorAll(".auth-form input[type=color]").forEach(input=>{input.addEventListener("input",update);input.addEventListener("change",update)});
+ update();
+})();
+</script>
 <?php if (!$embeddedRegionAppearanceEditor) require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
