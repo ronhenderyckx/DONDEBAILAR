@@ -109,6 +109,67 @@ if (isset($_GET['saved'])) {
 
 require $projectRoot . '/app/views/header.php';
 ?>
+<style>
+.platform-colors-page .admin-heading {
+    margin-bottom: 14px;
+    gap: 12px;
+}
+.platform-colors-page .admin-heading > div > p:last-child {
+    margin: 5px 0 0;
+}
+.platform-colors-page > .admin-section {
+    padding: 16px;
+}
+.platform-colors-page .section-heading {
+    margin-bottom: 8px;
+}
+.platform-colors-page .platform-color-preview-wrap {
+    margin: 12px 0 16px !important;
+}
+.platform-colors-page .platform-color-preview-wrap > h3 {
+    margin-bottom: 4px !important;
+}
+.platform-colors-page .platform-color-preview-wrap > p {
+    margin-bottom: 9px !important;
+}
+.platform-colors-page > .admin-section > form .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+}
+.platform-colors-page .admin-heading > a.button,
+.platform-colors-page > .admin-section > form .form-actions .button {
+    box-sizing: border-box;
+    width: 230px;
+    min-width: 230px;
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+    flex: 0 0 230px;
+}
+@media (max-width: 700px) {
+    .platform-colors-page > .admin-section {
+        padding: 12px;
+    }
+    .platform-colors-page .admin-heading {
+        align-items: stretch;
+    }
+    .platform-colors-page .admin-heading > a.button,
+    .platform-colors-page > .admin-section > form .form-actions .button {
+        width: 100%;
+        min-width: 0;
+        flex: 1 1 100%;
+    }
+    .platform-colors-page #platform-color-preview {
+        font-size: 13px;
+    }
+}
+</style>
+
 <section class="admin-page platform-colors-page">
     <div class="admin-heading">
         <div>
