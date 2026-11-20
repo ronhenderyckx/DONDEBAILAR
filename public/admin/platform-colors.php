@@ -17,10 +17,6 @@ $platformMenuColorFile = $projectRoot . '/storage/platform-menu-color.txt';
 $platformAdminColors = [
     'primary' => '#0A4D9F',
     'primary_dark' => '#083B79',
-    'back_button_bg' => '#FFFFFF',
-    'back_button_text' => '#202B38',
-    'save_button_bg' => '#0A4D9F',
-    'save_button_text' => '#FFFFFF',
     'action_button' => '#0A4D9F',
     'list_text' => '#202B38',
     'list_header_bg' => '#F1F3F6',
@@ -303,16 +299,7 @@ require $projectRoot . '/app/views/header.php';
                                 </tbody>
                             </table>
                         </div>
-                        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:10px 0;padding:10px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:8px">
-<strong style="font-size:12px">Terug- en opslagknoppen</strong>
-<label class="preview-color-choice" style="margin-left:0"><span>Terug achtergrond</span><input type="color" data-preview-color="back_button_bg" value="<?= escapeHtml($platformAdminColors['back_button_bg']) ?>" aria-label="Achtergrondkleur terugknop"></label>
-<label class="preview-color-choice" style="margin-left:0"><span>Terug tekst</span><input type="color" data-preview-color="back_button_text" value="<?= escapeHtml($platformAdminColors['back_button_text']) ?>" aria-label="Tekstkleur terugknop"></label>
-<label class="preview-color-choice" style="margin-left:0"><span>Opslaan achtergrond</span><input type="color" data-preview-color="save_button_bg" value="<?= escapeHtml($platformAdminColors['save_button_bg']) ?>" aria-label="Achtergrondkleur opslagknop"></label>
-<label class="preview-color-choice" style="margin-left:0"><span>Opslaan tekst</span><input type="color" data-preview-color="save_button_text" value="<?= escapeHtml($platformAdminColors['save_button_text']) ?>" aria-label="Tekstkleur opslagknop"></label>
-<button type="button" id="preview-back-button" class="button" style="border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;background:<?= escapeHtml($platformAdminColors['back_button_bg']) ?>;color:<?= escapeHtml($platformAdminColors['back_button_text']) ?>">Terug</button>
-<button type="button" id="preview-save-button" class="button button--primary" style="border:1px solid <?= escapeHtml($platformAdminColors['save_button_bg']) ?>;background:<?= escapeHtml($platformAdminColors['save_button_bg']) ?>;color:<?= escapeHtml($platformAdminColors['save_button_text']) ?>">Opslaan</button>
-</div>
-<div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+                        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
                             <button type="button" id="preview-primary-button" style="border:0;cursor:pointer;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Opslaan</button><label class="preview-color-choice"><span>Knoppen</span><input type="color" data-preview-color="primary" value="<?= escapeHtml($platformAdminColors['primary']) ?>" aria-label="Primaire kleur"></label>
                             <button type="button" id="preview-hover-button" style="border:0;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s ease">Beweeg muis hier</button><label class="preview-color-choice"><span>Hover</span><input type="color" data-preview-color="primary_dark" value="<?= escapeHtml($platformAdminColors['primary_dark']) ?>" aria-label="Donkere primaire kleur"></label>
                             <button type="button" id="preview-accent" style="border:0;cursor:pointer;background:<?= escapeHtml($platformAdminColors['accent']) ?>;color:#202B38;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Accent</button><label class="preview-color-choice"><span>Accent</span><input type="color" data-preview-color="accent" value="<?= escapeHtml($platformAdminColors['accent']) ?>" aria-label="Accentkleur"></label>
@@ -333,5 +320,5 @@ require $projectRoot . '/app/views/header.php';
         </form>
     </section>
 
-<script src="/assets/js/platform-colors-preview.js?v=5" defer></script>
+<script src="/assets/js/platform-colors-preview.js?v=6" defer></script>
 <?php require $projectRoot . '/app/views/footer.php'; ?>
