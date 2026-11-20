@@ -202,6 +202,10 @@ if ($isPlatformAdminPage) {
         'accent' => '#00AFC5',
         'header' => '#FFFFFF',
         'footer' => '#FFFFFF',
+        'footer_text' => '#687586',
+        'footer_border' => '#E7EAF0',
+        'footer_link' => '#0A4D9F',
+        'footer_link_hover' => '#083B79',
         'menu' => '#FFFFFF',
         'background' => '#F7F8FA',
         'surface' => '#FFFFFF',
@@ -234,6 +238,10 @@ if ($isPlatformAdminPage) {
         . ';--db-accent:' . $platformColors['accent']
         . ';--db-header-color:' . $platformColors['header']
         . ';--db-footer-color:' . $platformColors['footer']
+        . ';--db-footer-text:' . $platformColors['footer_text']
+        . ';--db-footer-border:' . $platformColors['footer_border']
+        . ';--db-footer-link:' . $platformColors['footer_link']
+        . ';--db-footer-link-hover:' . $platformColors['footer_link_hover']
         . ';--db-menu-color:' . $platformColors['menu']
         . ';--db-background:' . $platformColors['background']
         . ';--db-surface:' . $platformColors['surface']
