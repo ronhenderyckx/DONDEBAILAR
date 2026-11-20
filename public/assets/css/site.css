@@ -1436,3 +1436,29 @@ body.platform-admin-page {
         width: 100%;
     }
 }
+
+
+/* Houd invoervelden op de instellingenpagina compact in plaats van paginabreed. */
+.platform-admin-page .settings-page .auth-form {
+    max-width: 520px;
+}
+.platform-admin-page .settings-page .auth-form input:not([type="checkbox"]),
+.platform-admin-page .settings-page .auth-form select,
+.platform-admin-page .settings-page .auth-form textarea {
+    width: 100%;
+    max-width: 340px;
+}
+.platform-admin-page .settings-page .auth-form input[type="file"] {
+    max-width: 420px;
+}
+@media (max-width: 600px) {
+    .platform-admin-page .settings-page .auth-form {
+        max-width: 100%;
+    }
+    .platform-admin-page .settings-page .auth-form input:not([type="checkbox"]),
+    .platform-admin-page .settings-page .auth-form select,
+    .platform-admin-page .settings-page .auth-form textarea,
+    .platform-admin-page .settings-page .auth-form input[type="file"] {
+        max-width: 100%;
+    }
+}
