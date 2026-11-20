@@ -13,10 +13,6 @@
         const accent = color('accent', '#00AFC5');
         const header = color('header', '#FFFFFF');
         const footer = color('footer', '#FFFFFF');
-        const footerText = color('footer_text', muted);
-        const footerBorder = color('footer_border', border);
-        const footerLink = color('footer_link', primary);
-        const footerLinkHover = color('footer_link_hover', dark);
         const text = color('text', '#202B38');
         const menu = color('menu', '#FFFFFF');
         const menuText = color('menu_text', text);
@@ -26,6 +22,10 @@
         const surface = color('surface', '#FFFFFF');
         const muted = color('muted', '#687586');
         const border = color('border', '#E7EAF0');
+        const footerText = color('footer_text', muted);
+        const footerBorder = color('footer_border', border);
+        const footerLink = color('footer_link', primary);
+        const footerLinkHover = color('footer_link_hover', dark);
         const listHeaderBg = color('list_header_bg', '#F1F3F6');
         const listHeaderText = color('list_header_text', muted);
         const listRowBg = color('list_row_bg', surface);
@@ -209,6 +209,14 @@
 
         // Werk het voorbeeld onmiddellijk bij terwijl de kleurkiezer wordt bediend.
         applyPreviewColors();
+    }
+
+    const footerTextInput = document.getElementById('platform-footer-text');
+    const footerTextPreview = document.getElementById('preview-footer-text');
+    if (footerTextInput && footerTextPreview) {
+        footerTextInput.addEventListener('input', function () {
+            footerTextPreview.textContent = footerTextInput.value || 'Voorbeeld voettekst — DONDEBAILAR';
+        });
     }
 
     // Gebruik eventdelegatie zodat iedere kleurkiezer direct reageert.
