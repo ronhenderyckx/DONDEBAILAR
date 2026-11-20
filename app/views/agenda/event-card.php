@@ -150,7 +150,7 @@
                                 </div>
                             <?php endif; ?>
                             <?php if ($hasMoreInfo): ?>
-                                <p class="agenda-card__swipe-hint" data-swipe-hint>← SWIPE VOOR MEER INFO</p>
+                                <p class="agenda-card__swipe-hint" data-swipe-hint>→ Swipe voor meer info</p>
                             <?php endif; ?>
                         </div>
 
