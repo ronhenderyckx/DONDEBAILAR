@@ -3847,11 +3847,13 @@ body.has-agenda-footer .site-main > .agenda-page {
 
 /* Geannuleerde evenementen: zachte, transparante dagkleur-banner.
    Regenannulering krijgt daarnaast zichtbare regendruppels op de kaart. */
-.agenda-feed > .agenda-card.agenda-card--cancelled {
+.agenda-feed > .agenda-card.agenda-card--cancelled,
+.agenda-feed > .agenda-card.agenda-card--archived {
     position:relative!important;
     isolation:isolate;
 }
-.agenda-feed > .agenda-card.agenda-card--cancelled::after {
+.agenda-feed > .agenda-card.agenda-card--cancelled::after,
+.agenda-feed > .agenda-card.agenda-card--archived::after {
     content:"GEANNULEERD";
     position:absolute;
     z-index:50;
@@ -3871,6 +3873,9 @@ body.has-agenda-footer .site-main > .agenda-page {
     text-align:center;
     text-shadow:0 1px 2px rgba(255,255,255,.45);
     pointer-events:none;
+}
+.agenda-feed > .agenda-card.agenda-card--archived::after {
+    content:"GEARCHIVEERD";
 }
 .agenda-feed > .agenda-card.agenda-card--cancelled-rain::after {
     content:"GEANNULEERD WEGENS REGEN";
@@ -3892,19 +3897,22 @@ body.has-agenda-footer .site-main > .agenda-page {
 
 @media (max-width:700px) {
     /* Alle smartphone-annuleringsbanners staan als diagonale strook onder de media. */
-    .agenda-feed > .agenda-card.agenda-card--cancelled::after {
+    .agenda-feed > .agenda-card.agenda-card--cancelled::after,
+    .agenda-feed > .agenda-card.agenda-card--archived::after {
         display:none;
     }
-    .agenda-card__cancelled-label {
+    /* De diagonale banner loopt van de swipehoek linksonder naar de titel rechtsboven. */
+    .agenda-feed > .agenda-card .agenda-card__cancelled-label {
         display:block;
-        position:relative;
+        position:absolute;
         z-index:50;
-        order:2 !important;
-        left:-25%;
-        width:150%;
-        margin:54px -25% 54px !important;
+        right:auto;
+        bottom:18px;
+        left:-15%;
+        width:130%;
+        margin:0 !important;
         padding:9px 4px;
-        transform:rotate(-38deg);
+        transform:rotate(-25deg);
         transform-origin:center center;
         background:color-mix(in srgb,var(--db-event-day-color,#777777) 55%,transparent);
         color:var(--db-event-day-title-color,#222222);
