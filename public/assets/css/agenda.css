@@ -3754,15 +3754,17 @@ body.has-agenda-footer .site-main > .agenda-page {
     .agenda-card > .agenda-card__details > .agenda-card__hashtags {
         order: 4 !important;
     }
-    .agenda-card > .agenda-card__quick {
+    /* Bij openen komt alle extra informatie tussen hashtags en iconen. */
+    .agenda-card > .agenda-card__details > .agenda-card__description {
         order: 5 !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__swipe-hint {
+    .agenda-card > .agenda-card__quick {
         order: 6 !important;
     }
-    /* Uitklapbare extra informatie altijd onderaan de kaart tonen. */
-    .agenda-card > .agenda-card__details > .agenda-card__description {
+    .agenda-card > .agenda-card__details > .agenda-card__swipe-hint {
         order: 7 !important;
+    }
+/*
         width: auto !important;
         min-width: 0 !important;
     }
