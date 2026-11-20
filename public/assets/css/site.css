@@ -2047,3 +2047,34 @@ body.platform-admin-page {
     background: var(--db-menu-hover-bg, #F3F6F9) !important;
     color: var(--db-menu-hover-text, var(--db-primary)) !important;
 }
+
+
+/* Platformbeheer: lijstacties en statuslabels volgen ook de centrale kleurinstellingen. */
+.platform-admin-page .admin-table .button,
+.platform-admin-page .admin-table button.button {
+    background: var(--db-action-button, var(--db-form-button-bg, var(--db-primary))) !important;
+    border-color: var(--db-action-button, var(--db-form-button-bg, var(--db-primary))) !important;
+    color: var(--db-action-button-text, #FFFFFF) !important;
+}
+.platform-admin-page .admin-table .button:hover,
+.platform-admin-page .admin-table button.button:hover {
+    background: var(--db-action-hover-bg, var(--db-primary-dark)) !important;
+    border-color: var(--db-action-hover-bg, var(--db-primary-dark)) !important;
+    color: var(--db-action-hover-text, #FFFFFF) !important;
+}
+.platform-admin-page .admin-table .status-active,
+.platform-admin-page .status-active {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--db-status-active-bg, #EAF7F0) !important;
+    color: var(--db-status-active-text, #16845B) !important;
+}
+.platform-admin-page .admin-table .status-inactive,
+.platform-admin-page .status-inactive {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 999px;
+    background: var(--db-status-inactive-bg, #F0F1F3) !important;
+    color: var(--db-status-inactive-text, #68717C) !important;
+}
