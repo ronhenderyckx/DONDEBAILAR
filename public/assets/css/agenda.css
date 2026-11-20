@@ -3891,12 +3891,40 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-card__cancelled-label { display:none; }
 
 @media (max-width:700px) {
-    /* Smartphone gebruikt dezelfde diagonale banner over de volledige kaart als pc. */
+    /* Smartphone: banner onder de media, dus nooit over de afbeelding/video. */
     .agenda-feed > .agenda-card.agenda-card--cancelled::after {
-        display:block;
+        display:none;
     }
     .agenda-card__cancelled-label {
-        display:none !important;
+        display:block;
+        position:relative;
+        z-index:50;
+        order:2 !important;
+        width:calc(100% + 32px);
+        margin:2px -16px 12px !important;
+        padding:9px 4px;
+        transform:rotate(-4deg);
+        background:color-mix(in srgb,var(--db-event-day-color,#777777) 55%,transparent);
+        color:var(--db-event-day-title-color,#222222);
+        font-size:clamp(17px,4.5vw,23px);
+        font-weight:900;
+        letter-spacing:.1em;
+        line-height:1.2;
+        text-align:center;
+        box-sizing:border-box;
+        pointer-events:none;
+    }
+    /* Zonder media ligt dezelfde diagonale banner over de kaart. */
+    .agenda-card:has(.agenda-card__placeholder) .agenda-card__cancelled-label {
+        position:absolute;
+        top:50%;
+        left:-25%;
+        width:150%;
+        margin:0 !important;
+        padding:10px 0;
+        transform:translateY(-50%) rotate(-38deg);
+        font-size:clamp(22px,6vw,34px);
+        letter-spacing:.12em;
     }
     .agenda-card__rain-drop {
         font-size:clamp(60px,15vw,76px);
