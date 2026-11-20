@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $eventId = filter_var($_GET['event_id'] ?? null, FILTER_VALIDATE_INT);
 }
 if (!$eventId || $eventId < 1) { http_response_code(400); echo json_encode(['ok'=>false,'message'=>'Ongeldig evenement.']); exit; }
-$checkEvent = $db->prepare("SELECT id FROM events WHERE id = ? AND status = 'published' LIMIT 1");
+$checkEvent = $db->prepare("SELECT id FROM events WHERE id = ? AND status IN ('published','cancelled','cancelled_rain') LIMIT 1");
 $checkEvent->execute([$eventId]);
 if (!$checkEvent->fetchColumn()) { http_response_code(404); echo json_encode(['ok'=>false,'message'=>'Evenement niet gevonden.']); exit; }
 
