@@ -51,5 +51,5 @@ $escape = static fn ($value): string => htmlspecialchars((string) $value, ENT_QU
         <?php endif; ?>
     </nav>
 </header>
-<link rel="stylesheet" href="/assets/css/site.css">
+<link rel="stylesheet" href="/assets/css/site.css?v=20261120-mobile-order-1">
 <main class="site-main">
