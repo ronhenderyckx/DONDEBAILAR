@@ -490,12 +490,25 @@ if (!$embeddedRegionAppearanceEditor) {
                         <input aria-label="Zoeken" value="Zoek evenement..." readonly data-preview="search-field">
                         <button type="button" data-preview="search-button">⌕</button>
                     </div>
-                    <div class="region-preview-calendar" aria-label="Weekdagen">
-                        <?php foreach (['MA','DI','WO','DO','VR','ZA','ZO'] as $i => $day): ?>
-                            <div class="region-preview-calendar-day" data-preview-day="<?= $i ?>"><strong><?= $day ?></strong><span><?= 16 + $i ?></span></div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="region-preview-events">
+                    <div class="region-preview-workarea">
+                        <div class="region-preview-weekday-controls" aria-label="Weekdagkleuren instellen">
+                            <h3>Weekdagen en kleuren</h3>
+                            <?php foreach (['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag','Zondag'] as $i => $day): ?>
+                                <div class="region-preview-weekday-row">
+                                    <strong><?= $day ?></strong>
+                                    <label for="weekday_<?= $i ?>">Achtergrond
+                                        <input form="region-colors-form" type="color" id="weekday_<?= $i ?>" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>">
+                                    </label>
+                                    <label for="weekday_text_<?= $i ?>">Dagtekst
+                                        <input form="region-colors-form" type="color" id="weekday_text_<?= $i ?>" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>">
+                                    </label>
+                                    <label for="weekday_title_<?= $i ?>">Titel
+                                        <input form="region-colors-form" type="color" id="weekday_title_<?= $i ?>" name="weekday_title_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTitleColors[$i]) ?>">
+                                    </label>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                        <div class="region-preview-events">
                         <h3 class="agenda-day-heading" data-preview="day-heading">VIERNES 20 NOVIEMBRE 2026</h3>
                         <article class="agenda-card region-preview-agenda-card" data-preview="event" style="--db-event-day-color:var(--db-weekday-5,var(--db-primary));--db-event-day-text-color:var(--db-weekday-text-5,#222);--db-event-day-title-color:var(--db-weekday-title-5,#222)">
                             <div class="agenda-card__media-wrap">
@@ -531,7 +544,7 @@ if (!$embeddedRegionAppearanceEditor) {
                 </div>
             </div>
         </section>
-        <form method="post" enctype="multipart/form-data" class="auth-form" action="<?= $embeddedRegionAppearanceEditor ? '/admin/region-edit.php?id=' . (int) $regionId : '/admin/region-colors.php?region_id=' . (int) $regionId ?>">
+        <form id="region-colors-form" method="post" enctype="multipart/form-data" class="auth-form" action="<?= $embeddedRegionAppearanceEditor ? '/admin/region-edit.php?id=' . (int) $regionId : '/admin/region-colors.php?region_id=' . (int) $regionId ?>">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <?php if ($embeddedRegionAppearanceEditor): ?><input type="hidden" name="save_appearance" value="1"><?php endif; ?>
             <h2>Basiskleuren</h2>
@@ -574,36 +587,6 @@ if (!$embeddedRegionAppearanceEditor) {
             <p>Kies de kleur van de horizontale lijn onder de evenementenkaarten.</p>
             <div class="region-color-grid">
                 <label class="region-color-field" for="event_separator_color"><span>Kleur scheidingslijn</span><input type="color" id="event_separator_color" name="event_separator_color" value="<?= escapeHtml($separatorColor) ?>"><code><?= escapeHtml($separatorColor) ?></code></label>
-            </div>
-            <h2>Weekdagen</h2>
-            <p>Stel per weekdag de achtergrondkleur, de dagtekstkleur en de tekstkleur van de evenementtitel afzonderlijk in.</p>
-            <div class="region-weekday-grid">
-            <?php foreach (['Maandag','Dinsdag','Woensdag','Donderdag','Vrijdag','Zaterdag','Zondag'] as $i => $day): ?>
-                <div class="region-weekday-card">
-                    <strong><?= $day ?></strong>
-                    <div class="region-weekday-setting">
-                        <label for="weekday_<?= $i ?>">Achtergrondkleur</label>
-                        <div class="region-weekday-color">
-                            <input type="color" id="weekday_<?= $i ?>" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>">
-                            <code><?= escapeHtml($weekdayColors[$i]) ?></code>
-                        </div>
-                    </div>
-                    <div class="region-weekday-setting">
-                        <label for="weekday_text_<?= $i ?>">Tekstkleur dag</label>
-                        <div class="region-weekday-color">
-                            <input type="color" id="weekday_text_<?= $i ?>" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>">
-                            <code><?= escapeHtml($weekdayTextColors[$i]) ?></code>
-                        </div>
-                    </div>
-                    <div class="region-weekday-setting">
-                        <label for="weekday_title_<?= $i ?>">Tekstkleur evenementtitel</label>
-                        <div class="region-weekday-color">
-                            <input type="color" id="weekday_title_<?= $i ?>" name="weekday_title_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTitleColors[$i]) ?>">
-                            <code><?= escapeHtml($weekdayTitleColors[$i]) ?></code>
-                        </div>
-                    </div>
-                </div>
-            <?php endforeach; ?>
             </div>
             <h2>Footer en footerknoppen</h2>
             <p>Alle kleuren die bij de footer horen staan hier samen. Je kunt de achtergrond van de footer en knoppen apart instellen van de kleur van de pictogrammen.</p>
@@ -707,8 +690,17 @@ if (!$embeddedRegionAppearanceEditor) {
  .region-weekday-color input[type=color]{width:29px;height:27px}
  .region-weekday-color code{font-size:9px}
 }
-@media(max-width:520px){.region-agenda-live-preview{padding:10px}.region-preview-topbar{padding:9px}.region-preview-agenda{padding:8px}.region-preview-agenda-card .agenda-card__media-wrap,.region-preview-agenda-card .agenda-card__placeholder{height:100px;min-height:100px}.region-preview-agenda-card .agenda-card__details{padding:10px}.region-preview-calendar{gap:2px}.region-preview-calendar-day{padding:6px 1px}}
+@media(max-width:520px){.region-preview-workarea{display:grid;grid-template-columns:minmax(340px,0.9fr) minmax(0,1.1fr);gap:14px;align-items:start}
+.region-preview-weekday-controls{padding:12px;border:1px solid #e1e5eb;border-radius:9px;background:#fff}
+.region-preview-weekday-controls>h3{margin:0 0 9px;font-size:15px;color:#222}
+.region-preview-weekday-row{display:grid;grid-template-columns:minmax(82px,1fr) repeat(3,58px);align-items:center;gap:6px;padding:6px 0;border-top:1px solid #edf0f4}
+.region-preview-weekday-row>strong{font-size:12px;color:#222}
+.region-preview-weekday-row>label{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;line-height:1.1;color:#596273}
+.region-preview-weekday-row input[type=color]{width:42px;height:30px;padding:2px;border:1px solid #d5dbe3;border-radius:6px;background:#fff;cursor:pointer}
+.region-agenda-live-preview{padding:10px}.region-preview-topbar{padding:9px}.region-preview-agenda{padding:8px}.region-preview-agenda-card .agenda-card__media-wrap,.region-preview-agenda-card .agenda-card__placeholder{height:100px;min-height:100px}.region-preview-agenda-card .agenda-card__details{padding:10px}.region-preview-calendar{gap:2px}.region-preview-calendar-day{padding:6px 1px}}
 
+@media(max-width:900px){.region-preview-workarea{grid-template-columns:1fr}}
+@media(max-width:520px){.region-preview-weekday-controls{padding:8px}.region-preview-weekday-row{grid-template-columns:minmax(75px,1fr) repeat(3,52px);gap:3px}.region-preview-weekday-row>strong{font-size:11px}.region-preview-weekday-row>label{font-size:9px}.region-preview-weekday-row input[type=color]{width:36px;height:28px}}
 </style>
 <script>
 (function(){
@@ -729,8 +721,6 @@ if (!$embeddedRegionAppearanceEditor) {
   paint("[data-preview=strip]","background-color",strip); paint("[data-preview=filter-text]","color",stripText);
   paint("[data-preview=search-field]","background-color",value("search_field_color","#FFFFFF")); paint("[data-preview=search-field]","color",value("search_text_color","#222222"));
   paint("[data-preview=search-button]","background-color",search); paint("[data-preview=search-button]","color","#FFFFFF");
-  paint(".region-preview-calendar-day","background-color",value("weekday_colors[0]","#F6D84A"));
-  root.querySelectorAll(".region-preview-calendar-day").forEach((el,i)=>{el.style.setProperty("background-color",value("weekday_colors["+i+"]","#F6D84A"),"important");el.style.setProperty("color",value("weekday_text_colors["+i+"]","#222222"),"important")});
   const days=[5,6];
   root.querySelectorAll("[data-preview=event],[data-preview=event-second]").forEach((card,index)=>{
     const day=days[index]; const bgColor=value("weekday_colors["+day+"]",index===0?"#E78AAE":"#F49A45");
@@ -751,7 +741,7 @@ if (!$embeddedRegionAppearanceEditor) {
   paint("[data-preview=back-top]","background-color",back); paint("[data-preview=back-top]","color","#FFFFFF");
   root.querySelectorAll(".region-color-field input[type=color],.region-weekday-color input[type=color]").forEach(input=>{const code=input.parentElement.querySelector("code");if(code)code.textContent=input.value.toUpperCase()});
  }
- document.querySelectorAll(".auth-form input[type=color]").forEach(input=>{input.addEventListener("input",update);input.addEventListener("change",update)});
+ document.querySelectorAll(".auth-form input[type=color], #region-agenda-live-preview input[type=color]").forEach(input=>{input.addEventListener("input",update);input.addEventListener("change",update)});
  update();
 })();
 </script>
