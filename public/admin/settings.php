@@ -275,7 +275,7 @@ require $privateRoot . '/app/views/header.php';
                         </div>
                         <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
                             <span id="preview-primary-button" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Opslaan</span><label class="preview-color-choice"><span>Knoppen</span><input type="color" data-preview-color="primary" value="<?= escapeHtml($platformAdminColors['primary']) ?>" aria-label="Primaire kleur"></label>
-                            <span id="preview-hover-button" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['primary_dark']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Knop bij aanwijzen</span><label class="preview-color-choice"><span>Hover</span><input type="color" data-preview-color="primary_dark" value="<?= escapeHtml($platformAdminColors['primary_dark']) ?>" aria-label="Donkere primaire kleur"></label>
+                            <span id="preview-hover-button" role="button" tabindex="0" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;transition:background .15s ease">Beweeg muis hier</span><label class="preview-color-choice"><span>Hover</span><input type="color" data-preview-color="primary_dark" value="<?= escapeHtml($platformAdminColors['primary_dark']) ?>" aria-label="Donkere primaire kleur"></label>
                             <span id="preview-accent" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['accent']) ?>;color:#202B38;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Accent</span><label class="preview-color-choice"><span>Accent</span><input type="color" data-preview-color="accent" value="<?= escapeHtml($platformAdminColors['accent']) ?>" aria-label="Accentkleur"></label>
                         </div>
                     </div>
@@ -404,6 +404,33 @@ require $privateRoot . '/app/views/header.php';
 (function () {
     const preview = document.getElementById('platform-color-preview');
     if (!preview) return;
+
+    // Laat de voorbeeldknop en actielinks de echte hoverkleur gebruiken.
+    const hoverButton = preview.querySelector('#preview-hover-button');
+    const applyHover = function (element, hovering) {
+        if (!element) return;
+        element.style.backgroundColor = hovering
+            ? (preview.querySelector('[data-preview-color="primary_dark"]')?.value || '#083B79')
+            : (preview.querySelector('[data-preview-color="primary"]')?.value || '#0A4D9F');
+    };
+    if (hoverButton) {
+        hoverButton.addEventListener('mouseenter', function () { applyHover(hoverButton, true); });
+        hoverButton.addEventListener('mouseleave', function () { applyHover(hoverButton, false); });
+        hoverButton.addEventListener('focus', function () { applyHover(hoverButton, true); });
+        hoverButton.addEventListener('blur', function () { applyHover(hoverButton, false); });
+    }
+    preview.querySelectorAll('#preview-admin-list td:last-child span').forEach(function (action) {
+        action.style.cursor = 'pointer';
+        action.style.transition = 'background .15s ease, color .15s ease';
+        action.addEventListener('mouseenter', function () {
+            action.style.backgroundColor = preview.querySelector('[data-preview-color="primary_dark"]')?.value || '#083B79';
+            action.style.color = '#FFFFFF';
+        });
+        action.addEventListener('mouseleave', function () {
+            action.style.backgroundColor = 'transparent';
+            action.style.color = preview.querySelector('[data-preview-color="primary"]')?.value || '#0A4D9F';
+        });
+    });
 
     const targets = {
         primary: ['preview-primary-button'],
