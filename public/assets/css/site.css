@@ -1135,3 +1135,80 @@ body.has-agenda-footer .site-footer--agenda .agenda-footer-tools form.agenda-foo
 .site-brand__logo{width:auto;max-width:140px;max-height:38px;object-fit:contain}
 .site-brand__region-logo{max-width:110px;max-height:34px}
 .site-brand__region-name{display:inline-block!important;visibility:visible!important;white-space:nowrap}
+
+
+/* Platformbeheer: gebruik de volledige, centraal opgeslagen kleurinstellingen. */
+.platform-admin-page .admin-section {
+    background: var(--db-surface, #FFFFFF);
+    border-color: var(--db-border, #E7EAF0);
+    color: var(--db-text, #202B38);
+}
+.platform-admin-page .admin-section .section-heading,
+.platform-admin-page .admin-section h2,
+.platform-admin-page .admin-section h3 {
+    color: var(--db-text, #202B38);
+}
+.platform-admin-page .admin-section p,
+.platform-admin-page .admin-heading p:not(.eyebrow) {
+    color: var(--db-muted, #687586);
+}
+.platform-admin-page .auth-form {
+    box-sizing: border-box;
+    padding: 18px;
+    border: 1px solid var(--db-border, #E7EAF0);
+    border-radius: 10px;
+    background: var(--db-form-panel-bg, #F7F8FA);
+    color: var(--db-form-label-text, #202B38);
+}
+.platform-admin-page .auth-form label {
+    color: var(--db-form-label-text, #202B38);
+}
+.platform-admin-page .auth-form input:not([type="checkbox"]),
+.platform-admin-page .auth-form select,
+.platform-admin-page .auth-form textarea {
+    border-color: var(--db-form-input-border, #E7EAF0);
+    background: var(--db-form-input-bg, #FFFFFF);
+    color: var(--db-form-input-text, #202B38);
+}
+.platform-admin-page .auth-form input:not([type="checkbox"]):hover,
+.platform-admin-page .auth-form select:hover,
+.platform-admin-page .auth-form textarea:hover,
+.platform-admin-page .auth-form input:not([type="checkbox"]):focus,
+.platform-admin-page .auth-form select:focus,
+.platform-admin-page .auth-form textarea:focus {
+    border-color: var(--db-form-input-hover-border, var(--db-primary, #0A4D9F));
+}
+.platform-admin-page .auth-form input[type="checkbox"] {
+    accent-color: var(--db-form-button-bg, var(--db-primary, #0A4D9F));
+}
+.platform-admin-page .auth-form button[type="submit"],
+.platform-admin-page .admin-heading > .button,
+.platform-admin-page .auth-form .button {
+    border-color: var(--db-form-button-bg, var(--db-primary, #0A4D9F));
+    background: var(--db-form-button-bg, var(--db-primary, #0A4D9F));
+    color: var(--db-form-button-text, #FFFFFF);
+}
+.platform-admin-page .auth-form button[type="submit"]:hover,
+.platform-admin-page .admin-heading > .button:hover,
+.platform-admin-page .auth-form .button:hover {
+    border-color: var(--db-form-button-hover-bg, var(--db-primary-dark, #083B79));
+    background: var(--db-form-button-hover-bg, var(--db-primary-dark, #083B79));
+    color: var(--db-form-button-hover-text, #FFFFFF);
+}
+.platform-admin-page .admin-table {
+    color: var(--db-list-text, var(--db-text, #202B38));
+}
+.platform-admin-page .admin-table thead th {
+    background: var(--db-list-header-bg, #F1F3F6);
+    color: var(--db-list-header-text, #687586);
+}
+.platform-admin-page .admin-table tbody tr {
+    background: var(--db-list-row-bg, #FFFFFF);
+}
+.platform-admin-page .admin-table tbody tr:hover {
+    background: var(--db-list-hover-bg, var(--db-primary-dark, #083B79));
+}
+.platform-admin-page .admin-table tbody tr:hover > td,
+.platform-admin-page .admin-table tbody tr:hover > td a:not(.button) {
+    color: var(--db-list-hover-text, #FFFFFF);
+}
