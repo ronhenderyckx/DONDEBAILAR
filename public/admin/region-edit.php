@@ -140,6 +140,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['save_appearance'])) {
 require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 
+<style>
+#region-edit-form {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 22px;
+    row-gap: 8px;
+    align-items: end;
+    padding: 18px;
+}
+#region-edit-form .region-form-field {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+#region-edit-form .region-form-field label {
+    margin: 0;
+}
+#region-edit-form .region-form-field input,
+#region-edit-form .region-form-field select {
+    min-height: 40px;
+}
+#region-edit-form .region-form-wide {
+    grid-column: 1 / -1;
+}
+#region-edit-form .checkbox-label {
+    margin: 8px 0 0;
+}
+#region-edit-form .form-actions {
+    margin-top: 12px;
+    gap: 8px;
+}
+@media (max-width: 760px) {
+    #region-edit-form {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 7px;
+        padding: 16px;
+    }
+    #region-edit-form .region-form-wide {
+        grid-column: auto;
+    }
+}
+</style>
+
 <section class="admin-page region-edit-page">
     <div class="admin-heading">
         <div>
@@ -159,29 +203,36 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 
         <form method="post"
               action="/admin/region-edit.php?id=<?= (int) $regionId ?>"
-              class="auth-form">
+              class="auth-form" id="region-edit-form">
 
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
 
-            <label for="name">Naam van de regio</label>
-            <input type="text" id="name" name="name" maxlength="150"
-                   value="<?= escapeHtml($form['name']) ?>" required>
-
-            <label for="subdomain">Subdomein</label>
-            <div class="input-with-suffix">
-                <input type="text" id="subdomain" name="subdomain" maxlength="100"
-                       pattern="[a-z0-9-]{2,100}"
-                       value="<?= escapeHtml($form['subdomain']) ?>" required>
-                <span>.dondebailar.eu</span>
+            <div class="region-form-field">
+                <label for="name">Naam van de regio</label>
+                <input type="text" id="name" name="name" maxlength="150"
+                       value="<?= escapeHtml($form['name']) ?>" required>
             </div>
 
-            <label for="country_code">Landcode</label>
-            <input type="text" id="country_code" name="country_code"
-                   minlength="2" maxlength="2" pattern="[A-Z]{2}"
-                   value="<?= escapeHtml($form['country_code']) ?>" required>
+            <div class="region-form-field">
+                <label for="subdomain">Subdomein</label>
+                <div class="input-with-suffix">
+                    <input type="text" id="subdomain" name="subdomain" maxlength="100"
+                           pattern="[a-z0-9-]{2,100}"
+                           value="<?= escapeHtml($form['subdomain']) ?>" required>
+                    <span>.dondebailar.eu</span>
+                </div>
+            </div>
 
-            <label for="timezone">Tijdzone</label>
-            <select id="timezone" name="timezone" required>
+            <div class="region-form-field">
+                <label for="country_code">Landcode</label>
+                <input type="text" id="country_code" name="country_code"
+                       minlength="2" maxlength="2" pattern="[A-Z]{2}"
+                       value="<?= escapeHtml($form['country_code']) ?>" required>
+            </div>
+
+            <div class="region-form-field">
+                <label for="timezone">Tijdzone</label>
+                <select id="timezone" name="timezone" required>
                 <?php foreach ([
                     'Europe/Madrid', 'Europe/Brussels', 'Europe/Amsterdam',
                     'Europe/Paris', 'Europe/London', 'Europe/Berlin',
@@ -192,23 +243,26 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                         <?= escapeHtml($timezone) ?>
                     </option>
                 <?php endforeach; ?>
-            </select>
+                </select>
+            </div>
 
-            <label for="default_language">Standaardtaal</label>
-            <select id="default_language" name="default_language" required>
+            <div class="region-form-field">
+                <label for="default_language">Standaardtaal</label>
+                <select id="default_language" name="default_language" required>
                 <option value="nl" <?= $form['default_language'] === 'nl' ? 'selected' : '' ?>>Nederlands</option>
                 <option value="en" <?= $form['default_language'] === 'en' ? 'selected' : '' ?>>English</option>
                 <option value="es" <?= $form['default_language'] === 'es' ? 'selected' : '' ?>>Español</option>
                 <option value="fr" <?= $form['default_language'] === 'fr' ? 'selected' : '' ?>>Français</option>
-            </select>
+                </select>
+            </div>
 
-            <label class="checkbox-label">
+            <label class="checkbox-label region-form-wide">
                 <input type="checkbox" name="is_active" value="1"
                     <?= $form['is_active'] === '1' ? 'checked' : '' ?>>
                 Regio actief
             </label>
 
-            <div class="form-actions">
+            <div class="form-actions region-form-wide">
                 <button type="submit" class="button button--primary">Wijzigingen opslaan</button>
                 <a class="button" href="/admin/regions.php">Annuleren</a>
             </div>
