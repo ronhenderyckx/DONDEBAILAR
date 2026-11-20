@@ -528,7 +528,7 @@ if (!$embeddedRegionAppearanceEditor) {
                                     <label for="weekday_text_<?= $i ?>">Tekstkleur
                                         <input form="region-colors-form" type="color" id="weekday_text_<?= $i ?>" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>">
                                     </label>
-                                    <label for="weekday_title_<?= $i ?>">Tit kleur
+                                    <label for="weekday_title_<?= $i ?>">Titelkleur
                                         <input form="region-colors-form" type="color" id="weekday_title_<?= $i ?>" name="weekday_title_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTitleColors[$i]) ?>">
                                     </label>
                                 </div>
