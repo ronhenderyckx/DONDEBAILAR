@@ -3,6 +3,7 @@
 ?>
                     <?php $eventStatus = (string) ($event['status'] ?? 'published'); ?>
                     <article<?= !empty($eventIsAgendaStart) ? ' id="agenda-today-start"' : '' ?> class="agenda-card<?= !empty($eventIsPast) ? ' agenda-card--past' : '' ?><?= $eventStatus === 'cancelled' ? ' agenda-card--cancelled' : '' ?><?= $eventStatus === 'cancelled_rain' ? ' agenda-card--cancelled agenda-card--cancelled-rain' : '' ?>" style="--db-event-day-color:<?= !empty($eventIsPast) ? $escape($pastEventColor) : 'var(--db-weekday-' . (int) $start->format('N') . ',var(--db-primary))' ?>;--db-event-day-text-color:<?= !empty($eventIsPast) ? $escape($pastEventTextColor) : 'var(--db-weekday-text-' . (int) $start->format('N') . ',#222222)' ?>;--db-event-day-title-color:<?= !empty($eventIsPast) ? $escape($pastEventTextColor) : 'var(--db-weekday-title-' . (int) $start->format('N') . ',#222222)' ?>">
+                        <?php if ($eventStatus === 'cancelled_rain'): ?><span class="agenda-card__rain-drop agenda-card__rain-drop--top-left" aria-hidden="true">💧</span><span class="agenda-card__rain-drop agenda-card__rain-drop--bottom-right" aria-hidden="true">💧</span><?php endif; ?>
                         <div class="agenda-card__media-wrap">
                         <?php $eventMediaItems = $event['media_items'] ?? []; ?>
                         <?php if (count($eventMediaItems) > 1): ?>
