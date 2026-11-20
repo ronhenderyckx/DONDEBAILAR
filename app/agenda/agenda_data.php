@@ -183,7 +183,7 @@ if ($regionId > 0) {
         $city = '';
     }
 
-    $sql = "SELECT e.id, e.title, e.description, e.hashtags, e.starts_at, e.ends_at,
+    $sql = "SELECT e.id, e.title, e.description, e.hashtags, e.presale_price, e.door_price, e.starts_at, e.ends_at,
                    e.event_language, c.name AS category_name,
                    o.name AS organizer_name, o.phone AS organizer_phone, o.logo_path AS organizer_logo_path,
                    l.name AS location_name,
