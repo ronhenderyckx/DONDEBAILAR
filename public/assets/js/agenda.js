@@ -68,7 +68,7 @@ function setEventDescription(info, show) {
     const hint = info.querySelector('[data-swipe-hint]');
     if (hint) {
         hint.dataset.label = show ? 'Minder info' : 'Meer info';
-        hint.dataset.arrow = show ? '←' : '→';
+        hint.dataset.arrow = show ? '→' : '←';
         hint.setAttribute('aria-label', show ? 'Minder info' : 'Meer info');
     }
 }
