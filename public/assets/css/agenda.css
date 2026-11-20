@@ -3757,20 +3757,24 @@ body.has-agenda-footer .site-main > .agenda-page {
         order: 3 !important;
         margin: 4px 16px 7px !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__hashtags {
+    .agenda-card > .agenda-card__details > .agenda-card__prices {
         order: 4 !important;
+        margin: 0 16px 7px !important;
+    }
+    .agenda-card > .agenda-card__details > .agenda-card__hashtags {
+        order: 5 !important;
     }
     /* Bij openen komt alle extra informatie tussen hashtags en iconen. */
     .agenda-card > .agenda-card__details > .agenda-card__description {
-        order: 5 !important;
+        order: 6 !important;
         width: auto !important;
         min-width: 0 !important;
     }
     .agenda-card > .agenda-card__quick {
-        order: 6 !important;
+        order: 7 !important;
     }
     .agenda-card > .agenda-card__details > .agenda-card__swipe-hint {
-        order: 7 !important;
+        order: 8 !important;
     }
 }
 
