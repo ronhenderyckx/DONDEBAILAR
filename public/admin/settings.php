@@ -385,7 +385,7 @@ require $privateRoot . '/app/views/header.php';
                 <p>Deze limiet geldt voor nieuwe en gewijzigde evenementen in alle regio's. Een einde om 24:00 (middernacht) op de startdag valt buiten deze limiet. Als geen eindtijd wordt ingevuld, eindigt het evenement automatisch om 24:00.</p>
             </div>
         </div>
-        <form method="post" action="/admin/settings.php" class="auth-form">
+        <form method="post" action="/admin/settings.php" class="auth-form event-duration-settings-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="max_event_duration_hours">Maximale duur (1–168 uur)</label>
             <div style="max-width:180px">
