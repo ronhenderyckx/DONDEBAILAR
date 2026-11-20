@@ -194,7 +194,7 @@ $themeStyle = '--db-primary:' . $primaryColor
 
 // Alleen expliciet gemarkeerde platformbeheerpagina's gebruiken de platformmenukleur.
 // Regiobeheer, openbare pagina's en gedeelde beheerpagina's behouden hun eigen kleur.
-$isPlatformAdminPage = !empty($platformAdminPage) && $isAdmin;
+$isPlatformAdminPage = !empty($platformAdminPage);
 if ($isPlatformAdminPage) {
     $platformColors = [
         'primary' => '#0A4D9F',
