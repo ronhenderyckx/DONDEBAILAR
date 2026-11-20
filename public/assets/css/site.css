@@ -485,26 +485,18 @@ p {
     color: #FFFFFF;
 }
 
-/* Afzonderlijke kleuren voor terug- en opslagknoppen in platformbeheer. */
-.platform-admin-page .admin-heading > a.button:not(.button--primary) {
-    border-color: var(--db-back-button-bg, var(--db-border));
-    background: var(--db-back-button-bg, #FFFFFF);
-    color: var(--db-back-button-text, var(--db-text));
+/* Terug- en opslagknoppen gebruiken dezelfde centrale knopkleuren. */
+.platform-admin-page .admin-heading > a.button,
+.platform-admin-page .form-actions > .button {
+    border-color: var(--db-form-button-bg, var(--db-primary));
+    background: var(--db-form-button-bg, var(--db-primary));
+    color: var(--db-form-button-text, #FFFFFF);
 }
-.platform-admin-page .admin-heading > a.button:not(.button--primary):hover {
-    border-color: var(--db-back-button-bg, var(--db-border));
-    background: var(--db-back-button-bg, #FFFFFF);
-    color: var(--db-back-button-text, var(--db-text));
-}
-.platform-admin-page .form-actions > .button--primary {
-    border-color: var(--db-save-button-bg, var(--db-primary));
-    background: var(--db-save-button-bg, var(--db-primary));
-    color: var(--db-save-button-text, #FFFFFF);
-}
-.platform-admin-page .form-actions > .button--primary:hover {
-    border-color: var(--db-save-button-bg, var(--db-primary));
-    background: var(--db-save-button-bg, var(--db-primary));
-    color: var(--db-save-button-text, #FFFFFF);
+.platform-admin-page .admin-heading > a.button:hover,
+.platform-admin-page .form-actions > .button:hover {
+    border-color: var(--db-form-button-hover-bg, var(--db-primary-dark));
+    background: var(--db-form-button-hover-bg, var(--db-primary-dark));
+    color: var(--db-form-button-hover-text, #FFFFFF);
 }
 
 /* Tabellen */
