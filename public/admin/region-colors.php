@@ -475,7 +475,7 @@ if (!$embeddedRegionAppearanceEditor) {
         <?php if ($successMessage !== ''): ?><div class="message message--success" role="status"><?= escapeHtml($successMessage) ?></div><?php endif; ?>
         <section class="region-agenda-live-preview" id="region-agenda-live-preview" aria-label="Live voorbeeld van de regionale agenda">
             <div class="region-preview-heading">
-                <div><h2>Live voorbeeld agenda</h2><p>Wijzig hieronder de kleuren en bekijk hier onmiddellijk het resultaat.</p></div>
+                <div><h2>Live voorbeeld agenda</h2><p>Dezelfde agenda-indeling als op de startpagina. Wijzig kleuren en bekijk direct het resultaat.</p></div>
                 <span class="region-preview-live">LIVE VOORBEELD</span>
             </div>
             <div class="region-preview-shell" data-preview="page">
@@ -483,27 +483,51 @@ if (!$embeddedRegionAppearanceEditor) {
                     <strong class="region-preview-brand">DONDEBAILAR</strong>
                     <span>Agenda · Evenementen · Menu</span>
                 </div>
-                <div class="region-preview-content">
-                    <div class="region-preview-title"><strong>Marina Alta</strong><span>Dansagenda</span></div>
+                <div class="region-preview-agenda">
+                    <div class="region-preview-title"><strong><?= escapeHtml($region['name']) ?></strong><span>Agenda de baile</span></div>
                     <div class="region-preview-filters" data-preview="strip">
                         <span data-preview="filter-text">Alle steden</span><span data-preview="filter-text">Alle organisatoren</span>
-                        <button type="button" data-preview="search-button">Zoeken</button>
+                        <input aria-label="Zoeken" value="Zoek evenement..." readonly data-preview="search-field">
+                        <button type="button" data-preview="search-button">⌕</button>
                     </div>
-                    <div class="region-preview-days">
+                    <div class="region-preview-calendar" aria-label="Weekdagen">
                         <?php foreach (['MA','DI','WO','DO','VR','ZA','ZO'] as $i => $day): ?>
-                            <div class="region-preview-day" data-preview-day="<?= $i ?>"><strong><?= $day ?></strong><small>20</small></div>
+                            <div class="region-preview-calendar-day" data-preview-day="<?= $i ?>"><strong><?= $day ?></strong><span><?= 16 + $i ?></span></div>
                         <?php endforeach; ?>
                     </div>
-                    <article class="region-preview-event" data-preview="event">
-                        <div class="region-preview-event-date" data-preview-day="4"><strong>VR</strong><small>20</small></div>
-                        <div class="region-preview-event-copy"><strong data-preview="event-title">Salsa & Bachata Social</strong><span>20:00 · Dénia</span><small>Dansavond voor iedereen</small></div>
-                        <div class="region-preview-event-tags"><span class="region-preview-organizer" data-preview="organizer">Organisator</span><span class="region-preview-category" data-preview="category">Bachata</span><button type="button" data-preview="primary-button">Details</button></div>
-                    </article>
-                    <article class="region-preview-event region-preview-event--past" data-preview="past-event">
-                        <div class="region-preview-event-date"><strong>DO</strong><small>19</small></div>
-                        <div class="region-preview-event-copy"><strong>Afgelopen evenement</strong><span>20:30 · Jávea</span></div>
-                    </article>
-                    <div class="region-preview-footer" data-preview="footer"><span>DONDEBAILAR · Marina Alta</span><button type="button" data-preview="back-top">↑</button></div>
+                    <div class="region-preview-events">
+                        <h3 class="agenda-day-heading" data-preview="day-heading">VIERNES 20 NOVIEMBRE 2026</h3>
+                        <article class="agenda-card region-preview-agenda-card" data-preview="event" style="--db-event-day-color:var(--db-weekday-5,var(--db-primary));--db-event-day-text-color:var(--db-weekday-text-5,#222);--db-event-day-title-color:var(--db-weekday-title-5,#222)">
+                            <div class="agenda-card__media-wrap">
+                                <div class="agenda-card__placeholder" data-preview="event-media"><strong>SALSA · BACHATA · KIZOMBA</strong></div>
+                            </div>
+                            <div class="agenda-card__quick">
+                                <span class="region-preview-quick-icon">👠 <b>12</b></span><span class="region-preview-quick-icon">↗</span><span class="region-preview-quick-icon">⌖</span>
+                            </div>
+                            <div class="agenda-card__details">
+                                <h2><span data-preview="event-title">Salsa &amp; Bachata Social</span></h2>
+                                <p class="agenda-card__date-line" data-preview="event-date">VIERNES, 20 NOV 2026 <span>◷</span> 20:00</p>
+                                <p class="agenda-card__hashtags" data-preview="event-tags">#Bachata #Dénia</p>
+                                <p class="region-preview-event-description">Dansavond voor iedereen · Dénia</p>
+                            </div>
+                        </article>
+                        <h3 class="agenda-day-heading" data-preview="day-heading">SÁBADO 21 NOVIEMBRE 2026</h3>
+                        <article class="agenda-card region-preview-agenda-card" data-preview="event-second" style="--db-event-day-color:var(--db-weekday-6,var(--db-primary));--db-event-day-text-color:var(--db-weekday-text-6,#222);--db-event-day-title-color:var(--db-weekday-title-6,#222)">
+                            <div class="agenda-card__media-wrap"><div class="agenda-card__placeholder" data-preview="event-media-second"><strong>BACHATA SOCIAL</strong></div></div>
+                            <div class="agenda-card__quick"><span class="region-preview-quick-icon">👠 <b>8</b></span><span class="region-preview-quick-icon">↗</span></div>
+                            <div class="agenda-card__details">
+                                <h2><span>Latin Dance Night</span></h2>
+                                <p class="agenda-card__date-line">SÁBADO, 21 NOV 2026 <span>◷</span> 21:00</p>
+                                <p class="agenda-card__hashtags">#Salsa #Bachata #Jávea</p>
+                            </div>
+                        </article>
+                        <h3 class="agenda-day-heading" data-preview="past-heading">JUEVES 19 NOVIEMBRE 2026</h3>
+                        <article class="agenda-card agenda-card--past region-preview-agenda-card" data-preview="past-event" style="--db-event-day-color:#777;--db-event-day-text-color:#fff;--db-event-day-title-color:#fff">
+                            <div class="agenda-card__media-wrap"><div class="agenda-card__placeholder"><strong>EVENTO ANTERIOR</strong></div></div>
+                            <div class="agenda-card__details"><h2><span>Afgelopen evenement</span></h2><p class="agenda-card__date-line">JUEVES, 19 NOV 2026 <span>◷</span> 20:30</p></div>
+                        </article>
+                    </div>
+                    <div class="region-preview-footer" data-preview="footer"><span>DONDEBAILAR · <?= escapeHtml($region['name']) ?></span><button type="button" data-preview="back-top">↑</button></div>
                 </div>
             </div>
         </section>
@@ -670,23 +694,33 @@ if (!$embeddedRegionAppearanceEditor) {
 .region-preview-shell{overflow:hidden;border:1px solid #dce2e9;border-radius:10px;background:#fff;color:#222;font-size:12px}
 .region-preview-topbar{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 14px;background:#222;color:#fff}
 .region-preview-brand{font-size:14px;letter-spacing:.5px}
-.region-preview-content{padding:12px;background:#fff}
-.region-preview-title{display:flex;align-items:baseline;gap:9px;margin-bottom:10px;color:#222}
+.region-preview-agenda{padding:12px;background:#fff;color:#222}
+.region-preview-title{display:flex;align-items:baseline;gap:9px;margin:0 0 10px;color:#222}
 .region-preview-title strong{font-size:17px}.region-preview-title span{color:#687586}
-.region-preview-filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px;border-radius:7px;background:#fff;color:#222}
-.region-preview-filters span{padding:6px 8px;border:1px solid #ddd;border-radius:5px;background:#fff}
-.region-preview-filters button,.region-preview-footer button{border:0;border-radius:5px;padding:7px 12px;background:#e23a2c;color:#fff;font-weight:700}
-.region-preview-days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin:12px 0}
-.region-preview-day{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:5px;background:#f6d84a;color:#222}
-.region-preview-day strong{font-size:11px}.region-preview-day small{font-size:11px}
-.region-preview-event{display:flex;align-items:center;gap:10px;margin:7px 0;padding:10px;border:1px solid #d0d0d0;border-radius:7px;background:#fff;color:#222}
-.region-preview-event-date{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:38px;min-height:42px;border-radius:5px;background:#f49a45;color:#222}
-.region-preview-event-copy{display:flex;flex:1;flex-direction:column;gap:3px;min-width:0}
-.region-preview-event-copy strong{color:#222}.region-preview-event-copy span,.region-preview-event-copy small{color:#687586}
-.region-preview-event-tags{display:flex;align-items:center;gap:5px;flex-wrap:wrap;justify-content:flex-end}.region-preview-organizer{padding:5px 7px;border-radius:5px;background:#e23a2c;color:#fff;font-size:10px}.region-preview-category{padding:5px 7px;border-radius:5px;background:#1fa898;color:#fff;font-size:10px}.region-preview-event-tags button{border:0;border-radius:5px;padding:5px 7px;background:#e23a2c;color:#fff;font-size:10px;font-weight:700}
-.region-preview-event--past{background:#777;color:#fff}.region-preview-event--past .region-preview-event-copy strong,.region-preview-event--past .region-preview-event-copy span{color:#fff}
+.region-preview-filters{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:8px;background:#fff}
+.region-preview-filters span,.region-preview-filters input{min-width:0;padding:7px 9px;border:1px solid #ddd;border-radius:5px;background:#fff;color:#222}
+.region-preview-filters input{flex:1;width:90px}
+.region-preview-filters button{border:0;border-radius:5px;padding:7px 12px;background:#e23a2c;color:#fff;font-weight:700}
+.region-preview-calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin:10px 0 14px}
+.region-preview-calendar-day{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px;border-radius:5px;background:#f6d84a;color:#222}
+.region-preview-calendar-day strong{font-size:10px}.region-preview-calendar-day span{font-size:12px;font-weight:700}
+.region-preview-events{display:block}
+.region-preview-events .agenda-day-heading{margin:12px 0 8px;padding-bottom:6px;font-size:13px}
+.region-preview-agenda-card{display:block;margin:0 0 14px;overflow:hidden;border-radius:10px}
+.region-preview-agenda-card .agenda-card__media-wrap{height:125px}
+.region-preview-agenda-card .agenda-card__placeholder{display:flex;align-items:center;justify-content:center;min-height:125px;padding:12px;background:var(--db-event-day-color,var(--db-primary));color:var(--db-event-day-title-color,#222);text-align:center}
+.region-preview-agenda-card .agenda-card__placeholder strong{font-size:clamp(20px,4vw,32px)}
+.region-preview-agenda-card .agenda-card__quick{display:flex;justify-content:flex-end;gap:14px;padding:6px 12px;background:var(--db-event-day-color,var(--db-primary));color:var(--db-event-day-text-color,#222)}
+.region-preview-quick-icon{font-size:13px}
+.region-preview-agenda-card .agenda-card__details{padding:12px 14px;background:var(--db-event-day-color,var(--db-primary));color:var(--db-event-day-text-color,#222)}
+.region-preview-agenda-card .agenda-card__details h2{margin:0 0 6px;font-size:18px;color:var(--db-event-day-title-color,#222)}
+.region-preview-agenda-card .agenda-card__details h2 span{color:inherit}
+.region-preview-agenda-card .agenda-card__date-line{margin:0 0 6px;font-size:11px}
+.region-preview-agenda-card .agenda-card__hashtags{margin:0;font-size:11px}
+.region-preview-event-description{margin:7px 0 0;font-size:12px}
 .region-preview-footer{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px;padding:10px;border-top:2px solid #ddd;background:#fff;color:#687586}
-@media(max-width:520px){.region-agenda-live-preview{padding:10px}.region-preview-topbar{padding:9px}.region-preview-content{padding:8px}.region-preview-event{gap:7px;padding:8px}.region-preview-organizer{font-size:9px}.region-preview-days{gap:3px}}
+.region-preview-footer button{border:0;border-radius:5px;padding:7px 12px;background:#e23a2c;color:#fff;font-weight:700}
+@media(max-width:520px){.region-agenda-live-preview{padding:10px}.region-preview-topbar{padding:9px}.region-preview-agenda{padding:8px}.region-preview-agenda-card .agenda-card__media-wrap,.region-preview-agenda-card .agenda-card__placeholder{height:100px;min-height:100px}.region-preview-agenda-card .agenda-card__details{padding:10px}.region-preview-calendar{gap:2px}.region-preview-calendar-day{padding:6px 1px}}
 
 </style>
 <script>
@@ -696,29 +730,38 @@ if (!$embeddedRegionAppearanceEditor) {
  const value=(name,fallback)=>field(name)?.value||fallback;
  const paint=(selector,property,color)=>root.querySelectorAll(selector).forEach(el=>el.style.setProperty(property,color,"important"));
  function update(){
-  const primary=value("primary_color","#E23A2C"), dark=value("primary_dark","#8F211B");
-  const header=value("header_color","#222222"), menu=value("menu_color","#FFFFFF");
+  const primary=value("primary_color","#E23A2C"), header=value("header_color","#222222");
   const strip=value("selector_strip_background_color","#FFFFFF"), stripText=value("filter_text_color","#222222");
   const search=value("search_button_color",primary), organizer=value("organizer_color",primary);
   const footer=value("footer_color","#FFFFFF"), back=value("back_top_color",primary);
   const bg=value("background_color","#FFFFFF"), text=value("text_color","#222222");
   const past=value("past_event_color","#777777"), pastText=value("past_event_text_color","#FFFFFF");
-  paint("[data-preview=header]","background-color",header); paint("[data-preview=header]","color",text);
-  paint("[data-preview=page],.region-preview-content","background-color",bg); paint("[data-preview=page],.region-preview-content","color",text);
+  paint("[data-preview=header]","background-color",header); paint("[data-preview=header]","color","#FFFFFF");
+  paint("[data-preview=page],.region-preview-agenda","background-color",bg); paint("[data-preview=page],.region-preview-agenda","color",text);
+  paint(".region-preview-title","color",text);
   paint("[data-preview=strip]","background-color",strip); paint("[data-preview=filter-text]","color",stripText);
+  paint("[data-preview=search-field]","background-color",value("search_field_color","#FFFFFF")); paint("[data-preview=search-field]","color",value("search_text_color","#222222"));
   paint("[data-preview=search-button]","background-color",search); paint("[data-preview=search-button]","color","#FFFFFF");
-  paint("[data-preview=organizer]","background-color",organizer); paint("[data-preview=organizer]","color","#FFFFFF");\n  paint("[data-preview=category]","background-color",value("secondary_color","#1FA898")); paint("[data-preview=category]","color","#FFFFFF");\n  paint("[data-preview=primary-button]","background-color",primary); paint("[data-preview=primary-button]","color","#FFFFFF");
+  paint(".region-preview-calendar-day","background-color",value("weekday_colors[0]","#F6D84A"));
+  root.querySelectorAll(".region-preview-calendar-day").forEach((el,i)=>{el.style.setProperty("background-color",value("weekday_colors["+i+"]","#F6D84A"),"important");el.style.setProperty("color",value("weekday_text_colors["+i+"]","#222222"),"important")});
+  const days=[5,6];
+  root.querySelectorAll("[data-preview=event],[data-preview=event-second]").forEach((card,index)=>{
+    const day=days[index]; const bgColor=value("weekday_colors["+day+"]",index===0?"#E78AAE":"#F49A45");
+    const dayText=value("weekday_text_colors["+day+"]","#222222");
+    const titleText=value("weekday_title_colors["+day+"]",text);
+    card.style.setProperty("--db-event-day-color",bgColor);
+    card.style.setProperty("--db-event-day-text-color",dayText);
+    card.style.setProperty("--db-event-day-title-color",titleText);
+    card.querySelector(".agenda-card__details")?.style.setProperty("color",dayText,"important");
+    card.querySelector(".agenda-card__details h2")?.style.setProperty("color",titleText,"important");
+    card.querySelector(".agenda-card__quick")?.style.setProperty("color",dayText,"important");
+  });
+  paint("[data-preview=event-media]","background-color",value("weekday_colors[4]","#E78AAE"));
+  paint("[data-preview=past-event] .agenda-card__details","background-color",past);
+  paint("[data-preview=past-event] .agenda-card__details","color",pastText);
+  paint("[data-preview=past-event] .agenda-card__details h2","color",pastText);
   paint("[data-preview=footer]","background-color",footer); paint("[data-preview=footer]","color",text);
   paint("[data-preview=back-top]","background-color",back); paint("[data-preview=back-top]","color","#FFFFFF");
-  paint("[data-preview=past-event]","background-color",past); paint("[data-preview=past-event]","color",pastText);
-  paint("[data-preview=past-event] .region-preview-event-copy strong","color",pastText); paint("[data-preview=past-event] .region-preview-event-copy span","color",pastText);
-  paint(".region-preview-event:not(.region-preview-event--past)","background-color",bg); paint(".region-preview-event:not(.region-preview-event--past)","color",text);
-  paint("[data-preview=event-title]","color",value("weekday_title_colors[4]",text));\n  paint(".region-preview-title","color",text);\n  paint(".region-preview-filters span","background-color",value("search_field_color","#FFFFFF")); paint(".region-preview-filters span","color",value("search_text_color","#222222"));
-  paint(".region-preview-day","background-color",value("weekday_colors[0]","#F6D84A"));
-  paint(".region-preview-day","color",value("weekday_text_colors[0]","#222222"));
-  root.querySelectorAll(".region-preview-day").forEach((el,i)=>{el.style.setProperty("background-color",value("weekday_colors["+i+"]","#F6D84A"),"important");el.style.setProperty("color",value("weekday_text_colors["+i+"]","#222222"),"important")});
-  const eventDay=root.querySelector(".region-preview-event-date"); if(eventDay){eventDay.style.setProperty("background-color",value("weekday_colors[4]","#E78AAE"),"important");eventDay.style.setProperty("color",value("weekday_text_colors[4]","#222222"),"important")}
-  root.querySelector(".region-preview-event")?.style.setProperty("border-color",value("event_separator_color","#D0D0D0"),"important");
   root.querySelectorAll(".region-color-field input[type=color],.region-weekday-color input[type=color]").forEach(input=>{const code=input.parentElement.querySelector("code");if(code)code.textContent=input.value.toUpperCase()});
  }
  document.querySelectorAll(".auth-form input[type=color]").forEach(input=>{input.addEventListener("input",update);input.addEventListener("change",update)});
