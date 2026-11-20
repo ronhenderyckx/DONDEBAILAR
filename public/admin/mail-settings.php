@@ -214,6 +214,108 @@ if (isset($_GET['saved'])) {
 require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 
+<style>
+.platform-mail-settings-page .admin-heading {
+    margin-bottom: 14px;
+    gap: 12px;
+}
+.platform-mail-settings-page .admin-heading > div > p:last-child {
+    margin: 5px 0 0;
+}
+.platform-mail-settings-page .admin-section {
+    padding: 16px;
+    margin-bottom: 14px;
+}
+.platform-mail-settings-page .auth-form {
+    display: grid;
+    grid-template-columns: minmax(150px, 210px) minmax(0, 1fr);
+    align-items: center;
+    column-gap: 14px;
+    row-gap: 8px;
+}
+.platform-mail-settings-page .auth-form h2,
+.platform-mail-settings-page .auth-form .form-actions,
+.platform-mail-settings-page .auth-form > p {
+    grid-column: 1 / -1;
+}
+.platform-mail-settings-page .auth-form h2 {
+    margin: 5px 0 2px;
+}
+.platform-mail-settings-page .auth-form label {
+    margin: 0;
+}
+.platform-mail-settings-page .auth-form input:not([type="checkbox"]),
+.platform-mail-settings-page .auth-form select {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    margin: 0;
+}
+.platform-mail-settings-page .auth-form > p {
+    margin: -2px 0 2px;
+}
+.platform-mail-settings-page .auth-form label:has(input[type="checkbox"]) {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.platform-mail-settings-page .auth-form input[type="checkbox"] {
+    margin: 0;
+}
+.platform-mail-settings-page .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 5px;
+}
+.platform-mail-settings-page .button,
+.platform-mail-settings-page button.button,
+.platform-mail-settings-page a.button {
+    box-sizing: border-box;
+    width: 230px;
+    min-width: 230px;
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+    flex: 0 0 230px;
+}
+.platform-mail-settings-page > p:last-child {
+    margin-top: 10px;
+    font-size: 0.9em;
+}
+@media (max-width: 700px) {
+    .platform-mail-settings-page .admin-heading {
+        align-items: stretch;
+    }
+    .platform-mail-settings-page .auth-form {
+        grid-template-columns: minmax(0, 1fr);
+        row-gap: 6px;
+    }
+    .platform-mail-settings-page .auth-form h2,
+    .platform-mail-settings-page .auth-form .form-actions,
+    .platform-mail-settings-page .auth-form > p,
+    .platform-mail-settings-page .auth-form label:has(input[type="checkbox"]) {
+        grid-column: 1;
+    }
+    .platform-mail-settings-page .admin-section {
+        padding: 12px;
+    }
+    .platform-mail-settings-page .button,
+    .platform-mail-settings-page button.button,
+    .platform-mail-settings-page a.button {
+        width: 100%;
+        min-width: 0;
+        flex: 1 1 100%;
+    }
+}
+</style>
+
 <section class="admin-page platform-mail-settings-page">
     <div class="admin-heading">
         <div>
