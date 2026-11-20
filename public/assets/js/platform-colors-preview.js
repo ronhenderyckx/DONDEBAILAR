@@ -38,12 +38,14 @@
         preview.style.color = text;
         preview.style.borderColor = border;
 
+        // Gebruik !important: de algemene Platformbeheer-knop- en labelregels
+        // mogen de kleuren in dit live voorbeeld niet overschrijven.
         const setBackground = (selector, value) =>
-            preview.querySelectorAll(selector).forEach(el => el.style.backgroundColor = value);
+            preview.querySelectorAll(selector).forEach(el => el.style.setProperty('background-color', value, 'important'));
         const setText = (selector, value) =>
-            preview.querySelectorAll(selector).forEach(el => el.style.color = value);
+            preview.querySelectorAll(selector).forEach(el => el.style.setProperty('color', value, 'important'));
         const setBorder = (selector, value) =>
-            preview.querySelectorAll(selector).forEach(el => el.style.borderColor = value);
+            preview.querySelectorAll(selector).forEach(el => el.style.setProperty('border-color', value, 'important'));
 
         setBackground('#preview-header', header);
         setBackground('#preview-menu', menu);
@@ -66,31 +68,31 @@
         setBackground('#preview-form-panel', formPanelBg);
         preview.querySelectorAll('#preview-form-panel input:not([type="color"]), #preview-form-panel select, #preview-form-panel .preview-form-button--secondary').forEach(el => el.style.setProperty('background-color', formInputBg, 'important'));
         setBackground('#preview-form-panel .preview-form-button:not(.preview-form-button--secondary)', formButtonBg);
-        setText('#preview-form-panel', formLabelText);
+        setText('#preview-form-panel, #preview-form-panel label', formLabelText);
         setText('#preview-form-panel input:not([type="color"]), #preview-form-panel select, #preview-form-panel .preview-form-button--secondary', formInputText);
         setText('#preview-form-panel .preview-form-button:not(.preview-form-button--secondary)', formButtonText);
         setBorder('#preview-form-panel, #preview-form-panel input:not([type="color"]), #preview-form-panel select, #preview-form-panel .preview-form-button', formInputBorder);
         preview.querySelectorAll('#preview-form-panel input:not([type="color"]), #preview-form-panel select').forEach(field => {
             field.style.setProperty('background-color', formInputBg, 'important');
             field.style.transition = 'background-color .15s ease, border-color .15s ease, box-shadow .15s ease';
-            field.onmouseenter = () => { field.style.borderColor = formInputHoverBorder; };
-            field.onmouseleave = () => { if (document.activeElement !== field) field.style.borderColor = formInputBorder; };
-            field.onfocus = () => { field.style.borderColor = formInputHoverBorder; field.style.boxShadow = '0 0 0 2px ' + formInputHoverBorder + '33'; };
-            field.onblur = () => { field.style.borderColor = formInputBorder; field.style.boxShadow = 'none'; };
+            field.onmouseenter = () => { field.style.setProperty('border-color', formInputHoverBorder, 'important'); };
+            field.onmouseleave = () => { if (document.activeElement !== field) field.style.setProperty('border-color', formInputBorder, 'important'); };
+            field.onfocus = () => { field.style.setProperty('border-color', formInputHoverBorder, 'important'); field.style.setProperty('box-shadow', '0 0 0 2px ' + formInputHoverBorder + '33', 'important'); };
+            field.onblur = () => { field.style.setProperty('border-color', formInputBorder, 'important'); field.style.setProperty('box-shadow', 'none', 'important'); };
         });
         preview.querySelectorAll('#preview-form-panel .preview-form-button').forEach(button => {
             button.style.cursor = 'pointer';
             button.style.transition = 'background-color .15s ease, color .15s ease, border-color .15s ease';
             button.onmouseenter = () => {
-                button.style.backgroundColor = formButtonHoverBg;
-                button.style.color = formButtonHoverText;
-                button.style.borderColor = formButtonHoverBg;
+                button.style.setProperty('background-color', formButtonHoverBg, 'important');
+                button.style.setProperty('color', formButtonHoverText, 'important');
+                button.style.setProperty('border-color', formButtonHoverBg, 'important');
             };
             button.onmouseleave = () => {
                 const secondary = button.classList.contains('preview-form-button--secondary');
-                button.style.backgroundColor = secondary ? formInputBg : formButtonBg;
-                button.style.color = secondary ? formInputText : formButtonText;
-                button.style.borderColor = secondary ? formInputBorder : formButtonBg;
+                button.style.setProperty('background-color', secondary ? formInputBg : formButtonBg, 'important');
+                button.style.setProperty('color', secondary ? formInputText : formButtonText, 'important');
+                button.style.setProperty('border-color', secondary ? formInputBorder : formButtonBg, 'important');
             };
         });
         setBackground('#preview-admin-list thead', listHeaderBg);
@@ -120,21 +122,21 @@
         preview.querySelectorAll('#preview-admin-list tbody tr').forEach(row => {
             row.style.transition = 'background-color .15s ease, color .15s ease';
             row.onmouseenter = () => {
-                row.style.backgroundColor = listHoverBg;
-                row.querySelectorAll('td').forEach(cell => cell.style.color = listHoverText);
+                row.style.setProperty('background-color', listHoverBg, 'important');
+                row.querySelectorAll('td').forEach(cell => cell.style.setProperty('color', listHoverText, 'important'));
                 row.querySelectorAll('.preview-action-button').forEach(button => {
-                    button.style.backgroundColor = actionHoverBg;
-                    button.style.borderColor = actionHoverBg;
-                    button.style.color = actionHoverText;
+                    button.style.setProperty('background-color', actionHoverBg, 'important');
+                    button.style.setProperty('border-color', actionHoverBg, 'important');
+                    button.style.setProperty('color', actionHoverText, 'important');
                 });
             };
             row.onmouseleave = () => {
-                row.style.backgroundColor = listRowBg;
-                row.querySelectorAll('td').forEach(cell => cell.style.color = listText);
+                row.style.setProperty('background-color', listRowBg, 'important');
+                row.querySelectorAll('td').forEach(cell => cell.style.setProperty('color', listText, 'important'));
                 row.querySelectorAll('.preview-action-button').forEach(button => {
-                    button.style.backgroundColor = actionButton;
-                    button.style.borderColor = actionButton;
-                    button.style.color = actionButtonText;
+                    button.style.setProperty('background-color', actionButton, 'important');
+                    button.style.setProperty('border-color', actionButton, 'important');
+                    button.style.setProperty('color', actionButtonText, 'important');
                 });
             };
         });
@@ -142,12 +144,12 @@
         const hoverButton = preview.querySelector('#preview-hover-button');
         if (hoverButton) {
             hoverButton.onmouseenter = () => {
-                hoverButton.style.backgroundColor = dark;
-                hoverButton.style.color = '#FFFFFF';
+                hoverButton.style.setProperty('background-color', dark, 'important');
+                hoverButton.style.setProperty('color', '#FFFFFF', 'important');
             };
             hoverButton.onmouseleave = () => {
-                hoverButton.style.backgroundColor = primary;
-                hoverButton.style.color = '#FFFFFF';
+                hoverButton.style.setProperty('background-color', primary, 'important');
+                hoverButton.style.setProperty('color', '#FFFFFF', 'important');
             };
             hoverButton.onfocus = hoverButton.onmouseenter;
             hoverButton.onblur = hoverButton.onmouseleave;
@@ -157,14 +159,14 @@
             button.style.cursor = 'pointer';
             button.style.transition = 'background-color .15s ease, color .15s ease';
             button.onmouseenter = () => {
-                button.style.backgroundColor = actionHoverBg;
-                button.style.borderColor = actionHoverBg;
-                button.style.color = actionHoverText;
+                button.style.setProperty('background-color', actionHoverBg, 'important');
+                button.style.setProperty('border-color', actionHoverBg, 'important');
+                button.style.setProperty('color', actionHoverText, 'important');
             };
             button.onmouseleave = () => {
-                button.style.backgroundColor = actionButton;
-                button.style.borderColor = actionButton;
-                button.style.color = actionButtonText;
+                button.style.setProperty('background-color', actionButton, 'important');
+                button.style.setProperty('border-color', actionButton, 'important');
+                button.style.setProperty('color', actionButtonText, 'important');
             };
         });
     }
