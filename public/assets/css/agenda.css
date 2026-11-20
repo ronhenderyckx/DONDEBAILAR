@@ -3901,28 +3901,44 @@ body.has-agenda-footer .site-main > .agenda-page {
     .agenda-feed > .agenda-card.agenda-card--archived::after {
         display:none;
     }
-    /* De diagonale banner loopt van de swipehoek linksonder naar de titel rechtsboven. */
-    .agenda-feed > .agenda-card .agenda-card__cancelled-label {
+    /* Smartphone: de banner zit in het groene tekstgedeelte, nooit over de media.
+       De linkerzijde ligt lager dan de rechterzijde: linksonder naar rechtsboven. */
+    .agenda-card > .agenda-card__quick {
+        position:relative!important;
+        z-index:auto!important;
+        overflow:visible!important;
+    }
+    .agenda-card > .agenda-card__quick > .agenda-card__cancelled-label {
         display:block;
         position:absolute;
-        z-index:50;
-        right:auto;
-        bottom:18px;
+        z-index:0;
+        top:82px;
         left:-15%;
         width:130%;
-        margin:0 !important;
+        margin:0;
         padding:9px 4px;
+        box-sizing:border-box;
         transform:rotate(-25deg);
         transform-origin:center center;
-        background:color-mix(in srgb,var(--db-event-day-color,#777777) 55%,transparent);
+        background:color-mix(in srgb,var(--db-event-day-color,#777777) 58%,transparent);
         color:var(--db-event-day-title-color,#222222);
+        font-family:Arial,Helvetica,sans-serif;
         font-size:clamp(17px,4.5vw,23px);
         font-weight:900;
         letter-spacing:.1em;
         line-height:1.2;
         text-align:center;
-        box-sizing:border-box;
         pointer-events:none;
+    }
+    .agenda-card > .agenda-card__quick > :not(.agenda-card__cancelled-label) {
+        position:relative;
+        z-index:2;
+    }
+    .agenda-card > .agenda-card__details > h2,
+    .agenda-card > .agenda-card__details > p,
+    .agenda-card > .agenda-card__details > .agenda-card__description {
+        position:relative;
+        z-index:2;
     }
     .agenda-card__rain-drop {
         font-size:clamp(60px,15vw,76px);
