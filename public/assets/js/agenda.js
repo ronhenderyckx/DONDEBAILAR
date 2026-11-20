@@ -65,6 +65,12 @@ function setEventDescription(info, show) {
     if (!description) return;
     description.classList.toggle('is-visible', show);
     description.setAttribute('aria-hidden', show ? 'false' : 'true');
+    const hint = info.querySelector('[data-swipe-hint]');
+    if (hint) {
+        hint.dataset.label = show ? 'Minder info' : 'Meer info';
+        hint.dataset.arrow = show ? '←' : '→';
+        hint.setAttribute('aria-label', show ? 'Minder info' : 'Meer info');
+    }
 }
 let lastEventInfoSwipeAt = 0;
 document.querySelectorAll('[data-event-info]').forEach(function (info) {
