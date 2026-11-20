@@ -211,45 +211,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 <style>
-.admin-page .auth-form {
-    background: <?= escapeHtml($platformFormColors['form_panel_bg']) ?>;
-    color: <?= escapeHtml($platformFormColors['form_label_text']) ?>;
-    border: 1px solid <?= escapeHtml($platformFormColors['border']) ?>;
+#region-new-form {
+    background: <?= escapeHtml($platformFormColors['form_panel_bg']) ?> !important;
+    color: <?= escapeHtml($platformFormColors['form_label_text']) ?> !important;
+    border: 1px solid <?= escapeHtml($platformFormColors['border']) ?> !important;
     border-radius: 12px;
     padding: 24px;
 }
-.admin-page .auth-form > label,
-.admin-page .auth-form h2 { color: <?= escapeHtml($platformFormColors['form_label_text']) ?>; }
-.admin-page .auth-form input:not([type="checkbox"]),
-.admin-page .auth-form select,
-.admin-page .auth-form textarea {
+#region-new-form label,
+#region-new-form h2,
+#region-new-form p,
+#region-new-form .input-with-suffix span {
+    color: <?= escapeHtml($platformFormColors['form_label_text']) ?> !important;
+}
+#region-new-form input:not([type="checkbox"]),
+#region-new-form select,
+#region-new-form textarea,
+#region-new-form .input-with-suffix span {
     background-color: <?= escapeHtml($platformFormColors['form_input_bg']) ?> !important;
     color: <?= escapeHtml($platformFormColors['form_input_text']) ?> !important;
     border-color: <?= escapeHtml($platformFormColors['form_input_border']) ?> !important;
 }
-.admin-page .auth-form input:not([type="checkbox"]):hover,
-.admin-page .auth-form select:hover,
-.admin-page .auth-form textarea:hover,
-.admin-page .auth-form input:not([type="checkbox"]):focus,
-.admin-page .auth-form select:focus,
-.admin-page .auth-form textarea:focus {
+#region-new-form input:not([type="checkbox"]):hover,
+#region-new-form select:hover,
+#region-new-form textarea:hover,
+#region-new-form input:not([type="checkbox"]):focus,
+#region-new-form select:focus,
+#region-new-form textarea:focus {
     border-color: <?= escapeHtml($platformFormColors['form_input_hover_border']) ?> !important;
 }
-.admin-page .auth-form .button,
-.admin-page .auth-form button,
+#region-new-form input[type="checkbox"] {
+    accent-color: <?= escapeHtml($platformFormColors['form_button_bg']) ?>;
+}
+#region-new-form .button,
+#region-new-form button,
 .admin-page .admin-heading .button {
     background: <?= escapeHtml($platformFormColors['form_button_bg']) ?> !important;
     color: <?= escapeHtml($platformFormColors['form_button_text']) ?> !important;
     border-color: <?= escapeHtml($platformFormColors['form_button_bg']) ?> !important;
 }
-.admin-page .auth-form .button:hover,
-.admin-page .auth-form button:hover,
+#region-new-form .button:hover,
+#region-new-form button:hover,
 .admin-page .admin-heading .button:hover {
     background: <?= escapeHtml($platformFormColors['form_button_hover_bg']) ?> !important;
     color: <?= escapeHtml($platformFormColors['form_button_hover_text']) ?> !important;
     border-color: <?= escapeHtml($platformFormColors['form_button_hover_bg']) ?> !important;
 }
-.admin-page .auth-form p { color: <?= escapeHtml($platformFormColors['form_label_text']) ?>; }
 </style>
 
 <?php
@@ -272,7 +279,7 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
             </div>
         <?php endif; ?>
 
-        <form method="post" action="/admin/region-new.php" class="auth-form">
+        <form method="post" action="/admin/region-new.php" class="auth-form" id="region-new-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
 
             <label for="name">Naam van de regio</label>
