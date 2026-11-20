@@ -407,7 +407,7 @@ require $privateRoot . '/app/views/header.php';
             </div>
         </div>
 
-        <form method="post" action="/admin/settings.php" enctype="multipart/form-data" class="auth-form">
+        <form method="post" action="/admin/settings.php" enctype="multipart/form-data" class="auth-form platform-logo-settings-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="platform_logo">Logo uploaden (PNG, JPG of WEBP; maximaal 5 MB)</label>
             <div class="platform-logo-controls">
