@@ -12,6 +12,7 @@
         const listText = color('list_text', '#202B38');
         const accent = color('accent', '#00AFC5');
         const header = color('header', '#FFFFFF');
+        const footer = color('footer', '#FFFFFF');
         const text = color('text', '#202B38');
         const menu = color('menu', '#FFFFFF');
         const menuText = color('menu_text', text);
@@ -48,6 +49,7 @@
             preview.querySelectorAll(selector).forEach(el => el.style.setProperty('border-color', value, 'important'));
 
         setBackground('#preview-header', header);
+        setBackground('#preview-footer', footer);
         setBackground('#preview-menu', menu);
         setBackground('#preview-menu .preview-menu-item--hover', menuHoverBg);
         setText('#preview-menu .preview-menu-item', menuText);
@@ -177,7 +179,9 @@
         if (original) original.value = picker.value;
 
         // Werk ook de echte Terug- en Opslaan-knoppen direct bij.
-        if (key === 'primary') {
+        if (key === 'footer') {
+            document.body.style.setProperty('--db-footer-color', picker.value);
+        } else if (key === 'primary') {
             document.body.style.setProperty('--db-primary', picker.value);
         } else if (key === 'primary_dark') {
             document.body.style.setProperty('--db-primary-dark', picker.value);
