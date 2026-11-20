@@ -419,6 +419,29 @@ require $privateRoot . '/app/views/header.php';
         hoverButton.addEventListener('focus', function () { applyHover(hoverButton, true); });
         hoverButton.addEventListener('blur', function () { applyHover(hoverButton, false); });
     }
+    // Toon ook de hoverkleur wanneer de muis over een volledige lijstregel gaat.
+    preview.querySelectorAll('#preview-admin-list tbody tr').forEach(function (row) {
+        row.style.cursor = 'pointer';
+        row.style.transition = 'background .15s ease, color .15s ease';
+        row.addEventListener('mouseenter', function () {
+            row.style.backgroundColor = preview.querySelector('[data-preview-color="primary_dark"]')?.value || '#083B79';
+            row.querySelectorAll('td').forEach(function (cell) {
+                cell.style.color = '#FFFFFF';
+            });
+        });
+        row.addEventListener('mouseleave', function () {
+            row.style.backgroundColor = 'transparent';
+            const textColor = preview.querySelector('[data-preview-color="text"]')?.value || '#202B38';
+            row.querySelectorAll('td').forEach(function (cell) {
+                cell.style.color = textColor;
+            });
+            const actionColor = preview.querySelector('[data-preview-color="primary"]')?.value || '#0A4D9F';
+            row.querySelectorAll('td:last-child span').forEach(function (action) {
+                action.style.color = actionColor;
+            });
+        });
+    });
+
     preview.querySelectorAll('#preview-admin-list td:last-child span').forEach(function (action) {
         action.style.cursor = 'pointer';
         action.style.transition = 'background .15s ease, color .15s ease';
