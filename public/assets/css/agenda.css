@@ -3877,10 +3877,36 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-card__rain-drop {
     position:absolute;
     z-index:51;
-    font-size:clamp(20px,3vw,28px);
+    font-size:clamp(34px,5vw,44px);
     line-height:1;
-    opacity:.95;
+    opacity:.98;
     pointer-events:none;
 }
 .agenda-card__rain-drop--top-left { top:8px; left:12px; }
 .agenda-card__rain-drop--bottom-right { right:12px; bottom:8px; }
+
+.agenda-card__cancelled-label { display:none; }
+
+@media (max-width:700px) {
+    /* Mobiel staat de annuleringsbanner direct onder de media, in de tekstzone. */
+    .agenda-feed > .agenda-card.agenda-card--cancelled::after { display:none; }
+    .agenda-card__cancelled-label {
+        display:block;
+        position:relative;
+        width:calc(100% + 40px);
+        margin:0 -20px 12px;
+        padding:8px 4px;
+        transform:rotate(-4deg);
+        background:color-mix(in srgb,var(--db-event-day-color,#777777) 55%,transparent);
+        color:var(--db-event-day-title-color,#222222);
+        font-size:clamp(15px,4vw,20px);
+        font-weight:900;
+        letter-spacing:.08em;
+        line-height:1.2;
+        text-align:center;
+        box-sizing:border-box;
+    }
+    .agenda-card__rain-drop {
+        font-size:clamp(40px,10vw,52px);
+    }
+}
