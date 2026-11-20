@@ -70,6 +70,7 @@
                                 <button type="button" class="agenda-icon-button agenda-messages" data-event-messages data-url="/event-messages.php?id=<?= (int) $event['id'] ?>" aria-label="Berichten van evenement" title="Berichten van evenement"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"></path></svg><b class="agenda-message-count"><?= (int) ($event['message_count'] ?? 0) ?></b></button>
                             </div>
                         <div class="agenda-card__details" data-event-info>
+                            <?php if ($eventStatus === 'cancelled' || $eventStatus === 'cancelled_rain'): ?><div class="agenda-card__cancelled-label"><?= $eventStatus === 'cancelled_rain' ? 'GEANNULEERD WEGENS REGEN' : 'GEANNULEERD' ?></div><?php endif; ?>
 
                             <h2><a href="<?= $eventUrl ?>"><?= $escape($event['title']) ?></a></h2>
                             <?php
