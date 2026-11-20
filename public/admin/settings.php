@@ -224,6 +224,34 @@ require $privateRoot . '/app/views/header.php';
                 <p>Deze kleuren gelden uitsluitend voor de pagina's van Platformbeheer. Regiobeheer en de openbare website behouden hun eigen kleuren.</p>
             </div>
         </div>
+        <div class="platform-color-preview-wrap" style="margin:18px 0 24px">
+            <h3 style="margin:0 0 6px">Live voorbeeld</h3>
+            <p style="margin:0 0 12px;color:var(--db-muted)">Verander een kleur hieronder en bekijk meteen wat er in dit voorbeeld verandert. Je wijzigingen worden pas actief nadat je op ‘Platformkleuren opslaan’ klikt.</p>
+            <div id="platform-color-preview" style="border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:12px;overflow:hidden;background:<?= escapeHtml($platformAdminColors['background']) ?>;color:<?= escapeHtml($platformAdminColors['text']) ?>">
+                <div id="preview-header" style="background:<?= escapeHtml($platformAdminColors['header']) ?>;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">
+                    <strong style="font-size:17px;letter-spacing:.3px">DONDEBAILAR</strong>
+                    <span style="font-size:13px">Platformbeheer　☰</span>
+                </div>
+                <div id="preview-menu" style="background:<?= escapeHtml($platformAdminColors['menu']) ?>;padding:9px 16px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;font-size:13px">
+                    Dashboard　　Gebruikers　　Regio's　　Instellingen
+                </div>
+                <div id="preview-page" style="background:<?= escapeHtml($platformAdminColors['background']) ?>;padding:16px">
+                    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:<?= escapeHtml($platformAdminColors['muted']) ?>">PLATFORMBEHEER</div>
+                    <div style="font-size:21px;font-weight:700;margin:3px 0 5px">Instellingen</div>
+                    <div id="preview-muted" style="font-size:13px;color:<?= escapeHtml($platformAdminColors['muted']) ?>;margin-bottom:13px">Beheer de algemene instellingen en huisstijl.</div>
+                    <div id="preview-panel" style="background:<?= escapeHtml($platformAdminColors['surface']) ?>;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:9px;padding:14px">
+                        <div style="font-size:15px;font-weight:700;margin-bottom:5px">Voorbeeld van een instellingenblok</div>
+                        <div style="font-size:13px;margin-bottom:12px">Dit is gewone tekst in een paneel.</div>
+                        <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
+                            <span id="preview-primary-button" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Opslaan</span>
+                            <span id="preview-hover-button" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['primary_dark']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Knop bij aanwijzen</span>
+                            <span id="preview-accent" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['accent']) ?>;color:#202B38;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Accent</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <p style="font-size:12px;color:var(--db-muted);margin:8px 0 0">Dit is een vereenvoudigde voorbeeldweergave; de echte pagina kan per onderdeel iets verschillen.</p>
+        </div>
         <form method="post" action="/admin/settings.php" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="platform_color_primary">Primaire kleur (knoppen en links)</label>
@@ -371,5 +399,50 @@ require $privateRoot . '/app/views/header.php';
         </div>
     </section>
 </section>
+
+<script>
+(function () {
+    const preview = document.getElementById('platform-color-preview');
+    if (!preview) return;
+
+    const fields = {
+        primary: 'preview-primary-button',
+        primary_dark: 'preview-hover-button',
+        accent: 'preview-accent',
+        header: 'preview-header',
+        menu: 'preview-menu',
+        background: 'preview-page',
+        surface: 'preview-panel',
+        text: 'platform-color-preview',
+        muted: 'preview-muted',
+        border: null
+    };
+
+    Object.keys(fields).forEach(function (key) {
+        const input = document.getElementById('platform_color_' + key);
+        if (!input) return;
+        input.addEventListener('input', function () {
+            const targetId = fields[key];
+            if (targetId) {
+                const target = document.getElementById(targetId);
+                if (key === 'text') {
+                    target.style.color = input.value;
+                } else if (key === 'primary' || key === 'primary_dark' || key === 'accent') {
+                    target.style.backgroundColor = input.value;
+                } else {
+                    target.style.backgroundColor = input.value;
+                }
+            }
+            if (key === 'border') {
+                preview.style.borderColor = input.value;
+                ['preview-header', 'preview-menu', 'preview-panel'].forEach(function (id) {
+                    const target = document.getElementById(id);
+                    target.style.borderColor = input.value;
+                });
+            }
+        });
+    });
+})();
+</script>
 
 <?php require $privateRoot . '/app/views/footer.php'; ?>
