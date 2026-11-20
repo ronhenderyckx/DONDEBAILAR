@@ -2231,7 +2231,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     height:auto!important;
     min-height:0!important;
 }
-.agenda-card > .agenda-card__quick {
+.agenda-card__content > .agenda-card__quick {
     position:relative!important;
     top:auto!important;
     flex:0 0 auto!important;
@@ -2252,18 +2252,18 @@ body.has-agenda-footer .site-main > .agenda-page {
     stroke:var(--db-event-day-text-color,#222222)!important;
     color:var(--db-event-day-text-color,#222222)!important;
 }
-.agenda-card > .agenda-card__details {
+.agenda-card__content > .agenda-card__details {
     flex:0 0 auto!important;
     height:auto!important;
     min-height:0!important;
 }
 
 /* Tekstblok direct onder de actie-iconen plaatsen. */
-.agenda-card > .agenda-card__quick {
+.agenda-card__content > .agenda-card__quick {
     margin:0!important;
     padding-bottom:4px!important;
 }
-.agenda-card > .agenda-card__details {
+.agenda-card__content > .agenda-card__details {
     padding-top:4px!important;
 }
 
@@ -2355,7 +2355,7 @@ body.has-agenda-footer .site-main > .agenda-page {
 }
 
 /* De iconenbalk krijgt dezelfde zijmarges als de media erboven. */
-.agenda-card > .agenda-card__quick {
+.agenda-card__content > .agenda-card__quick {
     box-sizing:border-box!important;
     width:calc(100% - 24px)!important;
     max-width:calc(100% - 24px)!important;
@@ -2363,7 +2363,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     margin-right:auto!important;
 }
 @media(max-width:700px) {
-    .agenda-card > .agenda-card__quick {
+    .agenda-card__content > .agenda-card__quick {
         width:calc(100% - 32px)!important;
         max-width:calc(100% - 32px)!important;
     }
@@ -3305,7 +3305,7 @@ body.has-agenda-footer .site-main > .agenda-page {
         box-sizing: border-box;
     }
     /* Eerst naam en datum, daarna de iconen; media staat als laatste rechts. */
-    .agenda-card > .agenda-card__details {
+    .agenda-card__content > .agenda-card__details {
         grid-column: 1;
         grid-row: 1;
         align-self: start;
@@ -3314,16 +3314,16 @@ body.has-agenda-footer .site-main > .agenda-page {
         border-radius: 14px 0 0 0;
         text-align: left;
     }
-    .agenda-card > .agenda-card__details > h2 {
+    .agenda-card__content > .agenda-card__details > h2 {
         margin: 0 0 8px !important;
         text-align: left !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__date-line,
-    .agenda-card > .agenda-card__details > .agenda-card__hashtags {
+    .agenda-card__content > .agenda-card__details > .agenda-card__date-line,
+    .agenda-card__content > .agenda-card__details > .agenda-card__hashtags {
         text-align: left !important;
         margin-left: 0 !important;
     }
-    .agenda-card > .agenda-card__quick {
+    .agenda-card__content > .agenda-card__quick {
         grid-column: 1;
         grid-row: 2;
         display: flex;
@@ -3371,13 +3371,13 @@ body.has-agenda-footer .site-main > .agenda-page {
     }
     /* Maak de inhoud van details afzonderlijke grid-items, zodat de info
        onder de iconen kan staan zonder de smartphone-swipe te wijzigen. */
-    .agenda-card > .agenda-card__details {
+    .agenda-card__content > .agenda-card__details {
         display: contents !important;
     }
-    .agenda-card > .agenda-card__details > h2,
-    .agenda-card > .agenda-card__details > .agenda-card__date-line,
-    .agenda-card > .agenda-card__details > .agenda-card__hashtags,
-    .agenda-card > .agenda-card__details > .agenda-card__description {
+    .agenda-card__content > .agenda-card__details > h2,
+    .agenda-card__content > .agenda-card__details > .agenda-card__date-line,
+    .agenda-card__content > .agenda-card__details > .agenda-card__hashtags,
+    .agenda-card__content > .agenda-card__details > .agenda-card__description {
         grid-column: 1;
         min-width: 0;
         margin-left: 0 !important;
@@ -3387,21 +3387,21 @@ body.has-agenda-footer .site-main > .agenda-page {
         text-align: left !important;
         order: 0;
     }
-    .agenda-card > .agenda-card__details > h2 {
+    .agenda-card__content > .agenda-card__details > h2 {
         grid-row: 1;
         padding-top: 12px;
         margin-bottom: 5px !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__date-line {
+    .agenda-card__content > .agenda-card__details > .agenda-card__date-line {
         grid-row: 2;
         margin-bottom: 5px !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__hashtags {
+    .agenda-card__content > .agenda-card__details > .agenda-card__hashtags {
         grid-row: 3;
         margin-top: 0 !important;
         padding-bottom: 4px;
     }
-    .agenda-card > .agenda-card__quick {
+    .agenda-card__content > .agenda-card__quick {
         grid-column: 1;
         grid-row: 4;
         display: flex;
@@ -3422,7 +3422,7 @@ body.has-agenda-footer .site-main > .agenda-page {
         flex: 0 0 auto;
         min-width: 0;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__description {
+    .agenda-card__content > .agenda-card__details > .agenda-card__description {
         grid-row: 5;
         display: block !important;
         max-height: none !important;
@@ -3499,18 +3499,18 @@ body.has-agenda-footer .site-main > .agenda-page {
         grid-template-columns: minmax(260px, 1fr) minmax(300px, 1.15fr) minmax(220px, 30%) !important;
         grid-template-rows: auto auto auto auto auto;
     }
-    .agenda-card > .agenda-card__details > h2,
-    .agenda-card > .agenda-card__details > .agenda-card__date-line,
-    .agenda-card > .agenda-card__details > .agenda-card__hashtags,
-    .agenda-card > .agenda-card__quick,
+    .agenda-card__content > .agenda-card__details > h2,
+    .agenda-card__content > .agenda-card__details > .agenda-card__date-line,
+    .agenda-card__content > .agenda-card__details > .agenda-card__hashtags,
+    .agenda-card__content > .agenda-card__quick,
     .agenda-card > .agenda-card__swipe-hint {
         grid-column: 1;
     }
-    .agenda-card > .agenda-card__details > h2 { grid-row: 1; }
-    .agenda-card > .agenda-card__details > .agenda-card__date-line { grid-row: 2; }
-    .agenda-card > .agenda-card__details > .agenda-card__hashtags { grid-row: 3; }
-    .agenda-card > .agenda-card__quick { grid-row: 4; }
-    .agenda-card > .agenda-card__details > .agenda-card__description {
+    .agenda-card__content > .agenda-card__details > h2 { grid-row: 1; }
+    .agenda-card__content > .agenda-card__details > .agenda-card__date-line { grid-row: 2; }
+    .agenda-card__content > .agenda-card__details > .agenda-card__hashtags { grid-row: 3; }
+    .agenda-card__content > .agenda-card__quick { grid-row: 4; }
+    .agenda-card__content > .agenda-card__details > .agenda-card__description {
         grid-column: 2;
         grid-row: 1 / span 4;
         align-self: center;
@@ -3569,10 +3569,10 @@ body.has-agenda-footer .site-main > .agenda-page {
         align-items: stretch !important;
         height: auto !important;
     }
-    .agenda-card > .agenda-card__details {
+    .agenda-card__content > .agenda-card__details {
         display: contents !important;
     }
-    .agenda-card > .agenda-card__details > h2 {
+    .agenda-card__content > .agenda-card__details > h2 {
         grid-column: 1 !important;
         grid-row: 1 !important;
         justify-self: stretch;
@@ -3580,20 +3580,20 @@ body.has-agenda-footer .site-main > .agenda-page {
         margin: 0 !important;
         padding: 12px 10px 4px 12px !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__date-line {
+    .agenda-card__content > .agenda-card__details > .agenda-card__date-line {
         grid-column: 1 !important;
         grid-row: 2 !important;
         text-align: left !important;
         margin: 0 !important;
         padding: 0 10px 4px 12px !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__hashtags {
+    .agenda-card__content > .agenda-card__details > .agenda-card__hashtags {
         grid-column: 1 !important;
         grid-row: 3 !important;
         padding-left: 12px !important;
         padding-right: 10px !important;
     }
-    .agenda-card > .agenda-card__quick {
+    .agenda-card__content > .agenda-card__quick {
         grid-column: 1 !important;
         grid-row: 4 !important;
         width: auto !important;
@@ -3602,7 +3602,7 @@ body.has-agenda-footer .site-main > .agenda-page {
         padding-left: 12px !important;
         flex-wrap: wrap;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__description {
+    .agenda-card__content > .agenda-card__details > .agenda-card__description {
         grid-column: 2 !important;
         grid-row: 1 / span 4 !important;
         align-self: center !important;
@@ -3645,11 +3645,11 @@ body.has-agenda-footer .site-main > .agenda-page {
         grid-template-rows: repeat(5, minmax(1.5em, auto)) !important;
         align-items: stretch !important;
     }
-    .agenda-card > .agenda-card__details > h2 { grid-row: 1 !important; }
-    .agenda-card > .agenda-card__details > .agenda-card__date-line { grid-row: 2 !important; }
-    .agenda-card > .agenda-card__details > .agenda-card__hashtags { grid-row: 3 !important; }
-    .agenda-card > .agenda-card__quick { grid-row: 4 !important; }
-    .agenda-card > .agenda-card__details > .agenda-card__description {
+    .agenda-card__content > .agenda-card__details > h2 { grid-row: 1 !important; }
+    .agenda-card__content > .agenda-card__details > .agenda-card__date-line { grid-row: 2 !important; }
+    .agenda-card__content > .agenda-card__details > .agenda-card__hashtags { grid-row: 3 !important; }
+    .agenda-card__content > .agenda-card__quick { grid-row: 4 !important; }
+    .agenda-card__content > .agenda-card__details > .agenda-card__description {
         grid-column: 2 !important;
         grid-row: 1 / span 5 !important;
         align-self: stretch !important;
@@ -3712,7 +3712,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     .agenda-card > .agenda-card__media-wrap {
         display: none !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__description {
+    .agenda-card__content > .agenda-card__details > .agenda-card__description {
         grid-column: 2 !important;
     }
 }
@@ -3740,7 +3740,7 @@ body.has-agenda-footer .site-main > .agenda-page {
 /* Smartphone: media, naam, datum, hashtags, iconen en swipehint in vaste volgorde.
    Alleen de smartphone-indeling verandert; desktop blijft onaangeroerd. */
 @media (max-width: 700px) {
-    .agenda-card > .agenda-card__details {
+    .agenda-card__content > .agenda-card__details {
         display: contents !important;
     }
     .agenda-card > .agenda-card__media-wrap {
@@ -3749,41 +3749,41 @@ body.has-agenda-footer .site-main > .agenda-page {
     .agenda-card > .agenda-card__media-wrap:has(.agenda-card__placeholder) {
         display: none !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__cancelled-label {
+    .agenda-card__content > .agenda-card__details > .agenda-card__cancelled-label {
         order: 2 !important;
     }
-    .agenda-card > .agenda-card__details > h2 {
+    .agenda-card__content > .agenda-card__details > h2 {
         order: 3 !important;
         margin: 10px 16px 4px !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__date-line {
+    .agenda-card__content > .agenda-card__details > .agenda-card__date-line {
         order: 4 !important;
         margin: 4px 16px 7px !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__prices {
+    .agenda-card__content > .agenda-card__details > .agenda-card__prices {
         order: 5 !important;
         margin: 0 16px 7px !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__hashtags {
+    .agenda-card__content > .agenda-card__details > .agenda-card__hashtags {
         order: 6 !important;
     }
     /* Bij openen komt alle extra informatie tussen hashtags en iconen. */
-    .agenda-card > .agenda-card__details > .agenda-card__description {
+    .agenda-card__content > .agenda-card__details > .agenda-card__description {
         order: 7 !important;
         width: auto !important;
         min-width: 0 !important;
     }
-    .agenda-card > .agenda-card__quick {
+    .agenda-card__content > .agenda-card__quick {
         order: 8 !important;
     }
-    .agenda-card > .agenda-card__details > .agenda-card__swipe-hint {
+    .agenda-card__content > .agenda-card__details > .agenda-card__swipe-hint {
         order: 9 !important;
     }
 }
 
 /* Smartphone: prijzen direct onder de datum, links exact op dezelfde lijn uitgelijnd. */
 @media (max-width: 700px) {
-    .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__prices {
+    .agenda-feed .agenda-card__content > .agenda-card__details > p.agenda-card__prices {
         display: block !important;
         order: 5 !important;
         width: auto !important;
@@ -3796,7 +3796,7 @@ body.has-agenda-footer .site-main > .agenda-page {
 
 /* Smartphone: hashtags uitlijnen met de linker inspringing van naam en datum. */
 @media (max-width: 700px) {
-    .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__hashtags {
+    .agenda-feed .agenda-card__content > .agenda-card__details > p.agenda-card__hashtags {
         margin: 0 16px 7px 16px !important;
         padding: 0 !important;
         text-align: left !important;
@@ -3808,7 +3808,7 @@ body.has-agenda-footer .site-main > .agenda-page {
 
 /* Smartphone: swipehint uitlijnen met de tekst; zonder kader en met gelijke tekstkleur. */
 @media (max-width: 700px) {
-    .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__swipe-hint {
+    .agenda-feed .agenda-card__content > .agenda-card__details > p.agenda-card__swipe-hint {
         margin: 5px 16px 12px 16px !important;
         padding: 0 !important;
         align-self: flex-start !important;
@@ -3825,7 +3825,7 @@ body.has-agenda-footer .site-main > .agenda-page {
         opacity: 1 !important;
         color: inherit !important;
     }
-    .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__swipe-hint::before {
+    .agenda-feed .agenda-card__content > .agenda-card__details > p.agenda-card__swipe-hint::before {
         content: attr(data-arrow, "→");
         display: inline-block;
         margin-right: 8px;
@@ -3836,7 +3836,7 @@ body.has-agenda-footer .site-main > .agenda-page {
         text-shadow: none;
         vertical-align: -1px;
     }
-    .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__swipe-hint::after {
+    .agenda-feed .agenda-card__content > .agenda-card__details > p.agenda-card__swipe-hint::after {
         content: attr(data-label, "Meer info");
         color: inherit !important;
         font-size: 13px;
@@ -3896,47 +3896,62 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-card__cancelled-label { display:none; }
 
 @media (max-width:700px) {
-    /* Alle smartphone-annuleringsbanners staan als diagonale strook onder de media. */
+    /* De inhoudszone begint pas onder de media en groeit mee wanneer extra info opent. */
+    .agenda-card > .agenda-card__content {
+        display:flex!important;
+        flex-direction:column!important;
+        position:relative!important;
+        isolation:isolate;
+        overflow:hidden;
+        border-radius:0 0 14px 14px;
+        background:var(--db-event-day-color,var(--db-primary,#1FA898));
+    }
+    .agenda-card > .agenda-card__content::before {
+        content:"";
+        position:absolute;
+        z-index:0;
+        inset:0;
+        pointer-events:none;
+        background:color-mix(in srgb,var(--db-event-day-color,#1FA898) 62%,transparent);
+        clip-path:polygon(0 88%,0 100%,100% 12%,100% 0);
+    }
     .agenda-feed > .agenda-card.agenda-card--cancelled::after,
     .agenda-feed > .agenda-card.agenda-card--archived::after {
         display:none;
     }
-    /* Smartphone: de banner zit in het groene tekstgedeelte, nooit over de media.
-       De linkerzijde ligt lager dan de rechterzijde: linksonder naar rechtsboven. */
-    .agenda-card > .agenda-card__quick {
+    .agenda-card__content > .agenda-card__quick {
         position:relative!important;
-        z-index:auto!important;
+        z-index:1!important;
         overflow:visible!important;
     }
-    .agenda-card > .agenda-card__quick > .agenda-card__cancelled-label {
+    .agenda-card__content > .agenda-card__quick > .agenda-card__cancelled-label {
         display:block;
         position:absolute;
-        z-index:0;
-        top:82px;
-        left:-15%;
-        width:130%;
+        z-index:1;
+        left:-22%;
+        top:50%;
+        width:144%;
         margin:0;
-        padding:9px 4px;
+        padding:5px 4px;
         box-sizing:border-box;
-        transform:rotate(-25deg);
+        transform:translateY(-50%) rotate(-28deg);
         transform-origin:center center;
-        background:color-mix(in srgb,var(--db-event-day-color,#777777) 58%,transparent);
+        background:transparent;
         color:var(--db-event-day-title-color,#222222);
         font-family:Arial,Helvetica,sans-serif;
-        font-size:clamp(17px,4.5vw,23px);
+        font-size:clamp(15px,4vw,21px);
         font-weight:900;
-        letter-spacing:.1em;
-        line-height:1.2;
+        letter-spacing:.09em;
+        line-height:1.15;
         text-align:center;
+        text-shadow:0 1px 2px rgba(255,255,255,.35);
         pointer-events:none;
+        white-space:nowrap;
     }
-    .agenda-card > .agenda-card__quick > :not(.agenda-card__cancelled-label) {
-        position:relative;
-        z-index:2;
-    }
-    .agenda-card > .agenda-card__details > h2,
-    .agenda-card > .agenda-card__details > p,
-    .agenda-card > .agenda-card__details > .agenda-card__description {
+    .agenda-card__content > .agenda-card__quick > :not(.agenda-card__cancelled-label),
+    .agenda-card__content > .agenda-card__details > h2,
+    .agenda-card__content > .agenda-card__details > p,
+    .agenda-card__content > .agenda-card__details > .agenda-card__description {
         position:relative;
         z-index:2;
     }
