@@ -1562,3 +1562,48 @@ body.platform-admin-page {
         width: 120px;
     }
 }
+
+
+/* Correcte agenda-indeling: label op eigen regel, invoerveld en knop samen eronder. */
+.platform-admin-page .settings-page .agenda-settings-form {
+    display: block !important;
+}
+.platform-admin-page .settings-page .agenda-settings-form > label {
+    display: block;
+    margin: 0 0 9px;
+}
+.platform-admin-page .settings-page .agenda-settings-form .agenda-setting-controls {
+    display: flex !important;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    width: 100%;
+}
+.platform-admin-page .settings-page .agenda-settings-form .agenda-setting-input {
+    flex: 0 0 180px;
+    width: 180px;
+    max-width: 180px;
+}
+.platform-admin-page .settings-page .agenda-settings-form .agenda-setting-input input {
+    width: 100%;
+}
+.platform-admin-page .settings-page .agenda-settings-form .form-actions {
+    display: flex !important;
+    flex: 0 0 auto;
+    margin: 0 !important;
+    padding: 0;
+}
+.platform-admin-page .settings-page .agenda-settings-form .form-actions button {
+    white-space: nowrap;
+}
+@media (max-width: 420px) {
+    .platform-admin-page .settings-page .agenda-settings-form .agenda-setting-input {
+        flex-basis: 110px;
+        width: 110px;
+    }
+    .platform-admin-page .settings-page .agenda-settings-form .agenda-setting-controls {
+        gap: 7px;
+    }
+}
