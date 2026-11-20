@@ -249,7 +249,7 @@ require $privateRoot . '/app/views/header.php';
                     <div id="preview-panel" style="background:<?= escapeHtml($platformAdminColors['surface']) ?>;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:9px;padding:14px"><div style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:8px"><label class="preview-color-choice"><span>Paneel</span><input type="color" data-preview-color="surface" value="<?= escapeHtml($platformAdminColors['surface']) ?>" aria-label="Kleur panelen"></label><label class="preview-color-choice"><span>Randen</span><input type="color" data-preview-color="border" value="<?= escapeHtml($platformAdminColors['border']) ?>" aria-label="Randkleur"></label></div>
                         <div style="font-size:15px;font-weight:700;margin-bottom:5px">Voorbeeld van een instellingenblok</div>
                         <div style="font-size:13px;margin-bottom:12px">Dit is gewone tekst in een paneel.</div>
-                        <div id="preview-list-title" style="font-size:14px;font-weight:700;margin:16px 0 8px">Voorbeeld van een beheerlijst</div>
+                        <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:16px 0 8px"><div id="preview-list-title" style="font-size:14px;font-weight:700">Voorbeeld van een beheerlijst</div><label class="preview-color-choice" style="margin-left:0"><span>Knop Wijzigen</span><input type="color" data-preview-color="action_button" value="<?= escapeHtml($platformAdminColors['action_button']) ?>" aria-label="Kleur knop Wijzigen"></label></div>
                         <div style="overflow-x:auto">
                             <table id="preview-admin-list" style="width:100%;border-collapse:collapse;font-size:12px;background:<?= escapeHtml($platformAdminColors['surface']) ?>;color:<?= escapeHtml($platformAdminColors['text']) ?>">
                                 <thead><tr>
@@ -294,6 +294,7 @@ require $privateRoot . '/app/views/header.php';
                         $colorDescriptions = [
                             'primary' => ['Primaire kleur', 'Hoofdkleur voor actieknoppen, links en geselecteerde onderdelen.'],
                             'primary_dark' => ['Donkere primaire kleur', 'Donkere variant bij aanwijzen of hoveren over een knop.'],
+                            'action_button' => ['Knop Wijzigen', 'Achtergrondkleur van de knoppen Wijzigen in de beheerlijst. De hoverkleur gebruikt de donkere primaire kleur.'],
                             'accent' => ['Accentkleur', 'Laat belangrijke details en markeringen extra opvallen.'],
                             'header' => ['Bovenbalk', 'Achtergrond van de bovenste balk met het DONDEBAILAR-logo.'],
                             'menu' => ['Menu', 'Achtergrondkleur van het uitklapmenu met navigatie-items.'],
