@@ -364,7 +364,7 @@ require $privateRoot . '/app/views/header.php';
                 <p>Bepaal hoeveel evenementen in één reeks worden getoond. Bezoekers bladeren op de agenda met de pijltjes naar de vorige of volgende reeks.</p>
             </div>
         </div>
-        <form method="post" action="/admin/settings.php" class="auth-form">
+        <form method="post" action="/admin/settings.php" class="auth-form agenda-settings-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <label for="agenda_page_size">Evenementen per reeks (1–100)</label>
             <div class="agenda-setting-controls">
