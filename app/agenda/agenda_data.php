@@ -204,7 +204,7 @@ if ($regionId > 0) {
                  ORDER BY em.is_cover DESC, em.sort_order, em.id LIMIT 1)
             )
             WHERE e.region_id = :region_id
-              AND e.status = 'published'";
+              AND e.status IN ('published','cancelled','cancelled_rain')";
     $params = [
         'region_id' => $regionId,
     ];
