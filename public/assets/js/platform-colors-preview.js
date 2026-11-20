@@ -176,6 +176,13 @@
         const original = document.getElementById('platform_color_' + key);
         if (original) original.value = picker.value;
 
+        // Werk ook de echte Terug- en Opslaan-knoppen direct bij.
+        if (key === 'primary') {
+            document.body.style.setProperty('--db-primary', picker.value);
+        } else if (key === 'primary_dark') {
+            document.body.style.setProperty('--db-primary-dark', picker.value);
+        }
+
         // Houd eventuele tweede kleurkiezer voor dezelfde instelling gelijk.
         preview.querySelectorAll('[data-preview-color="' + key + '"]').forEach(other => {
             if (other !== picker) other.value = picker.value;
