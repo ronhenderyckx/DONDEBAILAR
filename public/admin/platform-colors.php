@@ -59,6 +59,8 @@ $platformAdminColors = [
     'border' => '#E7EAF0'
 ];
 $platformColorsFile = $projectRoot . '/storage/platform-admin-colors.json';
+$platformFooterTextFile = $projectRoot . '/storage/platform-admin-footer-text.txt';
+$platformFooterText = is_file($platformFooterTextFile) ? trim((string) file_get_contents($platformFooterTextFile)) : '';
 if (is_file($platformColorsFile)) {
     $savedPlatformColors = json_decode((string) file_get_contents($platformColorsFile), true);
     if (is_array($savedPlatformColors)) {
@@ -88,6 +90,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!verifyCsrfToken(is_string($csrf) ? $csrf : null)) {
         $errorMessage = 'De beveiligingscontrole is verlopen. Vernieuw de pagina.';
     } else {
+        $requestedFooterText = trim((string) ($_POST['platform_footer_text'] ?? ''));
+        if (mb_strlen($requestedFooterText, 'UTF-8') > 500) {
+            $errorMessage = 'De footertekst mag maximaal 500 tekens bevatten.';
+        }
         $requestedColors = [];
         foreach ($platformAdminColors as $colorKey => $fallbackColor) {
             $candidateColor = strtoupper(trim((string) ($_POST['platform_colors'][$colorKey] ?? '')));
@@ -101,6 +107,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $encodedColors = json_encode($requestedColors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             if ($encodedColors === false || file_put_contents($platformColorsFile, $encodedColors . PHP_EOL, LOCK_EX) === false) {
                 $errorMessage = 'De platformkleuren konden niet worden opgeslagen. Controleer de schrijfrechten van storage.';
+            } elseif (file_put_contents($platformFooterTextFile, $requestedFooterText . PHP_EOL, LOCK_EX) === false) {
+                $errorMessage = 'De footertekst kon niet worden opgeslagen. Controleer de schrijfrechten van storage.';
             } else {
                 header('Location: /admin/platform-colors.php?saved=1');
                 exit;
@@ -322,7 +330,7 @@ require $projectRoot . '/app/views/header.php';
                 </div>
                 <div id="preview-footer" style="padding:12px 16px;background:<?= escapeHtml($platformAdminColors['footer']) ?>;color:<?= escapeHtml($platformAdminColors['footer_text']) ?>;border-top:1px solid <?= escapeHtml($platformAdminColors['footer_border']) ?>;font-size:12px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap">
                     <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-                        <span>Voorbeeld voettekst — DONDEBAILAR</span>
+                        <span id="preview-footer-text"><?= escapeHtml($platformFooterText !== '' ? $platformFooterText : 'Voorbeeld voettekst — DONDEBAILAR') ?></span>
                         <a href="#" onclick="return false" style="color:<?= escapeHtml($platformAdminColors['footer_link']) ?>;text-decoration:underline">Voorbeeld link</a>
                         <a href="#" onclick="return false" class="preview-footer-link-hover" style="color:<?= escapeHtml($platformAdminColors['footer_link_hover']) ?>;text-decoration:underline">Voorbeeld link (hover)</a>
                     </div>
@@ -339,6 +347,11 @@ require $projectRoot . '/app/views/header.php';
         </div>
 <form method="post" action="/admin/platform-colors.php">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
+            <div class="platform-footer-text-setting" style="margin:12px 0 8px;max-width:620px">
+                <label for="platform-footer-text" style="display:block;font-weight:600;margin-bottom:6px">Tekst in de footer</label>
+                <input type="text" id="platform-footer-text" name="platform_footer_text" maxlength="500" value="<?= escapeHtml($platformFooterText) ?>" placeholder="Laat leeg om geen footertekst te tonen" style="width:100%;box-sizing:border-box">
+                <p style="font-size:12px;color:var(--db-muted);margin:5px 0 0">De tekst wordt direct in het voorbeeld getoond. Laat het veld leeg als je geen tekst in de echte footer wilt tonen.</p>
+            </div>
             <?php foreach ($platformAdminColors as $colorKey => $colorValue): ?>
                 <input type="hidden" id="platform_color_<?= escapeHtml($colorKey) ?>" name="platform_colors[<?= escapeHtml($colorKey) ?>]" value="<?= escapeHtml($colorValue) ?>">
             <?php endforeach; ?>
