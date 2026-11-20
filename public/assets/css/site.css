@@ -1939,3 +1939,31 @@ body.platform-admin-page {
 .platform-mail-settings-page .form-actions > button {
     margin: 0;
 }
+
+/* Regio wijzigen: alle actieknoppen hebben dezelfde vaste hoogte. */
+.region-edit-page a.button,
+.region-edit-page button.button,
+.region-edit-page .form-actions > a,
+.region-edit-page .form-actions > button {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    height: 44px;
+    padding: 0 16px;
+    line-height: 1.2;
+    vertical-align: middle;
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.region-edit-page .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+.region-edit-page .form-actions > a,
+.region-edit-page .form-actions > button {
+    flex: 0 0 auto;
+}
