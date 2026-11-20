@@ -3760,6 +3760,12 @@ body.has-agenda-footer .site-main > .agenda-page {
     .agenda-card > .agenda-card__details > .agenda-card__swipe-hint {
         order: 6 !important;
     }
+    /* Uitklapbare extra informatie altijd onderaan de kaart tonen. */
+    .agenda-card > .agenda-card__details > .agenda-card__description {
+        order: 7 !important;
+        width: auto !important;
+        min-width: 0 !important;
+    }
 }
 
 /* Smartphone: hashtags uitlijnen met de linker inspringing van naam en datum. */
