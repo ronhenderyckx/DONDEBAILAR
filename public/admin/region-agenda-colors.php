@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $save = $db->prepare('UPDATE region_appearance SET weekday_colors = :colors WHERE region_id = :id');
                 $save->execute(['id' => $regionId, 'colors' => $encoded]);
             } else {
-                $save = $db->prepare('INSERT INTO region_appearance
+                $save = $db->prepare("INSERT INTO region_appearance
                     (region_id, primary_color, primary_dark, accent_color, secondary_color, tertiary_color,
                      header_color, menu_color, organizer_color, filter_hover_color, filter_bar_color, filter_text_color,
                      past_event_color, search_button_color, back_top_color, search_field_color, search_text_color,
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     VALUES (:id, '#E23A2C', '#8F211B', '#F6B22E', '#1FA898', '#F4802A',
                      '#222222', '#FFFFFF', '#E23A2C', '#E23A2C', '#FFFFFF', '#222222',
                      '#777777', '#E23A2C', '#E23A2C', '#FFFFFF', '#222222',
-                     '#FFFFFF', '#FFFFFF', '#222222', :colors, NULL)');
+                     '#FFFFFF', '#FFFFFF', '#222222', :colors, NULL)");
                 $save->execute(['id' => $regionId, 'colors' => $encoded]);
             }
             $successMessage = 'De agendakleuren zijn opgeslagen.';
