@@ -1967,3 +1967,30 @@ body.platform-admin-page {
 .region-edit-page .form-actions > button {
     flex: 0 0 auto;
 }
+
+/* Nieuwe regio: alle actieknoppen hebben dezelfde vaste hoogte. */
+.region-new-page .admin-heading > .button,
+.region-new-page .form-actions > a.button,
+.region-new-page .form-actions > button.button {
+    box-sizing: border-box;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 44px;
+    min-height: 44px;
+    padding: 0 16px;
+    line-height: 1.2;
+    margin-top: 0;
+    margin-bottom: 0;
+    vertical-align: middle;
+}
+.region-new-page .form-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+.region-new-page .form-actions > a,
+.region-new-page .form-actions > button {
+    flex: 0 0 auto;
+}
