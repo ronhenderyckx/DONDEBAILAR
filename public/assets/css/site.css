@@ -1212,3 +1212,92 @@ body.has-agenda-footer .site-footer--agenda .agenda-footer-tools form.agenda-foo
 .platform-admin-page .admin-table tbody tr:hover > td a:not(.button) {
     color: var(--db-list-hover-text, #FFFFFF);
 }
+
+
+/* Platformbeheer: ingestelde kleuren moeten ook de echte pagina en formulieren sturen. */
+body.platform-admin-page {
+    background: var(--db-background, #F7F8FA) !important;
+    color: var(--db-text, #202B38) !important;
+}
+.platform-admin-page .site-main,
+.platform-admin-page .admin-page {
+    background: transparent !important;
+    color: var(--db-text, #202B38) !important;
+}
+.platform-admin-page .site-header {
+    background: var(--db-header-color, #FFFFFF) !important;
+    color: var(--db-text, #202B38) !important;
+}
+.platform-admin-page .site-menu,
+.platform-admin-page .site-menu__panel {
+    background: var(--db-menu-color, #FFFFFF) !important;
+    color: var(--db-text, #202B38) !important;
+}
+.platform-admin-page .admin-section,
+.platform-admin-page .auth-card {
+    background: var(--db-surface, #FFFFFF) !important;
+    border-color: var(--db-border, #E7EAF0) !important;
+    color: var(--db-text, #202B38) !important;
+}
+.platform-admin-page .admin-heading h1,
+.platform-admin-page .admin-section h2,
+.platform-admin-page .admin-section h3,
+.platform-admin-page .admin-section label {
+    color: var(--db-text, #202B38) !important;
+}
+.platform-admin-page .admin-heading p,
+.platform-admin-page .admin-section p {
+    color: var(--db-muted, #687586) !important;
+}
+.platform-admin-page input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+.platform-admin-page select,
+.platform-admin-page textarea {
+    background-color: var(--db-form-input-bg, #FFFFFF) !important;
+    color: var(--db-form-input-text, #202B38) !important;
+    -webkit-text-fill-color: var(--db-form-input-text, #202B38) !important;
+    border: 1px solid var(--db-form-input-border, #E7EAF0) !important;
+}
+.platform-admin-page input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):hover,
+.platform-admin-page input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):focus,
+.platform-admin-page select:hover,
+.platform-admin-page select:focus,
+.platform-admin-page textarea:hover,
+.platform-admin-page textarea:focus {
+    border-color: var(--db-form-input-hover-border, var(--db-primary, #0A4D9F)) !important;
+}
+.platform-admin-page input::placeholder,
+.platform-admin-page textarea::placeholder {
+    color: var(--db-muted, #687586) !important;
+    -webkit-text-fill-color: var(--db-muted, #687586) !important;
+}
+.platform-admin-page button,
+.platform-admin-page .button,
+.platform-admin-page input[type="submit"] {
+    background: var(--db-form-button-bg, var(--db-primary, #0A4D9F)) !important;
+    border-color: var(--db-form-button-bg, var(--db-primary, #0A4D9F)) !important;
+    color: var(--db-form-button-text, #FFFFFF) !important;
+}
+.platform-admin-page button:hover,
+.platform-admin-page .button:hover,
+.platform-admin-page input[type="submit"]:hover {
+    background: var(--db-form-button-hover-bg, var(--db-primary-dark, #083B79)) !important;
+    border-color: var(--db-form-button-hover-bg, var(--db-primary-dark, #083B79)) !important;
+    color: var(--db-form-button-hover-text, #FFFFFF) !important;
+}
+.platform-admin-page .admin-table {
+    color: var(--db-list-text, var(--db-text, #202B38)) !important;
+}
+.platform-admin-page .admin-table thead th {
+    background: var(--db-list-header-bg, #F1F3F6) !important;
+    color: var(--db-list-header-text, #687586) !important;
+}
+.platform-admin-page .admin-table tbody tr {
+    background: var(--db-list-row-bg, #FFFFFF) !important;
+}
+.platform-admin-page .admin-table tbody tr:hover {
+    background: var(--db-list-hover-bg, var(--db-primary-dark, #083B79)) !important;
+}
+.platform-admin-page .admin-table tbody tr:hover td,
+.platform-admin-page .admin-table tbody tr:hover td a:not(.button) {
+    color: var(--db-list-hover-text, #FFFFFF) !important;
+}
