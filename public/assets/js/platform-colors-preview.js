@@ -33,10 +33,6 @@
         const activeText = color('status_active_text', '#16845B');
         const inactiveBg = color('status_inactive_bg', '#F0F1F3');
         const inactiveText = color('status_inactive_text', '#68717C');
-        const backButtonBg = color('back_button_bg', '#FFFFFF');
-        const backButtonText = color('back_button_text', '#202B38');
-        const saveButtonBg = color('save_button_bg', primary);
-        const saveButtonText = color('save_button_text', '#FFFFFF');
 
         preview.style.backgroundColor = background;
         preview.style.color = text;
@@ -106,12 +102,6 @@
         setBackground('#preview-primary-button', primary);
         setBackground('#preview-hover-button', primary);
         setBackground('#preview-accent', accent);
-        setBackground('#preview-back-button', backButtonBg);
-        setText('#preview-back-button', backButtonText);
-        setBorder('#preview-back-button', backButtonBg);
-        setBackground('#preview-save-button', saveButtonBg);
-        setText('#preview-save-button', saveButtonText);
-        setBorder('#preview-save-button', saveButtonBg);
 
         setText('#preview-header, #preview-menu, #preview-page, #preview-panel', text);
         setText('#preview-muted', muted);
