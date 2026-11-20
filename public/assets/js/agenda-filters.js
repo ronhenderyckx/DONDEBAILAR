@@ -167,14 +167,19 @@
         refreshAgendaPage(parsed, url, addHistory);
     }
 
-    document.addEventListener('change', function (event) {
-        if (!(event.target instanceof HTMLInputElement) || event.target.id !== 'agenda-show-cancelled') return;
+    document.addEventListener('click', function (event) {
+        const cancelledButton = event.target instanceof Element ? event.target.closest('#agenda-show-cancelled') : null;
+        if (!cancelledButton) return;
         const url = new URL(window.location.href);
-        if (event.target.checked) url.searchParams.set('show_cancelled', '1');
+        const showCancelled = url.searchParams.get('show_cancelled') !== '1';
+        if (showCancelled) url.searchParams.set('show_cancelled', '1');
         else url.searchParams.delete('show_cancelled');
         url.searchParams.set('agenda_change', '1');
         url.searchParams.delete('page');
-        loadAgendaFilter(url, true).catch(function (error) {
+        loadAgendaFilter(url, true).then(function () {
+            cancelledButton.classList.toggle('is-active', showCancelled);
+            cancelledButton.setAttribute('aria-pressed', showCancelled ? 'true' : 'false');
+        }).catch(function (error) {
             if (error.name !== 'AbortError') window.location.assign(url.href);
         });
     });
@@ -197,8 +202,7 @@
         const link = event.target instanceof Element ? event.target.closest('.agenda-organizer-strip a[href]') : null;
         if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         const url = new URL(link.href, window.location.origin);
-        const cancelledToggle = document.getElementById('agenda-show-cancelled');
-        if (cancelledToggle && cancelledToggle.checked) url.searchParams.set('show_cancelled', '1');
+        if (new URL(window.location.href).searchParams.get('show_cancelled') === '1') url.searchParams.set('show_cancelled', '1');
         if (url.origin !== window.location.origin || url.pathname !== '/' || url.searchParams.get('agenda_change') !== '1') return;
         event.preventDefault();
         loadAgendaFilter(url, true).catch(function (error) {
