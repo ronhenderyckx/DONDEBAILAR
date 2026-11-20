@@ -199,6 +199,10 @@ if ($isPlatformAdminPage) {
     $platformColors = [
         'primary' => '#0A4D9F',
         'primary_dark' => '#083B79',
+        'back_button_bg' => '#FFFFFF',
+        'back_button_text' => '#202B38',
+        'save_button_bg' => '#0A4D9F',
+        'save_button_text' => '#FFFFFF',
         'accent' => '#00AFC5',
         'header' => '#FFFFFF',
         'menu' => '#FFFFFF',
@@ -238,6 +242,10 @@ if ($isPlatformAdminPage) {
         . ';--db-text:' . $platformColors['text']
         . ';--db-muted:' . $platformColors['muted']
         . ';--db-border:' . $platformColors['border'];
+    $themeStyle .= ';--db-back-button-bg:' . $platformColors['back_button_bg']
+        . ';--db-back-button-text:' . $platformColors['back_button_text']
+        . ';--db-save-button-bg:' . $platformColors['save_button_bg']
+        . ';--db-save-button-text:' . $platformColors['save_button_text'];
 
     // Deel ook de formulier- en lijstkleuren met alle platformbeheerpagina's.
     $platformDetailColors = [
