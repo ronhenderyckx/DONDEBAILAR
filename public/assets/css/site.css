@@ -485,6 +485,28 @@ p {
     color: #FFFFFF;
 }
 
+/* Afzonderlijke kleuren voor terug- en opslagknoppen in platformbeheer. */
+.platform-admin-page .admin-heading > a.button:not(.button--primary) {
+    border-color: var(--db-back-button-bg, var(--db-border));
+    background: var(--db-back-button-bg, #FFFFFF);
+    color: var(--db-back-button-text, var(--db-text));
+}
+.platform-admin-page .admin-heading > a.button:not(.button--primary):hover {
+    border-color: var(--db-back-button-bg, var(--db-border));
+    background: var(--db-back-button-bg, #FFFFFF);
+    color: var(--db-back-button-text, var(--db-text));
+}
+.platform-admin-page .form-actions > .button--primary {
+    border-color: var(--db-save-button-bg, var(--db-primary));
+    background: var(--db-save-button-bg, var(--db-primary));
+    color: var(--db-save-button-text, #FFFFFF);
+}
+.platform-admin-page .form-actions > .button--primary:hover {
+    border-color: var(--db-save-button-bg, var(--db-primary));
+    background: var(--db-save-button-bg, var(--db-primary));
+    color: var(--db-save-button-text, #FFFFFF);
+}
+
 /* Tabellen */
 
 .table-wrapper {
