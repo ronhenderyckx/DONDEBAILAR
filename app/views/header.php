@@ -238,6 +238,50 @@ if ($isPlatformAdminPage) {
         . ';--db-text:' . $platformColors['text']
         . ';--db-muted:' . $platformColors['muted']
         . ';--db-border:' . $platformColors['border'];
+
+    // Deel ook de formulier- en lijstkleuren met alle platformbeheerpagina's.
+    $platformDetailColors = [
+        'form_panel_bg' => '#F7F8FA',
+        'form_label_text' => '#202B38',
+        'form_input_bg' => '#FFFFFF',
+        'form_input_text' => '#202B38',
+        'form_input_border' => '#E7EAF0',
+        'form_input_hover_border' => '#0A4D9F',
+        'form_button_bg' => '#0A4D9F',
+        'form_button_text' => '#FFFFFF',
+        'form_button_hover_bg' => '#083B79',
+        'form_button_hover_text' => '#FFFFFF',
+        'list_text' => '#202B38',
+        'list_header_bg' => '#F1F3F6',
+        'list_header_text' => '#687586',
+        'list_row_bg' => '#FFFFFF',
+        'list_hover_bg' => '#083B79',
+        'list_hover_text' => '#FFFFFF',
+        'action_button' => '#0A4D9F',
+        'action_button_text' => '#FFFFFF',
+        'action_hover_bg' => '#083B79',
+        'action_hover_text' => '#FFFFFF',
+        'status_active_bg' => '#EAF7F0',
+        'status_active_text' => '#16845B',
+        'status_inactive_bg' => '#F0F1F3',
+        'status_inactive_text' => '#68717C',
+    ];
+    $platformDetailFile = $projectRoot . '/storage/platform-admin-colors.json';
+    if (is_file($platformDetailFile)) {
+        $savedDetailColors = json_decode((string) file_get_contents($platformDetailFile), true);
+        if (is_array($savedDetailColors)) {
+            foreach ($platformDetailColors as $colorKey => $fallbackColor) {
+                $candidateColor = strtoupper(trim((string) ($savedDetailColors[$colorKey] ?? '')));
+                if (preg_match('/^#[0-9A-F]{6}$/', $candidateColor)) {
+                    $platformDetailColors[$colorKey] = $candidateColor;
+                }
+            }
+        }
+    }
+    foreach ($platformDetailColors as $colorKey => $colorValue) {
+        $cssVariable = str_replace('_', '-', $colorKey);
+        $themeStyle .= ';--db-' . $cssVariable . ':' . $colorValue;
+    }
 }
 $appearancePalette = json_decode((string) ($region['weekday_colors'] ?? ''), true);
 $selectorStripBackgroundColor = is_array($appearancePalette) ? (string) ($appearancePalette['selector_strip_background_color'] ?? '#FFFFFF') : '#FFFFFF';
