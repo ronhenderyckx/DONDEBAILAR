@@ -3808,6 +3808,6 @@ body.has-agenda-footer .site-main > .agenda-page {
         content: "Swipe voor meer info";
         color: inherit !important;
         font-size: 13px;
-        font-weight: 800;
+        font-weight: 400;
     }
 }
