@@ -170,7 +170,7 @@ if ($regionId > 0) {
          FROM locations l
          INNER JOIN events e ON e.location_id = l.id
          WHERE l.region_id = :region_id AND l.is_active = 1 AND l.city <> ''
-           AND e.region_id = :event_region_id AND e.status = 'published'
+           AND e.region_id = :event_region_id AND e.status IN ('published','cancelled','cancelled_rain')
          ORDER BY l.city"
     );
     $cityQuery->execute([
