@@ -473,71 +473,12 @@ if (!$embeddedRegionAppearanceEditor) {
         <?php endif; ?>
         <?php if ($errorMessage !== ''): ?><div class="message message--error" role="alert"><?= escapeHtml($errorMessage) ?></div><?php endif; ?>
         <?php if ($successMessage !== ''): ?><div class="message message--success" role="status"><?= escapeHtml($successMessage) ?></div><?php endif; ?>
-        <section class="region-agenda-live-preview" id="region-agenda-live-preview" aria-label="Live voorbeeld van de regionale agenda">
-            <div class="region-preview-heading">
-                <div><h2>Live voorbeeld agenda</h2><p>Dezelfde agenda-indeling als op de startpagina. Wijzig kleuren en bekijk direct het resultaat.</p></div>
-                <span class="region-preview-live">LIVE VOORBEELD</span>
+        <section class="region-agenda-colors-link">
+            <div>
+                <h2>Agendakleuren</h2>
+                <p>De zeven weekdagkaarten en hun kleurinstellingen hebben een eigen scherm met live voorbeeld.</p>
             </div>
-            <div class="region-preview-shell" data-preview="page">
-                <div class="region-preview-topbar" data-preview="header">
-                    <strong class="region-preview-brand">DONDEBAILAR</strong>
-                    <span>Agenda · Evenementen · Menu</span>
-                </div>
-                <div class="region-preview-agenda">
-                    <div class="region-preview-title"><strong><?= escapeHtml($region['name']) ?></strong><span>Agenda de baile</span></div>
-                    <div class="region-preview-filters" data-preview="strip">
-                        <span data-preview="filter-text">Alle steden</span><span data-preview="filter-text">Alle organisatoren</span>
-                        <input aria-label="Zoeken" value="Zoek evenement..." readonly data-preview="search-field">
-                        <button type="button" data-preview="search-button">⌕</button>
-                    </div>
-                    <div class="region-preview-weekday-list">
-                        <?php
-                        $previewDays = [
-                            ['Maandag', 'MAANDAG, 16 NOV 2026', 'Salsa beginnersles', '#Salsa #Dénia', '19:00'],
-                            ['Dinsdag', 'DINSDAG, 17 NOV 2026', 'Bachata open training', '#Bachata #Jávea', '19:30'],
-                            ['Woensdag', 'WOENSDAG, 18 NOV 2026', 'Latin dance social', '#Latin #Calpe', '20:00'],
-                            ['Donderdag', 'DONDERDAG, 19 NOV 2026', 'Kizomba workshop', '#Kizomba #Altea', '20:30'],
-                            ['Vrijdag', 'VRIJDAG, 20 NOV 2026', 'Salsa & Bachata Social', '#Bachata #Dénia', '21:00'],
-                            ['Zaterdag', 'ZATERDAG, 21 NOV 2026', 'Latin Dance Night', '#Salsa #Bachata #Jávea', '21:30'],
-                            ['Zondag', 'ZONDAG, 22 NOV 2026', 'Sunday dance practice', '#Dansen #MarinaAlta', '18:00'],
-                        ];
-                        ?>
-                        <?php foreach ($previewDays as $i => [$dayName, $dateText, $eventName, $tags, $timeText]): ?>
-                            <div class="region-preview-day-row">
-                                <article class="agenda-card region-preview-agenda-card" data-preview-day="<?= $i ?>">
-                                    <div class="agenda-card__media-wrap">
-                                        <div class="agenda-card__placeholder" data-preview="day-media-<?= $i ?>"><strong><?= escapeHtml($eventFallbackText) ?></strong></div>
-                                    </div>
-                                    <div class="agenda-card__quick">
-                                        <span class="region-preview-quick-icon">👠 <b><?= 5 + $i ?></b></span>
-                                        <span class="region-preview-quick-icon">↗</span>
-                                        <span class="region-preview-quick-icon">⌖</span>
-                                    </div>
-                                    <div class="agenda-card__details">
-                                        <h2><span><?= escapeHtml($eventName) ?></span></h2>
-                                        <p class="agenda-card__date-line"><?= escapeHtml($dateText) ?> <span>◷</span> <?= escapeHtml($timeText) ?></p>
-                                        <p class="agenda-card__hashtags"><?= escapeHtml($tags) ?></p>
-                                        <p class="region-preview-event-description">Voorbeeld evenement · Marina Alta</p>
-                                    </div>
-                                </article>
-                                <div class="region-preview-day-controls" aria-label="Kleuren voor <?= escapeHtml($dayName) ?>">
-                                    <strong><?= escapeHtml($dayName) ?></strong>
-                                    <label for="weekday_<?= $i ?>">Kaartkleur
-                                        <input form="region-colors-form" type="color" id="weekday_<?= $i ?>" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>">
-                                    </label>
-                                    <label for="weekday_text_<?= $i ?>">Tekstkleur
-                                        <input form="region-colors-form" type="color" id="weekday_text_<?= $i ?>" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>">
-                                    </label>
-                                    <label for="weekday_title_<?= $i ?>">Titelkleur
-                                        <input form="region-colors-form" type="color" id="weekday_title_<?= $i ?>" name="weekday_title_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTitleColors[$i]) ?>">
-                                    </label>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="region-preview-footer" data-preview="footer"><span>DONDEBAILAR · <?= escapeHtml($region['name']) ?></span><button type="button" data-preview="back-top">↑</button></div>
-                </div>
-            </div>
+            <a class="button button--primary" href="/admin/region-agenda-colors.php?region_id=<?= (int) $regionId ?>">Agendakleuren instellen</a>
         </section>
         <form id="region-colors-form" method="post" enctype="multipart/form-data" class="auth-form" action="<?= $embeddedRegionAppearanceEditor ? '/admin/region-edit.php?id=' . (int) $regionId : '/admin/region-colors.php?region_id=' . (int) $regionId ?>">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
