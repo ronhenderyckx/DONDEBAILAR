@@ -12,6 +12,7 @@ $admin = requirePlatformAdmin();
 $db = Database::connection();
 
 $pageTitle = 'E-mailinstellingen - DONDEBAILAR';
+$platformAdminPage = true;
 $errorMessage = '';
 $successMessage = '';
 
