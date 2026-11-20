@@ -294,7 +294,6 @@ require $privateRoot . '/app/views/header.php';
                                 </label>
                             </div>
                             <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px">
-                                <button type="button" class="preview-form-button preview-form-button--secondary" style="padding:7px 12px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_input_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_input_text']) ?>">Annuleren</button>
                                 <button type="button" class="preview-form-button" style="padding:7px 12px;border:0;border-radius:6px;background:<?= escapeHtml($platformAdminColors['form_button_bg']) ?>;color:<?= escapeHtml($platformAdminColors['form_button_text']) ?>">Opslaan</button>
                             </div>
                         </div>
