@@ -527,12 +527,12 @@ require $privateRoot . '/app/views/header.php';
                 });
             };
             row.onmouseleave = () => {
-                row.style.backgroundColor = 'transparent';
+                row.style.backgroundColor = listRowBg;
                 row.querySelectorAll('td').forEach(cell => cell.style.color = listText);
                 row.querySelectorAll('.preview-action-button').forEach(button => {
                     button.style.backgroundColor = actionButton;
                     button.style.borderColor = actionButton;
-                    button.style.color = '#FFFFFF';
+                    button.style.color = actionButtonText;
                 });
             };
         });
