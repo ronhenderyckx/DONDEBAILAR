@@ -70,22 +70,40 @@ body { margin: 0; min-width: 320px; }
     .site-navigation a { width: 100%; }
 }
 
-/* Mobile agenda cards: event title and date above the action icons. */
+/* Mobile agenda cards: media, title, date, hashtags, then action icons. */
 @media (max-width: 700px) {
     .agenda-card__details {
         display: flex;
         flex-direction: column;
+        align-items: stretch;
+        text-align: left;
     }
     .agenda-card__details > * {
-        order: 4;
+        order: 5;
     }
     .agenda-card__details > h2 {
         order: 1;
-    }
-    .agenda-card__details > .agenda-card__quick {
-        order: 2;
+        width: 100%;
+        text-align: left;
     }
     .agenda-card__details > .agenda-card__date-line {
+        order: 2;
+        width: 100%;
+        text-align: left;
+    }
+    .agenda-card__details > .agenda-card__hashtags {
         order: 3;
+        width: 100%;
+        text-align: left;
+    }
+    .agenda-card__details > .agenda-card__quick {
+        order: 4;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        gap: 10px;
+        width: 100%;
+        text-align: left;
     }
 }
