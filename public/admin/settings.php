@@ -420,16 +420,12 @@ require $privateRoot . '/app/views/header.php';
                 <input type="file" id="platform_logo" name="platform_logo" accept="image/png,image/jpeg,image/webp" required>
                 <div class="form-actions">
                     <button type="submit" class="button button--primary">Logo opslaan</button>
+                    <?php if ($logoPath !== ''): ?>
+                        <button type="submit" class="button" name="remove_logo" value="1" formnovalidate onclick="return confirm('Het platformlogo verwijderen?');">Logo verwijderen</button>
+                    <?php endif; ?>
                 </div>
             </div>
         </form>
-
-        <?php if ($logoPath !== ''): ?>
-            <form method="post" action="/admin/settings.php" onsubmit="return confirm('Het platformlogo verwijderen?');">
-                <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
-                <button type="submit" class="button" name="remove_logo" value="1">Logo verwijderen</button>
-            </form>
-        <?php endif; ?>
     </section>
 
     <section class="admin-section">
