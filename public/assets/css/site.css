@@ -1745,3 +1745,41 @@ body.platform-admin-page {
         max-width: 100% !important;
     }
 }
+
+
+/* Compacte bediening op smartphones: invoerveld en opslaanknop blijven samen binnen het scherm. */
+@media (max-width: 600px) {
+    .platform-admin-page .settings-page .agenda-settings-form .agenda-setting-controls,
+    .platform-admin-page .settings-page .event-duration-settings-form .duration-setting-controls {
+        display: flex !important;
+        flex-wrap: nowrap !important;
+        align-items: center;
+        gap: 7px;
+        width: 100%;
+        max-width: 100%;
+    }
+    .platform-admin-page .settings-page .agenda-settings-form .agenda-setting-input,
+    .platform-admin-page .settings-page .event-duration-settings-form .duration-setting-input {
+        flex: 0 0 76px !important;
+        width: 76px !important;
+        max-width: 76px !important;
+        min-width: 0;
+    }
+    .platform-admin-page .settings-page .agenda-settings-form .form-actions,
+    .platform-admin-page .settings-page .event-duration-settings-form .form-actions {
+        flex: 0 1 auto !important;
+        min-width: 0;
+    }
+    .platform-admin-page .settings-page .agenda-settings-form .form-actions button,
+    .platform-admin-page .settings-page .event-duration-settings-form .form-actions button {
+        box-sizing: border-box;
+        max-width: 100%;
+        min-height: 42px;
+        height: auto;
+        padding: 7px 9px;
+        font-size: 12px;
+        line-height: 1.2;
+        white-space: normal;
+        text-align: center;
+    }
+}
