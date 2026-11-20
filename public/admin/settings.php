@@ -146,6 +146,20 @@ require $privateRoot . '/app/views/header.php';
 
 
 <style>
+.settings-page .button,
+.settings-page button.button,
+.settings-page a.button {
+    box-sizing: border-box;
+    width: 230px;
+    min-width: 230px;
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
+    flex: 0 0 230px;
+}
 .settings-page {
     display: flex;
     flex-direction: column;
