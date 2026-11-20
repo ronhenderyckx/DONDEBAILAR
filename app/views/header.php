@@ -478,6 +478,7 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                     </div>
                 </div>
             </div>
+            <label class="agenda-cancelled-toggle" for="agenda-show-cancelled"><input type="checkbox" id="agenda-show-cancelled" name="show_cancelled" value="1"<?= (($_GET['show_cancelled'] ?? '') === '1') ? ' checked' : '' ?>><span>Geannuleerde</span></label>
         </form>
 
         </div>
