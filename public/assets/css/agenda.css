@@ -3891,38 +3891,14 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-card__cancelled-label { display:none; }
 
 @media (max-width:700px) {
-    /* Mobiel staat de annuleringsbanner direct onder de media, in de tekstzone. */
-    .agenda-feed > .agenda-card.agenda-card--cancelled::after { display:none; }
-    .agenda-card__cancelled-label {
+    /* Smartphone gebruikt dezelfde diagonale banner over de volledige kaart als pc. */
+    .agenda-feed > .agenda-card.agenda-card--cancelled::after {
         display:block;
-        position:relative;
-        width:calc(100% + 40px);
-        margin:0 -20px 12px;
-        padding:8px 4px;
-        transform:rotate(-4deg);
-        background:color-mix(in srgb,var(--db-event-day-color,#777777) 55%,transparent);
-        color:var(--db-event-day-title-color,#222222);
-        font-size:clamp(15px,4vw,20px);
-        font-weight:900;
-        letter-spacing:.08em;
-        line-height:1.2;
-        text-align:center;
-        box-sizing:border-box;
+    }
+    .agenda-card__cancelled-label {
+        display:none !important;
     }
     .agenda-card__rain-drop {
         font-size:clamp(60px,15vw,76px);
-    }
-    /* Zonder echte media komt de banner diagonaal over de volledige kaart. */
-    .agenda-card:has(.agenda-card__placeholder) .agenda-card__cancelled-label {
-        position:absolute;
-        z-index:50;
-        top:50%;
-        left:-25%;
-        width:150%;
-        margin:0;
-        padding:10px 0;
-        transform:translateY(-50%) rotate(-38deg);
-        font-size:clamp(22px,6vw,34px);
-        letter-spacing:.12em;
     }
 }
