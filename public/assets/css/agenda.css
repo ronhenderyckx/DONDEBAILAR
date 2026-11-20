@@ -3931,7 +3931,7 @@ body.has-agenda-footer .site-main > .agenda-page {
     .agenda-card__content > .agenda-card__quick > .agenda-card__cancelled-label {
         display:block;
         position:absolute;
-        z-index:1;
+        z-index:3;
         left:-22%;
         top:50%;
         width:144%;
@@ -3952,7 +3952,10 @@ body.has-agenda-footer .site-main > .agenda-page {
         pointer-events:none;
         white-space:nowrap;
     }
-    .agenda-card__content > .agenda-card__quick > :not(.agenda-card__cancelled-label),
+    .agenda-card__content > .agenda-card__quick > :not(.agenda-card__cancelled-label) {
+        position:relative;
+        z-index:4;
+    }
     .agenda-card__content > .agenda-card__details > h2,
     .agenda-card__content > .agenda-card__details > p,
     .agenda-card__content > .agenda-card__details > .agenda-card__description {
