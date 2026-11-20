@@ -1856,3 +1856,59 @@ body.platform-admin-page {
         font-size: 10px;
     }
 }
+
+
+/* Platformlogo: ruimere, nette indeling op smartphones. */
+.platform-admin-page .settings-page .platform-logo-settings-form {
+    display: block !important;
+}
+.platform-admin-page .settings-page .platform-logo-settings-form > label {
+    display: block;
+    margin: 0 0 9px;
+}
+@media (max-width: 600px) {
+    .platform-admin-page .settings-page .platform-logo-settings-form .platform-logo-controls {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        gap: 9px;
+        width: 100%;
+        min-width: 0;
+    }
+    .platform-admin-page .settings-page .platform-logo-settings-form .platform-logo-controls > input[type="file"] {
+        display: block;
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0;
+        height: auto;
+        min-height: 44px;
+        padding: 7px;
+        font-size: 13px;
+    }
+    .platform-admin-page .settings-page .platform-logo-settings-form .platform-logo-controls .form-actions {
+        display: flex !important;
+        flex: 0 1 auto !important;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 7px;
+        min-width: 0;
+    }
+    .platform-admin-page .settings-page .platform-logo-settings-form .platform-logo-controls .form-actions button {
+        min-height: 40px;
+        height: auto;
+        padding: 8px 10px;
+        font-size: 12px;
+        line-height: 1.2;
+        white-space: normal;
+    }
+    .platform-admin-page .settings-page .platform-logo-settings-form .platform-logo-preview {
+        flex: 0 0 auto;
+        margin-left: auto;
+        justify-content: flex-end;
+    }
+    .platform-admin-page .settings-page .platform-logo-settings-form .platform-logo-preview img {
+        max-width: 72px;
+        max-height: 40px;
+    }
+}
