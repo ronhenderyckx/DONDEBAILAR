@@ -228,24 +228,29 @@ require $privateRoot . '/app/views/header.php';
             <h3 style="margin:0 0 6px">Live voorbeeld</h3>
             <p style="margin:0 0 12px;color:var(--db-muted)">Verander een kleur hieronder en bekijk meteen wat er in dit voorbeeld verandert. Je wijzigingen worden pas actief nadat je op ‘Platformkleuren opslaan’ klikt.</p>
             <div id="platform-color-preview" style="border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:12px;overflow:hidden;background:<?= escapeHtml($platformAdminColors['background']) ?>;color:<?= escapeHtml($platformAdminColors['text']) ?>">
+                <style>
+                    #platform-color-preview .preview-color-choice{display:inline-flex;align-items:center;gap:5px;margin-left:8px;font-size:11px;font-weight:400;vertical-align:middle}
+                    #platform-color-preview .preview-color-choice input{width:25px;height:23px;padding:1px;border:1px solid #999;border-radius:5px;cursor:pointer;vertical-align:middle}
+                    #platform-color-preview .preview-color-choice span{white-space:nowrap}
+                </style>
                 <div id="preview-header" style="background:<?= escapeHtml($platformAdminColors['header']) ?>;padding:13px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">
-                    <strong style="font-size:17px;letter-spacing:.3px">DONDEBAILAR</strong>
-                    <span style="font-size:13px">Platformbeheer　☰</span>
+                    <strong style="font-size:17px;letter-spacing:.3px">DONDEBAILAR</strong><label class="preview-color-choice" title="Kies de kleur van de bovenbalk"><span>Bovenbalk</span><input type="color" data-preview-color="header" value="<?= escapeHtml($platformAdminColors['header']) ?>" aria-label="Kleur bovenbalk"></label>
+                    <span style="font-size:13px">Platformbeheer　☰ <label class="preview-color-choice" title="Kies de achtergrondkleur van het menu"><span>Menu</span><input type="color" data-preview-color="menu" value="<?= escapeHtml($platformAdminColors['menu']) ?>" aria-label="Kleur menu"></label></span>
                 </div>
                 <div id="preview-menu" style="background:<?= escapeHtml($platformAdminColors['menu']) ?>;padding:9px 16px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;font-size:13px">
                     Dashboard　　Gebruikers　　Regio's　　Instellingen
                 </div>
                 <div id="preview-page" style="background:<?= escapeHtml($platformAdminColors['background']) ?>;padding:16px">
-                    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:<?= escapeHtml($platformAdminColors['muted']) ?>">PLATFORMBEHEER</div>
-                    <div style="font-size:21px;font-weight:700;margin:3px 0 5px">Instellingen</div>
+                    <div style="font-size:11px;font-weight:700;letter-spacing:1px;color:<?= escapeHtml($platformAdminColors['muted']) ?>">PLATFORMBEHEER <label class="preview-color-choice"><span>Gedempte tekst</span><input type="color" data-preview-color="muted" value="<?= escapeHtml($platformAdminColors['muted']) ?>" aria-label="Gedempte tekstkleur"></label></div>
+                    <div style="font-size:21px;font-weight:700;margin:3px 0 5px">Instellingen <label class="preview-color-choice"><span>Tekst</span><input type="color" data-preview-color="text" value="<?= escapeHtml($platformAdminColors['text']) ?>" aria-label="Tekstkleur"></label></div>
                     <div id="preview-muted" style="font-size:13px;color:<?= escapeHtml($platformAdminColors['muted']) ?>;margin-bottom:13px">Beheer de algemene instellingen en huisstijl.</div>
-                    <div id="preview-panel" style="background:<?= escapeHtml($platformAdminColors['surface']) ?>;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:9px;padding:14px">
+                    <div id="preview-panel" style="background:<?= escapeHtml($platformAdminColors['surface']) ?>;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:9px;padding:14px"><div style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:8px"><label class="preview-color-choice"><span>Paneel</span><input type="color" data-preview-color="surface" value="<?= escapeHtml($platformAdminColors['surface']) ?>" aria-label="Kleur panelen"></label><label class="preview-color-choice"><span>Randen</span><input type="color" data-preview-color="border" value="<?= escapeHtml($platformAdminColors['border']) ?>" aria-label="Randkleur"></label></div>
                         <div style="font-size:15px;font-weight:700;margin-bottom:5px">Voorbeeld van een instellingenblok</div>
                         <div style="font-size:13px;margin-bottom:12px">Dit is gewone tekst in een paneel.</div>
                         <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
-                            <span id="preview-primary-button" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Opslaan</span>
-                            <span id="preview-hover-button" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['primary_dark']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Knop bij aanwijzen</span>
-                            <span id="preview-accent" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['accent']) ?>;color:#202B38;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Accent</span>
+                            <span id="preview-primary-button" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Opslaan</span><label class="preview-color-choice"><span>Knoppen</span><input type="color" data-preview-color="primary" value="<?= escapeHtml($platformAdminColors['primary']) ?>" aria-label="Primaire kleur"></label>
+                            <span id="preview-hover-button" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['primary_dark']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Knop bij aanwijzen</span><label class="preview-color-choice"><span>Hover</span><input type="color" data-preview-color="primary_dark" value="<?= escapeHtml($platformAdminColors['primary_dark']) ?>" aria-label="Donkere primaire kleur"></label>
+                            <span id="preview-accent" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['accent']) ?>;color:#202B38;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Accent</span><label class="preview-color-choice"><span>Accent</span><input type="color" data-preview-color="accent" value="<?= escapeHtml($platformAdminColors['accent']) ?>" aria-label="Accentkleur"></label>
                         </div>
                     </div>
                 </div>
@@ -405,44 +410,49 @@ require $privateRoot . '/app/views/header.php';
     const preview = document.getElementById('platform-color-preview');
     if (!preview) return;
 
-    const fields = {
-        primary: 'preview-primary-button',
-        primary_dark: 'preview-hover-button',
-        accent: 'preview-accent',
-        header: 'preview-header',
-        menu: 'preview-menu',
-        background: 'preview-page',
-        surface: 'preview-panel',
-        text: 'platform-color-preview',
-        muted: 'preview-muted',
-        border: null
+    const targets = {
+        primary: ['preview-primary-button'],
+        primary_dark: ['preview-hover-button'],
+        accent: ['preview-accent'],
+        header: ['preview-header'],
+        menu: ['preview-menu'],
+        background: ['preview-page'],
+        surface: ['preview-panel'],
+        text: ['platform-color-preview'],
+        muted: ['preview-muted'],
+        border: ['platform-color-preview', 'preview-header', 'preview-menu', 'preview-panel']
     };
 
-    Object.keys(fields).forEach(function (key) {
-        const input = document.getElementById('platform_color_' + key);
-        if (!input) return;
-        input.addEventListener('input', function () {
-            const targetId = fields[key];
-            if (targetId) {
-                const target = document.getElementById(targetId);
-                if (key === 'text') {
-                    target.style.color = input.value;
-                } else if (key === 'primary' || key === 'primary_dark' || key === 'accent') {
-                    target.style.backgroundColor = input.value;
-                } else {
-                    target.style.backgroundColor = input.value;
-                }
+    preview.querySelectorAll('[data-preview-color]').forEach(function (picker) {
+        picker.addEventListener('input', function () {
+            const key = picker.dataset.previewColor;
+            const original = document.getElementById('platform_color_' + key);
+            if (original) {
+                original.value = picker.value;
+                original.dispatchEvent(new Event('input', { bubbles: true }));
             }
-            if (key === 'border') {
-                preview.style.borderColor = input.value;
-                ['preview-header', 'preview-menu', 'preview-panel'].forEach(function (id) {
-                    const target = document.getElementById(id);
-                    target.style.borderColor = input.value;
-                });
-            }
+            (targets[key] || []).forEach(function (id) {
+                const element = document.getElementById(id);
+                if (!element) return;
+                if (key === 'text') element.style.color = picker.value;
+                else if (key === 'border') element.style.borderColor = picker.value;
+                else if (key === 'muted') {
+                    element.style.color = picker.value;
+                    const eyebrow = preview.querySelector('.preview-eyebrow');
+                    if (eyebrow) eyebrow.style.color = picker.value;
+                } else element.style.backgroundColor = picker.value;
+            });
+            preview.querySelectorAll('[data-preview-color="' + key + '"]').forEach(function (other) {
+                if (other !== picker) other.value = picker.value;
+            });
         });
     });
-})();
+
+    const backgroundPicker = preview.querySelector('[data-preview-color="background"]');
+    if (backgroundPicker) backgroundPicker.addEventListener('input', function () {
+        document.getElementById('platform-color-preview').style.backgroundColor = backgroundPicker.value;
+    });
+})();;
 </script>
 
 <?php require $privateRoot . '/app/views/footer.php'; ?>
