@@ -40,14 +40,6 @@
             const incomingStrip = parsedDocument.querySelector('[data-panel="' + panelName + '"] .agenda-organizer-strip');
             if (currentStrip && incomingStrip) currentStrip.innerHTML = incomingStrip.innerHTML;
         });
-
-        const cancelledButton = document.getElementById('agenda-show-cancelled');
-        if (cancelledButton) {
-            const showCancelled = targetUrl.searchParams.get('show_cancelled') === '1';
-            cancelledButton.classList.toggle('is-active', showCancelled);
-            cancelledButton.setAttribute('aria-pressed', showCancelled ? 'true' : 'false');
-        }
-
         // Vernieuw de URL zonder de eenmalige agenda_change-vlag.
         const cleanUrl = new URL(targetUrl.href);
         cleanUrl.searchParams.delete('agenda_change');
@@ -175,21 +167,6 @@
     }
 
     document.addEventListener('click', function (event) {
-        const cancelledButton = event.target instanceof Element ? event.target.closest('#agenda-show-cancelled') : null;
-        if (!cancelledButton) return;
-        const url = new URL(window.location.href);
-        const showCancelled = url.searchParams.get('show_cancelled') !== '1';
-        if (showCancelled) url.searchParams.set('show_cancelled', '1');
-        else url.searchParams.delete('show_cancelled');
-        url.searchParams.set('agenda_change', '1');
-        url.searchParams.delete('page');
-        loadAgendaFilter(url, true).then(function () {
-            cancelledButton.classList.toggle('is-active', showCancelled);
-            cancelledButton.setAttribute('aria-pressed', showCancelled ? 'true' : 'false');
-        }).catch(function (error) {
-            if (error.name !== 'AbortError') window.location.assign(url.href);
-        });
-    });
 
     document.addEventListener('click', function (event) {
         // Wisselen tussen STEDEN en ORGANISATOREN wist een actieve vrije zoekterm.
@@ -209,7 +186,6 @@
         const link = event.target instanceof Element ? event.target.closest('.agenda-organizer-strip a[href]') : null;
         if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
         const url = new URL(link.href, window.location.origin);
-        if (new URL(window.location.href).searchParams.get('show_cancelled') === '1') url.searchParams.set('show_cancelled', '1');
         if (url.origin !== window.location.origin || url.pathname !== '/' || url.searchParams.get('agenda_change') !== '1') return;
         event.preventDefault();
         loadAgendaFilter(url, true).catch(function (error) {
