@@ -334,5 +334,5 @@ require $projectRoot . '/app/views/header.php';
         </form>
     </section>
 
-<script src="/assets/js/platform-colors-preview.js?v=7" defer></script>
+<script src="/assets/js/platform-colors-preview.js?v=8" defer></script>
 <?php require $projectRoot . '/app/views/footer.php'; ?>
