@@ -765,6 +765,12 @@
     color:#fff;
     font-size:15px
 }
+.agenda-card__prices {
+    margin:0 0 7px;
+    color:#fff;
+    font-size:14px;
+    font-weight:600
+}
 .agenda-card__date-line {
     margin:0 0 7px;
     color:#fff;
