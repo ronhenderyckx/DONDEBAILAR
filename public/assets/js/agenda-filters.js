@@ -41,6 +41,13 @@
             if (currentStrip && incomingStrip) currentStrip.innerHTML = incomingStrip.innerHTML;
         });
 
+        const cancelledButton = document.getElementById('agenda-show-cancelled');
+        if (cancelledButton) {
+            const showCancelled = targetUrl.searchParams.get('show_cancelled') === '1';
+            cancelledButton.classList.toggle('is-active', showCancelled);
+            cancelledButton.setAttribute('aria-pressed', showCancelled ? 'true' : 'false');
+        }
+
         // Vernieuw de URL zonder de eenmalige agenda_change-vlag.
         const cleanUrl = new URL(targetUrl.href);
         cleanUrl.searchParams.delete('agenda_change');
