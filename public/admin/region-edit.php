@@ -140,7 +140,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && empty($_POST['save_appearance'])) {
 require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 
-<section class="admin-page">
+<section class="admin-page region-edit-page">
     <div class="admin-heading">
         <div>
             <p class="eyebrow">PLATFORMBEHEER</p>
