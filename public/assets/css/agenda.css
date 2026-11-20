@@ -3974,6 +3974,10 @@ body.has-agenda-footer .site-main > .agenda-page {
     .agenda-card__rain-drop {
         font-size:clamp(60px,15vw,76px);
     }
+    .agenda-card__content > .agenda-card__rain-drop--top-left {
+        top:48px;
+        left:12px;
+    }
 }
 
 
