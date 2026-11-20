@@ -36,6 +36,32 @@ $pageTitle = 'Gebruiker wijzigen - DONDEBAILAR';
 $platformAdminPage = true;
 $errorMessage = '';
 
+$platformFormColors = [
+    'form_panel_bg' => '#F7F8FA',
+    'form_label_text' => '#202B38',
+    'form_input_bg' => '#FFFFFF',
+    'form_input_text' => '#202B38',
+    'form_input_border' => '#E7EAF0',
+    'form_input_hover_border' => '#0A4D9F',
+    'form_button_bg' => '#0A4D9F',
+    'form_button_text' => '#FFFFFF',
+    'form_button_hover_bg' => '#083B79',
+    'form_button_hover_text' => '#FFFFFF',
+    'border' => '#E7EAF0',
+];
+$platformFormColorsFile = DONDEBAILAR_PRIVATE_ROOT . '/storage/platform-admin-colors.json';
+if (is_file($platformFormColorsFile)) {
+    $savedFormColors = json_decode((string) file_get_contents($platformFormColorsFile), true);
+    if (is_array($savedFormColors)) {
+        foreach ($platformFormColors as $colorKey => $fallbackColor) {
+            $candidateColor = strtoupper(trim((string) ($savedFormColors[$colorKey] ?? '')));
+            if (preg_match('/^#[0-9A-F]{6}$/', $candidateColor)) {
+                $platformFormColors[$colorKey] = $candidateColor;
+            }
+        }
+    }
+}
+
 $regions = $db->query(
     "SELECT id, name FROM regions ORDER BY name"
 )->fetchAll();
@@ -178,6 +204,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
+?>
+<style>
+.admin-page .auth-form {
+    background: <?= escapeHtml($platformFormColors['form_panel_bg']) ?>;
+    color: <?= escapeHtml($platformFormColors['form_label_text']) ?>;
+    border: 1px solid <?= escapeHtml($platformFormColors['border']) ?>;
+    border-radius: 12px;
+    padding: 24px;
+}
+.admin-page .auth-form > label,
+.admin-page .auth-form h2 { color: <?= escapeHtml($platformFormColors['form_label_text']) ?>; }
+.admin-page .auth-form input,
+.admin-page .auth-form select,
+.admin-page .auth-form textarea {
+    background-color: <?= escapeHtml($platformFormColors['form_input_bg']) ?> !important;
+    color: <?= escapeHtml($platformFormColors['form_input_text']) ?> !important;
+    border-color: <?= escapeHtml($platformFormColors['form_input_border']) ?> !important;
+}
+.admin-page .auth-form input:hover,
+.admin-page .auth-form select:hover,
+.admin-page .auth-form textarea:hover,
+.admin-page .auth-form input:focus,
+.admin-page .auth-form select:focus,
+.admin-page .auth-form textarea:focus {
+    border-color: <?= escapeHtml($platformFormColors['form_input_hover_border']) ?> !important;
+}
+.admin-page .auth-form .button,
+.admin-page .auth-form button,
+.admin-page .admin-heading .button {
+    background: <?= escapeHtml($platformFormColors['form_button_bg']) ?> !important;
+    color: <?= escapeHtml($platformFormColors['form_button_text']) ?> !important;
+    border-color: <?= escapeHtml($platformFormColors['form_button_bg']) ?> !important;
+}
+.admin-page .auth-form .button:hover,
+.admin-page .auth-form button:hover,
+.admin-page .admin-heading .button:hover {
+    background: <?= escapeHtml($platformFormColors['form_button_hover_bg']) ?> !important;
+    color: <?= escapeHtml($platformFormColors['form_button_hover_text']) ?> !important;
+    border-color: <?= escapeHtml($platformFormColors['form_button_hover_bg']) ?> !important;
+}
+.admin-page .auth-form p { color: <?= escapeHtml($platformFormColors['form_label_text']) ?>; }
+</style>
+
+<?php
 ?>
 
 <section class="admin-page">
