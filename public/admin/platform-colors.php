@@ -163,19 +163,33 @@ require $projectRoot . '/app/views/header.php';
                         <div style="font-size:15px;font-weight:700;margin-bottom:5px">Voorbeeld van een instellingenblok</div>
                         <div style="font-size:13px;margin-bottom:12px">Dit is gewone tekst in een paneel.</div>
                         <div id="preview-form-panel" style="border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:8px;padding:12px;margin:12px 0 18px;background:<?= escapeHtml($platformAdminColors['form_panel_bg']) ?>">
-                            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:10px">
-                                <div style="font-size:14px;font-weight:700">Voorbeeld invulscherm</div>
-                                <div style="display:flex;gap:8px;flex-wrap:wrap">
-                                    <label class="preview-color-choice" style="margin:0"><span>Paneel</span><input type="color" data-preview-color="form_panel_bg" value="<?= escapeHtml($platformAdminColors['form_panel_bg']) ?>" aria-label="Achtergrond invulscherm"></label>
+                            <div style="font-size:14px;font-weight:700;margin-bottom:12px">Voorbeeld invulscherm</div>
+                            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-bottom:14px">
+                                <div style="padding:10px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:7px">
+                                    <div style="font-size:12px;font-weight:700;margin-bottom:8px">1. Invulscherm</div>
+                                    <label class="preview-color-choice" style="margin:0"><span>Achtergrond invulscherm</span><input type="color" data-preview-color="form_panel_bg" value="<?= escapeHtml($platformAdminColors['form_panel_bg']) ?>" aria-label="Achtergrond invulscherm"></label>
+                                </div>
+                                <div style="padding:10px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:7px">
+                                    <div style="font-size:12px;font-weight:700;margin-bottom:8px">2. Labels</div>
                                     <label class="preview-color-choice" style="margin:0"><span>Labeltekst</span><input type="color" data-preview-color="form_label_text" value="<?= escapeHtml($platformAdminColors['form_label_text']) ?>" aria-label="Labeltekst invulscherm"></label>
-                                    <label class="preview-color-choice" style="margin:0"><span>Veldachtergrond</span><input type="color" data-preview-color="form_input_bg" value="<?= escapeHtml($platformAdminColors['form_input_bg']) ?>" aria-label="Veldachtergrond invulscherm"></label>
-                                    <label class="preview-color-choice" style="margin:0"><span>Veldtekst</span><input type="color" data-preview-color="form_input_text" value="<?= escapeHtml($platformAdminColors['form_input_text']) ?>" aria-label="Veldtekst invulscherm"></label>
-                                    <label class="preview-color-choice" style="margin:0"><span>Veldrand</span><input type="color" data-preview-color="form_input_border" value="<?= escapeHtml($platformAdminColors['form_input_border']) ?>" aria-label="Randkleur invoervelden"></label>
-                                    <label class="preview-color-choice" style="margin:0"><span>Veld hoverrand</span><input type="color" data-preview-color="form_input_hover_border" value="<?= escapeHtml($platformAdminColors['form_input_hover_border']) ?>" aria-label="Hoverrand invoervelden"></label>
-                                    <label class="preview-color-choice" style="margin:0"><span>Knop</span><input type="color" data-preview-color="form_button_bg" value="<?= escapeHtml($platformAdminColors['form_button_bg']) ?>" aria-label="Achtergrondkleur formulierknop"></label>
-                                    <label class="preview-color-choice" style="margin:0"><span>Knoptekst</span><input type="color" data-preview-color="form_button_text" value="<?= escapeHtml($platformAdminColors['form_button_text']) ?>" aria-label="Tekstkleur formulierknop"></label>
-                                    <label class="preview-color-choice" style="margin:0"><span>Knop hover</span><input type="color" data-preview-color="form_button_hover_bg" value="<?= escapeHtml($platformAdminColors['form_button_hover_bg']) ?>" aria-label="Hoverkleur formulierknop"></label>
-                                    <label class="preview-color-choice" style="margin:0"><span>Hovertekst</span><input type="color" data-preview-color="form_button_hover_text" value="<?= escapeHtml($platformAdminColors['form_button_hover_text']) ?>" aria-label="Hovertekstkleur formulierknop"></label>
+                                </div>
+                                <div style="padding:10px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:7px">
+                                    <div style="font-size:12px;font-weight:700;margin-bottom:8px">3. Invoervelden</div>
+                                    <div style="display:grid;gap:7px">
+                                        <label class="preview-color-choice" style="margin:0"><span>Veldachtergrond</span><input type="color" data-preview-color="form_input_bg" value="<?= escapeHtml($platformAdminColors['form_input_bg']) ?>" aria-label="Veldachtergrond invulscherm"></label>
+                                        <label class="preview-color-choice" style="margin:0"><span>Veldtekst</span><input type="color" data-preview-color="form_input_text" value="<?= escapeHtml($platformAdminColors['form_input_text']) ?>" aria-label="Veldtekst invulscherm"></label>
+                                        <label class="preview-color-choice" style="margin:0"><span>Veldrand</span><input type="color" data-preview-color="form_input_border" value="<?= escapeHtml($platformAdminColors['form_input_border']) ?>" aria-label="Randkleur invoervelden"></label>
+                                        <label class="preview-color-choice" style="margin:0"><span>Hoverrand</span><input type="color" data-preview-color="form_input_hover_border" value="<?= escapeHtml($platformAdminColors['form_input_hover_border']) ?>" aria-label="Hoverrand invoervelden"></label>
+                                    </div>
+                                </div>
+                                <div style="padding:10px;border:1px solid <?= escapeHtml($platformAdminColors['form_input_border']) ?>;border-radius:7px">
+                                    <div style="font-size:12px;font-weight:700;margin-bottom:8px">4. Knoppen</div>
+                                    <div style="display:grid;gap:7px">
+                                        <label class="preview-color-choice" style="margin:0"><span>Knopachtergrond</span><input type="color" data-preview-color="form_button_bg" value="<?= escapeHtml($platformAdminColors['form_button_bg']) ?>" aria-label="Achtergrondkleur formulierknop"></label>
+                                        <label class="preview-color-choice" style="margin:0"><span>Knoptekst</span><input type="color" data-preview-color="form_button_text" value="<?= escapeHtml($platformAdminColors['form_button_text']) ?>" aria-label="Tekstkleur formulierknop"></label>
+                                        <label class="preview-color-choice" style="margin:0"><span>Knop hoverachtergrond</span><input type="color" data-preview-color="form_button_hover_bg" value="<?= escapeHtml($platformAdminColors['form_button_hover_bg']) ?>" aria-label="Hoverkleur formulierknop"></label>
+                                        <label class="preview-color-choice" style="margin:0"><span>Knop hovertekst</span><input type="color" data-preview-color="form_button_hover_text" value="<?= escapeHtml($platformAdminColors['form_button_hover_text']) ?>" aria-label="Hovertekstkleur formulierknop"></label>
+                                    </div>
                                 </div>
                             </div>
                             <div style="max-width:360px">
