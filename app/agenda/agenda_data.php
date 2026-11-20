@@ -183,6 +183,7 @@ if ($regionId > 0) {
         $city = '';
     }
 
+    $showCancelled = (($_GET['show_cancelled'] ?? '') === '1');
     $sql = "SELECT e.id, e.title, e.description, e.hashtags, e.presale_price, e.door_price, e.starts_at, e.ends_at,
                    e.event_language, e.status, c.name AS category_name,
                    o.name AS organizer_name, o.phone AS organizer_phone, o.logo_path AS organizer_logo_path,
@@ -204,9 +205,10 @@ if ($regionId > 0) {
                  ORDER BY em.is_cover DESC, em.sort_order, em.id LIMIT 1)
             )
             WHERE e.region_id = :region_id
-              AND e.status IN ('published','cancelled','cancelled_rain')";
+              AND (e.status = 'published' OR (:show_cancelled = 1 AND e.status IN ('cancelled','cancelled_rain')))";
     $params = [
         'region_id' => $regionId,
+        'show_cancelled' => $showCancelled ? 1 : 0,
     ];
     if ($organizerId > 0) {
         $sql .= " AND e.organizer_id = :organizer_id";
