@@ -248,6 +248,31 @@ require $privateRoot . '/app/views/header.php';
                     <div id="preview-panel" style="background:<?= escapeHtml($platformAdminColors['surface']) ?>;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:9px;padding:14px"><div style="display:flex;justify-content:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:8px"><label class="preview-color-choice"><span>Paneel</span><input type="color" data-preview-color="surface" value="<?= escapeHtml($platformAdminColors['surface']) ?>" aria-label="Kleur panelen"></label><label class="preview-color-choice"><span>Randen</span><input type="color" data-preview-color="border" value="<?= escapeHtml($platformAdminColors['border']) ?>" aria-label="Randkleur"></label></div>
                         <div style="font-size:15px;font-weight:700;margin-bottom:5px">Voorbeeld van een instellingenblok</div>
                         <div style="font-size:13px;margin-bottom:12px">Dit is gewone tekst in een paneel.</div>
+                        <div style="font-size:14px;font-weight:700;margin:16px 0 8px">Voorbeeld van een beheerlijst</div>
+                        <div style="overflow-x:auto">
+                            <table style="width:100%;border-collapse:collapse;font-size:12px">
+                                <thead><tr>
+                                    <th style="text-align:left;padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Naam</th>
+                                    <th style="text-align:left;padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Regio</th>
+                                    <th style="text-align:left;padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Status</th>
+                                    <th style="text-align:left;padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Acties</th>
+                                </tr></thead>
+                                <tbody>
+                                    <tr>
+                                        <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Marina Alta</td>
+                                        <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>">Spanje</td>
+                                        <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>"><span style="display:inline-block;padding:3px 7px;border-radius:12px;background:#E4F5E9;color:#207544">Actief</span></td>
+                                        <td style="padding:9px 7px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>"><span style="display:inline-block;padding:4px 8px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:5px">Wijzigen</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding:9px 7px">Costa Blanca</td>
+                                        <td style="padding:9px 7px">Spanje</td>
+                                        <td style="padding:9px 7px"><span style="display:inline-block;padding:3px 7px;border-radius:12px;background:#FCE8E8;color:#A52A2A">Inactief</span></td>
+                                        <td style="padding:9px 7px"><span style="display:inline-block;padding:4px 8px;border:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;border-radius:5px">Wijzigen</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                         <div style="display:flex;align-items:center;gap:9px;flex-wrap:wrap">
                             <span id="preview-primary-button" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['primary']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Opslaan</span><label class="preview-color-choice"><span>Knoppen</span><input type="color" data-preview-color="primary" value="<?= escapeHtml($platformAdminColors['primary']) ?>" aria-label="Primaire kleur"></label>
                             <span id="preview-hover-button" style="display:inline-block;background:<?= escapeHtml($platformAdminColors['primary_dark']) ?>;color:#FFFFFF;border-radius:6px;padding:8px 12px;font-size:13px;font-weight:700">Knop bij aanwijzen</span><label class="preview-color-choice"><span>Hover</span><input type="color" data-preview-color="primary_dark" value="<?= escapeHtml($platformAdminColors['primary_dark']) ?>" aria-label="Donkere primaire kleur"></label>
