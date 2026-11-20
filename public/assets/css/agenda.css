@@ -3963,3 +3963,25 @@ body.has-agenda-footer .site-main > .agenda-page {
         font-size:clamp(60px,15vw,76px);
     }
 }
+
+
+/* Correctie: de media blijft altijd het eerste element van de kaart op smartphone. */
+@media (max-width:700px) {
+    .agenda-feed > .agenda-card {
+        display:flex!important;
+        flex-direction:column!important;
+    }
+    .agenda-feed > .agenda-card > .agenda-card__media-wrap {
+        display:block!important;
+        order:0!important;
+        position:relative!important;
+        flex:0 0 auto!important;
+        width:100%!important;
+    }
+    .agenda-feed > .agenda-card > .agenda-card__content {
+        display:flex!important;
+        order:1!important;
+        flex:0 0 auto!important;
+        width:100%!important;
+    }
+}
