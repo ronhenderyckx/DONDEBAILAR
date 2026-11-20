@@ -64,6 +64,7 @@
                             </a>
                         <?php endif; ?>
                         </div>
+                            <div class="agenda-card__content">
                             <div class="agenda-card__quick">
                                 <?php if ($eventBannerType !== ''): ?><div class="agenda-card__cancelled-label"><?= $eventBannerType === 'cancelled_rain' ? 'GEANNULEERD WEGENS REGEN' : ($eventBannerType === 'cancelled' ? 'GEANNULEERD' : 'GEARCHIVEERD') ?></div><?php endif; ?>
                                 <button type="button" class="agenda-attendance<?= !empty($event['is_attending']) ? ' is-attending' : '' ?>" data-event-id="<?= (int) $event['id'] ?>" data-event-title="<?= $escape($event['title']) ?>" aria-label="Ik kom dansen" aria-pressed="<?= !empty($event['is_attending']) ? 'true' : 'false' ?>" title="Tik: Ik kom dansen · Lang indrukken: deelnemers"><span aria-hidden="true">👠</span><b><?= (int) ($event['attendance_count'] ?? 0) ?></b></button>
@@ -161,5 +162,6 @@
                                 <p class="agenda-card__swipe-hint" data-swipe-hint>→ Swipe voor meer info</p>
                             <?php endif; ?>
                         </div>
+                            </div>
 
                     </article>
