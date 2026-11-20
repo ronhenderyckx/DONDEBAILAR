@@ -201,6 +201,7 @@ if ($isPlatformAdminPage) {
         'primary_dark' => '#083B79',
         'accent' => '#00AFC5',
         'header' => '#FFFFFF',
+        'footer' => '#FFFFFF',
         'menu' => '#FFFFFF',
         'background' => '#F7F8FA',
         'surface' => '#FFFFFF',
@@ -232,6 +233,7 @@ if ($isPlatformAdminPage) {
         . ';--db-primary-dark:' . $platformColors['primary_dark']
         . ';--db-accent:' . $platformColors['accent']
         . ';--db-header-color:' . $platformColors['header']
+        . ';--db-footer-color:' . $platformColors['footer']
         . ';--db-menu-color:' . $platformColors['menu']
         . ';--db-background:' . $platformColors['background']
         . ';--db-surface:' . $platformColors['surface']
