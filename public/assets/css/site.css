@@ -2092,3 +2092,20 @@ body.platform-admin-page {
     background: var(--db-status-inactive-bg, #F0F1F3) !important;
     color: var(--db-status-inactive-text, #68717C) !important;
 }
+
+
+/* Alle kleuren van de footer op Platformbeheer volgen de instellingen en live preview. */
+.platform-admin-page .site-footer {
+    background: var(--db-footer-color, #FFFFFF) !important;
+    border-top: 1px solid var(--db-footer-border, var(--db-border)) !important;
+}
+.platform-admin-page .site-footer,
+.platform-admin-page .site-footer__inner {
+    color: var(--db-footer-text, var(--db-muted)) !important;
+}
+.platform-admin-page .site-footer a {
+    color: var(--db-footer-link, var(--db-primary)) !important;
+}
+.platform-admin-page .site-footer a:hover {
+    color: var(--db-footer-link-hover, var(--db-primary-dark)) !important;
+}
