@@ -431,18 +431,26 @@ require $projectRoot . '/app/views/header.php';
         });
     }
 
-    preview.querySelectorAll('[data-preview-color]').forEach(picker => {
-        picker.addEventListener('input', function () {
-            const key = picker.dataset.previewColor;
-            const original = document.getElementById('platform_color_' + key);
-            if (original) original.value = picker.value;
-            preview.querySelectorAll('[data-preview-color="' + key + '"]').forEach(other => {
-                if (other !== picker) other.value = picker.value;
-            });
-            applyPreviewColors();
+    function syncColorPicker(picker) {
+        const key = picker.dataset.previewColor;
+        const original = document.getElementById('platform_color_' + key);
+        if (original) original.value = picker.value;
+
+        // Houd eventuele tweede kleurkiezer voor dezelfde instelling gelijk.
+        preview.querySelectorAll('[data-preview-color="' + key + '"]').forEach(other => {
+            if (other !== picker) other.value = picker.value;
         });
+
+        // Werk het voorbeeld onmiddellijk bij terwijl de kleurkiezer wordt bediend.
+        applyPreviewColors();
+    }
+
+    preview.querySelectorAll('[data-preview-color]').forEach(picker => {
+        picker.addEventListener('input', () => syncColorPicker(picker));
+        picker.addEventListener('change', () => syncColorPicker(picker));
     });
 
+    // Toon bij het openen meteen alle opgeslagen kleuren in het voorbeeld.
     applyPreviewColors();
 })();
 </script>
