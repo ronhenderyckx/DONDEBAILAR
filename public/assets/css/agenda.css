@@ -3793,3 +3793,15 @@ body.has-agenda-footer .site-main > .agenda-page {
         opacity: 1 !important;
     }
 }
+
+
+/* Alleen smartphone: vervang de zichtbare hint; desktop behoudt de oorspronkelijke tekst en pijl. */
+@media (max-width: 700px) {
+    .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__swipe-hint {
+        font-size: 0 !important;
+    }
+    .agenda-feed .agenda-card > .agenda-card__details > p.agenda-card__swipe-hint::before {
+        content: "← SWIPE VOOR MEER INFO";
+        font-size: 13px;
+    }
+}
