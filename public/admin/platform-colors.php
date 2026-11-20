@@ -44,6 +44,9 @@ $platformAdminColors = [
     'accent' => '#00AFC5',
     'header' => '#FFFFFF',
     'menu' => '#FFFFFF',
+    'menu_text' => '#202B38',
+    'menu_hover_bg' => '#F3F6F9',
+    'menu_hover_text' => '#0A4D9F',
     'background' => '#F7F8FA',
     'surface' => '#FFFFFF',
     'text' => '#202B38',
@@ -141,8 +144,13 @@ require $projectRoot . '/app/views/header.php';
                     <strong style="font-size:17px;letter-spacing:.3px">DONDEBAILAR</strong><label class="preview-color-choice" title="Kies de kleur van de bovenbalk"><span>Bovenbalk</span><input type="color" data-preview-color="header" value="<?= escapeHtml($platformAdminColors['header']) ?>" aria-label="Kleur bovenbalk"></label>
                     <span style="font-size:13px">Platformbeheer　☰ <label class="preview-color-choice" title="Kies de achtergrondkleur van het menu"><span>Menu</span><input type="color" data-preview-color="menu" value="<?= escapeHtml($platformAdminColors['menu']) ?>" aria-label="Kleur menu"></label></span>
                 </div>
-                <div id="preview-menu" style="background:<?= escapeHtml($platformAdminColors['menu']) ?>;padding:9px 16px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;font-size:13px">
-                    Dashboard　　Gebruikers　　Regio's　　Instellingen
+                <div id="preview-menu" style="background:<?= escapeHtml($platformAdminColors['menu']) ?>;padding:9px 16px;border-bottom:1px solid <?= escapeHtml($platformAdminColors['border']) ?>;font-size:13px;display:flex;gap:5px;flex-wrap:wrap">
+                    <span class="preview-menu-item">Dashboard</span><span class="preview-menu-item preview-menu-item--hover">Gebruikers (hover)</span><span class="preview-menu-item">Regio's</span><span class="preview-menu-item">Instellingen</span>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;width:100%;margin-top:5px">
+                        <label class="preview-color-choice" style="margin-left:0"><span>Menutekst</span><input type="color" data-preview-color="menu_text" value="<?= escapeHtml($platformAdminColors['menu_text']) ?>" aria-label="Menutekstkleur"></label>
+                        <label class="preview-color-choice" style="margin-left:0"><span>Menu hoverachtergrond</span><input type="color" data-preview-color="menu_hover_bg" value="<?= escapeHtml($platformAdminColors['menu_hover_bg']) ?>" aria-label="Menu hoverachtergrond"></label>
+                        <label class="preview-color-choice" style="margin-left:0"><span>Menu hovertekst</span><input type="color" data-preview-color="menu_hover_text" value="<?= escapeHtml($platformAdminColors['menu_hover_text']) ?>" aria-label="Menu hovertekstkleur"></label>
+                    </div>
                 </div>
                 <div id="preview-page" style="background:<?= escapeHtml($platformAdminColors['background']) ?>;padding:16px">
                     <div style="display:flex;justify-content:flex-end;margin-bottom:8px"><label class="preview-color-choice"><span>Pagina-achtergrond</span><input type="color" data-preview-color="background" value="<?= escapeHtml($platformAdminColors['background']) ?>" aria-label="Achtergrondkleur pagina"></label></div>
@@ -253,6 +261,9 @@ require $projectRoot . '/app/views/header.php';
         const accent = color('accent', '#00AFC5');
         const header = color('header', '#FFFFFF');
         const menu = color('menu', '#FFFFFF');
+        const menuText = color('menu_text', text);
+        const menuHoverBg = color('menu_hover_bg', '#F3F6F9');
+        const menuHoverText = color('menu_hover_text', primary);
         const background = color('background', '#F7F8FA');
         const surface = color('surface', '#FFFFFF');
         const text = color('text', '#202B38');
@@ -284,6 +295,10 @@ require $projectRoot . '/app/views/header.php';
 
         setBackground('#preview-header', header);
         setBackground('#preview-menu', menu);
+        setBackground('#preview-menu .preview-menu-item--hover', menuHoverBg);
+        setText('#preview-menu .preview-menu-item', menuText);
+        setText('#preview-menu .preview-menu-item--hover', menuHoverText);
+        preview.querySelectorAll('#preview-menu .preview-menu-item').forEach(item => { item.style.padding = '5px 8px'; item.style.borderRadius = '5px'; });
         setBackground('#preview-page', background);
         setBackground('#preview-panel, #preview-admin-list', surface);
         const formPanelBg = color('form_panel_bg', background);
