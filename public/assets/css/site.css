@@ -1360,3 +1360,79 @@ body.platform-admin-page {
         margin-bottom: 12px;
     }
 }
+
+
+/* Verzorgde, compacte formulieren op Platformbeheer > Instellingen. */
+.platform-admin-page .settings-page .auth-form {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+    max-width: 720px;
+    padding: 16px 18px;
+    border: 1px solid var(--db-border, #E7EAF0);
+    border-radius: 12px;
+    background: var(--db-form-panel-bg, #F7F8FA);
+    box-shadow: 0 2px 8px rgba(25, 35, 50, .04);
+}
+.platform-admin-page .settings-page .auth-form > label {
+    display: block;
+    margin: 0 0 -4px;
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.4;
+    color: var(--db-form-label-text, var(--db-text, #202B38)) !important;
+}
+.platform-admin-page .settings-page .auth-form input:not([type="checkbox"]),
+.platform-admin-page .settings-page .auth-form select,
+.platform-admin-page .settings-page .auth-form textarea {
+    box-sizing: border-box;
+    min-height: 42px;
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid var(--db-form-input-border, #D8DEE8) !important;
+    border-radius: 8px;
+    background: var(--db-form-input-bg, #FFFFFF) !important;
+    color: var(--db-form-input-text, #202B38) !important;
+    font: inherit;
+    transition: border-color .16s ease, box-shadow .16s ease;
+}
+.platform-admin-page .settings-page .auth-form input[type="file"] {
+    min-height: auto;
+    padding: 9px;
+}
+.platform-admin-page .settings-page .auth-form input:not([type="checkbox"]):focus,
+.platform-admin-page .settings-page .auth-form select:focus,
+.platform-admin-page .settings-page .auth-form textarea:focus {
+    outline: none;
+    border-color: var(--db-form-input-hover-border, var(--db-primary, #0A4D9F)) !important;
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--db-form-input-hover-border, var(--db-primary, #0A4D9F)) 18%, transparent);
+}
+.platform-admin-page .settings-page .auth-form .form-actions {
+    display: flex;
+    justify-content: flex-start;
+    margin-top: 2px;
+}
+.platform-admin-page .settings-page .auth-form .form-actions .button,
+.platform-admin-page .settings-page > .admin-section > form:not(.auth-form) .form-actions .button {
+    min-height: 40px;
+    padding: 9px 16px;
+    border-radius: 8px;
+    font-weight: 650;
+}
+.platform-admin-page .settings-page > .admin-section > form:not(.auth-form) {
+    margin-top: 12px;
+}
+.platform-admin-page .settings-page > .admin-section > form:not(.auth-form) .form-actions {
+    display: flex;
+    justify-content: flex-start;
+}
+@media (max-width: 600px) {
+    .platform-admin-page .settings-page .auth-form {
+        max-width: none;
+        padding: 13px;
+    }
+    .platform-admin-page .settings-page .auth-form .form-actions,
+    .platform-admin-page .settings-page .auth-form .form-actions .button {
+        width: 100%;
+    }
+}
