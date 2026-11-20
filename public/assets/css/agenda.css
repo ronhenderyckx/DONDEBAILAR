@@ -3729,3 +3729,31 @@ body.has-agenda-footer .site-main > .agenda-page {
     font-weight: 800;
     line-height: 1.3;
 }
+
+
+/* Smartphone: evenementnaam boven de actie-iconen; datum volgt onder de iconen. */
+@media (max-width: 700px) {
+    .agenda-card > .agenda-card__details {
+        display: contents !important;
+    }
+    .agenda-card > .agenda-card__details > h2 {
+        order: 1 !important;
+        margin: 10px 16px 4px !important;
+    }
+    .agenda-card > .agenda-card__quick {
+        order: 2 !important;
+    }
+    .agenda-card > .agenda-card__details > .agenda-card__date-line {
+        order: 3 !important;
+        margin: 4px 16px 7px !important;
+    }
+    .agenda-card > .agenda-card__details > .agenda-card__hashtags {
+        order: 4 !important;
+    }
+    .agenda-card > .agenda-card__details > .agenda-card__description {
+        order: 5 !important;
+    }
+    .agenda-card > .agenda-card__swipe-hint {
+        order: 6 !important;
+    }
+}
