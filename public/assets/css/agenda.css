@@ -3844,11 +3844,11 @@ body.has-agenda-footer .site-main > .agenda-page {
 
 /* Geannuleerde evenementen: zachte, transparante dagkleur-banner.
    Regenannulering krijgt daarnaast zichtbare regendruppels op de kaart. */
-.agenda-feed > .agenda-card.agenda-card--cancelled:not(.agenda-card--past) {
+.agenda-feed > .agenda-card.agenda-card--cancelled {
     position:relative!important;
     isolation:isolate;
 }
-.agenda-feed > .agenda-card.agenda-card--cancelled:not(.agenda-card--past)::after {
+.agenda-feed > .agenda-card.agenda-card--cancelled::after {
     content:"GEANNULEERD";
     position:absolute;
     z-index:50;
@@ -3869,12 +3869,12 @@ body.has-agenda-footer .site-main > .agenda-page {
     text-shadow:0 1px 2px rgba(255,255,255,.45);
     pointer-events:none;
 }
-.agenda-feed > .agenda-card.agenda-card--cancelled-rain:not(.agenda-card--past)::after {
+.agenda-feed > .agenda-card.agenda-card--cancelled-rain::after {
     content:"GEANNULEERD WEGENS REGEN";
     font-size:clamp(16px,3.4vw,30px);
     letter-spacing:.09em;
 }
-.agenda-feed > .agenda-card.agenda-card--cancelled-rain:not(.agenda-card--past)::before {
+.agenda-feed > .agenda-card.agenda-card--cancelled-rain::before {
     content:"💧  💧  💧  💧  💧";
     position:absolute;
     z-index:51;
