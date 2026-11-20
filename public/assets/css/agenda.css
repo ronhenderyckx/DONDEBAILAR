@@ -3852,12 +3852,12 @@ body.has-agenda-footer .site-main > .agenda-page {
     content:"GEANNULEERD";
     position:absolute;
     z-index:50;
-    top:44%;
-    left:-20%;
-    width:140%;
+    top:50%;
+    left:-25%;
+    width:150%;
     box-sizing:border-box;
     padding:10px 0;
-    transform:rotate(-24deg);
+    transform:translateY(-50%) rotate(-38deg);
     background:color-mix(in srgb,var(--db-event-day-color,#777777) 42%,transparent);
     color:var(--db-event-day-title-color,#222222)!important;
     font-family:Arial,Helvetica,sans-serif;
@@ -3874,15 +3874,13 @@ body.has-agenda-footer .site-main > .agenda-page {
     font-size:clamp(16px,3.4vw,30px);
     letter-spacing:.09em;
 }
-.agenda-feed > .agenda-card.agenda-card--cancelled-rain::before {
-    content:"💧  💧  💧  💧  💧";
+.agenda-card__rain-drop {
     position:absolute;
     z-index:51;
-    top:8px;
-    right:12px;
-    font-size:clamp(18px,3vw,26px);
+    font-size:clamp(20px,3vw,28px);
     line-height:1;
-    letter-spacing:3px;
-    opacity:.9;
+    opacity:.95;
     pointer-events:none;
 }
+.agenda-card__rain-drop--top-left { top:8px; left:12px; }
+.agenda-card__rain-drop--bottom-right { right:12px; bottom:8px; }
