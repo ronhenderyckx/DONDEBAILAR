@@ -437,6 +437,7 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
             <input type="hidden" name="agenda_change" value="1">
             <input type="hidden" name="filter" value="<?= $escape($activeFilter) ?>">
             <div class="agenda-selector-line">
+                <button type="button" class="agenda-selector-button agenda-cancelled-button<?= (($_GET['show_cancelled'] ?? '') === '1') ? ' is-active' : '' ?>" id="agenda-show-cancelled" aria-pressed="<?= (($_GET['show_cancelled'] ?? '') === '1') ? 'true' : 'false' ?>" title="Toon of verberg geannuleerde evenementen" aria-label="Toon of verberg geannuleerde evenementen"><span class="agenda-filter-icon" aria-hidden="true">✕</span><span class="agenda-filter-switch-label">GEANNULEERD</span></button>
                 <button type="button" class="agenda-selector-button is-active" id="agenda-filter-switch" data-filter-index="0" aria-label="Wissel tussen filters" title="Wissel tussen filters"><span class="agenda-filter-switch-icon agenda-filter-switch-icon--city"><?php if ($citySwitchFilterIconPath !== ''): ?><img class="agenda-filter-icon agenda-filter-icon--image" src="<?= $escape($citySwitchFilterIconPath) ?>" alt="" aria-hidden="true" decoding="async"><?php else: ?><span class="agenda-filter-icon" aria-hidden="true">🏙️</span><?php endif; ?></span><span class="agenda-filter-switch-icon agenda-filter-switch-icon--organizer" hidden><?php if ($organizerFilterIconPath !== ''): ?><img class="agenda-filter-icon agenda-filter-icon--image" src="<?= $escape($organizerFilterIconPath) ?>" alt="" aria-hidden="true" decoding="async"><?php else: ?><span class="agenda-filter-icon" aria-hidden="true">💃</span><?php endif; ?></span><span class="agenda-filter-switch-label">ORGANISATOREN</span></button>
                 <div class="agenda-selector-panel is-open" data-panel="organizer">
                     <div class="agenda-organizer-strip" aria-label="Organisatoren met toekomstige evenementen">
@@ -478,7 +479,6 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
                     </div>
                 </div>
             </div>
-            <label class="agenda-cancelled-toggle" for="agenda-show-cancelled"><input type="checkbox" id="agenda-show-cancelled" name="show_cancelled" value="1"<?= (($_GET['show_cancelled'] ?? '') === '1') ? ' checked' : '' ?>><span>Geannuleerde</span></label>
         </form>
 
         </div>
@@ -506,7 +506,7 @@ $agendaCssVersion = is_file($agendaCssFile) ? (string) filemtime($agendaCssFile)
 .site-brand--region{display:inline-flex!important;align-items:center;gap:6px;min-width:0;flex:0 1 auto;text-decoration:none}.site-brand__region-logo{display:block;max-width:90px;max-height:34px;width:auto;height:auto;object-fit:contain}.site-brand__region-name{display:inline-block!important;visibility:visible!important;white-space:nowrap;font-size:13px;font-weight:700;color:var(--db-text,#222)}
 @media(max-width:600px){.site-header__inner{gap:5px;width:calc(100% - 16px);min-height:42px!important}.site-brand--platform{min-height:38px}.site-brand__logo{max-width:120px;max-height:34px}.site-welcome{font-size:10px;max-width:30vw}.site-notifications,.site-save-preferences{width:26px;height:28px}.site-notifications svg,.site-save-preferences svg{width:19px;height:19px}.site-menu__toggle{min-height:28px;padding:0 6px}}
 
-.agenda-cancelled-toggle{display:inline-flex;align-items:center;gap:8px;margin:7px 4px 2px;color:var(--db-filter-text-color,#222);font-size:12px;font-weight:700;cursor:pointer}.agenda-cancelled-toggle input{width:18px;height:18px;margin:0;accent-color:var(--db-primary);cursor:pointer}
+.agenda-cancelled-button{flex:0 0 62px!important;width:62px!important;min-width:62px!important;height:62px!important;min-height:62px!important;margin-top:8px;gap:3px}.agenda-cancelled-button .agenda-filter-icon{font-size:25px;line-height:1}.agenda-cancelled-button .agenda-filter-switch-label{font-size:8px;line-height:1.1;text-align:center}.agenda-cancelled-button[aria-pressed="true"]{background:linear-gradient(145deg,#b3261e,#7f1712);color:#fff}
 </style>
 </header>
 
