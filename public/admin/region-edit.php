@@ -276,7 +276,7 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                 <p>Pas de algemene regiokleuren, filterknoppen, footer en het regiologo aan. De weekdag- en evenementkleuren stel je apart in bij Agendakleuren.</p>
             </div>
             <div class="region-appearance-actions">
-                <a class="button button--primary" href="/admin/region-logo.php?region_id=<?= (int) $regionId ?>#region-colors">Kleuren aanpassen</a>
+                <a class="button button--primary" href="/admin/region-agenda-colors.php?region_id=<?= (int) $regionId ?>">Kleuren aanpassen</a>
                 <a class="button" href="/admin/region-logo.php?region_id=<?= (int) $regionId ?>#region-logo">Logo aanpassen</a>
             </div>
         </div>
