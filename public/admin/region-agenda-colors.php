@@ -175,7 +175,7 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 <section class="admin-page region-agenda-colors-page">
     <div class="admin-heading">
         <div><p class="eyebrow">REGIOBEHEER</p><h1>Agendakleuren</h1><p>Pas alle kleuren van de agenda aan voor <?= escapeHtml($region['name']) ?>, inclusief header, menu, filters en evenementenkaarten.</p></div>
-        <a class="button" href="/admin/region-colors.php?region_id=<?= (int) $regionId ?>">Terug naar kleuren en logo</a>
+        <a class="button" href="/admin/region-logo.php?region_id=<?= (int) $regionId ?>">Terug naar kleuren en logo</a>
     </div>
     <?php if ($errorMessage !== ''): ?><div class="message message--error" role="alert"><?= escapeHtml($errorMessage) ?></div><?php endif; ?>
     <?php if ($successMessage !== ''): ?><div class="message message--success" role="status"><?= escapeHtml($successMessage) ?></div><?php endif; ?>
@@ -276,7 +276,7 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                     <?php endforeach; ?>
                 </aside>
             </div>
-            <div class="form-actions"><button class="button button--primary" type="submit">Agendakleuren opslaan</button><a class="button" href="/admin/region-colors.php?region_id=<?= (int) $regionId ?>">Terug</a></div>
+            <div class="form-actions"><button class="button button--primary" type="submit">Agendakleuren opslaan</button><a class="button" href="/admin/region-logo.php?region_id=<?= (int) $regionId ?>">Terug</a></div>
         </form>
     </section>
 </section>
