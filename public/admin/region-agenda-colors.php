@@ -127,9 +127,23 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
             <?php foreach ($weekdayNames as $i => $day): ?>
                 <div class="agenda-weekday-editor-row">
                     <article class="agenda-card agenda-weekday-preview-card" data-day-card="<?= $i ?>">
-                        <div class="agenda-card__media-wrap"><div class="agenda-card__placeholder" data-day-placeholder="<?= $i ?>"><strong>SALSA · BACHATA · KIZOMBA</strong></div></div>
-                        <div class="agenda-card__quick"><span class="region-preview-quick-icon">👠 <b><?= 5 + $i ?></b></span><span class="region-preview-quick-icon">↗</span><span class="region-preview-quick-icon">⌖</span></div>
+                        <div class="agenda-card__media-wrap">
+                            <div class="agenda-card__gallery" data-gallery>
+                                <div class="agenda-card__gallery-track"><div class="agenda-card__media-slide"><div class="agenda-card__placeholder" data-day-placeholder="<?= $i ?>"><strong>SALSA · BACHATA · KIZOMBA</strong></div></div></div>
+                                <button type="button" class="agenda-preview-slider-arrow agenda-preview-slider-prev" aria-label="Vorige foto">‹</button>
+                                <button type="button" class="agenda-preview-slider-arrow agenda-preview-slider-next" aria-label="Volgende foto">›</button>
+                                <span class="agenda-card__media-count">1 / 3</span>
+                            </div>
+                        </div>
+                        <div class="agenda-card__content">
+                        <div class="agenda-card__quick">
+                            <button type="button" class="agenda-attendance" aria-label="Ik kom dansen"><span>👠</span><b><?= 5 + $i ?></b></button>
+                            <button type="button" class="agenda-icon-button" aria-label="Deel evenement">↗</button>
+                            <button type="button" class="agenda-icon-button" aria-label="Toon locatie">⌖</button>
+                            <button type="button" class="agenda-icon-button" aria-label="Berichten">▤ <b class="agenda-message-count">2</b></button>
+                        </div>
                         <div class="agenda-card__details">
+                            <button type="button" class="agenda-preview-switch" aria-label="Wissel tussen evenement en extra informatie">Meer info ↔</button>
                             <h2><?= escapeHtml($eventNames[$i]) ?></h2>
                             <p class="agenda-card__date-line"><?= escapeHtml($weekdayDates[$i]) ?> <span>◷</span> <?= escapeHtml($eventTimes[$i]) ?></p>
                             <p class="agenda-card__hashtags"><?= escapeHtml($eventTags[$i]) ?></p>
@@ -150,6 +164,19 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 </section>
 <style>
 .agenda-weekday-editor{display:flex;flex-direction:column;gap:12px}
+.agenda-preview-slider-arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);width:30px;height:36px;border:0;border-radius:5px;background:rgba(0,0,0,.58);color:#fff;font-size:25px;line-height:1;cursor:default}
+.agenda-preview-slider-prev{left:8px}.agenda-preview-slider-next{right:8px}
+.agenda-weekday-preview-card .agenda-card__media-wrap{position:relative;overflow:hidden}
+.agenda-weekday-preview-card .agenda-card__gallery{position:relative;width:100%;height:100%;min-height:118px}
+.agenda-weekday-preview-card .agenda-card__gallery-track,.agenda-weekday-preview-card .agenda-card__media-slide{height:100%;min-height:118px}
+.agenda-weekday-preview-card .agenda-card__placeholder{height:100%;display:flex;align-items:center;justify-content:center}
+.agenda-weekday-preview-card .agenda-card__media-count{position:absolute;right:9px;bottom:8px;z-index:2}
+.agenda-weekday-preview-card .agenda-card__content{position:relative}
+.agenda-weekday-preview-card .agenda-card__quick{display:flex;align-items:center;gap:9px;padding:8px 12px}
+.agenda-weekday-preview-card .agenda-attendance,.agenda-weekday-preview-card .agenda-icon-button{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:34px;min-height:30px;border:0;background:transparent;color:inherit;font-size:16px}
+.agenda-weekday-preview-card .agenda-icon-button{font-size:20px}
+.agenda-weekday-preview-card .agenda-preview-switch{float:right;margin:0 0 6px 8px;padding:4px 9px;border:1px solid #cbd2dc;border-radius:5px;background:#f7f8fa;color:#333;font-size:11px}
+.agenda-weekday-preview-card .agenda-card__details h2{clear:both}
 .agenda-weekday-editor-row{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:14px;align-items:stretch;padding:10px;border:1px solid #e1e5eb;border-radius:10px;background:#fff}
 .agenda-weekday-preview-card{margin:0;min-width:0}
 .agenda-weekday-preview-card .agenda-card__media-wrap,.agenda-weekday-preview-card .agenda-card__placeholder{min-height:118px}
