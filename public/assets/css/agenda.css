@@ -2253,7 +2253,10 @@ body.has-agenda-footer .site-main > .agenda-page {
     stroke:var(--db-event-day-text-color,#222222)!important;
     color:var(--db-event-day-text-color,#222222)!important;
 }
-.agenda-card__quick .agenda-attendance,
+.agenda-card__quick .agenda-attendance {
+    background:var(--db-event-day-color,#222222)!important;
+    color:var(--db-event-day-text-color,#222222)!important;
+}
 .agenda-card__quick .agenda-attendance b,
 .agenda-card__quick .agenda-message-count {
     color:var(--db-event-day-text-color,#222222)!important;
