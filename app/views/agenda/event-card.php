@@ -1,7 +1,7 @@
 <?php
 // Eén evenementkaart. Vereist $event, $eventIndex en de agenda-hulpfuncties/instellingen.
 // Veilige standaardkleur voor tekst op gearchiveerde evenementkaarten.
-$pastEventTextColor = $pastEventTextColor ?? '#222222';
+$pastEventTextColor = $pastEventTextColor ?? '#FFFFFF';
 ?>
                     <?php $eventStatus = (string) ($event['status'] ?? 'published'); ?>
                     <?php $eventBannerType = in_array($eventStatus, ['cancelled', 'cancelled_rain'], true) ? $eventStatus : (!empty($eventIsPast) ? 'archived' : ''); ?>
