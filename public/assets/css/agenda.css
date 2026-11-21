@@ -4038,7 +4038,9 @@ body.has-agenda-footer .site-main > .agenda-page {
 }
 
 
-/* Verwijder uitsluitend het lijntje aan de onderkant van de organisatorbalk. */
-.site-header__agenda-filters .agenda-selector-panel[data-panel="organizer"] {
+/* Verwijder de horizontale onderlijn van het organisatorpaneel.
+   Niet afhankelijk maken van een specifieke header-wrapper: het paneel kan
+   op verschillende pagina-indelingen in een andere wrapper staan. */
+.agenda-selector-panel[data-panel="organizer"] {
     border-bottom:0!important;
 }
