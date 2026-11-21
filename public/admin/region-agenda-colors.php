@@ -147,7 +147,6 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                             <h2><?= escapeHtml($eventNames[$i]) ?></h2>
                             <p class="agenda-card__date-line"><?= escapeHtml($weekdayDates[$i]) ?> <span>◷</span> <?= escapeHtml($eventTimes[$i]) ?></p>
                             <p class="agenda-card__hashtags"><?= escapeHtml($eventTags[$i]) ?></p>
-                            <p class="agenda-weekday-description">Voorbeeld evenement · <?= escapeHtml($region['name']) ?></p>
                         </div>
                     </article>
                     <div class="agenda-weekday-color-controls">
