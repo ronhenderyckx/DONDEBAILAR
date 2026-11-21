@@ -19,7 +19,9 @@ $GLOBALS['config'] = $config;
 $timezone = $config['app']['default_timezone'] ?? 'Europe/Madrid';
 date_default_timezone_set((string) $timezone);
 
-$debug = (bool) ($config['app']['debug'] ?? false);
+$host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+$host = preg_replace('/:\\d+$/', '', $host) ?? '';
+$debug = (bool) ($config['app']['debug'] ?? false) && $host === 'test.dondebailar.eu';
 ini_set('display_errors', $debug ? '1' : '0');
 ini_set('log_errors', '1');
 error_reporting(E_ALL);
