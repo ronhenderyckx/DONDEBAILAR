@@ -172,6 +172,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
 
             foreach ($regionRoles as $regionId => $role) {
+                // Een lege keuze betekent bewust: deze gebruiker krijgt geen toegang tot die regio.
+                if ($role === '') {
+                    continue;
+                }
+
                 if (!in_array($regionId, $validRegionIds, true)) {
                     throw new RuntimeException('Ongeldige regio geselecteerd.');
                 }
