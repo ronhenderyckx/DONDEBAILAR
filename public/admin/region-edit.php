@@ -182,7 +182,7 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
         grid-column: auto;
     }
 }
-</style>
+    .region-appearance-actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}\n    @media(max-width:560px){.region-appearance-actions{width:100%;flex-direction:column;align-items:stretch}.region-appearance-actions .button{width:100%;justify-content:center}}\n</style>
 
 <section class="admin-page region-edit-page">
     <div class="admin-heading">
@@ -275,7 +275,10 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                 <h2>Regiokleuren en logo</h2>
                 <p>Pas de algemene regiokleuren, filterknoppen, footer en het regiologo aan. De weekdag- en evenementkleuren stel je apart in bij Agendakleuren.</p>
             </div>
-            <a class="button button--primary" href="/admin/region-colors.php?region_id=<?= (int) $regionId ?>">Kleuren en logo aanpassen</a>
+            <div class="region-appearance-actions">
+                <a class="button button--primary" href="/admin/region-colors.php?region_id=<?= (int) $regionId ?>#region-colors">Kleuren aanpassen</a>
+                <a class="button" href="/admin/region-colors.php?region_id=<?= (int) $regionId ?>#region-logo">Logo aanpassen</a>
+            </div>
         </div>
     </section>
 </section>
