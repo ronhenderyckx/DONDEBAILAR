@@ -34,9 +34,29 @@ $defaultColors = ['#F6D84A', '#4A90D9', '#55A96B', '#A78BDA', '#E78AAE', '#F49A4
 $defaultText = array_fill(0, 7, '#222222');
 $defaultTitles = array_fill(0, 7, '#222222');
 
-$appearanceQuery = $db->prepare('SELECT weekday_colors FROM region_appearance WHERE region_id = :id LIMIT 1');
+$regionColorDefaults = [
+    'primary_color' => '#E23A2C',
+    'primary_dark' => '#8F211B',
+    'accent_color' => '#F6B22E',
+    'secondary_color' => '#1FA898',
+    'tertiary_color' => '#F4802A',
+    'header_color' => '#222222',
+    'menu_color' => '#FFFFFF',
+    'organizer_color' => '#E23A2C',
+    'filter_hover_color' => '#E23A2C',
+    'filter_bar_color' => '#FFFFFF',
+    'filter_text_color' => '#222222',
+    'search_button_color' => '#E23A2C',
+    'back_top_color' => '#E23A2C',
+    'search_field_color' => '#FFFFFF',
+    'search_text_color' => '#222222',
+    'footer_color' => '#FFFFFF',
+    'background_color' => '#FFFFFF',
+    'text_color' => '#222222',
+];
+$appearanceQuery = $db->prepare('SELECT * FROM region_appearance WHERE region_id = :id LIMIT 1');
 $appearanceQuery->execute(['id' => $regionId]);
-$appearance = $appearanceQuery->fetch() ?: [];
+$appearance = $appearanceQuery->fetch() ?: [];\n$regionColors = [];\nforeach ($regionColorDefaults as $key => $fallback) {\n    $candidate = strtoupper((string) ($appearance[$key] ?? $fallback));\n    $regionColors[$key] = preg_match('/^#[0-9A-F]{6}$/', $candidate) ? $candidate : $fallback;\n}
 $weekdayData = json_decode((string) ($appearance['weekday_colors'] ?? ''), true);
 if (!is_array($weekdayData)) $weekdayData = [];
 $weekdayColors = $defaultColors;
@@ -62,6 +82,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'weekday_text_colors' => is_array($_POST['weekday_text_colors'] ?? null) ? $_POST['weekday_text_colors'] : [],
             'weekday_title_colors' => is_array($_POST['weekday_title_colors'] ?? null) ? $_POST['weekday_title_colors'] : [],
         ];
+        foreach ($regionColorDefaults as $key => $fallback) {
+            $candidate = strtoupper(trim((string) ($_POST[$key] ?? $regionColors[$key])));
+            if (!preg_match('/^#[0-9A-F]{6}$/', $candidate)) {
+                $errorMessage = 'Een of meer regiokleuren zijn ongeldig.';
+                break;
+            }
+            $regionColors[$key] = $candidate;
+        }
         foreach ($weekdayNames as $i => $_day) {
             $values = [
                 ['source' => 'weekday_colors', 'current' => $weekdayColors[$i]],
@@ -88,21 +116,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $encoded = json_encode($weekdayData, JSON_THROW_ON_ERROR);
             $exists = $db->prepare('SELECT region_id FROM region_appearance WHERE region_id = :id LIMIT 1');
             $exists->execute(['id' => $regionId]);
-            if ($exists->fetchColumn()) {
-                $save = $db->prepare('UPDATE region_appearance SET weekday_colors = :colors WHERE region_id = :id');
-                $save->execute(['id' => $regionId, 'colors' => $encoded]);
-            } else {
-                $save = $db->prepare("INSERT INTO region_appearance
-                    (region_id, primary_color, primary_dark, accent_color, secondary_color, tertiary_color,
-                     header_color, menu_color, organizer_color, filter_hover_color, filter_bar_color, filter_text_color,
-                     past_event_color, search_button_color, back_top_color, search_field_color, search_text_color,
-                     footer_color, background_color, text_color, weekday_colors, logo_path)
-                    VALUES (:id, '#E23A2C', '#8F211B', '#F6B22E', '#1FA898', '#F4802A',
-                     '#222222', '#FFFFFF', '#E23A2C', '#E23A2C', '#FFFFFF', '#222222',
-                     '#777777', '#E23A2C', '#E23A2C', '#FFFFFF', '#222222',
-                     '#FFFFFF', '#FFFFFF', '#222222', :colors, NULL)");
-                $save->execute(['id' => $regionId, 'colors' => $encoded]);
+            $saveValues = ['id' => $regionId, 'colors' => $encoded];
+            $colorAssignments = [];
+            $colorColumns = ['region_id'];
+            $colorPlaceholders = [':id'];
+            foreach ($regionColors as $key => $value) {
+                $colorAssignments[] = $key . ' = :' . $key;
+                $colorColumns[] = $key;
+                $colorPlaceholders[] = ':' . $key;
+                $saveValues[$key] = $value;
             }
+            if ($exists->fetchColumn()) {
+                $save = $db->prepare('UPDATE region_appearance SET weekday_colors = :colors, ' . implode(', ', $colorAssignments) . ' WHERE region_id = :id');
+            } else {
+                $save = $db->prepare('INSERT INTO region_appearance (' . implode(', ', array_merge($colorColumns, ['weekday_colors'])) . ') VALUES (' . implode(', ', array_merge($colorPlaceholders, [':colors'])) . ')');
+            }
+            $save->execute($saveValues);
             $successMessage = 'De agendakleuren zijn opgeslagen.';
         }
     }
@@ -128,13 +157,42 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                     <iframe
                         id="agenda-live-preview"
                         title="Volledige live agenda Costa Blanca"
-                        src="/?region_id=<?= (int) $regionId ?>"
+                        src="/?region_id=<?= (int) $regionId ?>&amp;agenda_color_preview=1"
                         loading="eager"
                     ></iframe>
                 </div>
                 <aside class="agenda-weekday-color-panel" aria-label="Kleuren per weekdag">
-                    <h3>Kleuren per weekdag</h3>
-                    <p>De volledige agenda wordt links getoond. Wijzig rechts de kleuren en bekijk meteen het resultaat.</p>
+                    <h3>Algemene regiokleuren</h3>
+                    <p>Pas ook header, menu, filters, knoppen, achtergrond en footer aan. Het volledige voorbeeld links verandert direct mee.</p>
+                    <?php
+                    $regionColorLabels = [
+                        'primary_color' => 'Primaire kleur',
+                        'primary_dark' => 'Donkere primaire kleur',
+                        'accent_color' => 'Accentkleur',
+                        'secondary_color' => 'Secundaire kleur',
+                        'tertiary_color' => 'Tertiaire kleur',
+                        'header_color' => 'Headerkleur',
+                        'menu_color' => 'Menukleur',
+                        'organizer_color' => 'Organisatorfilter',
+                        'filter_hover_color' => 'Filter hoverkleur',
+                        'filter_bar_color' => 'Filterbalk achtergrond',
+                        'filter_text_color' => 'Filterbalk tekst',
+                        'search_button_color' => 'Zoekknop',
+                        'back_top_color' => 'Naar boven-knop',
+                        'search_field_color' => 'Zoekveld achtergrond',
+                        'search_text_color' => 'Zoekveld tekst',
+                        'footer_color' => 'Footer achtergrond',
+                        'background_color' => 'Pagina-achtergrond',
+                        'text_color' => 'Algemene tekst',
+                    ];
+                    ?>
+                    <section class="agenda-color-group">
+                        <h4>Algemene kleuren</h4>
+                        <?php foreach ($regionColorLabels as $key => $label): ?>
+                            <label><?= escapeHtml($label) ?><input type="color" name="<?= escapeHtml($key) ?>" value="<?= escapeHtml($regionColors[$key]) ?>"></label>
+                        <?php endforeach; ?>
+                    </section>
+                    <h3>Weekdagkleuren</h3>
                     <?php foreach ($weekdayNames as $i => $day): ?>
                         <section class="agenda-weekday-color-group">
                             <h4><?= escapeHtml($day) ?></h4>
@@ -159,6 +217,10 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 .agenda-weekday-color-panel{position:sticky;top:12px;max-height:calc(100vh - 265px);overflow:auto;padding:12px;border:1px solid #e1e5eb;border-radius:9px;background:#f8f9fb}
 .agenda-weekday-color-panel>h3{margin:0 0 5px;font-size:16px}
 .agenda-weekday-color-panel>p{margin:0 0 10px;font-size:12px;line-height:1.4;color:#596273}
+.agenda-color-group{display:grid;gap:7px;padding:9px 0;border-top:1px solid #e1e5eb}
+.agenda-color-group h4{margin:0;font-size:13px}
+.agenda-color-group label{display:grid;grid-template-columns:1fr 48px;align-items:center;gap:8px;font-size:11px;font-weight:600;color:#596273}
+.agenda-color-group input[type=color]{width:48px;height:29px;padding:2px;border:1px solid #d5dbe3;border-radius:5px;background:#fff;cursor:pointer}
 .agenda-weekday-color-group{display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:5px 8px;padding:9px 0;border-top:1px solid #e1e5eb}
 .agenda-weekday-color-group h4{grid-column:1/-1;margin:0;font-size:13px}
 .agenda-weekday-color-group label{display:contents;font-size:11px;font-weight:600;color:#596273}
@@ -199,6 +261,19 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
     root.style.setProperty('--db-weekday-text-'+(i+1),text);
     root.style.setProperty('--db-weekday-title-'+(i+1),title);
    }
+   const variables={
+    primary_color:'--db-primary',primary_dark:'--db-primary-dark',accent_color:'--db-accent',
+    secondary_color:'--db-secondary',tertiary_color:'--db-tertiary',header_color:'--db-header-color',
+    menu_color:'--db-menu-color',organizer_color:'--db-organizer-color',filter_hover_color:'--db-filter-hover-color',
+    filter_bar_color:'--db-filter-bar-color',filter_text_color:'--db-filter-text-color',
+    search_button_color:'--db-search-button-color',back_top_color:'--db-back-top-color',
+    search_field_color:'--db-search-field-color',search_text_color:'--db-search-text-color',
+    footer_color:'--db-footer-color',background_color:'--db-background',text_color:'--db-text'
+   };
+   Object.keys(variables).forEach(key=>{
+    const input=form.querySelector('[name="'+key+'"]');
+    if(input)root.style.setProperty(variables[key],input.value);
+   });
   }catch(error){/* Preview blijft bruikbaar als de browser iframe-toegang beperkt. */}
  }
  frame.addEventListener('load',applyAgendaColors);
