@@ -119,52 +119,187 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 
 <style>
-    #users-admin-table { color: <?= escapeHtml($userListColors['list_text']) ?>; border-color: <?= escapeHtml($userListColors['border']) ?>; }
-    #users-admin-table thead th { background: <?= escapeHtml($userListColors['list_header_bg']) ?> !important; color: <?= escapeHtml($userListColors['list_header_text']) ?> !important; border-color: <?= escapeHtml($userListColors['border']) ?> !important; }
-    #users-admin-table tbody tr { background: <?= escapeHtml($userListColors['list_row_bg']) ?> !important; color: <?= escapeHtml($userListColors['list_text']) ?> !important; }
-    #users-admin-table tbody tr:hover { background: <?= escapeHtml($userListColors['list_hover_bg']) ?> !important; color: <?= escapeHtml($userListColors['list_hover_text']) ?> !important; }
-    #users-admin-table tbody tr:hover td, #users-admin-table tbody tr:hover strong { color: <?= escapeHtml($userListColors['list_hover_text']) ?> !important; }
-    #users-admin-table .button { background: <?= escapeHtml($userListColors['action_button']) ?> !important; color: <?= escapeHtml($userListColors['action_button_text']) ?> !important; border-color: <?= escapeHtml($userListColors['action_button']) ?> !important; }
-    #users-admin-table .button:hover { background: <?= escapeHtml($userListColors['action_hover_bg']) ?> !important; color: <?= escapeHtml($userListColors['action_hover_text']) ?> !important; border-color: <?= escapeHtml($userListColors['action_hover_bg']) ?> !important; }
-    #users-admin-table td, #users-admin-table th { border-color: <?= escapeHtml($userListColors['border']) ?> !important; }
+    /* Alle onderdelen van deze pagina volgen de ingestelde platformkleuren. */
+    .users-admin-page {
+        color: <?= escapeHtml($userListColors['text'] ?? '#202B38') ?>;
+        background: <?= escapeHtml($userListColors['background'] ?? '#F7F8FA') ?>;
+    }
+    .users-admin-page .admin-section {
+        background: <?= escapeHtml($userListColors['surface'] ?? '#FFFFFF') ?>;
+        border-color: <?= escapeHtml($userListColors['border']) ?>;
+    }
+    .users-admin-page .admin-heading p:last-child,
+    .users-admin-page .users-result-count {
+        color: <?= escapeHtml($userListColors['muted'] ?? '#687586') ?>;
+    }
+    .users-admin-page .section-heading > .button,
+    .users-filter-actions .button {
+        background: <?= escapeHtml($userListColors['form_button_bg'] ?? $userListColors['action_button']) ?> !important;
+        color: <?= escapeHtml($userListColors['form_button_text'] ?? $userListColors['action_button_text']) ?> !important;
+        border: 1px solid <?= escapeHtml($userListColors['form_button_bg'] ?? $userListColors['action_button']) ?> !important;
+    }
+    .users-admin-page .section-heading > .button:hover,
+    .users-filter-actions .button:hover {
+        background: <?= escapeHtml($userListColors['form_button_hover_bg'] ?? $userListColors['action_hover_bg']) ?> !important;
+        color: <?= escapeHtml($userListColors['form_button_hover_text'] ?? $userListColors['action_hover_text']) ?> !important;
+        border-color: <?= escapeHtml($userListColors['form_button_hover_bg'] ?? $userListColors['action_hover_bg']) ?> !important;
+    }
+
+    #users-admin-table {
+        table-layout: auto;
+        color: <?= escapeHtml($userListColors['list_text']) ?>;
+        background: <?= escapeHtml($userListColors['surface'] ?? '#FFFFFF') ?>;
+        border-color: <?= escapeHtml($userListColors['border']) ?>;
+    }
+    #users-admin-table thead th {
+        background: <?= escapeHtml($userListColors['list_header_bg']) ?> !important;
+        color: <?= escapeHtml($userListColors['list_header_text']) ?> !important;
+        border-color: <?= escapeHtml($userListColors['border']) ?> !important;
+    }
+    #users-admin-table tbody tr,
+    #users-admin-table tbody tr td {
+        background: <?= escapeHtml($userListColors['list_row_bg']) ?> !important;
+        color: <?= escapeHtml($userListColors['list_text']) ?> !important;
+    }
+    #users-admin-table tbody tr:hover,
+    #users-admin-table tbody tr:hover td {
+        background: <?= escapeHtml($userListColors['list_hover_bg']) ?> !important;
+        color: <?= escapeHtml($userListColors['list_hover_text']) ?> !important;
+    }
+    #users-admin-table tbody tr:hover td,
+    #users-admin-table tbody tr:hover strong {
+        color: <?= escapeHtml($userListColors['list_hover_text']) ?> !important;
+    }
+    #users-admin-table td,
+    #users-admin-table th {
+        border-color: <?= escapeHtml($userListColors['border']) ?> !important;
+    }
+    #users-admin-table th {
+        padding: 9px 11px;
+        font-size: 10px;
+    }
+    #users-admin-table td {
+        padding: 9px 11px;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    #users-admin-table td:last-child {
+        min-width: 100px;
+        white-space: nowrap;
+    }
+    #users-admin-table td:last-child .button {
+        margin: 0 4px 0 0;
+        vertical-align: middle;
+        min-height: 32px;
+        padding: 6px 10px;
+        font-size: 11px;
+        background: <?= escapeHtml($userListColors['action_button']) ?> !important;
+        color: <?= escapeHtml($userListColors['action_button_text']) ?> !important;
+        border-color: <?= escapeHtml($userListColors['action_button']) ?> !important;
+    }
+    #users-admin-table td:last-child .button:hover {
+        background: <?= escapeHtml($userListColors['action_hover_bg']) ?> !important;
+        color: <?= escapeHtml($userListColors['action_hover_text']) ?> !important;
+        border-color: <?= escapeHtml($userListColors['action_hover_bg']) ?> !important;
+    }
+    #users-admin-table .user-status {
+        display: inline-block;
+        padding: 4px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    #users-admin-table .user-status--active {
+        background: <?= escapeHtml($userListColors['status_active_bg']) ?> !important;
+        color: <?= escapeHtml($userListColors['status_active_text']) ?> !important;
+    }
+    #users-admin-table .user-status--inactive {
+        background: <?= escapeHtml($userListColors['status_inactive_bg']) ?> !important;
+        color: <?= escapeHtml($userListColors['status_inactive_text']) ?> !important;
+    }
+
+    /* Zoek- en filterpaneel gebruikt de aparte formulierkleuren. */
+    .users-filter-form {
+        margin: 0 0 18px;
+        padding: 14px;
+        background: <?= escapeHtml($userListColors['form_panel_bg'] ?? '#F7F8FA') ?>;
+        border: 1px solid <?= escapeHtml($userListColors['border']) ?>;
+        border-radius: 10px;
+    }
+    .users-filter-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+    }
+    .users-filter-grid label {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        min-width: 0;
+        color: <?= escapeHtml($userListColors['form_label_text'] ?? '#202B38') ?>;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .users-filter-grid input,
+    .users-filter-grid select {
+        width: 100%;
+        min-height: 38px;
+        padding: 8px 10px;
+        border: 1px solid <?= escapeHtml($userListColors['form_input_border'] ?? $userListColors['border']) ?>;
+        border-radius: 6px;
+        background: <?= escapeHtml($userListColors['form_input_bg'] ?? '#FFFFFF') ?>;
+        color: <?= escapeHtml($userListColors['form_input_text'] ?? '#202B38') ?>;
+        font: inherit;
+        font-weight: 400;
+    }
+    .users-filter-grid input:focus,
+    .users-filter-grid select:focus {
+        outline: none;
+        border-color: <?= escapeHtml($userListColors['form_input_hover_border'] ?? $userListColors['primary']) ?>;
+        box-shadow: 0 0 0 2px <?= escapeHtml($userListColors['form_input_hover_border'] ?? $userListColors['primary']) ?>22;
+    }
+    .users-filter-actions {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 9px;
+        margin-top: 13px;
+    }
+    .users-filter-actions .button {
+        min-height: 36px;
+        padding: 8px 13px;
+        font-size: 12px;
+    }
+    .users-result-count {
+        margin-left: auto;
+        font-size: 12px;
+    }
 
     /* Compacte en responsieve tabel, gelijk aan het regio-overzicht. */
     .users-admin-page .admin-heading { margin-bottom: 20px; gap: 12px; }
     .users-admin-page .admin-section { margin-bottom: 18px; padding: 18px; }
     .users-admin-page .section-heading { margin-bottom: 12px; gap: 10px; }
-    #users-admin-table { table-layout: auto; }
-    #users-admin-table th { padding: 9px 11px; font-size: 10px; }
-    #users-admin-table td { padding: 9px 11px; font-size: 12px; line-height: 1.4; }
-    #users-admin-table td:last-child { min-width: 100px; white-space: nowrap; }
-    #users-admin-table td:last-child .button { margin: 0 4px 0 0; vertical-align: middle; }
-    #users-admin-table .button { min-height: 32px; padding: 6px 10px; font-size: 11px; }
-    .users-filter-form { margin: 0 0 18px; padding: 14px; background: #F7F8FA; border: 1px solid <?= escapeHtml($userListColors['border']) ?>; border-radius: 10px; }
-    .users-filter-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-    .users-filter-grid label { display: flex; flex-direction: column; gap: 5px; min-width: 0; color: #354052; font-size: 12px; font-weight: 600; }
-    .users-filter-grid input, .users-filter-grid select { width: 100%; min-height: 38px; padding: 8px 10px; border: 1px solid #D5DAE2; border-radius: 6px; background: #FFFFFF; color: #202B38; font: inherit; font-weight: 400; }
-    .users-filter-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-top: 13px; }
-    .users-filter-actions .button { min-height: 36px; padding: 8px 13px; font-size: 12px; }
-    .users-result-count { margin-left: auto; color: #687586; font-size: 12px; }
+
     @media (max-width: 760px) {
         .users-filter-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .users-filter-search { grid-column: 1 / -1; }
         .users-filter-actions { align-items: stretch; }
         .users-filter-actions .button { flex: 1 1 calc(50% - 9px); text-align: center; }
         .users-result-count { flex: 1 1 100%; margin: 3px 0 0; }
+        .users-admin-page .admin-heading { margin-bottom: 16px; }
+        .users-admin-page .admin-section { padding: 14px; }
+        .users-admin-page .section-heading { align-items: flex-start; }
+        #users-admin-table th,
+        #users-admin-table td { padding: 9px 10px; }
     }
     @media (max-width: 420px) {
         .users-filter-grid { grid-template-columns: 1fr; }
         .users-filter-search { grid-column: auto; }
     }
-    @media (max-width: 760px) {
-        .users-admin-page .admin-heading { margin-bottom: 16px; }
-        .users-admin-page .admin-section { padding: 14px; }
-        .users-admin-page .section-heading { align-items: flex-start; }
-        #users-admin-table th, #users-admin-table td { padding: 9px 10px; }
-    }
 </style>
 
-<section class="admin-page">
+<section class="admin-page users-admin-page">
     <div class="admin-heading">
         <div>
             <p class="eyebrow">PLATFORMBEHEER</p>
@@ -268,7 +403,7 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                                 <td><?= escapeHtml($item['email']) ?></td>
                                 <td><?= escapeHtml($item['platform_role']) ?></td>
                                 <td><?= escapeHtml($item['region_roles'] ?: 'Geen regio toegewezen') ?></td>
-                                <td><?= escapeHtml($item['status']) ?></td>
+                                <td><span class="user-status <?= strtolower((string) $item['status']) === 'active' ? 'user-status--active' : 'user-status--inactive' ?>"><?= escapeHtml($item['status']) ?></span></td>
                                 <td>
                                     <a class="button button--small"
                                        href="/admin/user-edit.php?id=<?= (int) $item['id'] ?>">
