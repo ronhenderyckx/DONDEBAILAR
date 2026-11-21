@@ -206,7 +206,7 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
             <h1>Nieuwe gebruiker</h1>
             <p>Maak een account aan en wijs eventueel regio's toe.</p>
         </div>
-        <a class="button" href="/admin/users.php">Terug naar overzicht</a>
+        <a class="button" href="/admin/users.php">Terug</a>
     </div>
 
     <section class="admin-section">
