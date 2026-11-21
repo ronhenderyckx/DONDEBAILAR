@@ -191,6 +191,14 @@ $themeStyle = '--db-primary:' . $primaryColor
     . ';--db-footer-color:' . $colorValue('footer_color', '#FFFFFF')
     . ';--db-background:' . $colorValue('background_color', '#F7F8FA')
     . ';--db-text:' . $colorValue('text_color', '#202B38');
+if (!empty($isAgendaPage)) {
+    $arrowBackground = (string) ($agendaArrowBackground ?? '#F6B22E');
+    $arrowText = (string) ($agendaArrowText ?? '#222222');
+    if (!preg_match('/^#[0-9a-fA-F]{6}$/', $arrowBackground)) $arrowBackground = '#F6B22E';
+    if (!preg_match('/^#[0-9a-fA-F]{6}$/', $arrowText)) $arrowText = '#222222';
+    $themeStyle .= ';--db-agenda-arrow-background:' . strtoupper($arrowBackground)
+        . ';--db-agenda-arrow-text:' . strtoupper($arrowText);
+}
 
 // Alleen expliciet gemarkeerde platformbeheerpagina's gebruiken de platformmenukleur.
 // Regiobeheer, openbare pagina's en gedeelde beheerpagina's behouden hun eigen kleur.
