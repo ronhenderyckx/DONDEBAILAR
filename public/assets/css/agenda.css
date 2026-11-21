@@ -4051,3 +4051,21 @@ body.has-agenda-footer .site-main > .agenda-page {
     outline:0!important;
     box-shadow:none!important;
 }
+
+
+/* Verwijder de scheidingslijn rond het organisatorblok in de evenementkaart. */
+.agenda-card__section-label,
+.agenda-card__info-block--organizer,
+.agenda-card__organizer {
+    border-top: none !important;
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+.agenda-card__section-label::before,
+.agenda-card__section-label::after,
+.agenda-card__info-block--organizer::before,
+.agenda-card__info-block--organizer::after {
+    content: none !important;
+    display: none !important;
+}
