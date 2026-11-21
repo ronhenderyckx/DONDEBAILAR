@@ -555,9 +555,9 @@
     display:flex;
     align-items:center;
     gap:12px;
-    margin:14px 0 0;
-    padding-top:12px;
-    border-top:1px solid rgba(255,255,255,.22)
+    margin:0;
+    padding-top:0;
+    border-top:none
 }
 .agenda-card__organizer-logo {
     display:block;
