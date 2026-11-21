@@ -204,10 +204,6 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                         'tertiary_color' => 'Tertiaire kleur',
                         'header_color' => 'Headerkleur',
                         'menu_color' => 'Menukleur',
-                        'organizer_color' => 'Organisatorfilter',
-                        'filter_hover_color' => 'Filter hoverkleur',
-                        'filter_bar_color' => 'Filterbalk achtergrond',
-                        'filter_text_color' => 'Filterbalk tekst',
                         'search_button_color' => 'Zoekknop',
                         'back_top_color' => 'Naar boven-knop',
                         'search_field_color' => 'Zoekveld achtergrond',
@@ -223,9 +219,28 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                         <?php foreach ($regionColorLabels as $key => $label): ?>
                             <label><?= escapeHtml($label) ?><input type="color" name="<?= escapeHtml($key) ?>" value="<?= escapeHtml($regionColors[$key]) ?>"></label>
                         <?php endforeach; ?>
+                    </section>
+                    <section class="agenda-color-group">
+                        <h4>Locatie- en organisatorbalk</h4>
+                        <p>Stel de achtergrond, knoppen, tekst en hoverkleur van de balk met locaties en organisatoren afzonderlijk in.</p>
+                        <?php foreach ([
+                            'selector_strip_background_color' => 'Achtergrond van de balk',
+                        ] as $key => $label): ?>
+                            <label><?= escapeHtml($label) ?><input type="color" name="<?= escapeHtml($key) ?>" value="<?= escapeHtml($extraColors[$key]) ?>"></label>
+                        <?php endforeach; ?>
+                        <?php foreach ([
+                            'filter_bar_color' => 'Achtergrond van de filterbalk',
+                            'organizer_color' => 'Achtergrond van de organisatieknoppen',
+                            'filter_text_color' => 'Tekstkleur van locaties en organisatoren',
+                            'filter_hover_color' => 'Hoverkleur van de knoppen',
+                        ] as $key => $label): ?>
+                            <label><?= escapeHtml($label) ?><input type="color" name="<?= escapeHtml($key) ?>" value="<?= escapeHtml($regionColors[$key]) ?>"></label>
+                        <?php endforeach; ?>
+                    </section>
+                    <section class="agenda-color-group">
+                        <h4>Evenementen en iconen</h4>
                         <?php foreach ([
                             'past_event_color' => 'Kaartkleur afgelopen evenementen',
-                            'selector_strip_background_color' => 'Achtergrond locatie- en organisatorbalk',
                             'event_separator_color' => 'Scheidingslijn evenementen',
                             'past_event_text_color' => 'Tekstkleur afgelopen evenementen',
                             'event_title_color' => 'Algemene evenementtitel',
