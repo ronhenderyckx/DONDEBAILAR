@@ -167,8 +167,6 @@
     }
 
     document.addEventListener('click', function (event) {
-
-    document.addEventListener('click', function (event) {
         // Wisselen tussen STEDEN en ORGANISATOREN wist een actieve vrije zoekterm.
         const filterSwitch = event.target instanceof Element ? event.target.closest('#agenda-filter-switch') : null;
         if (filterSwitch) {
