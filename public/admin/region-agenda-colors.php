@@ -137,7 +137,6 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                         </div>
                     </article>
                     <div class="agenda-weekday-color-controls">
-                        <h3><?= escapeHtml($day) ?></h3>
                         <label>Kaartkleur<input type="color" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>"></label>
                         <label>Tekstkleur<input type="color" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>"></label>
                         <label>Titelkleur<input type="color" name="weekday_title_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTitleColors[$i]) ?>"></label>
