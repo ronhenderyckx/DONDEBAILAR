@@ -59,6 +59,21 @@ $appearanceQuery->execute(['id' => $regionId]);
 $appearance = $appearanceQuery->fetch() ?: [];\n$regionColors = [];\nforeach ($regionColorDefaults as $key => $fallback) {\n    $candidate = strtoupper((string) ($appearance[$key] ?? $fallback));\n    $regionColors[$key] = preg_match('/^#[0-9A-F]{6}$/', $candidate) ? $candidate : $fallback;\n}
 $weekdayData = json_decode((string) ($appearance['weekday_colors'] ?? ''), true);
 if (!is_array($weekdayData)) $weekdayData = [];
+$extraColorDefaults = [
+    'past_event_color' => '#777777',
+    'selector_strip_background_color' => '#FFFFFF',
+    'event_separator_color' => '#D0D0D0',
+    'past_event_text_color' => '#FFFFFF',
+    'event_title_color' => '#222222',
+    'back_top_icon_color' => '#FFFFFF',
+    'search_icon_color' => '#FFFFFF',
+    'speaker_icon_color' => '#FFFFFF',
+];
+$extraColors = [];
+foreach ($extraColorDefaults as $key => $fallback) {
+    $candidate = strtoupper((string) ($key === 'past_event_color' ? ($appearance[$key] ?? $fallback) : ($weekdayData[$key] ?? $fallback)));
+    $extraColors[$key] = preg_match('/^#[0-9A-F]{6}$/', $candidate) ? $candidate : $fallback;
+}
 $weekdayColors = $defaultColors;
 $weekdayTextColors = $defaultText;
 $weekdayTitleColors = $defaultTitles;
@@ -90,6 +105,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $regionColors[$key] = $candidate;
         }
+        foreach ($extraColorDefaults as $key => $fallback) {
+            $candidate = strtoupper(trim((string) ($_POST[$key] ?? $extraColors[$key])));
+            if (!preg_match('/^#[0-9A-F]{6}$/', $candidate)) {
+                $errorMessage = 'Een of meer aanvullende kleuren zijn ongeldig.';
+                break;
+            }
+            $extraColors[$key] = $candidate;
+        }
         foreach ($weekdayNames as $i => $_day) {
             $values = [
                 ['source' => 'weekday_colors', 'current' => $weekdayColors[$i]],
@@ -113,10 +136,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $weekdayData['weekday_text_' . $i] = $weekdayTextColors[$i];
                 $weekdayData['weekday_title_' . $i] = $weekdayTitleColors[$i];
             }
+            foreach ($extraColors as $key => $value) {
+                if ($key !== 'past_event_color') $weekdayData[$key] = $value;
+            }
             $encoded = json_encode($weekdayData, JSON_THROW_ON_ERROR);
             $exists = $db->prepare('SELECT region_id FROM region_appearance WHERE region_id = :id LIMIT 1');
             $exists->execute(['id' => $regionId]);
-            $saveValues = ['id' => $regionId, 'colors' => $encoded];
+            $saveValues = ['id' => $regionId, 'colors' => $encoded, 'past_event_color' => $extraColors['past_event_color'], 'logo_path' => null];
             $colorAssignments = [];
             $colorColumns = ['region_id'];
             $colorPlaceholders = [':id'];
@@ -127,7 +153,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $saveValues[$key] = $value;
             }
             if ($exists->fetchColumn()) {
-                $save = $db->prepare('UPDATE region_appearance SET weekday_colors = :colors, ' . implode(', ', $colorAssignments) . ' WHERE region_id = :id');
+                $save = $db->prepare('UPDATE region_appearance SET weekday_colors = :colors, past_event_color = :past_event_color, ' . implode(', ', $colorAssignments) . ' WHERE region_id = :id');
             } else {
                 $save = $db->prepare('INSERT INTO region_appearance (' . implode(', ', array_merge($colorColumns, ['weekday_colors'])) . ') VALUES (' . implode(', ', array_merge($colorPlaceholders, [':colors'])) . ')');
             }
@@ -184,12 +210,32 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                         'footer_color' => 'Footer achtergrond',
                         'background_color' => 'Pagina-achtergrond',
                         'text_color' => 'Algemene tekst',
+                        'past_event_color' => 'Kaartkleur afgelopen evenementen',
+                        'selector_strip_background_color' => 'Achtergrond locatie- en organisatorbalk',
+                        'event_separator_color' => 'Scheidingslijn evenementen',
+                        'past_event_text_color' => 'Tekstkleur afgelopen evenementen',
+                        'event_title_color' => 'Algemene evenementtitel',
+                        'back_top_icon_color' => 'Icoon naar boven',
+                        'search_icon_color' => 'Zoekicoon',
+                        'speaker_icon_color' => 'Geluidicoon',
                     ];
                     ?>
                     <section class="agenda-color-group">
                         <h4>Algemene kleuren</h4>
                         <?php foreach ($regionColorLabels as $key => $label): ?>
                             <label><?= escapeHtml($label) ?><input type="color" name="<?= escapeHtml($key) ?>" value="<?= escapeHtml($regionColors[$key]) ?>"></label>
+                        <?php endforeach; ?>
+                        <?php foreach ([
+                            'past_event_color' => 'Kaartkleur afgelopen evenementen',
+                            'selector_strip_background_color' => 'Achtergrond locatie- en organisatorbalk',
+                            'event_separator_color' => 'Scheidingslijn evenementen',
+                            'past_event_text_color' => 'Tekstkleur afgelopen evenementen',
+                            'event_title_color' => 'Algemene evenementtitel',
+                            'back_top_icon_color' => 'Icoon naar boven',
+                            'search_icon_color' => 'Zoekicoon',
+                            'speaker_icon_color' => 'Geluidicoon',
+                        ] as $key => $label): ?>
+                            <label><?= escapeHtml($label) ?><input type="color" name="<?= escapeHtml($key) ?>" value="<?= escapeHtml($extraColors[$key]) ?>"></label>
                         <?php endforeach; ?>
                     </section>
                     <h3>Weekdagkleuren</h3>
@@ -268,7 +314,11 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
     filter_bar_color:'--db-filter-bar-color',filter_text_color:'--db-filter-text-color',
     search_button_color:'--db-search-button-color',back_top_color:'--db-back-top-color',
     search_field_color:'--db-search-field-color',search_text_color:'--db-search-text-color',
-    footer_color:'--db-footer-color',background_color:'--db-background',text_color:'--db-text'
+    footer_color:'--db-footer-color',background_color:'--db-background',text_color:'--db-text',
+    past_event_color:'--db-past-event-color',selector_strip_background_color:'--db-selector-strip-background',
+    event_separator_color:'--db-event-separator-color',past_event_text_color:'--db-past-event-text-color',
+    event_title_color:'--db-event-title-color',back_top_icon_color:'--db-back-top-icon-color',
+    search_icon_color:'--db-search-icon-color',speaker_icon_color:'--db-speaker-icon-color'
    };
    Object.keys(variables).forEach(key=>{
     const input=form.querySelector('[name="'+key+'"]');
