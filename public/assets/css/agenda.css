@@ -555,9 +555,9 @@
     display:flex;
     align-items:center;
     gap:12px;
-    margin:0;
-    padding-top:0;
-    border-top:none
+    margin:14px 0 0;
+    padding-top:12px;
+    border-top:1px solid rgba(255,255,255,.22)
 }
 .agenda-card__organizer-logo {
     display:block;
@@ -4068,4 +4068,9 @@ body.has-agenda-footer .site-main > .agenda-page {
 .agenda-card__info-block--organizer::after {
     content: none !important;
     display: none !important;
+}
+
+/* Alleen de scheidingslijn verwijderen; bestaande tussenruimte behouden. */
+.agenda-card__organizer {
+    border-top: 0 !important;
 }
