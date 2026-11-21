@@ -14,20 +14,36 @@ $platformAdminPage = true;
 
 // Gebruik dezelfde kleuren als de voorbeeldlijst bij Platforminstellingen.
 $regionListColors = [
+    'primary' => '#0A4D9F',
+    'primary_dark' => '#083B79',
+    'action_button' => '#0A4D9F',
+    'action_button_text' => '#FFFFFF',
+    'action_hover_bg' => '#083B79',
+    'action_hover_text' => '#FFFFFF',
     'list_text' => '#202B38',
     'list_header_bg' => '#F1F3F6',
     'list_header_text' => '#687586',
     'list_row_bg' => '#FFFFFF',
     'list_hover_bg' => '#083B79',
     'list_hover_text' => '#FFFFFF',
-    'action_button' => '#0A4D9F',
-    'action_button_text' => '#FFFFFF',
-    'action_hover_bg' => '#083B79',
-    'action_hover_text' => '#FFFFFF',
     'status_active_bg' => '#EAF7F0',
     'status_active_text' => '#16845B',
     'status_inactive_bg' => '#F0F1F3',
     'status_inactive_text' => '#68717C',
+    'form_panel_bg' => '#F7F8FA',
+    'form_label_text' => '#202B38',
+    'form_input_bg' => '#FFFFFF',
+    'form_input_text' => '#202B38',
+    'form_input_border' => '#E7EAF0',
+    'form_input_hover_border' => '#0A4D9F',
+    'form_button_bg' => '#0A4D9F',
+    'form_button_text' => '#FFFFFF',
+    'form_button_hover_bg' => '#083B79',
+    'form_button_hover_text' => '#FFFFFF',
+    'background' => '#F7F8FA',
+    'surface' => '#FFFFFF',
+    'text' => '#202B38',
+    'muted' => '#687586',
     'border' => '#E7EAF0',
 ];
 $platformColorsFile = DONDEBAILAR_PRIVATE_ROOT . '/storage/platform-admin-colors.json';
@@ -53,70 +69,106 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 
 <style>
-    #regions-admin-table { color: <?= escapeHtml($regionListColors['list_text']) ?>; border-color: <?= escapeHtml($regionListColors['border']) ?>; }
-    #regions-admin-table thead th { background: <?= escapeHtml($regionListColors['list_header_bg']) ?> !important; color: <?= escapeHtml($regionListColors['list_header_text']) ?> !important; border-color: <?= escapeHtml($regionListColors['border']) ?> !important; }
-    #regions-admin-table tbody tr { background: <?= escapeHtml($regionListColors['list_row_bg']) ?> !important; color: <?= escapeHtml($regionListColors['list_text']) ?> !important; }
-    #regions-admin-table tbody tr:hover { background: <?= escapeHtml($regionListColors['list_hover_bg']) ?> !important; color: <?= escapeHtml($regionListColors['list_hover_text']) ?> !important; }
-    #regions-admin-table tbody tr:hover td, #regions-admin-table tbody tr:hover strong { color: <?= escapeHtml($regionListColors['list_hover_text']) ?> !important; }
-    #regions-admin-table .button { background: <?= escapeHtml($regionListColors['action_button']) ?> !important; color: <?= escapeHtml($regionListColors['action_button_text']) ?> !important; border-color: <?= escapeHtml($regionListColors['action_button']) ?> !important; }
-    #regions-admin-table .button:hover { background: <?= escapeHtml($regionListColors['action_hover_bg']) ?> !important; color: <?= escapeHtml($regionListColors['action_hover_text']) ?> !important; border-color: <?= escapeHtml($regionListColors['action_hover_bg']) ?> !important; }
-    #regions-admin-table .status-active { background: <?= escapeHtml($regionListColors['status_active_bg']) ?> !important; color: <?= escapeHtml($regionListColors['status_active_text']) ?> !important; }
-    #regions-admin-table .status-inactive { background: <?= escapeHtml($regionListColors['status_inactive_bg']) ?> !important; color: <?= escapeHtml($regionListColors['status_inactive_text']) ?> !important; }
-    #regions-admin-table td, #regions-admin-table th { border-color: <?= escapeHtml($regionListColors['border']) ?> !important; }
+    /* De volledige regio-overzichtspagina gebruikt de ingestelde platformkleuren. */
+    .regions-admin-page {
+        color: <?= escapeHtml($regionListColors['text']) ?>;
+        background: <?= escapeHtml($regionListColors['background']) ?>;
+    }
+    .regions-admin-page .admin-heading > div > p:last-child,
+    .regions-admin-page .admin-section > p {
+        color: <?= escapeHtml($regionListColors['muted']) ?>;
+    }
+    .regions-admin-page .admin-section {
+        background: <?= escapeHtml($regionListColors['surface']) ?>;
+        border-color: <?= escapeHtml($regionListColors['border']) ?>;
+    }
+    .regions-admin-page .section-heading > h2 {
+        color: <?= escapeHtml($regionListColors['text']) ?>;
+    }
+    .regions-admin-page .section-heading > .button {
+        background: <?= escapeHtml($regionListColors['form_button_bg']) ?> !important;
+        color: <?= escapeHtml($regionListColors['form_button_text']) ?> !important;
+        border: 1px solid <?= escapeHtml($regionListColors['form_button_bg']) ?> !important;
+    }
+    .regions-admin-page .section-heading > .button:hover {
+        background: <?= escapeHtml($regionListColors['form_button_hover_bg']) ?> !important;
+        color: <?= escapeHtml($regionListColors['form_button_hover_text']) ?> !important;
+        border-color: <?= escapeHtml($regionListColors['form_button_hover_bg']) ?> !important;
+    }
+    #regions-admin-table {
+        table-layout: auto;
+        color: <?= escapeHtml($regionListColors['list_text']) ?>;
+        background: <?= escapeHtml($regionListColors['surface']) ?>;
+        border-color: <?= escapeHtml($regionListColors['border']) ?>;
+    }
+    #regions-admin-table thead th {
+        background: <?= escapeHtml($regionListColors['list_header_bg']) ?> !important;
+        color: <?= escapeHtml($regionListColors['list_header_text']) ?> !important;
+        border-color: <?= escapeHtml($regionListColors['border']) ?> !important;
+    }
+    #regions-admin-table tbody tr,
+    #regions-admin-table tbody tr td {
+        background: <?= escapeHtml($regionListColors['list_row_bg']) ?> !important;
+        color: <?= escapeHtml($regionListColors['list_text']) ?> !important;
+    }
+    #regions-admin-table tbody tr:hover,
+    #regions-admin-table tbody tr:hover td,
+    #regions-admin-table tbody tr:hover strong {
+        background: <?= escapeHtml($regionListColors['list_hover_bg']) ?> !important;
+        color: <?= escapeHtml($regionListColors['list_hover_text']) ?> !important;
+    }
+    #regions-admin-table td,
+    #regions-admin-table th {
+        border-color: <?= escapeHtml($regionListColors['border']) ?> !important;
+    }
+    #regions-admin-table .button {
+        background: <?= escapeHtml($regionListColors['action_button']) ?> !important;
+        color: <?= escapeHtml($regionListColors['action_button_text']) ?> !important;
+        border-color: <?= escapeHtml($regionListColors['action_button']) ?> !important;
+    }
+    #regions-admin-table .button:hover {
+        background: <?= escapeHtml($regionListColors['action_hover_bg']) ?> !important;
+        color: <?= escapeHtml($regionListColors['action_hover_text']) ?> !important;
+        border-color: <?= escapeHtml($regionListColors['action_hover_bg']) ?> !important;
+    }
+    #regions-admin-table .status-active {
+        background: <?= escapeHtml($regionListColors['status_active_bg']) ?> !important;
+        color: <?= escapeHtml($regionListColors['status_active_text']) ?> !important;
+    }
+    #regions-admin-table .status-inactive {
+        background: <?= escapeHtml($regionListColors['status_inactive_bg']) ?> !important;
+        color: <?= escapeHtml($regionListColors['status_inactive_text']) ?> !important;
+    }
+    #regions-admin-table .status-active,
+    #regions-admin-table .status-inactive {
+        display: inline-block;
+        padding: 4px 9px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
 
     /* Compacte desktopweergave: meer regio-informatie in beeld met minder witruimte. */
-    .regions-admin-page .admin-heading {
-        margin-bottom: 20px;
-        gap: 12px;
-    }
+    .regions-admin-page .admin-heading { margin-bottom: 20px; gap: 12px; }
     .regions-admin-page .admin-section {
         margin-bottom: 18px;
         padding: 18px;
     }
-    .regions-admin-page .section-heading {
-        margin-bottom: 12px;
-        gap: 10px;
-    }
-    #regions-admin-table {
-        table-layout: auto;
-    }
-    #regions-admin-table th {
-        padding: 9px 11px;
-        font-size: 10px;
-    }
-    #regions-admin-table td {
-        padding: 9px 11px;
-        font-size: 12px;
-        line-height: 1.4;
-    }
-    #regions-admin-table td:last-child {
-        min-width: 225px;
-        white-space: nowrap;
-    }
+    .regions-admin-page .section-heading { margin-bottom: 12px; gap: 10px; }
+    #regions-admin-table th { padding: 9px 11px; font-size: 10px; }
+    #regions-admin-table td { padding: 9px 11px; font-size: 12px; line-height: 1.4; }
+    #regions-admin-table td:last-child { min-width: 225px; white-space: nowrap; }
     #regions-admin-table td:last-child .button,
-    #regions-admin-table td:last-child form {
-        margin: 0 4px 0 0;
-        vertical-align: middle;
-    }
-    #regions-admin-table .button {
-        min-height: 32px;
-        padding: 6px 10px;
-        font-size: 11px;
-    }
+    #regions-admin-table td:last-child form { margin: 0 4px 0 0; vertical-align: middle; }
+    #regions-admin-table .button { min-height: 32px; padding: 6px 10px; font-size: 11px; }
+
     @media (max-width: 760px) {
-        .regions-admin-page .admin-heading {
-            margin-bottom: 16px;
-        }
-        .regions-admin-page .admin-section {
-            padding: 14px;
-        }
-        .regions-admin-page .section-heading {
-            align-items: flex-start;
-        }
+        .regions-admin-page .admin-heading { margin-bottom: 16px; }
+        .regions-admin-page .admin-section { padding: 14px; }
+        .regions-admin-page .section-heading { align-items: flex-start; }
         #regions-admin-table th,
-        #regions-admin-table td {
-            padding: 9px 10px;
-        }
+        #regions-admin-table td { padding: 9px 10px; }
     }
 </style>
 
