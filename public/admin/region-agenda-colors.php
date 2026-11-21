@@ -174,13 +174,13 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 ?>
 <section class="admin-page region-agenda-colors-page">
     <div class="admin-heading">
-        <div><p class="eyebrow">REGIOBEHEER</p><h1>Agendakleuren</h1><p>Stel per weekdag de kleuren van de evenementenkaarten in voor <?= escapeHtml($region['name']) ?>.</p></div>
+        <div><p class="eyebrow">REGIOBEHEER</p><h1>Agendakleuren</h1><p>Pas alle kleuren van de agenda aan voor <?= escapeHtml($region['name']) ?>, inclusief header, menu, filters en evenementenkaarten.</p></div>
         <a class="button" href="/admin/region-colors.php?region_id=<?= (int) $regionId ?>">Terug naar kleuren en logo</a>
     </div>
     <?php if ($errorMessage !== ''): ?><div class="message message--error" role="alert"><?= escapeHtml($errorMessage) ?></div><?php endif; ?>
     <?php if ($successMessage !== ''): ?><div class="message message--success" role="status"><?= escapeHtml($successMessage) ?></div><?php endif; ?>
     <section class="admin-section">
-        <div class="section-heading"><div><h2>Live agenda-voorbeeld</h2><p>Elke kaart toont fictieve evenementgegevens. Pas de kleuren rechts aan en zie onmiddellijk het resultaat.</p></div></div>
+        <div class="section-heading"><div><h2>Live agenda-voorbeeld</h2><p>De volledige agenda van deze regio wordt getoond. Pas rechts de kleuren aan en bekijk direct het resultaat.</p></div></div>
         <form method="post" id="agenda-weekday-colors-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <div class="agenda-fullscreen-editor">
