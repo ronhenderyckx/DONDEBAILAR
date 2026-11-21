@@ -75,6 +75,23 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
     #users-admin-table .button { background: <?= escapeHtml($userListColors['action_button']) ?> !important; color: <?= escapeHtml($userListColors['action_button_text']) ?> !important; border-color: <?= escapeHtml($userListColors['action_button']) ?> !important; }
     #users-admin-table .button:hover { background: <?= escapeHtml($userListColors['action_hover_bg']) ?> !important; color: <?= escapeHtml($userListColors['action_hover_text']) ?> !important; border-color: <?= escapeHtml($userListColors['action_hover_bg']) ?> !important; }
     #users-admin-table td, #users-admin-table th { border-color: <?= escapeHtml($userListColors['border']) ?> !important; }
+
+    /* Compacte en responsieve tabel, gelijk aan het regio-overzicht. */
+    .users-admin-page .admin-heading { margin-bottom: 20px; gap: 12px; }
+    .users-admin-page .admin-section { margin-bottom: 18px; padding: 18px; }
+    .users-admin-page .section-heading { margin-bottom: 12px; gap: 10px; }
+    #users-admin-table { table-layout: auto; }
+    #users-admin-table th { padding: 9px 11px; font-size: 10px; }
+    #users-admin-table td { padding: 9px 11px; font-size: 12px; line-height: 1.4; }
+    #users-admin-table td:last-child { min-width: 100px; white-space: nowrap; }
+    #users-admin-table td:last-child .button { margin: 0 4px 0 0; vertical-align: middle; }
+    #users-admin-table .button { min-height: 32px; padding: 6px 10px; font-size: 11px; }
+    @media (max-width: 760px) {
+        .users-admin-page .admin-heading { margin-bottom: 16px; }
+        .users-admin-page .admin-section { padding: 14px; }
+        .users-admin-page .section-heading { align-items: flex-start; }
+        #users-admin-table th, #users-admin-table td { padding: 9px 10px; }
+    }
 </style>
 
 <section class="admin-page">
