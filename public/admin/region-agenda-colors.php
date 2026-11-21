@@ -210,14 +210,7 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                         'footer_color' => 'Footer achtergrond',
                         'background_color' => 'Pagina-achtergrond',
                         'text_color' => 'Algemene tekst',
-                        'past_event_color' => 'Kaartkleur afgelopen evenementen',
-                        'selector_strip_background_color' => 'Achtergrond locatie- en organisatorbalk',
-                        'event_separator_color' => 'Scheidingslijn evenementen',
-                        'past_event_text_color' => 'Tekstkleur afgelopen evenementen',
-                        'event_title_color' => 'Algemene evenementtitel',
-                        'back_top_icon_color' => 'Icoon naar boven',
-                        'search_icon_color' => 'Zoekicoon',
-                        'speaker_icon_color' => 'Geluidicoon',
+
                     ];
                     ?>
                     <section class="agenda-color-group">
@@ -323,6 +316,15 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
    Object.keys(variables).forEach(key=>{
     const input=form.querySelector('[name="'+key+'"]');
     if(input)root.style.setProperty(variables[key],input.value);
+   });
+   const pastColor=form.querySelector('[name="past_event_color"]')?.value;
+   const pastText=form.querySelector('[name="past_event_text_color"]')?.value;
+   doc.querySelectorAll('.agenda-card--past').forEach(card=>{
+    if(pastColor)card.style.setProperty('--db-event-day-color',pastColor);
+    if(pastText){
+     card.style.setProperty('--db-event-day-text-color',pastText);
+     card.style.setProperty('--db-event-day-title-color',pastText);
+    }
    });
   }catch(error){/* Preview blijft bruikbaar als de browser iframe-toegang beperkt. */}
  }
