@@ -245,12 +245,36 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
     border-color: <?= escapeHtml($platformFormColors['form_button_hover_bg']) ?> !important;
 }
 .admin-page .auth-form p { color: <?= escapeHtml($platformFormColors['form_label_text']) ?>; }
+
+.user-edit-page .admin-heading{margin-bottom:18px;gap:12px}
+.user-edit-page .admin-section{padding:18px;margin-bottom:18px}
+.user-edit-page .auth-form{max-width:none;padding:20px}
+.user-edit-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
+.user-edit-field{min-width:0;display:flex;flex-direction:column;gap:6px}
+.user-edit-field label,.user-edit-region label{margin:0}
+.user-edit-field input,.user-edit-field select,.user-edit-region select{width:100%;min-width:0}
+.user-edit-field p{margin:0;font-size:12px;line-height:1.45}
+.user-edit-regions{margin-top:22px;padding-top:18px;border-top:1px solid <?= escapeHtml($platformFormColors['border']) ?>}
+.user-edit-regions h2{margin:0 0 5px}
+.user-edit-regions>p{margin:0 0 12px}
+.user-edit-region-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.user-edit-region{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,1fr);align-items:center;gap:12px;padding:12px;border:1px solid <?= escapeHtml($platformFormColors['border']) ?>;border-radius:8px;background:<?= escapeHtml($platformFormColors['form_input_bg']) ?>}
+.user-edit-page .form-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:20px}
+.user-edit-page .form-actions>*{display:inline-flex;align-items:center;justify-content:center;min-width:190px;min-height:42px;margin:0;text-align:center}
+@media(max-width:760px){
+ .user-edit-page .admin-section{padding:14px}
+ .user-edit-page .auth-form{padding:14px}
+ .user-edit-fields,.user-edit-region-grid{grid-template-columns:1fr}
+ .user-edit-region{grid-template-columns:minmax(0,1fr) minmax(130px,1fr);gap:8px;padding:10px}
+ .user-edit-page .form-actions{flex-direction:column;align-items:stretch}
+ .user-edit-page .form-actions>*{width:100%;min-width:0}
+}
 </style>
 
 <?php
 ?>
 
-<section class="admin-page">
+<section class="admin-page user-edit-page">
     <div class="admin-heading">
         <div>
             <p class="eyebrow">PLATFORMBEHEER</p>
@@ -273,55 +297,67 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
 
-            <label for="display_name">Naam</label>
-            <input type="text" id="display_name" name="display_name"
-                   maxlength="120" value="<?= escapeHtml($form['display_name']) ?>" required>
-
-            <label for="email">E-mailadres</label>
-            <input type="email" id="email" name="email"
-                   maxlength="190" value="<?= escapeHtml($form['email']) ?>" required>
-
-            <label for="password">Nieuw wachtwoord</label>
-            <input type="password" id="password" name="password"
-                   minlength="12" autocomplete="new-password">
-            <p>Laat dit veld leeg om het huidige wachtwoord te behouden.</p>
-
-            <label for="preferred_language">Voorkeurstaal</label>
-            <select id="preferred_language" name="preferred_language">
-                <option value="nl" <?= $form['preferred_language'] === 'nl' ? 'selected' : '' ?>>Nederlands</option>
-                <option value="en" <?= $form['preferred_language'] === 'en' ? 'selected' : '' ?>>English</option>
-                <option value="es" <?= $form['preferred_language'] === 'es' ? 'selected' : '' ?>>Español</option>
-                <option value="fr" <?= $form['preferred_language'] === 'fr' ? 'selected' : '' ?>>Français</option>
-            </select>
-
-            <label for="platform_role">Platformrol</label>
-            <select id="platform_role" name="platform_role">
-                <option value="user" <?= $form['platform_role'] === 'user' ? 'selected' : '' ?>>Gebruiker</option>
-                <option value="admin" <?= $form['platform_role'] === 'admin' ? 'selected' : '' ?>>Platformbeheerder</option>
-            </select>
-
-            <label for="status">Accountstatus</label>
-            <select id="status" name="status">
-                <option value="active" <?= $form['status'] === 'active' ? 'selected' : '' ?>>Actief</option>
-                <option value="pending_email" <?= $form['status'] === 'pending_email' ? 'selected' : '' ?>>E-mail nog niet bevestigd</option>
-                <option value="suspended" <?= $form['status'] === 'suspended' ? 'selected' : '' ?>>Geblokkeerd</option>
-            </select>
-
-            <h2>Regionale toegangen</h2>
-            <p>Stel per regio de toegangsrechten in.</p>
-
-            <?php foreach ($regions as $region): ?>
-                <?php $rid = (int) $region['id']; ?>
-                <div class="admin-section">
-                    <label><?= escapeHtml($region['name']) ?></label>
-                    <select name="regions[<?= $rid ?>]">
-                        <option value="">Geen toegang</option>
-                        <option value="user" <?= ($regionRoles[$rid] ?? '') === 'user' ? 'selected' : '' ?>>Gewone gebruiker</option>
-                        <option value="editor" <?= ($regionRoles[$rid] ?? '') === 'editor' ? 'selected' : '' ?>>Regioredacteur</option>
-                        <option value="region_admin" <?= ($regionRoles[$rid] ?? '') === 'region_admin' ? 'selected' : '' ?>>Regionale beheerder</option>
+            <div class="user-edit-fields">
+                <div class="user-edit-field">
+                    <label for="display_name">Naam</label>
+                    <input type="text" id="display_name" name="display_name"
+                           maxlength="120" value="<?= escapeHtml($form['display_name']) ?>" required>
+                </div>
+                <div class="user-edit-field">
+                    <label for="email">E-mailadres</label>
+                    <input type="email" id="email" name="email"
+                           maxlength="190" value="<?= escapeHtml($form['email']) ?>" required>
+                </div>
+                <div class="user-edit-field">
+                    <label for="password">Nieuw wachtwoord</label>
+                    <input type="password" id="password" name="password"
+                           minlength="12" autocomplete="new-password">
+                    <p>Laat dit veld leeg om het huidige wachtwoord te behouden.</p>
+                </div>
+                <div class="user-edit-field">
+                    <label for="preferred_language">Voorkeurstaal</label>
+                    <select id="preferred_language" name="preferred_language">
+                        <option value="nl" <?= $form['preferred_language'] === 'nl' ? 'selected' : '' ?>>Nederlands</option>
+                        <option value="en" <?= $form['preferred_language'] === 'en' ? 'selected' : '' ?>>English</option>
+                        <option value="es" <?= $form['preferred_language'] === 'es' ? 'selected' : '' ?>>Español</option>
+                        <option value="fr" <?= $form['preferred_language'] === 'fr' ? 'selected' : '' ?>>Français</option>
                     </select>
                 </div>
-            <?php endforeach; ?>
+                <div class="user-edit-field">
+                    <label for="platform_role">Platformrol</label>
+                    <select id="platform_role" name="platform_role">
+                        <option value="user" <?= $form['platform_role'] === 'user' ? 'selected' : '' ?>>Gebruiker</option>
+                        <option value="admin" <?= $form['platform_role'] === 'admin' ? 'selected' : '' ?>>Platformbeheerder</option>
+                    </select>
+                </div>
+                <div class="user-edit-field">
+                    <label for="status">Accountstatus</label>
+                    <select id="status" name="status">
+                        <option value="active" <?= $form['status'] === 'active' ? 'selected' : '' ?>>Actief</option>
+                        <option value="pending_email" <?= $form['status'] === 'pending_email' ? 'selected' : '' ?>>E-mail nog niet bevestigd</option>
+                        <option value="suspended" <?= $form['status'] === 'suspended' ? 'selected' : '' ?>>Geblokkeerd</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="user-edit-regions">
+                <h2>Regionale toegangen</h2>
+                <p>Stel per regio de toegangsrechten in.</p>
+                <div class="user-edit-region-grid">
+                    <?php foreach ($regions as $region): ?>
+                        <?php $rid = (int) $region['id']; ?>
+                        <div class="user-edit-region">
+                            <label><?= escapeHtml($region['name']) ?></label>
+                            <select name="regions[<?= $rid ?>]">
+                                <option value="">Geen toegang</option>
+                                <option value="user" <?= ($regionRoles[$rid] ?? '') === 'user' ? 'selected' : '' ?>>Gewone gebruiker</option>
+                                <option value="editor" <?= ($regionRoles[$rid] ?? '') === 'editor' ? 'selected' : '' ?>>Regioredacteur</option>
+                                <option value="region_admin" <?= ($regionRoles[$rid] ?? '') === 'region_admin' ? 'selected' : '' ?>>Regionale beheerder</option>
+                            </select>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
 
             <div class="form-actions">
                 <button type="submit" class="button button--primary">Wijzigingen opslaan</button>
