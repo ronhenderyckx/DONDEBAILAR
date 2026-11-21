@@ -100,7 +100,7 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
             <h1>Regiologo</h1>
             <p>Beheer het logo van <?= escapeHtml($region['name']) ?>.</p>
         </div>
-        <a class="button" href="/admin/region-edit.php?id=<?= (int) $regionId ?>">Terug naar regio</a>
+        <a class="button" href="/admin/region-edit.php?id=<?= (int) $regionId ?>">Terug</a>
     </div>
 
     <section class="admin-section">
@@ -140,7 +140,7 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 
             <div class="form-actions">
                 <button type="submit" class="button button--primary">Logo opslaan</button>
-                <a class="button" href="/admin/region-edit.php?id=<?= (int) $regionId ?>">Terug naar regio</a>
+                <a class="button" href="/admin/region-edit.php?id=<?= (int) $regionId ?>">Terug</a>
             </div>
         </form>
     </section>
