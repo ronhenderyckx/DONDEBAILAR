@@ -171,9 +171,9 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 .agenda-weekday-preview-card .agenda-card__placeholder{height:100%;display:flex;align-items:center;justify-content:center}
 .agenda-weekday-preview-card .agenda-card__media-count{position:absolute;right:9px;bottom:8px;z-index:2}
 .agenda-weekday-preview-card .agenda-card__content{position:relative}
-.agenda-weekday-preview-card .agenda-card__quick{display:flex;align-items:center;gap:9px;padding:8px 12px;color:#fff}
-.agenda-weekday-preview-card .agenda-attendance,.agenda-weekday-preview-card .agenda-icon-button{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:34px;min-height:30px;border:0;background:transparent;color:#fff;font-size:16px}
-.agenda-weekday-preview-card .agenda-icon-button{font-size:20px;color:#fff}.agenda-weekday-preview-card .agenda-icon-button:hover{background:#ffffff26;color:#fff}.agenda-weekday-preview-card .agenda-attendance{color:#fff}.agenda-weekday-preview-card .agenda-message-count{color:#fff}
+.agenda-weekday-preview-card .agenda-card__quick{display:flex;align-items:center;gap:9px;padding:8px 12px;background:var(--db-event-day-color);color:var(--db-event-day-text-color)}
+.agenda-weekday-preview-card .agenda-attendance,.agenda-weekday-preview-card .agenda-icon-button{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:34px;min-height:30px;border:0;background:transparent;color:var(--db-event-day-text-color);font-size:16px}
+.agenda-weekday-preview-card .agenda-icon-button{font-size:20px;color:var(--db-event-day-text-color)}.agenda-weekday-preview-card .agenda-icon-button:hover{background:color-mix(in srgb,var(--db-event-day-text-color) 16%,transparent);color:var(--db-event-day-text-color)}.agenda-weekday-preview-card .agenda-attendance{color:var(--db-event-day-text-color)}.agenda-weekday-preview-card .agenda-message-count{color:var(--db-event-day-text-color)}
 .agenda-weekday-preview-card .agenda-preview-switch{float:right;margin:0 0 6px 8px;padding:4px 9px;border:1px solid #cbd2dc;border-radius:5px;background:#f7f8fa;color:#333;font-size:11px}
 .agenda-weekday-preview-card .agenda-card__details h2{clear:both}
 .agenda-weekday-editor-row{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:14px;align-items:stretch;padding:10px;border:1px solid #e1e5eb;border-radius:10px;background:#fff}
@@ -202,7 +202,9 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
    const media=card.querySelector('.agenda-card__media-wrap');
    const placeholder=card.querySelector('.agenda-card__placeholder');
    const details=card.querySelector('.agenda-card__details');
+   const quick=card.querySelector('.agenda-card__quick');
    if(media)media.style.setProperty('background-color',bg,'important');
+   if(quick){quick.style.setProperty('background-color',bg,'important');quick.style.setProperty('color',text,'important');quick.querySelectorAll('.agenda-attendance,.agenda-icon-button,.agenda-message-count').forEach(el=>el.style.setProperty('color',text,'important'));}
    if(placeholder){placeholder.style.setProperty('background-color',bg,'important');placeholder.style.setProperty('color',text,'important')}
    if(details)details.style.setProperty('color',text,'important');
    const heading=details?.querySelector('h2');
