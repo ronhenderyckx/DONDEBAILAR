@@ -4038,9 +4038,16 @@ body.has-agenda-footer .site-main > .agenda-page {
 }
 
 
-/* Verwijder de horizontale onderlijn van het organisatorpaneel.
-   Niet afhankelijk maken van een specifieke header-wrapper: het paneel kan
-   op verschillende pagina-indelingen in een andere wrapper staan. */
-.agenda-selector-panel[data-panel="organizer"] {
-    border-bottom:0!important;
+/* Organisatorstrook: verwijder het kader dat de zichtbare horizontale
+   onderlijn veroorzaakt. De gele achtergrond en de bladerpijl blijven staan. */
+.site-header__agenda-filters .agenda-selector-panel[data-panel="organizer"],
+.site-header__agenda-filters .agenda-selector-panel[data-panel="organizer"]:not([hidden]) {
+    border:0!important;
+    outline:0!important;
+    box-shadow:none!important;
+}
+.site-header__agenda-filters .agenda-selector-panel[data-panel="organizer"] .agenda-organizer-strip {
+    border:0!important;
+    outline:0!important;
+    box-shadow:none!important;
 }
