@@ -179,6 +179,18 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 .agenda-weekday-editor-row{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:14px;align-items:stretch;padding:10px;border:1px solid #e1e5eb;border-radius:10px;background:#fff}
 .agenda-weekday-preview-card{margin:0;min-width:0}
 .agenda-weekday-preview-card .agenda-card__media-wrap,.agenda-weekday-preview-card .agenda-card__placeholder{min-height:118px}
+.agenda-weekday-preview-card .agenda-card__swipe-hint{
+  display:block!important;
+  width:100%;
+  box-sizing:border-box;
+  margin:0!important;
+  padding:4px 12px 10px!important;
+  text-align:left!important;
+  color:var(--db-event-day-text-color)!important;
+  font-size:12px;
+  font-weight:700;
+  line-height:1.4;
+}
 .agenda-weekday-preview-card .agenda-card__details{padding:12px}
 .agenda-weekday-description{margin:6px 0 0;font-size:13px}
 .agenda-weekday-color-controls{display:grid;align-content:center;gap:10px;padding:12px;border:1px solid #e1e5eb;border-radius:8px;background:#f8f9fb}
