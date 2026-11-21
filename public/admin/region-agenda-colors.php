@@ -65,10 +65,10 @@ foreach ($regionColorDefaults as $key => $fallback) {
 $weekdayData = json_decode((string) ($appearance['weekday_colors'] ?? ''), true);
 if (!is_array($weekdayData)) $weekdayData = [];
 $extraColorDefaults = [
-    'past_event_color' => '#777777',
+    'past_event_color' => '#858585',
     'selector_strip_background_color' => '#FFFFFF',
     'event_separator_color' => '#D0D0D0',
-    'past_event_text_color' => '#FFFFFF',
+    'past_event_text_color' => '#404040',
     'event_title_color' => '#222222',
     'back_top_icon_color' => '#FFFFFF',
     'search_icon_color' => '#FFFFFF',
@@ -222,9 +222,9 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                     </section>
                     <section class="agenda-color-group">
                         <h4>Locatie- en organisatorbalk</h4>
-                        <p>Stel de achtergrond, knoppen, tekst en hoverkleur van de balk met locaties en organisatoren afzonderlijk in.</p>
+                        <p>Stel de achtergrondkleur van de horizontale balk met steden en organisatoren afzonderlijk in.</p>
                         <?php foreach ([
-                            'selector_strip_background_color' => 'Achtergrond van de balk',
+                            'selector_strip_background_color' => 'Achtergrondkleur locatie- en organisatorbalk',
                         ] as $key => $label): ?>
                             <label><?= escapeHtml($label) ?><input type="color" name="<?= escapeHtml($key) ?>" value="<?= escapeHtml($extraColors[$key]) ?>"></label>
                         <?php endforeach; ?>
@@ -238,17 +238,31 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                         <?php endforeach; ?>
                     </section>
                     <section class="agenda-color-group">
-                        <h4>Evenementen en iconen</h4>
+                        <h4>Afgelopen evenementen</h4>
+                        <p>Stel de achtergrondkleur van afgelopen evenementenkaarten afzonderlijk in, los van de weekdagkleuren.</p>
                         <?php foreach ([
-                            'past_event_color' => 'Kaartkleur afgelopen evenementen',
-                            'event_separator_color' => 'Scheidingslijn evenementen',
+                            'past_event_color' => 'Achtergrondkleur afgelopen evenementen',
                             'past_event_text_color' => 'Tekstkleur afgelopen evenementen',
-                            'event_title_color' => 'Algemene evenementtitel',
-                            'back_top_icon_color' => 'Icoon naar boven',
-                            'search_icon_color' => 'Zoekicoon',
-                            'speaker_icon_color' => 'Geluidicoon',
                         ] as $key => $label): ?>
                             <label><?= escapeHtml($label) ?><input type="color" name="<?= escapeHtml($key) ?>" value="<?= escapeHtml($extraColors[$key]) ?>"></label>
+                        <?php endforeach; ?>
+                    </section>
+                    <section class="agenda-color-group">
+                        <h4>Scheidingslijn tussen evenementen</h4>
+                        <p>Kies de kleur van de horizontale lijn onder de evenementenkaarten.</p>
+                        <label>Kleur scheidingslijn<input type="color" name="event_separator_color" value="<?= escapeHtml($extraColors['event_separator_color']) ?>"></label>
+                    </section>
+                    <section class="agenda-color-group">
+                        <h4>Footer en footerknoppen</h4>
+                        <?php foreach ([
+                            'footer_color' => 'Achtergrondkleur footer',
+                            'back_top_color' => 'Achtergrondkleur footerknop',
+                            'back_top_icon_color' => 'Icoonkleur footerknop',
+                            'search_button_color' => 'Achtergrondkleur zoekknop',
+                            'search_icon_color' => 'Icoonkleur zoekknop',
+                            'speaker_icon_color' => 'Icoonkleur geluidsknop',
+                        ] as $key => $label): ?>
+                            <label><?= escapeHtml($label) ?><input type="color" name="<?= escapeHtml($key) ?>" value="<?= escapeHtml($key === 'back_top_icon_color' || $key === 'search_icon_color' || $key === 'speaker_icon_color' ? $extraColors[$key] : $regionColors[$key]) ?>"></label>
                         <?php endforeach; ?>
                     </section>
                     <h3>Weekdagkleuren</h3>
