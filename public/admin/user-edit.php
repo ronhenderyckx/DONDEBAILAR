@@ -260,14 +260,16 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 .user-edit-region-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .user-edit-region{display:grid;grid-template-columns:minmax(0,1fr) minmax(180px,1fr);align-items:center;gap:12px;padding:12px;border:1px solid <?= escapeHtml($platformFormColors['border']) ?>;border-radius:8px;background:<?= escapeHtml($platformFormColors['form_input_bg']) ?>}
 .user-edit-page .form-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:20px}
-.user-edit-page .form-actions>*{display:inline-flex;align-items:center;justify-content:center;min-width:190px;min-height:42px;margin:0;text-align:center}
+.user-edit-page .form-actions>button,
+.user-edit-page .form-actions>a{box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;flex:0 0 190px;width:190px;height:44px;min-width:190px;min-height:44px;margin:0 !important;padding:10px 16px;line-height:1.2;text-align:center;white-space:normal}
 @media(max-width:760px){
  .user-edit-page .admin-section{padding:14px}
  .user-edit-page .auth-form{padding:14px}
  .user-edit-fields,.user-edit-region-grid{grid-template-columns:1fr}
  .user-edit-region{grid-template-columns:minmax(0,1fr) minmax(130px,1fr);gap:8px;padding:10px}
- .user-edit-page .form-actions{flex-direction:column;align-items:stretch}
- .user-edit-page .form-actions>*{width:100%;min-width:0}
+ .user-edit-page .form-actions{flex-direction:column;align-items:stretch;gap:10px}
+ .user-edit-page .form-actions>button,
+ .user-edit-page .form-actions>a{flex:0 0 auto;width:100%;min-width:0;height:44px;min-height:44px;margin:0 !important}
 }
 </style>
 
