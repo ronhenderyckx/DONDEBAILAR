@@ -4036,3 +4036,9 @@ body.has-agenda-footer .site-main > .agenda-page {
         opacity:1!important;
     }
 }
+
+
+/* Verwijder uitsluitend het bovenlijntje boven de organisatorstrook. */
+.site-header__agenda-filters .agenda-selector-panel[data-panel="organizer"] {
+    border-top:0!important;
+}
