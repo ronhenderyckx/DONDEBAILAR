@@ -114,21 +114,29 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
         <form method="post" enctype="multipart/form-data" class="auth-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
 
-            <h2>Huidig regiologo</h2>
-            <?php if ($logoPath !== ''): ?>
-                <p><img src="/<?= escapeHtml(ltrim($logoPath, '/')) ?>" alt="Huidig regiologo" class="region-logo-current"></p>
-                <label class="checkbox-label">
-                    <input type="checkbox" name="delete_logo" value="1">
-                    Huidig logo verwijderen
-                </label>
-            <?php else: ?>
-                <p>Er is nog geen regiologo ingesteld.</p>
-            <?php endif; ?>
+            <div class="region-logo-layout">
+                <section class="region-logo-panel">
+                    <h2>Huidig regiologo</h2>
+                    <?php if ($logoPath !== ''): ?>
+                        <div class="region-logo-preview">
+                            <img src="/<?= escapeHtml(ltrim($logoPath, '/')) ?>" alt="Huidig regiologo" class="region-logo-current">
+                        </div>
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="delete_logo" value="1">
+                            Huidig logo verwijderen
+                        </label>
+                    <?php else: ?>
+                        <p>Er is nog geen regiologo ingesteld.</p>
+                    <?php endif; ?>
+                </section>
 
-            <h2>Nieuw regiologo</h2>
-            <p>Upload een PNG-, JPG- of WebP-afbeelding van maximaal 5 MB. Het logo wordt automatisch verkleind.</p>
-            <label for="region_logo">Logo kiezen</label>
-            <input type="file" id="region_logo" name="region_logo" accept="image/png,image/jpeg,image/webp">
+                <section class="region-logo-panel">
+                    <h2>Nieuw regiologo</h2>
+                    <p>Upload een PNG-, JPG- of WebP-afbeelding van maximaal 5 MB. Het logo wordt automatisch verkleind.</p>
+                    <label for="region_logo">Logo kiezen</label>
+                    <input type="file" id="region_logo" name="region_logo" accept="image/png,image/jpeg,image/webp">
+                </section>
+            </div>
 
             <div class="form-actions">
                 <button type="submit" class="button button--primary">Logo opslaan</button>
@@ -139,14 +147,19 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 </section>
 
 <style>
-.region-logo-current{display:block;max-width:220px;max-height:120px;object-fit:contain;margin:12px 0 18px}
-.admin-section .auth-form>h2{margin:24px 0 8px;padding-bottom:10px;border-bottom:1px solid #e5e9ef}
-.admin-section .auth-form>h2:first-of-type{margin-top:8px}
+.region-logo-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:stretch;margin-top:8px}
+.region-logo-panel{min-width:0;padding:20px;border:1px solid #e1e5eb;border-radius:10px;background:#fff}
+.region-logo-panel h2{margin:0 0 12px;padding-bottom:10px;border-bottom:1px solid #e5e9ef}
+.region-logo-preview{display:flex;align-items:center;justify-content:center;min-height:180px;padding:16px;margin:12px 0 18px;border:1px dashed #d5dbe3;border-radius:8px;background:#f8f9fb}
+.region-logo-current{display:block;max-width:100%;max-height:180px;object-fit:contain}
+.region-logo-panel input[type=file]{width:100%;max-width:100%;margin-top:8px}
+.region-logo-layout+.form-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:22px}
+@media(max-width:760px){.region-logo-layout{grid-template-columns:1fr;gap:14px}.region-logo-panel{padding:16px}}
 @media(max-width:560px){
     .admin-heading{align-items:flex-start;gap:12px;flex-direction:column}
     .admin-heading>.button{width:100%;text-align:center}
-    .form-actions{display:flex;flex-direction:column;gap:10px}
-    .form-actions .button{width:100%;text-align:center}
+    .region-logo-layout+.form-actions{display:flex;flex-direction:column;gap:10px}
+    .region-logo-layout+.form-actions .button{width:100%;text-align:center}
 }
 </style>
 <?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
