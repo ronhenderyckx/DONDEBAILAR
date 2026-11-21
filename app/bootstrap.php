@@ -27,6 +27,9 @@ ini_set('log_errors', '1');
 error_reporting(E_ALL);
 
 if (session_status() !== PHP_SESSION_ACTIVE) {
+    // Weiger niet-bestaande of door een aanvaller vooraf gekozen sessie-ID's.
+    ini_set('session.use_strict_mode', '1');
+
     $httpsOnly = (bool) ($config['security']['https_only'] ?? false);
     session_name((string) ($config['security']['session_name'] ?? 'DONDEBAILAR_SESSION'));
     session_set_cookie_params([
