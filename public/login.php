@@ -1,22 +1,8 @@
 <?php
 declare(strict_types=1);
 
-$host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
-$host = preg_replace('/:\\d+$/', '', $host) ?? '';
-$environmentRoots = [
-    'test.dondebailar.eu' => 'DONDEBAILAR-TEST',
-];
-
-if (!isset($environmentRoots[$host])) {
-    http_response_code(404);
-    exit('Inloggen is niet beschikbaar op deze website.');
-}
-
-$privateRoot = dirname(__DIR__) . '/private/' . $environmentRoots[$host];
-if (!is_file($privateRoot . '/app/bootstrap.php')) {
-    http_response_code(503);
-    exit('De private applicatiebestanden zijn niet beschikbaar.');
-}
+require_once __DIR__ . '/_private-root.php';
+$privateRoot = DONDEBAILAR_PRIVATE_ROOT;
 
 require_once $privateRoot . '/app/bootstrap.php';
 require_once $privateRoot . '/app/Authorization.php';
