@@ -198,18 +198,6 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
     root.style.setProperty('--db-weekday-'+(i+1),bg);
     root.style.setProperty('--db-weekday-text-'+(i+1),text);
     root.style.setProperty('--db-weekday-title-'+(i+1),title);
-    doc.querySelectorAll('.agenda-card').forEach(card=>{
-     const date=card.querySelector('.agenda-card__date-line');
-     const match=date?.textContent.match(/(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY|MAANDAG|DINSDAG|WOENSDAG|DONDERDAG|VRIJDAG|ZATERDAG|ZONDAG)/i);
-     if(match){
-      const dayMap={MONDAY:1,TUESDAY:2,WEDNESDAY:3,THURSDAY:4,FRIDAY:5,SATURDAY:6,SUNDAY:7,MAANDAG:1,DINSDAG:2,WOENSDAG:3,DONDERDAG:4,VRIJDAG:5,ZATERDAG:6,ZONDAG:7};
-      if(dayMap[match[0].toUpperCase()]===i+1){
-       card.style.setProperty('--db-event-day-color',bg);
-       card.style.setProperty('--db-event-day-text-color',text);
-       card.style.setProperty('--db-event-day-title-color',title);
-      }
-     }
-    });
    }
   }catch(error){/* Preview blijft bruikbaar als de browser iframe-toegang beperkt. */}
  }
