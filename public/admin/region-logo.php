@@ -153,13 +153,16 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
 .region-logo-preview{display:flex;align-items:center;justify-content:center;min-height:180px;padding:16px;margin:12px 0 18px;border:1px dashed #d5dbe3;border-radius:8px;background:#f8f9fb}
 .region-logo-current{display:block;max-width:100%;max-height:180px;object-fit:contain}
 .region-logo-panel input[type=file]{width:100%;max-width:100%;margin-top:8px}
-.region-logo-layout+.form-actions{display:flex;justify-content:flex-end;gap:12px;margin-top:22px}
+.region-logo-layout+.form-actions{display:flex;justify-content:flex-end;align-items:center;gap:12px;margin-top:22px}
+.region-logo-layout+.form-actions>button,
+.region-logo-layout+.form-actions>a{display:inline-flex;align-items:center;justify-content:center;min-width:190px;min-height:44px;margin:0;text-align:center}
 @media(max-width:760px){.region-logo-layout{grid-template-columns:1fr;gap:14px}.region-logo-panel{padding:16px}}
 @media(max-width:560px){
     .admin-heading{align-items:flex-start;gap:12px;flex-direction:column}
     .admin-heading>.button{width:100%;text-align:center}
-    .region-logo-layout+.form-actions{display:flex;flex-direction:column;gap:10px}
-    .region-logo-layout+.form-actions .button{width:100%;text-align:center}
+    .region-logo-layout+.form-actions{display:flex;flex-direction:column;align-items:stretch;gap:10px}
+    .region-logo-layout+.form-actions>button,
+    .region-logo-layout+.form-actions>a{width:100%;min-width:0;min-height:44px;margin:0;text-align:center}
 }
 </style>
 <?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
