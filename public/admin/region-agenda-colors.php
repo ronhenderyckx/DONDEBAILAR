@@ -123,127 +123,101 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
         <div class="section-heading"><div><h2>Live agenda-voorbeeld</h2><p>Elke kaart toont fictieve evenementgegevens. Pas de kleuren rechts aan en zie onmiddellijk het resultaat.</p></div></div>
         <form method="post" id="agenda-weekday-colors-form">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
-            <div class="agenda-weekday-editor">
-            <?php foreach ($weekdayNames as $i => $day): ?>
-                <div class="agenda-weekday-editor-row">
-                    <article class="agenda-card agenda-weekday-preview-card" data-day-card="<?= $i ?>">
-                        <div class="agenda-card__media-wrap">
-                            <div class="agenda-card__gallery" data-gallery>
-                                <div class="agenda-card__gallery-track"><div class="agenda-card__media-slide"><div class="agenda-card__placeholder" data-day-placeholder="<?= $i ?>"><strong>SALSA · BACHATA · KIZOMBA</strong></div></div></div>
-                                <button type="button" class="agenda-preview-slider-arrow agenda-preview-slider-prev" aria-label="Vorige foto">‹</button>
-                                <button type="button" class="agenda-preview-slider-arrow agenda-preview-slider-next" aria-label="Volgende foto">›</button>
-                                <span class="agenda-card__media-count">1 / 3</span>
-                            </div>
-                        </div>
-                        <div class="agenda-card__content">
-                        <div class="agenda-card__quick">
-                            <button type="button" class="agenda-attendance" aria-label="Ik kom dansen"><span>👠</span><b><?= 5 + $i ?></b></button>
-                            <button type="button" class="agenda-icon-button agenda-share" aria-label="Deel evenement" title="Deel evenement"><svg aria-hidden="true" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"></path></svg></button>
-                            <button type="button" class="agenda-icon-button agenda-location" aria-label="Toon locatie op kaart" title="Toon locatie op kaart"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg></button>
-                            <button type="button" class="agenda-icon-button agenda-messages" aria-label="Berichten van evenement" title="Berichten van evenement"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"></path></svg><b class="agenda-message-count">2</b></button>
-                        </div>
-                        <p class="agenda-card__swipe-hint" data-swipe-hint>→ Swipe voor meer info</p>
-                        <div class="agenda-card__details">
-                            <h2><?= escapeHtml($eventNames[$i]) ?></h2>
-                            <p class="agenda-card__date-line"><?= escapeHtml($weekdayDates[$i]) ?> <span>◷</span> <?= escapeHtml($eventTimes[$i]) ?></p>
-                            <p class="agenda-card__hashtags"><?= escapeHtml($eventTags[$i]) ?></p>
-                        </div>
-                    </article>
-                    <div class="agenda-weekday-color-controls">
-                        <label>Kaartkleur<input type="color" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>"></label>
-                        <label>Tekstkleur<input type="color" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>"></label>
-                        <label>Titelkleur<input type="color" name="weekday_title_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTitleColors[$i]) ?>"></label>
-                    </div>
+            <div class="agenda-fullscreen-editor">
+                <div class="agenda-fullscreen-preview">
+                    <iframe
+                        id="agenda-live-preview"
+                        title="Volledige live agenda Costa Blanca"
+                        src="/?region_id=<?= (int) $regionId ?>"
+                        loading="eager"
+                    ></iframe>
                 </div>
-            <?php endforeach; ?>
+                <aside class="agenda-weekday-color-panel" aria-label="Kleuren per weekdag">
+                    <h3>Kleuren per weekdag</h3>
+                    <p>De volledige agenda wordt links getoond. Wijzig rechts de kleuren en bekijk meteen het resultaat.</p>
+                    <?php foreach ($weekdayNames as $i => $day): ?>
+                        <section class="agenda-weekday-color-group">
+                            <h4><?= escapeHtml($day) ?></h4>
+                            <label>Kaartkleur<input type="color" name="weekday_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayColors[$i]) ?>"></label>
+                            <label>Tekstkleur<input type="color" name="weekday_text_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTextColors[$i]) ?>"></label>
+                            <label>Titelkleur<input type="color" name="weekday_title_colors[<?= $i ?>]" value="<?= escapeHtml($weekdayTitleColors[$i]) ?>"></label>
+                        </section>
+                    <?php endforeach; ?>
+                </aside>
             </div>
             <div class="form-actions"><button class="button button--primary" type="submit">Agendakleuren opslaan</button><a class="button" href="/admin/region-colors.php?region_id=<?= (int) $regionId ?>">Terug</a></div>
         </form>
     </section>
 </section>
 <style>
-.agenda-weekday-editor{display:flex;flex-direction:column;gap:12px}
-.agenda-preview-slider-arrow{position:absolute;z-index:2;top:50%;transform:translateY(-50%);width:30px;height:36px;border:0;border-radius:5px;background:rgba(0,0,0,.58);color:#fff;font-size:25px;line-height:1;cursor:default}
-.agenda-preview-slider-prev{left:8px}.agenda-preview-slider-next{right:8px}
-.agenda-weekday-preview-card .agenda-card__media-wrap{position:relative;overflow:hidden}
-.agenda-weekday-preview-card .agenda-card__gallery{position:relative;width:100%;height:100%;min-height:118px}
-.agenda-weekday-preview-card .agenda-card__gallery-track,.agenda-weekday-preview-card .agenda-card__media-slide{height:100%;min-height:118px}
-.agenda-weekday-preview-card .agenda-card__placeholder{height:100%;display:flex;align-items:center;justify-content:center}
-.agenda-weekday-preview-card .agenda-card__media-count{position:absolute;right:9px;bottom:8px;z-index:2}
-.agenda-weekday-preview-card .agenda-card__content{position:relative}
-.agenda-weekday-preview-card .agenda-card__quick{display:flex;align-items:center;gap:9px;padding:8px 12px;background:var(--db-event-day-color);color:var(--db-event-day-text-color)}
-.agenda-weekday-preview-card .agenda-attendance,.agenda-weekday-preview-card .agenda-icon-button{display:inline-flex;align-items:center;justify-content:center;gap:4px;min-width:34px;min-height:30px;border:0;background:transparent;color:var(--db-event-day-text-color);font-size:16px}
-.agenda-weekday-preview-card .agenda-icon-button,.agenda-weekday-preview-card .agenda-icon-button:hover{font-size:20px;background:var(--db-event-day-color)!important;color:var(--db-event-day-text-color)!important}.agenda-weekday-preview-card .agenda-icon-button svg,.agenda-weekday-preview-card .agenda-icon-button svg *{stroke:var(--db-event-day-text-color)!important;color:var(--db-event-day-text-color)!important}.agenda-weekday-preview-card .agenda-attendance{background:var(--db-event-day-color)!important;color:var(--db-event-day-text-color)}.agenda-weekday-preview-card .agenda-message-count{color:var(--db-event-day-text-color)}
-.agenda-weekday-preview-card .agenda-preview-switch{float:right;margin:0 0 6px 8px;padding:4px 9px;border:1px solid #cbd2dc;border-radius:5px;background:#f7f8fa;color:#333;font-size:11px}
-.agenda-weekday-preview-card .agenda-card__details h2{clear:both}
-.agenda-weekday-editor-row{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:14px;align-items:stretch;padding:10px;border:1px solid #e1e5eb;border-radius:10px;background:#fff}
-.agenda-weekday-preview-card{margin:0;min-width:0}
-.agenda-weekday-preview-card .agenda-card__media-wrap,.agenda-weekday-preview-card .agenda-card__placeholder{min-height:118px}
-/* Houd de voorbeeldkaart los van de complexe grid/flex-volgorde van de echte agenda.
-   De swipe-aanwijzing staat daardoor altijd direct na de iconenbalk. */
-.agenda-weekday-preview-card .agenda-card__content{
-  display:flex!important;
-  flex-direction:column!important;
-  align-items:stretch!important;
+.region-agenda-colors-page{width:100%;max-width:none;margin-left:0;margin-right:0}
+.region-agenda-colors-page>.admin-section{width:100%;max-width:none}
+.region-agenda-colors-page .section-heading{margin-bottom:10px}
+.agenda-fullscreen-editor{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start;width:100%}
+.agenda-fullscreen-preview{min-width:0;width:100%;height:calc(100vh - 245px);min-height:620px;border:1px solid #dce2e9;border-radius:9px;overflow:hidden;background:#fff}
+.agenda-fullscreen-preview iframe{display:block;width:100%;height:100%;border:0;background:#fff}
+.agenda-weekday-color-panel{position:sticky;top:12px;max-height:calc(100vh - 265px);overflow:auto;padding:12px;border:1px solid #e1e5eb;border-radius:9px;background:#f8f9fb}
+.agenda-weekday-color-panel>h3{margin:0 0 5px;font-size:16px}
+.agenda-weekday-color-panel>p{margin:0 0 10px;font-size:12px;line-height:1.4;color:#596273}
+.agenda-weekday-color-group{display:grid;grid-template-columns:minmax(0,1fr) 48px;gap:5px 8px;padding:9px 0;border-top:1px solid #e1e5eb}
+.agenda-weekday-color-group h4{grid-column:1/-1;margin:0;font-size:13px}
+.agenda-weekday-color-group label{display:contents;font-size:11px;font-weight:600;color:#596273}
+.agenda-weekday-color-group input[type=color]{grid-column:2;width:48px;height:29px;padding:2px;border:1px solid #d5dbe3;border-radius:5px;background:#fff;cursor:pointer}
+.agenda-weekday-color-group label{display:grid;grid-template-columns:1fr 48px;grid-column:1/-1;align-items:center;gap:8px}
+.agenda-weekday-color-group label input[type=color]{grid-column:2}
+.region-agenda-colors-page .form-actions{margin-top:12px}
+@media(max-width:900px){
+ .agenda-fullscreen-editor{grid-template-columns:minmax(0,1fr) 250px;gap:9px}
+ .agenda-fullscreen-preview{height:calc(100vh - 230px);min-height:560px}
+ .agenda-weekday-color-panel{max-height:calc(100vh - 250px);padding:9px}
 }
-.agenda-weekday-preview-card .agenda-card__quick{
-  order:1!important;
-  width:100%!important;
-  box-sizing:border-box!important;
-  margin:0!important;
+@media(max-width:680px){
+ .agenda-fullscreen-editor{grid-template-columns:1fr}
+ .agenda-fullscreen-preview{height:72vh;min-height:520px}
+ .agenda-weekday-color-panel{position:static;max-height:none;overflow:visible}
+ .agenda-weekday-color-group{grid-template-columns:repeat(3,minmax(0,1fr))}
+ .agenda-weekday-color-group h4{grid-column:1/-1}
+ .agenda-weekday-color-group label{display:flex;flex-direction:column;align-items:flex-start;gap:4px}
+ .agenda-weekday-color-group input[type=color]{width:100%;height:34px}
 }
-.agenda-weekday-preview-card .agenda-card__swipe-hint{
-  display:block!important;
-  order:2!important;
-  align-self:stretch!important;
-  width:100%!important;
-  box-sizing:border-box!important;
-  margin:0!important;
-  padding:4px 12px 8px!important;
-  text-align:left!important;
-  color:var(--db-event-day-text-color)!important;
-  font-size:12px!important;
-  font-weight:700!important;
-  line-height:1.4!important;
-}
-.agenda-weekday-preview-card .agenda-card__details{
-  order:3!important;
-}
-.agenda-weekday-preview-card .agenda-card__details{padding:12px}
-.agenda-weekday-description{margin:6px 0 0;font-size:13px}
-.agenda-weekday-color-controls{display:grid;align-content:center;gap:10px;padding:12px;border:1px solid #e1e5eb;border-radius:8px;background:#f8f9fb}
-.agenda-weekday-color-controls h3{margin:0 0 3px;font-size:15px}
-.agenda-weekday-color-controls label{display:grid;grid-template-columns:1fr 48px;align-items:center;gap:8px;font-size:12px;font-weight:600;color:#596273}
-.agenda-weekday-color-controls input[type=color]{width:48px;height:34px;padding:2px;border:1px solid #d5dbe3;border-radius:6px;background:#fff;cursor:pointer}
-@media(max-width:600px){.agenda-weekday-editor-row{grid-template-columns:1fr;gap:8px;padding:8px}.agenda-weekday-preview-card .agenda-card__media-wrap,.agenda-weekday-preview-card .agenda-card__placeholder{min-height:90px}.agenda-weekday-color-controls{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px}.agenda-weekday-color-controls h3{grid-column:1/-1}.agenda-weekday-color-controls label{display:flex;flex-direction:column;align-items:flex-start;font-size:10px}.agenda-weekday-color-controls input[type=color]{width:100%;height:32px}}
 </style>
 <script>
 (function(){
- const form=document.getElementById('agenda-weekday-colors-form'); if(!form)return;
- function update(){
-  for(let i=0;i<7;i++){
-   const card=form.querySelector('[data-day-card="'+i+'"]');
-   const bg=form.querySelector('[name="weekday_colors['+i+']"]').value;
-   const text=form.querySelector('[name="weekday_text_colors['+i+']"]').value;
-   const title=form.querySelector('[name="weekday_title_colors['+i+']"]').value;
-   card.style.setProperty('--db-event-day-color',bg);
-   card.style.setProperty('--db-event-day-text-color',text);
-   card.style.setProperty('--db-event-day-title-color',title);
-   const media=card.querySelector('.agenda-card__media-wrap');
-   const placeholder=card.querySelector('.agenda-card__placeholder');
-   const details=card.querySelector('.agenda-card__details');
-   const quick=card.querySelector('.agenda-card__quick');
-   if(media)media.style.setProperty('background-color',bg,'important');
-   if(quick){quick.style.setProperty('background-color',bg,'important');quick.style.setProperty('color',text,'important');quick.querySelectorAll('.agenda-attendance').forEach(el=>{el.style.setProperty('background-color',bg,'important');el.style.setProperty('color',text,'important')});quick.querySelectorAll('.agenda-message-count').forEach(el=>el.style.setProperty('color',text,'important'));quick.querySelectorAll('.agenda-icon-button').forEach(el=>{el.style.setProperty('background-color',bg,'important');el.style.setProperty('color',text,'important');el.querySelectorAll('svg,svg *').forEach(svg=>{svg.style.setProperty('stroke',text,'important');svg.style.setProperty('color',text,'important')})});}
-   if(placeholder){placeholder.style.setProperty('background-color',bg,'important');placeholder.style.setProperty('color',text,'important')}
-   if(details)details.style.setProperty('color',text,'important');
-   const heading=details?.querySelector('h2');
-   if(heading)heading.style.setProperty('color',title,'important');
-   details?.querySelectorAll('.agenda-card__date-line,.agenda-card__hashtags,.agenda-weekday-description').forEach(el=>el.style.setProperty('color',text,'important'));
-  }
+ const form=document.getElementById('agenda-weekday-colors-form');
+ const frame=document.getElementById('agenda-live-preview');
+ if(!form||!frame)return;
+ function applyAgendaColors(){
+  try{
+   const doc=frame.contentDocument;
+   if(!doc||!doc.documentElement)return;
+   const root=doc.documentElement;
+   for(let i=0;i<7;i++){
+    const bg=form.querySelector('[name="weekday_colors['+i+']"]').value;
+    const text=form.querySelector('[name="weekday_text_colors['+i+']"]').value;
+    const title=form.querySelector('[name="weekday_title_colors['+i+']"]').value;
+    root.style.setProperty('--db-weekday-'+(i+1),bg);
+    root.style.setProperty('--db-weekday-text-'+(i+1),text);
+    root.style.setProperty('--db-weekday-title-'+(i+1),title);
+    doc.querySelectorAll('.agenda-card').forEach(card=>{
+     const date=card.querySelector('.agenda-card__date-line');
+     const match=date?.textContent.match(/(MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY|SUNDAY|MAANDAG|DINSDAG|WOENSDAG|DONDERDAG|VRIJDAG|ZATERDAG|ZONDAG)/i);
+     if(match){
+      const dayMap={MONDAY:1,TUESDAY:2,WEDNESDAY:3,THURSDAY:4,FRIDAY:5,SATURDAY:6,SUNDAY:7,MAANDAG:1,DINSDAG:2,WOENSDAG:3,DONDERDAG:4,VRIJDAG:5,ZATERDAG:6,ZONDAG:7};
+      if(dayMap[match[0].toUpperCase()]===i+1){
+       card.style.setProperty('--db-event-day-color',bg);
+       card.style.setProperty('--db-event-day-text-color',text);
+       card.style.setProperty('--db-event-day-title-color',title);
+      }
+     }
+    });
+   }
+  }catch(error){/* Preview blijft bruikbaar als de browser iframe-toegang beperkt. */}
  }
- form.querySelectorAll('input[type=color]').forEach(input=>{input.addEventListener('input',update);input.addEventListener('change',update)});
- update();
+ frame.addEventListener('load',applyAgendaColors);
+ form.querySelectorAll('input[type=color]').forEach(input=>{
+  input.addEventListener('input',applyAgendaColors);
+  input.addEventListener('change',applyAgendaColors);
+ });
 })();
 </script>
 <?php require DONDEBAILAR_PRIVATE_ROOT . '/app/views/footer.php'; ?>
