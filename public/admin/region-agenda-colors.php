@@ -138,9 +138,9 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
                         <div class="agenda-card__content">
                         <div class="agenda-card__quick">
                             <button type="button" class="agenda-attendance" aria-label="Ik kom dansen"><span>👠</span><b><?= 5 + $i ?></b></button>
-                            <button type="button" class="agenda-icon-button" aria-label="Deel evenement">↗</button>
-                            <button type="button" class="agenda-icon-button" aria-label="Toon locatie">⌖</button>
-                            <button type="button" class="agenda-icon-button" aria-label="Berichten">▤ <b class="agenda-message-count">2</b></button>
+                            <button type="button" class="agenda-icon-button agenda-share" aria-label="Deel evenement" title="Deel evenement"><svg aria-hidden="true" viewBox="0 0 24 24" width="21" height="21" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"></circle><circle cx="6" cy="12" r="3"></circle><circle cx="18" cy="19" r="3"></circle><path d="m8.7 10.7 6.6-4.4M8.7 13.3l6.6 4.4"></path></svg></button>
+                            <button type="button" class="agenda-icon-button agenda-location" aria-label="Toon locatie op kaart" title="Toon locatie op kaart"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg></button>
+                            <button type="button" class="agenda-icon-button agenda-messages" aria-label="Berichten van evenement" title="Berichten van evenement"><svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.4 8.4 0 0 1 3.8-.9h.5a8.5 8.5 0 0 1 8 8v.5Z"></path></svg><b class="agenda-message-count">2</b></button>
                         </div>
                         <div class="agenda-card__details">
                             <button type="button" class="agenda-preview-switch" aria-label="Wissel tussen evenement en extra informatie">Meer info ↔</button>
