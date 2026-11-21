@@ -56,7 +56,12 @@ $regionColorDefaults = [
 ];
 $appearanceQuery = $db->prepare('SELECT * FROM region_appearance WHERE region_id = :id LIMIT 1');
 $appearanceQuery->execute(['id' => $regionId]);
-$appearance = $appearanceQuery->fetch() ?: [];\n$regionColors = [];\nforeach ($regionColorDefaults as $key => $fallback) {\n    $candidate = strtoupper((string) ($appearance[$key] ?? $fallback));\n    $regionColors[$key] = preg_match('/^#[0-9A-F]{6}$/', $candidate) ? $candidate : $fallback;\n}
+$appearance = $appearanceQuery->fetch() ?: [];
+$regionColors = [];
+foreach ($regionColorDefaults as $key => $fallback) {
+    $candidate = strtoupper((string) ($appearance[$key] ?? $fallback));
+    $regionColors[$key] = preg_match('/^#[0-9A-F]{6}$/', $candidate) ? $candidate : $fallback;
+}
 $weekdayData = json_decode((string) ($appearance['weekday_colors'] ?? ''), true);
 if (!is_array($weekdayData)) $weekdayData = [];
 $extraColorDefaults = [
@@ -144,8 +149,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $exists->execute(['id' => $regionId]);
             $saveValues = ['id' => $regionId, 'colors' => $encoded, 'past_event_color' => $extraColors['past_event_color'], 'logo_path' => null];
             $colorAssignments = [];
-            $colorColumns = ['region_id'];
-            $colorPlaceholders = [':id'];
+            $colorColumns = ['region_id', 'past_event_color', 'logo_path'];
+            $colorPlaceholders = [':id', ':past_event_color', ':logo_path'];
             foreach ($regionColors as $key => $value) {
                 $colorAssignments[] = $key . ' = :' . $key;
                 $colorColumns[] = $key;
