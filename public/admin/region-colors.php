@@ -483,7 +483,7 @@ if (!$embeddedRegionAppearanceEditor) {
         <form id="region-colors-form" method="post" enctype="multipart/form-data" class="auth-form" action="<?= $embeddedRegionAppearanceEditor ? '/admin/region-edit.php?id=' . (int) $regionId : '/admin/region-colors.php?region_id=' . (int) $regionId ?>">
             <input type="hidden" name="csrf_token" value="<?= escapeHtml(csrfToken()) ?>">
             <?php if ($embeddedRegionAppearanceEditor): ?><input type="hidden" name="save_appearance" value="1"><?php endif; ?>
-            <h2>Basiskleuren</h2>
+            <h2 id="region-colors">Basiskleuren</h2>
             <div class="region-color-grid">
             <?php foreach ([
                 'primary_color' => 'Primaire kleur',
@@ -578,7 +578,7 @@ if (!$embeddedRegionAppearanceEditor) {
             <p>Deze tekst verschijnt op de evenementkaart wanneer er geen afbeelding of video is toegevoegd. De naam van het evenement wordt eronder getoond.</p>
             <label for="event_fallback_text">Tekst voor deze regio (maximaal 100 tekens)</label>
             <input type="text" id="event_fallback_text" name="event_fallback_text" maxlength="100" value="<?= escapeHtml($eventFallbackText) ?>">
-            <h2>Regiologo</h2>
+            <h2 id="region-logo">Regiologo</h2>
             <?php if ($logoPath !== ''): ?>
                 <p><img src="/<?= escapeHtml(ltrim($logoPath, '/')) ?>" alt="Huidig regiologo" style="max-width:220px;max-height:100px;object-fit:contain"></p>
                 <label class="checkbox-label"><input type="checkbox" name="delete_logo" value="1"> Huidig logo verwijderen</label>
