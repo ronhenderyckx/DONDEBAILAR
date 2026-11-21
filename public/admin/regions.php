@@ -127,8 +127,6 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
             <h1>Regio's beheren</h1>
             <p>Beheer de regionale agenda's van DONDEBAILAR.</p>
         </div>
-
-        <a class="button" href="/admin/">Terug naar dashboard</a>
     </div>
 
     <section class="admin-section">
