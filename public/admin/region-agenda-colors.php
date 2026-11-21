@@ -190,7 +190,7 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
   try{
    const doc=frame.contentDocument;
    if(!doc||!doc.documentElement)return;
-   const root=doc.documentElement;
+   const root=doc.body||doc.documentElement;
    for(let i=0;i<7;i++){
     const bg=form.querySelector('[name="weekday_colors['+i+']"]').value;
     const text=form.querySelector('[name="weekday_text_colors['+i+']"]').value;
