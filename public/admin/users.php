@@ -101,7 +101,6 @@ require DONDEBAILAR_PRIVATE_ROOT . '/app/views/header.php';
             <h1>Gebruikers beheren</h1>
             <p>Beheer accounts, platformrechten en regionale toegangen.</p>
         </div>
-        <a class="button" href="/admin/">Terug naar dashboard</a>
     </div>
 
     <?php if (isset($_GET['created'])): ?>
